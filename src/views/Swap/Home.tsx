@@ -37,6 +37,7 @@ import { getSwapOutAmount } from 'utils/swap'
 import { SwapCard as ISwapCard } from './components/types'
 import { tokens } from 'constants/tokens'
 import { useCustomConnection } from 'providers/connection'
+import { useFarmUserAccount } from 'providers/farm'
 
 interface TransactionResult {
   status: boolean | null
@@ -134,6 +135,7 @@ const Home: React.FC = (props) => {
     }
     return null
   }, [destinationAccount, tokenTo])
+  const [farmUser] = useFarmUserAccount()
   const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58())
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol)
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol)
@@ -267,8 +269,8 @@ const Home: React.FC = (props) => {
           swapDirection:
             tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? SWAP_DIRECTION.SellBase : SWAP_DIRECTION.SellQuote,
         },
+        farmUser: farmUser.publicKey,
       })
-
       transaction = await signTransaction(transaction)
 
       const hash = await sendSignedTransaction({ signedTransaction: transaction, connection })
@@ -326,6 +328,7 @@ const Home: React.FC = (props) => {
     connection,
     destinationAccount?.pubkey,
     rewardsAccount?.pubkey,
+    farmUser.publicKey,
     signTransaction,
     destinationBalance,
   ])

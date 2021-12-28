@@ -2,9 +2,11 @@ import { Connection, Keypair, PublicKey, Transaction, SystemProgram } from '@sol
 import BN from 'bn.js'
 
 import {
+  createClaimFarmInstruction,
   createFarmDepositInstruction,
   createFarmWithdrawInstruction,
   createInitFarmUserInstruction,
+  createRefreshFarmInstruction,
   FarmDepositData,
   FarmWithdrawData,
 } from 'lib/instructions/farm'
@@ -13,6 +15,7 @@ import { ExTokenAccount, FarmPoolInfo, MarketConfig } from 'providers/types'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createApproveInstruction } from 'lib/instructions'
 import { mergeTransactions, signTransaction } from '.'
+import { WalletPublicKeyError } from '@solana/wallet-adapter-base'
 
 export async function createFarmUser({
   connection,
@@ -111,6 +114,11 @@ export async function stake({
         SWAP_PROGRAM_ID,
       ),
     )
+    .add(
+      createRefreshFarmInstruction(farmPool.poolAddress, farmPool.publicKey, farmPool.poolMintKey, SWAP_PROGRAM_ID, [
+        farmUser,
+      ]),
+    )
   signers.push(userTransferAuthority)
 
   transaction = mergeTransactions([createFarmUserAccountTransaction, transaction])
@@ -144,15 +152,63 @@ export async function unstake({
   )
 
   let transaction = new Transaction()
+  transaction
+    .add(
+      createFarmWithdrawInstruction(
+        farmPool.publicKey,
+        farmUser,
+        walletPubkey,
+        farmPoolAuthority,
+        farmPool.poolToken,
+        poolTokenAccount.pubkey,
+        unstakeData,
+        SWAP_PROGRAM_ID,
+      ),
+    )
+    .add(
+      createRefreshFarmInstruction(farmPool.poolAddress, farmPool.publicKey, farmPool.poolMintKey, SWAP_PROGRAM_ID, [
+        farmUser,
+      ]),
+    )
+
+  return await signTransaction({ transaction, feePayer: walletPubkey, connection })
+}
+
+export async function claim({
+  connection,
+  config,
+  walletPubkey,
+  farmPool,
+  farmUser,
+  poolTokenAccount,
+}: {
+  connection: Connection
+  config: PublicKey
+  walletPubkey: PublicKey
+  farmPool: FarmPoolInfo
+  farmUser: PublicKey
+  poolTokenAccount: ExTokenAccount
+}) {
+  if (!connection || !walletPubkey || !farmPool || !farmUser || !poolTokenAccount) {
+    return null
+  }
+
+  const nonce = new BN(farmPool.bumpSeed)
+  const farmPoolAuthority = await PublicKey.createProgramAddress(
+    [farmPool.publicKey.toBuffer(), nonce.toArrayLike(Buffer, 'le', 1)],
+    SWAP_PROGRAM_ID,
+  )
+
+  const transaction = new Transaction()
   transaction.add(
-    createFarmWithdrawInstruction(
+    createClaimFarmInstruction(
+      config,
       farmPool.publicKey,
       farmUser,
-      walletPubkey,
-      farmPoolAuthority,
-      farmPool.poolToken,
       poolTokenAccount.pubkey,
-      unstakeData,
+      farmPoolAuthority,
+      walletPubkey,
+      farmPool.poolMintKey,
       SWAP_PROGRAM_ID,
     ),
   )
@@ -160,4 +216,27 @@ export async function unstake({
   return await signTransaction({ transaction, feePayer: walletPubkey, connection })
 }
 
-export async function claim() {}
+export async function refresh({
+  connection,
+  swap,
+  farmPool,
+  poolMint,
+  walletPubkey,
+  farmUser,
+}: {
+  connection: Connection
+  swap: PublicKey
+  farmPool: PublicKey
+  poolMint: PublicKey
+  walletPubkey: PublicKey
+  farmUser: PublicKey
+}) {
+  if (!connection || !farmPool || !poolMint || !walletPubkey || !farmUser) {
+    return null
+  }
+
+  const transaction = new Transaction()
+  transaction.add(createRefreshFarmInstruction(swap, farmPool, poolMint, SWAP_PROGRAM_ID, [farmUser]))
+
+  return await signTransaction({ transaction, feePayer: walletPubkey, connection })
+}
