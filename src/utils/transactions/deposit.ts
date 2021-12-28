@@ -11,7 +11,6 @@ import {
 } from 'lib/instructions'
 import { createTokenAccountTransaction, signTransaction, mergeTransactions } from '.'
 import { SWAP_PROGRAM_ID } from 'constants/index'
-import { createRefreshFarmInstruction } from 'lib/instructions/farm'
 
 export async function deposit({
   connection,
@@ -23,8 +22,6 @@ export async function deposit({
   basePricePythKey,
   quotePricePythKey,
   depositData,
-  farmPool,
-  farmUser,
 }: {
   connection: Connection
   walletPubkey: PublicKey
@@ -35,8 +32,6 @@ export async function deposit({
   basePricePythKey: PublicKey
   quotePricePythKey: PublicKey
   depositData: DepositData
-  farmPool?: PublicKey
-  farmUser?: PublicKey
 }) {
   if (!connection || !walletPubkey || !pool || !baseAccount || !quoteAccount) {
     return null
@@ -90,7 +85,6 @@ export async function deposit({
         SWAP_PROGRAM_ID,
       ),
     )
-    .add(createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [farmUser]))
 
   transaction = mergeTransactions([createAccountTransaction, transaction])
 

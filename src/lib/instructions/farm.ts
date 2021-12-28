@@ -221,23 +221,20 @@ export const createClaimFarmInstruction = (
 export const createRefreshFarmInstruction = (
   swap: PublicKey,
   farmPool: PublicKey,
-  poolMint: PublicKey,
-  programId: PublicKey,
   farmUsers: Array<PublicKey>,
+  programId: PublicKey,
 ) => {
   const keys = [
     { pubkey: swap, isSigner: false, isWritable: false },
     { pubkey: farmPool, isSigner: false, isWritable: false },
-    { pubkey: poolMint, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
-    ...farmUsers.map((farmUser) => ({ pubkey: farmUser, isSigner: false, isWritable: true })),
+    ...farmUsers.map((user) => ({ pubkey: user, isSigner: false, isWritable: true })),
   ]
 
   const dataLayout = struct([u8('instruction')])
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
     {
-      instruction: FarmInstruction.Refresh,
+      instruction: FarmInstruction.Claim,
     },
     data,
   )

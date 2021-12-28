@@ -30,7 +30,7 @@ import { lpTokens } from 'constants/tokens'
 import { useModal } from 'providers/modal'
 import { useConfig } from 'providers/config'
 import { sendSignedTransaction } from 'utils/transactions'
-import { claim, stake, unstake } from 'utils/transactions/farm'
+import { stake, unstake } from 'utils/transactions/stake'
 import { exponentiate, exponentiatedBy } from 'utils/decimal'
 import { SOLSCAN_LINK } from 'constants/index'
 import { useCustomConnection } from 'providers/connection'
@@ -38,7 +38,7 @@ import Slider from './components/Slider'
 
 interface TransactionResult {
   status: boolean | null
-  action?: 'stake' | 'unstake' | 'claim'
+  action?: 'stake' | 'unstake'
   hash?: string
   stake?: ISwapCard
 }
@@ -94,12 +94,7 @@ const Stake = (): ReactElement => {
     }
     return new BigNumber(0)
   }, [position, lpMint])
-  const unclaimedReward = useMemo(() => {
-    if (position && lpMint) {
-      return exponentiatedBy(position.rewardEstimated, lpMint.decimals)
-    }
-    return new BigNumber(0)
-  }, [position, lpMint])
+
   const poolRate = useMemo(() => {
     if (farmPool && totalStaked) {
       const apr = new BigNumber(farmPool.aprNumerator.toString())
@@ -212,35 +207,9 @@ const Stake = (): ReactElement => {
     position,
   ])
 
-  const handleClaim = useCallback(async () => {
-    if (!connection || !farmPool || !walletPubkey || !lpMint || !lpToken) {
-      return null
-    }
-
-    try {
-      const transaction = await claim({
-        connection,
-        config: config.publicKey,
-        walletPubkey,
-        farmPool,
-        farmUser: farmUser.publicKey,
-        poolTokenAccount: lpToken,
-      })
-      const signedTransaction = await signTransaction(transaction)
-      const hash = await sendSignedTransaction({
-        signedTransaction,
-        connection,
-      })
-
-      setTransactionResult({
-        status: true,
-        action: 'claim',
-        hash,
-      })
-    } catch (e) {
-      setTransactionResult({ status: false })
-    }
-  }, [config, connection, farmPool, farmUser, lpMint, lpToken, signTransaction, walletPubkey])
+  const handleClaim = () => {
+    // TODO: claim
+  }
 
   const handleSnackBarClose = useCallback(() => {
     setState((state) => ({ ...state, open: false }))
@@ -370,7 +339,7 @@ const Stake = (): ReactElement => {
             <ConnectButton
               variant="contained"
               onClick={handleClaim}
-              disabled={!unclaimedReward.gt(0)}
+              disabled={!position?.rewardDebt.gt(0)}
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
               data-amp-analytics-attrs="page: Farms, target: Claim"
@@ -379,7 +348,7 @@ const Stake = (): ReactElement => {
             </ConnectButton>
           </Box>
           <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>{unclaimedReward.toString()}</Typography>
+            <Typography className={classes.amount}>{position?.rewardDebt.toString() || 0}</Typography>
             <Typography className={classes.amount}>0 / Day</Typography>
           </Box>
         </Box>

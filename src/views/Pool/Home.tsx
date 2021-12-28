@@ -53,6 +53,7 @@ const Home: React.FC = () => {
         const baseSymbol = `${!isMainnet ? 'Crypto.' : ''}${c.baseTokenInfo.symbol.toUpperCase()}/USD`
         const quoteSymbol = `${!isMainnet ? 'Crypto.' : ''}${c.quoteTokenInfo.symbol.toUpperCase()}/USD`
         let volumn = new BigNumber(0)
+        console.log(baseSymbol)
         if (symbolMap[baseSymbol] && symbolMap[quoteSymbol]) {
           const basePrice = ((symbolMap[baseSymbol] as any).price as PriceData).price
             ? ((symbolMap[baseSymbol] as any).price as PriceData).price

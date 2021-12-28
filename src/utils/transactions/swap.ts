@@ -5,7 +5,6 @@ import { createApproveInstruction, createSwapInstruction, SwapData, SWAP_DIRECTI
 import { ExTokenAccount, MarketConfig, PoolInfo } from 'providers/types'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
-import { createRefreshFarmInstruction } from 'lib/instructions/farm'
 
 export async function swap({
   connection,
@@ -16,7 +15,6 @@ export async function swap({
   destinationRef,
   rewardTokenRef,
   swapData,
-  farmUser,
 }: {
   connection: Connection
   walletPubkey: PublicKey
@@ -26,7 +24,6 @@ export async function swap({
   destinationRef?: PublicKey
   rewardTokenRef?: PublicKey
   swapData: SwapData
-  farmUser?: PublicKey
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
     return null
@@ -99,7 +96,6 @@ export async function swap({
         SWAP_PROGRAM_ID,
       ),
     )
-    .add(createRefreshFarmInstruction(pool.publicKey, pool.publicKey, pool.poolMintKey, SWAP_PROGRAM_ID, [farmUser]))
 
   transaction = mergeTransactions([createDestinationAccountTransaction, createRewardAccountTransaction, transaction])
 
