@@ -12,6 +12,7 @@ import {
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { TokenInfo } from 'constants/tokens'
+import { createRefreshFarmInstruction } from 'lib/instructions/farm'
 
 export async function withdraw({
   connection,
@@ -23,6 +24,8 @@ export async function withdraw({
   basePricePythKey,
   quotePricePythKey,
   withdrawData,
+  farmPool,
+  farmUser,
 }: {
   connection: Connection
   walletPubkey: PublicKey
@@ -33,6 +36,8 @@ export async function withdraw({
   basePricePythKey: PublicKey
   quotePricePythKey: PublicKey
   withdrawData: WithdrawData
+  farmPool?: PublicKey
+  farmUser?: PublicKey
 }) {
   if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
     return null
@@ -94,6 +99,7 @@ export async function withdraw({
         SWAP_PROGRAM_ID,
       ),
     )
+    .add(createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [farmUser]))
 
   transaction = mergeTransactions([createBaseTokenTransaction, createQuoteTokenTransaction, transaction])
 

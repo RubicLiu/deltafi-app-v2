@@ -133,6 +133,7 @@ export interface FarmPoolInfo {
   name: string
   publicKey: PublicKey
   bumpSeed: number
+  poolAddress: PublicKey
   poolMintKey: PublicKey
   poolToken: PublicKey
   baseTokenInfo: TokenInfo

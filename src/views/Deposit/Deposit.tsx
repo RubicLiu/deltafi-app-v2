@@ -40,6 +40,7 @@ import { deposit, withdraw, sendSignedTransaction } from 'utils/transactions'
 import { convertDoller, formatPubkey } from 'utils/utils'
 import { SOLSCAN_LINK } from 'constants/index'
 import { useCustomConnection } from 'providers/connection'
+import { useFarmByPoolAddress, useFarmUserAccount } from 'providers/farm'
 
 interface TransactionResult {
   status: boolean | null
@@ -235,6 +236,8 @@ const Deposit: React.FC = () => {
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58())
   const baseTokenAccount = useTokenFromMint(pool?.baseTokenInfo.address)
   const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address)
+  const [farmUser] = useFarmUserAccount()
+  const farmPool = useFarmByPoolAddress(poolAddress)
   const poolMint = useTokenMintAccount(pool?.poolMintKey)
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol)
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol)
@@ -342,6 +345,8 @@ const Deposit: React.FC = () => {
             amountTokenB: BigInt(exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString()),
             amountMintMin: BigInt(0),
           },
+          farmPool: farmPool.publicKey,
+          farmUser: farmUser.publicKey,
         })
       } else {
         return null
@@ -377,8 +382,10 @@ const Deposit: React.FC = () => {
     quoteTokenAccount,
     base,
     quote,
-    poolTokenAccount,
     signTransaction,
+    poolTokenAccount?.pubkey,
+    farmPool,
+    farmUser,
   ])
 
   const handleWithdraw = useCallback(async () => {
@@ -413,6 +420,8 @@ const Deposit: React.FC = () => {
             minAmountTokenA: BigInt(exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString()),
             minAmountTokenB: BigInt(exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString()),
           },
+          farmPool: farmPool.publicKey,
+          farmUser: farmUser.publicKey,
         })
       } else {
         return null
@@ -444,15 +453,17 @@ const Deposit: React.FC = () => {
     connection,
     pool,
     walletPubkey,
-    baseTokenAccount,
-    quoteTokenAccount,
+    poolTokenAccount,
+    state,
     base,
     quote,
-    poolTokenAccount,
-    withdrawPercentage,
-    priceImpact,
-    state,
     signTransaction,
+    priceImpact,
+    baseTokenAccount?.pubkey,
+    quoteTokenAccount?.pubkey,
+    withdrawPercentage,
+    farmPool,
+    farmUser,
   ])
 
   const handleSnackBarClose = useCallback(() => {

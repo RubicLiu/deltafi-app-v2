@@ -51,6 +51,7 @@ export function FarmPoolsProvider({ children }) {
               name: schema.name,
               publicKey: new PublicKey(key),
               bumpSeed: data.bumpSeed,
+              poolAddress: schema.poolAddress,
               poolMintKey: data.poolMint,
               poolToken: data.poolToken,
               baseTokenInfo: getTokenInfo(schema.base),
@@ -67,6 +68,7 @@ export function FarmPoolsProvider({ children }) {
                   name: schema.name,
                   publicKey: new PublicKey(key),
                   bumpSeed: data.bumpSeed,
+                  poolAddress: schema.poolAddress,
                   poolMintKey: data.poolMint,
                   poolToken: data.poolToken,
                   baseTokenInfo: getTokenInfo(schema.base),
@@ -109,6 +111,12 @@ export function useFarmPoolByAddress(address: string | null | undefined) {
   if (address && pools) {
     return pools.find((pool) => pool.publicKey.toBase58() === address)
   }
+}
+
+export function useFarmByPoolAddress(poolAddress: string | null | undefined) {
+  const { pools, schemas } = useFarmPools()
+  const schema = schemas.find((schema) => schema.poolAddress.toBase58() === poolAddress)
+  if (schema && pools) return pools.find((pool) => pool.publicKey.equals(schema.address))
 }
 
 async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) {
