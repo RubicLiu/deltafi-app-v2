@@ -426,7 +426,7 @@ const Stake = (): ReactElement => {
                 handleChangeCard={setStaking}
                 tokens={lpTokens}
                 disableDrop
-                // percentage={percentage}
+                percentage={percentage}
               />
             </Box>
             <SettingsPanel
