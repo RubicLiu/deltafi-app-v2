@@ -95,9 +95,7 @@ const Header: React.FC = (props) => {
             data-amp-analytics-name="click"
             data-amp-analytics-attrs="page: Header, target: Logo"
           >
-            <Typography color="primary" variant="h4">
-              DeltaFi
-            </Typography>
+            <img src="/horizontal 60.svg"/>
           </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
