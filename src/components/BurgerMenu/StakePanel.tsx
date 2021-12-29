@@ -214,7 +214,7 @@ const StakePanel: React.FC = (props) => {
                 Pool Rate
               </Text>
               <Text fontFamily="'Inter', sans-serif" className="deposit-share">
-                240,000 DFI / day
+                240,000 DLT / day
               </Text>
             </FlexColumnWrapper>
           </FlexWrapper>
@@ -229,13 +229,13 @@ const StakePanel: React.FC = (props) => {
                   0
                 </Text>
                 <Text color="#FFFFFF" small>
-                  USDT - USDC Delta LT
+                  USDT - USDC DLT
                 </Text>
               </FlexWrapper>
             </LiquidItemDiv>
             <LiquidItemDiv isDark={isDark}>
               <Text small fontFamily="'Inter', sans-serif" className="liquid-title">
-                Your unclaimed DFI
+                Your unclaimed DLT
               </Text>
               <FlexWrapper className="space-between">
                 <Text fontSize="24px">0</Text>

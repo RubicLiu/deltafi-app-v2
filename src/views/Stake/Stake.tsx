@@ -325,7 +325,7 @@ const Stake = (): ReactElement => {
           </Box>
           <Box>
             <Typography>Pool Rate</Typography>
-            <Typography>{poolRate} DFI / day</Typography>
+            <Typography>{poolRate} DLT / day</Typography>
           </Box>
         </Box>
 
@@ -360,7 +360,7 @@ const Stake = (): ReactElement => {
           <Typography className={classes.title}>Your Liquidity Staked</Typography>
           <Box className={classes.cardBottom}>
             <Typography className={classes.amount}>{depositAmount.toString()}</Typography>
-            <Typography className={classes.amount}>{farmPool.name} Delta LT</Typography>
+            <Typography className={classes.amount}>{farmPool.name} DLT</Typography>
           </Box>
         </Box>
         <Box className={classes.unclaimedToken}>
