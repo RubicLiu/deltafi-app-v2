@@ -13,6 +13,8 @@ export class PMM implements PoolState {
   quoteTarget = new BN(0)
   totalSupply = new BN(0)
   multiplier = Multiplier.One
+  lastPythPrice = new BN(0)
+  lastValidPythPriceSlot = new BN(0)
 
   constructor(state: PoolState) {
     this.marketPrice = new BN(state.marketPrice)
@@ -22,6 +24,8 @@ export class PMM implements PoolState {
     this.baseTarget = new BN(state.baseTarget)
     this.quoteTarget = new BN(state.quoteTarget)
     this.totalSupply = new BN(state.totalSupply)
+    this.lastPythPrice = new BN(state.lastPythPrice)
+    this.lastValidPythPriceSlot = new BN(state.lastValidPythPriceSlot)
     this.multiplier = state.multiplier
 
     this.adjustTarget()

@@ -22,6 +22,8 @@ export interface PoolState {
   quoteTarget: BigNumber
   totalSupply: BigNumber
   multiplier: Multiplier
+  lastPythPrice: BigNumber
+  lastValidPythPriceSlot: BigNumber
 }
 
 /** @internal */
@@ -36,6 +38,8 @@ export const PoolStateLayout = (property: string) =>
       decimal('quoteTarget'),
       u64('totalSupply'),
       u8('multiplier'),
+      decimal('lastPythPrice'),
+      u64('lastValidPythPriceSlot'),
     ],
     property,
   )

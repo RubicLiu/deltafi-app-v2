@@ -1,8 +1,7 @@
 import { AccountInfo, PublicKey, Connection } from '@solana/web3.js'
 import { struct, u8 } from 'buffer-layout'
-import BigNumber from 'bignumber.js'
 
-import { AccountParser, bool, decimal, publicKey, u64 } from 'utils/layout'
+import { AccountParser, bool, publicKey } from 'utils/layout'
 import { loadAccount } from 'utils/account'
 
 import { Fees, FeesLayout } from './fees'
@@ -34,10 +33,6 @@ export interface SwapInfo {
   fees: Fees
   rewards: Rewards
   poolState: PoolState
-  isOpenTwap: boolean
-  blockTimestampLast: bigint
-  cumulativeTicks: bigint
-  basePriceCumulativeLast: BigNumber
 }
 
 /** @internal */
@@ -60,10 +55,6 @@ export const SwapInfoLayout = struct<SwapInfo>(
     FeesLayout('fees'),
     RewardsLayout('rewards'),
     PoolStateLayout('poolState'),
-    u8('isOpenTwap'),
-    u64('blockTimestampLast'),
-    u64('cumulativeTicks'),
-    decimal('basePriceCumulativeLast'),
   ],
   'swapInfo',
 )

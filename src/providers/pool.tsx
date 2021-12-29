@@ -60,8 +60,6 @@ export function EntirePoolsProvider({ children }) {
               fees: data.fees,
               rewards: data.rewards,
               poolState: data.poolState,
-              isOpenTwap: data.isOpenTwap,
-              blockTimeStamp: data.blockTimestampLast,
             })
 
             subscription_ids.push(
@@ -84,7 +82,6 @@ export function EntirePoolsProvider({ children }) {
                   fees: data.fees,
                   rewards: data.rewards,
                   poolState: data.poolState,
-                  isOpenTwap: data.isOpenTwap,
                 })
               }),
             )

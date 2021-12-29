@@ -9,8 +9,8 @@ export interface FarmPoolSchema extends PoolSchema {
 export const farmPools: FarmPoolSchema[] = [
   {
     name: 'SOL - SRM',
-    address: new PublicKey('GUG8pqps3JWNMFFSPNphsMPKoP2proLuhn7mnyqjHEvv'),
-    poolAddress: new PublicKey('4Vq3b8KV6mnL8egijJ4SV9fQxzQivRuTHAs1dmTfhVDH'),
+    address: new PublicKey('B2zhczNpXGqrnxyZ7CqpjhLXGngC9Pm6W9RwUxQmTf7y'),
+    poolAddress: new PublicKey('C8HGj5NADAi12G2jwTc1Gzwyfm1ncCMv22um3Whqtuu8'),
     base: 'SOL',
     quote: 'SRM',
   },

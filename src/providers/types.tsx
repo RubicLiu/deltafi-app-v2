@@ -104,7 +104,6 @@ export interface PoolInfo {
   fees: Fees
   rewards: Rewards
   poolState: PoolState
-  isOpenTwap: boolean
 }
 
 export interface PoolContextValues {

@@ -119,7 +119,6 @@ const Stake = (): ReactElement => {
     if (!connection || !farmPool || !walletPubkey || !lpMint || !lpToken) {
       return null
     }
-
     if (method === 'stake') {
       if (staking.amount === '' || new BigNumber(lpToken.account.amount).lt(staking.amount)) {
         return null

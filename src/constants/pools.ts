@@ -10,7 +10,7 @@ export interface PoolSchema {
 export const pools: PoolSchema[] = [
   {
     name: 'SOL-SRM',
-    address: new PublicKey('4Vq3b8KV6mnL8egijJ4SV9fQxzQivRuTHAs1dmTfhVDH'),
+    address: new PublicKey('C8HGj5NADAi12G2jwTc1Gzwyfm1ncCMv22um3Whqtuu8'),
     base: 'SOL',
     quote: 'SRM',
   },

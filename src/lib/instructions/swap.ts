@@ -18,14 +18,10 @@ export interface InitializeData {
   nonce: number
   slope: number | bigint
   midPrice: BigNumber
-  isOpenTwap: boolean
 }
 
 /** @internal */
-export const InitializeDataLayout = struct<InitializeData>(
-  [u8('nonce'), u64('slop'), decimal('midPrice'), u8('isOpenTwap')],
-  'initData',
-)
+export const InitializeDataLayout = struct<InitializeData>([u8('nonce'), u64('slop'), decimal('midPrice')], 'initData')
 
 export const createInitSwapInstruction = (
   config: PublicKey,
