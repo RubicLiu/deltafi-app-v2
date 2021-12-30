@@ -96,7 +96,7 @@ const Stake = (): ReactElement => {
   }, [position, lpMint])
   const unclaimedReward = useMemo(() => {
     if (position && lpMint) {
-      return exponentiatedBy(position.rewardEstimated, lpMint.decimals)
+      return exponentiatedBy(position.rewardDebt, lpMint.decimals)
     }
     return new BigNumber(0)
   }, [position, lpMint])
