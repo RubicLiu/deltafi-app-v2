@@ -28,7 +28,7 @@ const PageLoader: React.FC = (props) => {
   return (
     <Box className={classes.root}>
       <Box className={classes.logo}>
-        <LogoIcon width={128} height={128} />
+        <img src="/images/logomark 200.svg" width={128} height={128} className={classes.logo} />
       </Box>
     </Box>
   )
