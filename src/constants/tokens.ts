@@ -33,7 +33,7 @@ export const tokens: TokenInfo[] = [
 export const lpTokens: TokenInfo[] = [
   {
     chainId: 101,
-    address: '3RJW7yq6Ty1SDGrn9ek2PhSYLcXuCMjRxqYBhR7Rkn8Y',
+    address: '5ZE4QgqSWf7YSaCapkN9JpMer1xFrVSMjbmb9bJHAwdm',
     symbol: 'SOL-SRM',
     name: 'LP SOL-SRM',
     decimals: 9,
