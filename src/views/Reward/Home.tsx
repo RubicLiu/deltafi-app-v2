@@ -186,7 +186,7 @@ const Home: React.FC = (props) => {
           <>
             <Box className={classes.inviteComponentMargin}>
               <Typography variant="h5" color="primary" align="center" paragraph>
-                Send Invitations
+                Send Invitations (Mock link for now. Real referral link coming soon...)
               </Typography>
 
               <Paper className={classes.sharePannel}>
@@ -267,7 +267,7 @@ const Home: React.FC = (props) => {
             {/* My Rewards */}
             <Box className={classes.mainComponentMargin}>
               <Typography variant="h5" color="primary" align="center" paragraph>
-                My Rewards
+                My Rewards (Mock data only now. Real date coming soon...)
               </Typography>
               {myRewards.map((item, index) => (
                 <MyReward detail={item} key={index} />
