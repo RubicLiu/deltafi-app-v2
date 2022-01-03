@@ -1,7 +1,8 @@
 import { struct } from 'buffer-layout'
-import { u64 } from 'utils/layout'
+import { bool, u64 } from 'utils/layout'
 
 export interface Fees {
+  isInitialized: boolean
   adminTradeFeeNumerator: bigint
   adminTradeFeeDenominator: bigint
   adminWithdrawFeeNumerator: bigint
@@ -16,6 +17,7 @@ export interface Fees {
 export const FeesLayout = (property = 'fees') =>
   struct<Fees>(
     [
+      bool('isInitialized'),
       u64('adminTradeFeeNumerator'),
       u64('adminTradeFeeDenominator'),
       u64('adminWithdrawFeeNumerator'),
