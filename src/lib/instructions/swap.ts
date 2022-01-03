@@ -9,9 +9,7 @@ export enum SwapInstruction {
   Initialize = 0,
   Swap,
   Deposit,
-  DepositOne,
   Withdraw,
-  WithdrawOne,
 }
 
 export interface InitializeData {
@@ -206,58 +204,6 @@ export const createDepositInstruction = (
   })
 }
 
-export interface DepositOneData {
-  tokenAmount: bigint
-  minMintAmount: bigint
-}
-
-/** @internal */
-export const DepositOneDataLayout = struct<DepositOneData>([u64('tokenAmount'), u64('minMintAmount')], 'depositOneData')
-
-export const createDepositOneInstruction = (
-  tokenSwap: PublicKey,
-  authority: PublicKey,
-  userTransferAuthority: PublicKey,
-  source: PublicKey,
-  swapSource: PublicKey,
-  poolMint: PublicKey,
-  destination: PublicKey,
-  pythA: PublicKey,
-  pythB: PublicKey,
-  depositData: DepositOneData,
-  programId: PublicKey,
-) => {
-  const keys = [
-    { pubkey: tokenSwap, isSigner: false, isWritable: true },
-    { pubkey: authority, isSigner: false, isWritable: false },
-    { pubkey: userTransferAuthority, isSigner: true, isWritable: false },
-    { pubkey: source, isSigner: false, isWritable: true },
-    { pubkey: swapSource, isSigner: false, isWritable: true },
-    { pubkey: poolMint, isSigner: false, isWritable: true },
-    { pubkey: destination, isSigner: false, isWritable: true },
-    { pubkey: pythA, isSigner: false, isWritable: false },
-    { pubkey: pythB, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
-
-  const dataLayout = struct([u8('instruction'), DepositOneDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode(
-    {
-      instruction: SwapInstruction.DepositOne,
-      depositData,
-    },
-    data,
-  )
-
-  return new TransactionInstruction({
-    keys,
-    programId,
-    data,
-  })
-}
-
 export interface WithdrawData {
   amountPoolToken: bigint
   minAmountTokenA: bigint
@@ -310,63 +256,6 @@ export const createWithdrawInstruction = (
   dataLayout.encode(
     {
       instruction: SwapInstruction.Withdraw,
-      withdrawData,
-    },
-    data,
-  )
-
-  return new TransactionInstruction({
-    keys,
-    programId,
-    data,
-  })
-}
-
-export interface WithdrawOneData {
-  amountPoolToken: bigint
-  minTokenAmount: bigint
-}
-
-/** @internal */
-export const WithdrawOneDataLayout = struct<WithdrawOneData>(
-  [u64('amountPoolToken'), u64('minTokenAmount')],
-  'withdrawOneData',
-)
-
-export const createWithdrawOneInstruction = (
-  tokenSwap: PublicKey,
-  authority: PublicKey,
-  userTransferAuthority: PublicKey,
-  source: PublicKey,
-  poolMint: PublicKey,
-  swapDestination: PublicKey,
-  destination: PublicKey,
-  adminFeeDestination: PublicKey,
-  pythA: PublicKey,
-  pythB: PublicKey,
-  withdrawData: WithdrawOneData,
-  programId: PublicKey,
-) => {
-  const keys = [
-    { pubkey: tokenSwap, isSigner: false, isWritable: true },
-    { pubkey: authority, isSigner: false, isWritable: false },
-    { pubkey: userTransferAuthority, isSigner: true, isWritable: false },
-    { pubkey: poolMint, isSigner: false, isWritable: true },
-    { pubkey: source, isSigner: false, isWritable: true },
-    { pubkey: swapDestination, isSigner: false, isWritable: true },
-    { pubkey: destination, isSigner: false, isWritable: true },
-    { pubkey: adminFeeDestination, isSigner: false, isWritable: true },
-    { pubkey: pythA, isSigner: false, isWritable: false },
-    { pubkey: pythB, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
-
-  const dataLayout = struct([u8('instruction'), WithdrawOneDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode(
-    {
-      instruction: SwapInstruction.WithdrawOne,
       withdrawData,
     },
     data,
