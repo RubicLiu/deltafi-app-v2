@@ -109,5 +109,5 @@ export async function deposit({
 
   transaction = mergeTransactions([createAccountTransaction, transaction])
 
-  return await signTransaction({ transaction, feePayer: walletPubkey, signers: [userTransferAuthority], connection })
+  return await signTransaction({ transaction, feePayer: walletPubkey, signers, connection })
 }
