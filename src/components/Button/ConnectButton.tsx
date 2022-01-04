@@ -12,15 +12,13 @@ const useStyles = makeStyles(({ breakpoints, spacing, palette }: Theme) => ({
     boxShadow: `2px 1000px 1px ${palette.background.primary} inset`,
     fontSize: 14,
     fontWeight: 500,
+    textTransform: 'capitalize',
     '&:hover': {
       boxShadow: 'none',
       border: 'solid 1px transparent',
     },
     '&.Mui-disabled': {
-      border: 0,
-      color: '#FFFFFF',
-      fontWeight: 600,
-      backgroundColor: '#88809C',
+      color: '#88809C',
     },
     [breakpoints.up('sm')]: {
       fontSize: 18,
@@ -55,12 +53,8 @@ const useStyles = makeStyles(({ breakpoints, spacing, palette }: Theme) => ({
     },
   },
   buttonDisabled: {
-    border: 0,
-    color: '#FFFFFF',
-    fontWeight: 600,
-    backgroundColor: '#88809C',
-    boxShadow: 'none',
-    background: 'none',
+    color: '#88809C',
+    textTransform: 'capitalize',
   },
   roundButton: {
     minWidth: 42,

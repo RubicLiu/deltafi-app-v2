@@ -37,7 +37,6 @@ import { getSwapOutAmount } from 'utils/swap'
 import { SwapCard as ISwapCard } from './components/types'
 import { tokens } from 'constants/tokens'
 import { useCustomConnection } from 'providers/connection'
-import { useFarmUserAccount } from 'providers/farm'
 
 interface TransactionResult {
   status: boolean | null
@@ -135,7 +134,6 @@ const Home: React.FC = (props) => {
     }
     return null
   }, [destinationAccount, tokenTo])
-  const [farmUser] = useFarmUserAccount()
   const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58())
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol)
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol)
@@ -397,6 +395,36 @@ const Home: React.FC = (props) => {
     )
   }, [handleSnackBarClose, classes])
 
+  const actionButton = useMemo(() => {
+    if (isConnectedWallet) {
+      const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount)
+      const isInsufficientLiquidity = exponentiatedBy(pool?.poolState.baseReserve, tokenFrom.token.decimals).isLessThan(
+        tokenFrom.amount,
+      )
+
+      return (
+        <ConnectButton
+          fullWidth
+          size="large"
+          variant="outlined"
+          disabled={isInsufficientBalance || isInsufficientLiquidity}
+          onClick={handleSwap}
+          data-amp-analytics-on="click"
+          data-amp-analytics-name="click"
+          data-amp-analytics-attrs="page: Swap, target: EnterAmount"
+        >
+          {isInsufficientBalance ? 'Insufficient Balance' : isInsufficientLiquidity ? 'Insufficient Liquidity' : 'Swap'}
+        </ConnectButton>
+      )
+    }
+
+    return (
+      <ConnectButton fullWidth size="large" onClick={() => setMenu(true, 'connect')}>
+        Connect Wallet
+      </ConnectButton>
+    )
+  }, [isConnectedWallet, handleSwap, setMenu, sourceBalance, pool, tokenFrom])
+
   if (!pool) return null
 
   const { open, vertical, horizontal } = state
@@ -441,23 +469,7 @@ const Home: React.FC = (props) => {
             />
           </ReactCardFlip>
           <Box marginTop={2} width="100%" position="relative" zIndex={1}>
-            {isConnectedWallet ? (
-              <ConnectButton
-                fullWidth
-                size="large"
-                variant="contained"
-                onClick={handleSwap}
-                data-amp-analytics-on="click"
-                data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Swap, target: EnterAmount"
-              >
-                Swap
-              </ConnectButton>
-            ) : (
-              <ConnectButton fullWidth size="large" onClick={() => setMenu(true, 'connect')}>
-                Connect Wallet
-              </ConnectButton>
-            )}
+            {actionButton}
           </Box>
         </Paper>
       </Container>
