@@ -1,16 +1,13 @@
 import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
-import { PoolInfo, ExTokenAccount } from 'providers/types'
-import {
-  createApproveInstruction,
-  createWithdrawInstruction,
-  WithdrawData,
-} from 'lib/instructions'
+import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
+import { createApproveInstruction, createWithdrawInstruction, WithdrawData } from 'lib/instructions'
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { TokenInfo } from 'constants/tokens'
 import { createRefreshFarmInstruction } from 'lib/instructions/farm'
+import { createFarmUser } from './farm'
 
 export async function withdraw({
   connection,
@@ -22,6 +19,7 @@ export async function withdraw({
   basePricePythKey,
   quotePricePythKey,
   withdrawData,
+  config,
   farmPool,
   farmUser,
 }: {
@@ -34,6 +32,7 @@ export async function withdraw({
   basePricePythKey: PublicKey
   quotePricePythKey: PublicKey
   withdrawData: WithdrawData
+  config: MarketConfig
   farmPool?: PublicKey
   farmUser?: PublicKey
 }) {
@@ -97,7 +96,26 @@ export async function withdraw({
         SWAP_PROGRAM_ID,
       ),
     )
-    .add(createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [farmUser]))
+
+  let signers = [userTransferAuthority]
+  if (!farmUser) {
+    const { transaction: createFarmUserTransaction, address: newFarmUser } = await createFarmUser({
+      connection,
+      walletPubkey,
+      config,
+    })
+    transaction = mergeTransactions([createFarmUserTransaction, transaction])
+    transaction.add(
+      createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [
+        newFarmUser.publicKey,
+      ]),
+    )
+    signers.push(newFarmUser)
+  } else {
+    transaction.add(
+      createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [farmUser]),
+    )
+  }
 
   transaction = mergeTransactions([createBaseTokenTransaction, createQuoteTokenTransaction, transaction])
 

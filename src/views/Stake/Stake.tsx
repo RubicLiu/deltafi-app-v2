@@ -156,11 +156,7 @@ const Stake = (): ReactElement => {
         setTransactionResult({ status: false })
       }
     } else {
-      if (
-        staking.amount === '' ||
-        !position ||
-        exponentiatedBy(position.depositBalance, lpMint.decimals).lt(staking.amount)
-      ) {
+      if (staking.amount === '' || !position || depositAmount.lt(staking.amount)) {
         return null
       }
 
@@ -209,6 +205,7 @@ const Stake = (): ReactElement => {
     signTransaction,
     method,
     position,
+    depositAmount,
   ])
 
   const handleClaim = useCallback(async () => {
@@ -219,7 +216,7 @@ const Stake = (): ReactElement => {
     try {
       const transaction = await claim({
         connection,
-        config: config.publicKey,
+        config,
         walletPubkey,
         farmPool,
         farmUser: farmUser.publicKey,
@@ -237,6 +234,7 @@ const Stake = (): ReactElement => {
         hash,
       })
     } catch (e) {
+      console.log(e)
       setTransactionResult({ status: false })
     }
   }, [config, connection, farmPool, farmUser, lpMint, lpToken, signTransaction, walletPubkey])

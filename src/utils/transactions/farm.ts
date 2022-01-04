@@ -15,7 +15,6 @@ import { ExTokenAccount, FarmPoolInfo, MarketConfig } from 'providers/types'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createApproveInstruction } from 'lib/instructions'
 import { mergeTransactions, signTransaction } from '.'
-import { WalletPublicKeyError } from '@solana/wallet-adapter-base'
 
 export async function createFarmUser({
   connection,
@@ -46,8 +45,8 @@ export async function createFarmUser({
     .add(createInitFarmUserInstruction(config.publicKey, stakeAccount.publicKey, walletPubkey, SWAP_PROGRAM_ID))
 
   return {
-    transaction: await signTransaction({ transaction, feePayer: walletPubkey, signers: [stakeAccount], connection }),
-    address: stakeAccount.publicKey,
+    transaction,
+    address: stakeAccount,
   }
 }
 
@@ -183,7 +182,7 @@ export async function claim({
   poolTokenAccount,
 }: {
   connection: Connection
-  config: PublicKey
+  config: MarketConfig
   walletPubkey: PublicKey
   farmPool: FarmPoolInfo
   farmUser: PublicKey
@@ -193,22 +192,22 @@ export async function claim({
     return null
   }
 
-  const nonce = new BN(farmPool.bumpSeed)
-  const farmPoolAuthority = await PublicKey.createProgramAddress(
-    [farmPool.publicKey.toBuffer(), nonce.toArrayLike(Buffer, 'le', 1)],
+  const nonce = new BN(config.bumpSeed)
+  const marketAuthority = await PublicKey.createProgramAddress(
+    [config.publicKey.toBuffer(), nonce.toArrayLike(Buffer, 'le', 1)],
     SWAP_PROGRAM_ID,
   )
 
   const transaction = new Transaction()
   transaction.add(
     createClaimFarmInstruction(
-      config,
+      config.publicKey,
       farmPool.publicKey,
       farmUser,
-      poolTokenAccount.pubkey,
-      farmPoolAuthority,
       walletPubkey,
-      farmPool.poolMintKey,
+      marketAuthority,
+      walletPubkey,
+      config.deltafiMint,
       SWAP_PROGRAM_ID,
     ),
   )

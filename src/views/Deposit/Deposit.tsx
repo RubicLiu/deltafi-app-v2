@@ -41,6 +41,7 @@ import { convertDoller, formatPubkey } from 'utils/utils'
 import { SOLSCAN_LINK } from 'constants/index'
 import { useCustomConnection } from 'providers/connection'
 import { useFarmByPoolAddress, useFarmUserAccount } from 'providers/farm'
+import { useConfig } from 'providers/config'
 
 interface TransactionResult {
   status: boolean | null
@@ -237,6 +238,7 @@ const Deposit: React.FC = () => {
   const baseTokenAccount = useTokenFromMint(pool?.baseTokenInfo.address)
   const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address)
   const [farmUser] = useFarmUserAccount()
+  const { config } = useConfig()
   const farmPool = useFarmByPoolAddress(poolAddress)
   const poolMint = useTokenMintAccount(pool?.poolMintKey)
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol)
@@ -345,8 +347,9 @@ const Deposit: React.FC = () => {
             amountTokenB: BigInt(exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString()),
             amountMintMin: BigInt(0),
           },
-          farmPool: farmPool.publicKey,
-          farmUser: farmUser.publicKey,
+          config,
+          farmPool: farmPool?.publicKey,
+          farmUser: farmUser?.publicKey,
         })
       } else {
         return null
@@ -384,6 +387,7 @@ const Deposit: React.FC = () => {
     quote,
     signTransaction,
     poolTokenAccount?.pubkey,
+    config,
     farmPool,
     farmUser,
   ])
@@ -420,8 +424,9 @@ const Deposit: React.FC = () => {
             minAmountTokenA: BigInt(exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString()),
             minAmountTokenB: BigInt(exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString()),
           },
-          farmPool: farmPool.publicKey,
-          farmUser: farmUser.publicKey,
+          config,
+          farmPool: farmPool?.publicKey,
+          farmUser: farmUser?.publicKey,
         })
       } else {
         return null
@@ -462,6 +467,7 @@ const Deposit: React.FC = () => {
     baseTokenAccount?.pubkey,
     quoteTokenAccount?.pubkey,
     withdrawPercentage,
+    config,
     farmPool,
     farmUser,
   ])

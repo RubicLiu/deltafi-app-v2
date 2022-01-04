@@ -1,15 +1,12 @@
 import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
-import { PoolInfo, ExTokenAccount } from 'providers/types'
-import {
-  createApproveInstruction,
-  createDepositInstruction,
-  DepositData,
-} from 'lib/instructions'
+import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
+import { createApproveInstruction, createDepositInstruction, DepositData } from 'lib/instructions'
 import { createTokenAccountTransaction, signTransaction, mergeTransactions } from '.'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createRefreshFarmInstruction } from 'lib/instructions/farm'
+import { createFarmUser } from './farm'
 
 export async function deposit({
   connection,
@@ -21,6 +18,7 @@ export async function deposit({
   basePricePythKey,
   quotePricePythKey,
   depositData,
+  config,
   farmPool,
   farmUser,
 }: {
@@ -33,6 +31,7 @@ export async function deposit({
   basePricePythKey: PublicKey
   quotePricePythKey: PublicKey
   depositData: DepositData
+  config: MarketConfig
   farmPool?: PublicKey
   farmUser?: PublicKey
 }) {
@@ -88,7 +87,25 @@ export async function deposit({
         SWAP_PROGRAM_ID,
       ),
     )
-    .add(createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [farmUser]))
+  let signers = [userTransferAuthority]
+  if (!farmUser) {
+    const { transaction: createFarmUserTransaction, address: newFarmUser } = await createFarmUser({
+      connection,
+      walletPubkey,
+      config,
+    })
+    transaction = mergeTransactions([createFarmUserTransaction, transaction])
+    transaction.add(
+      createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [
+        newFarmUser.publicKey,
+      ]),
+    )
+    signers.push(newFarmUser)
+  } else {
+    transaction.add(
+      createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [farmUser]),
+    )
+  }
 
   transaction = mergeTransactions([createAccountTransaction, transaction])
 
