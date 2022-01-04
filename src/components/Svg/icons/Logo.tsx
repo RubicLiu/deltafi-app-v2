@@ -1,12 +1,12 @@
-import { useTheme } from '@material-ui/core'
 import React from 'react'
+// import { useTheme } from '@material-ui/core'
 import Svg from '../Svg'
 import { SvgProps } from '../types'
 
 interface LogoProps extends SvgProps {}
 
 const Icon: React.FC<LogoProps> = (props) => {
-  const theme = useTheme()
+  // const theme = useTheme()
   // const isDark = theme.palette.type === 'dark'
   return (
     <Svg viewBox="0 0 21 26" {...props}>

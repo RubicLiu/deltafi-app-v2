@@ -179,16 +179,16 @@ export async function claim({
   walletPubkey,
   farmPool,
   farmUser,
-  poolTokenAccount,
+  claimDestination,
 }: {
   connection: Connection
   config: MarketConfig
   walletPubkey: PublicKey
   farmPool: FarmPoolInfo
   farmUser: PublicKey
-  poolTokenAccount: ExTokenAccount
+  claimDestination: PublicKey
 }) {
-  if (!connection || !walletPubkey || !farmPool || !farmUser || !poolTokenAccount) {
+  if (!connection || !walletPubkey || !farmPool || !farmUser || !claimDestination) {
     return null
   }
 
@@ -206,7 +206,7 @@ export async function claim({
       farmUser,
       walletPubkey,
       marketAuthority,
-      walletPubkey,
+      claimDestination,
       config.deltafiMint,
       SWAP_PROGRAM_ID,
     ),

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Box, Typography, Slider } from '@material-ui/core'
 import { Theme, makeStyles } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
@@ -32,7 +32,7 @@ const CustomSlider = withStyles((theme: Theme) => ({
     border: '1px solid white',
     marginTop: -6,
     marginLeft: -10,
-    '&:focus, &:hover, &$active': {
+    '&:focus, &:hover': {
       boxShadow: 'inherit',
     },
   },

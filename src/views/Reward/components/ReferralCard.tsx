@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Box, Typography, makeStyles, Theme, Paper } from '@material-ui/core'
+import { Box, Typography, makeStyles, Paper } from '@material-ui/core'
 import { CardProps } from './types'
 
-const useStyles = makeStyles(({}: Theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     height: '272px',
     backgroundColor: '#1D1A27',

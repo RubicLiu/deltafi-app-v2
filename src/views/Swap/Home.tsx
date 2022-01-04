@@ -243,13 +243,13 @@ const Home: React.FC = (props) => {
     }
 
     try {
-      const { amountOutWithSlippage } = getSwapOutAmount(
-        pool,
-        tokenFrom.token.address,
-        tokenTo.token.address,
-        tokenFrom.amount ?? '0',
-        parseFloat(priceImpact),
-      )
+      // const { amountOutWithSlippage } = getSwapOutAmount(
+      //   pool,
+      //   tokenFrom.token.address,
+      //   tokenTo.token.address,
+      //   tokenFrom.amount ?? '0',
+      //   parseFloat(priceImpact),
+      // )
       let transaction = await swap({
         connection,
         walletPubkey,
@@ -321,7 +321,7 @@ const Home: React.FC = (props) => {
     sourceBalance,
     tokenFrom,
     tokenTo,
-    priceImpact,
+    // priceImpact,
     connection,
     destinationAccount?.pubkey,
     rewardsAccount?.pubkey,

@@ -1,14 +1,12 @@
 import React from 'react'
-import styled from 'styled-components'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { Box, Typography, makeStyles, Theme, Grid, Paper, TextField, Link } from '@material-ui/core'
+import { Box, Typography, makeStyles, Theme, Grid, Paper, Link } from '@material-ui/core'
 import Page from 'components/layout/Page'
 import { ConnectButton } from 'components'
 import { useModal } from 'providers/modal'
 import ReferralCard from './components/ReferralCard'
 import MyReward from './components/MyReward'
 import CopyLinkButton from './components/CopyLinkButton'
-import { withStyles, createStyles } from '@material-ui/core/styles'
 import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from 'components'
 
 /*

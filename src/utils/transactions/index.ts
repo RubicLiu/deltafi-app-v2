@@ -242,3 +242,4 @@ async function simulateTransaction(
 
 export * from './deposit'
 export * from './withdraw'
+export * from './farm'

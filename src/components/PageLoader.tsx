@@ -1,6 +1,5 @@
 import React from 'react'
 import { Box, makeStyles, Theme } from '@material-ui/core'
-import LogoIcon from './LogoIcon'
 
 const useStyles = makeStyles(({ palette, spacing, transitions }: Theme) => ({
   root: {
@@ -28,7 +27,7 @@ const PageLoader: React.FC = (props) => {
   return (
     <Box className={classes.root}>
       <Box className={classes.logo}>
-        <img src="/images/logomark 200.svg" width={128} height={128} className={classes.logo} />
+        <img src="/images/logomark 200.svg" width={128} height={128} className={classes.logo} alt="logo" />
       </Box>
     </Box>
   )

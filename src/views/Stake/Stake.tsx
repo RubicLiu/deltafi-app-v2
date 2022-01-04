@@ -29,10 +29,9 @@ import { useFarmPoolByAddress, useFarmUserAccount } from 'providers/farm'
 import { lpTokens } from 'constants/tokens'
 import { useModal } from 'providers/modal'
 import { useConfig } from 'providers/config'
-import { sendSignedTransaction } from 'utils/transactions'
-import { claim, stake, unstake } from 'utils/transactions/farm'
+import { sendSignedTransaction, claim, stake, unstake } from 'utils/transactions'
 import { exponentiate, exponentiatedBy } from 'utils/decimal'
-import { SOLSCAN_LINK } from 'constants/index'
+import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK } from 'constants/index'
 import { useCustomConnection } from 'providers/connection'
 import Slider from './components/Slider'
 
@@ -75,6 +74,7 @@ const Stake = (): ReactElement => {
   const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58())
   const lpMint = useTokenMintAccount(farmPool?.poolMintKey)
   const [farmUser] = useFarmUserAccount()
+  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58())
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
   })
@@ -220,7 +220,7 @@ const Stake = (): ReactElement => {
         walletPubkey,
         farmPool,
         farmUser: farmUser.publicKey,
-        poolTokenAccount: lpToken,
+        claimDestination: rewardsAccount?.pubkey,
       })
       const signedTransaction = await signTransaction(transaction)
       const hash = await sendSignedTransaction({
@@ -237,7 +237,7 @@ const Stake = (): ReactElement => {
       console.log(e)
       setTransactionResult({ status: false })
     }
-  }, [config, connection, farmPool, farmUser, lpMint, lpToken, signTransaction, walletPubkey])
+  }, [config, connection, farmPool, farmUser, lpMint, lpToken, signTransaction, walletPubkey, rewardsAccount])
 
   const handleSnackBarClose = useCallback(() => {
     setState((state) => ({ ...state, open: false }))
@@ -276,11 +276,13 @@ const Stake = (): ReactElement => {
       <Box display="flex" alignItems="center">
         <img src={`/images/snack-success.svg`} alt="snack-status-icon" className={classes.snackBarIcon} />
         <Box>
-          <Typography variant="body1" color="primary">
-            {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(stake.amount).toFixed(2)} ${
-              stake.token.symbol
-            } LP`}
-          </Typography>
+          {stake && (
+            <Typography variant="body1" color="primary">
+              {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(stake?.amount).toFixed(2)} ${
+                stake.token.symbol
+              } LP`}
+            </Typography>
+          )}
           <Box display="flex" alignItems="center">
             <Typography variant="subtitle2" color="primary">
               View Transaction:

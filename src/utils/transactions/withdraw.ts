@@ -5,7 +5,6 @@ import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
 import { createApproveInstruction, createWithdrawInstruction, WithdrawData } from 'lib/instructions'
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
 import { SWAP_PROGRAM_ID } from 'constants/index'
-import { TokenInfo } from 'constants/tokens'
 import { createRefreshFarmInstruction } from 'lib/instructions/farm'
 import { createFarmUser } from './farm'
 

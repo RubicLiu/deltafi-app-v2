@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { AppBar, makeStyles, Theme, Container, Toolbar, Link, AppBarProps, Typography } from '@material-ui/core'
+import { AppBar, makeStyles, Theme, Container, Toolbar, Link, AppBarProps } from '@material-ui/core'
 import { useWallet } from '@solana/wallet-adapter-react'
 
 import { ConnectButton, TabMenu, WalletButton } from 'components'
@@ -95,7 +95,7 @@ const Header: React.FC = (props) => {
             data-amp-analytics-name="click"
             data-amp-analytics-attrs="page: Header, target: Logo"
           >
-            <img src="/horizontal 60.svg"/>
+            <img src="/horizontal 60.svg" alt="logo" />
           </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>

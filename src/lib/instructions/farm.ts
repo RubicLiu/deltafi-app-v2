@@ -198,7 +198,7 @@ export const createClaimFarmInstruction = (
     { pubkey: marketAuthority, isSigner: false, isWritable: false },
     { pubkey: claimDestination, isSigner: false, isWritable: true },
     { pubkey: claimMint, isSigner: false, isWritable: true },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ]
 
   const dataLayout = struct([u8('instruction')])
