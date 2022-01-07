@@ -158,7 +158,8 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
 const Home: React.FC = (props) => {
   const classes = useStyles(props)
   const { setMenu } = useModal()
-  const { connected: isConnectedWallet } = useWallet()
+  const { connected: isConnectedWallet, publicKey} = useWallet()
+  const referralLink = "https://www.deltafi.ai/referral/" + publicKey
 
   return (
     <Page>
@@ -192,7 +193,7 @@ const Home: React.FC = (props) => {
                   My Referral Link
                 </Typography>
                 <Box className={`${classes.subContentMargin3} ${classes.sharePanelRow}`}>
-                  <input placeholder="https://invite.deltafi.referral.vebccndnv3veoev" className={classes.inputLink} />
+                  <input placeholder={referralLink} className={classes.inputLink} />
                   <CopyLinkButton
                     onClick={() => {
                       alert('Click Copy Link')
