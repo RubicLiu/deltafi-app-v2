@@ -185,17 +185,13 @@ const getReferralLink = (() => {
 })();
 
 const Home: React.FC = props => {
-  console.log("prop:", props);
   const classes = useStyles(props);
   const { setMenu } = useModal()
   const { connected: isConnectedWallet, publicKey} = useWallet()
 
-  console.log("isconnected: ", isConnectedWallet);
-  console.log("address: ", publicKey);
   const [referralLink, setReferralLink] = useState("");
   
   useEffect(() => {
-    console.log(process.env.REACT_APP_BACKEND_HOST);
     (async () => {
       await getReferralLink(publicKey, link => setReferralLink(link));
     })();

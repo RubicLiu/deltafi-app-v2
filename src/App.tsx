@@ -75,8 +75,6 @@ const updateWallet = (() => {
 
     if (address !== null && !walletAddress) {
 
-      console.log("updateWallet:", address);
-
       const res = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/check_record/" + address.toString());
       if (res.ok) {
         const resJson = await res.json();
@@ -99,7 +97,6 @@ const updateWallet = (() => {
 
         if (updateRes.ok) {
           walletAddress = address.toString();
-          console.log("updated wallet");
         }
       }
     }
@@ -107,8 +104,6 @@ const updateWallet = (() => {
 })();
 
 const App: React.FC<{params: string}> = ({ params }) => {
-
-  console.log("app:");
 
   const { setConfigAddress } = useConfig()
   const { setSchemas } = usePools()
