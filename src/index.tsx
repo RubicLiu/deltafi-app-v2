@@ -4,10 +4,12 @@ import App from './App'
 import Providers from './providers'
 import reportWebVitals from './reportWebVitals'
 
+console.log(window.location.search);
+
 ReactDOM.render(
   <React.StrictMode>
     <Providers>
-      <App />
+      <App params={window.location.search}/>
     </Providers>
   </React.StrictMode>,
   document.getElementById('root'),

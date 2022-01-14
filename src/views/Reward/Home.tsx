@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Box, Typography, makeStyles, Theme, Grid, Paper, Link } from '@material-ui/core'
 import Page from 'components/layout/Page'
@@ -8,6 +8,7 @@ import ReferralCard from './components/ReferralCard'
 import MyReward from './components/MyReward'
 import CopyLinkButton from './components/CopyLinkButton'
 import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from 'components'
+import { getJsonWalletAddress } from 'ethers/lib/utils'
 
 /*
  * mockup test data for reward page
@@ -155,10 +156,46 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   },
 }))
 
-const Home: React.FC = (props) => {
-  const classes = useStyles(props)
+/**
+ * a function that links to 2 closure variables, 
+ * referralLink and pubKey
+ * this function is called when wallet connection status changes, 
+ * and get the correct referral link from backend
+ */
+const getReferralLink = (() => {
+  let referralLink = null;
+  let pubKey = null;
+
+  return async (publicKey, setLink: (link: string) => void) => {
+    if (publicKey === null) {
+      return null;
+    }
+    if (!referralLink || publicKey !== pubKey) {
+      pubKey = publicKey.toString();
+      const res = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/get_code/" + pubKey);
+      if (res.ok) {
+        const jsonData = await res.json();
+        referralLink = process.env.REACT_APP_LOCAL_HOST + "?referral_code=" + jsonData.referral_code;
+      }
+
+      setLink(referralLink);
+    }
+    return referralLink;
+  }
+})();
+
+const Home: React.FC = props => {
+  const classes = useStyles(props);
   const { setMenu } = useModal()
-  const { connected: isConnectedWallet } = useWallet()
+  const { connected: isConnectedWallet, publicKey} = useWallet()
+
+  const [referralLink, setReferralLink] = useState("");
+  
+  useEffect(() => {
+    (async () => {
+      await getReferralLink(publicKey, link => setReferralLink(link));
+    })();
+  }, [isConnectedWallet, publicKey]);
 
   return (
     <Page>
@@ -192,10 +229,11 @@ const Home: React.FC = (props) => {
                   My Referral Link
                 </Typography>
                 <Box className={`${classes.subContentMargin3} ${classes.sharePanelRow}`}>
-                  <input placeholder="https://invite.deltafi.referral.vebccndnv3veoev" className={classes.inputLink} />
+                  <input placeholder={referralLink} className={classes.inputLink} />
                   <CopyLinkButton
                     onClick={() => {
-                      alert('Click Copy Link')
+                      navigator.clipboard.writeText(referralLink);
+                      alert('referral link copied to clipboard')
                     }}
                   >
                     Copy Link
@@ -291,4 +329,4 @@ const Home: React.FC = (props) => {
     </Page>
   )
 }
-export default Home
+export default Home;
