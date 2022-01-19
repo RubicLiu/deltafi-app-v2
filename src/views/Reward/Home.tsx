@@ -172,13 +172,13 @@ const getReferralLink = (() => {
     }
     if (!referralLink || publicKey !== pubKey) {
       pubKey = publicKey.toString();
-      const res = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/get_code/" + pubKey);
+      const res = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/get_code/" + publicKey);
       if (res.ok) {
         const jsonData = await res.json();
         referralLink = process.env.REACT_APP_LOCAL_HOST + "?referral_code=" + jsonData.referral_code;
       }
 
-      setLink(referralLink);
+      setLink(referralLink);  
     }
     return referralLink;
   }
@@ -192,6 +192,7 @@ const Home: React.FC = props => {
   const [referralLink, setReferralLink] = useState("");
   
   useEffect(() => {
+
     (async () => {
       await getReferralLink(publicKey, link => setReferralLink(link));
     })();
