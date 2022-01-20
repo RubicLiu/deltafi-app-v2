@@ -234,7 +234,6 @@ const Home: React.FC = props => {
                   <CopyLinkButton
                     onClick={() => {
                       navigator.clipboard.writeText(referralLink);
-                      alert('referral link copied to clipboard')
                     }}
                   >
                     Copy Link
