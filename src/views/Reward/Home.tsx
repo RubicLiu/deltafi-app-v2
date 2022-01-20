@@ -8,6 +8,7 @@ import ReferralCard from './components/ReferralCard'
 import MyReward from './components/MyReward'
 import CopyLinkButton from './components/CopyLinkButton'
 import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from 'components'
+import copy from 'copy-to-clipboard';
 import { getJsonWalletAddress } from 'ethers/lib/utils'
 
 /*
@@ -233,8 +234,7 @@ const Home: React.FC = props => {
                   <input placeholder={referralLink} className={classes.inputLink} />
                   <CopyLinkButton
                     onClick={() => {
-                      navigator.clipboard.writeText(referralLink);
-                      alert('referral link copied to clipboard')
+                      copy(referralLink);
                     }}
                   >
                     Copy Link
