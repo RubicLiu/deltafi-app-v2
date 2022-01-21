@@ -304,7 +304,7 @@ const Home: React.FC = props => {
             {/* My Rewards */}
             <Box className={classes.mainComponentMargin}>
               <Typography variant="h5" color="primary" align="center" paragraph>
-                My Rewards (Mock data only now. Real date coming soon...)
+                My Rewards (Mock data only now. Real data coming soon...)
               </Typography>
               {myRewards.map((item, index) => (
                 <MyReward detail={item} key={index} />
