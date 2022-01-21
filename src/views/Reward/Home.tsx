@@ -223,7 +223,7 @@ const Home: React.FC = props => {
           <>
             <Box className={classes.inviteComponentMargin}>
               <Typography variant="h5" color="primary" align="center" paragraph>
-                Send Invitations (Mock link for now. Real referral link coming soon...)
+                Send Invitations
               </Typography>
 
               <Paper className={classes.sharePannel}>
