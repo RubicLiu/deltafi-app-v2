@@ -398,8 +398,11 @@ const Home: React.FC = (props) => {
   const actionButton = useMemo(() => {
     if (isConnectedWallet) {
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount)
-      const isInsufficientLiquidity = exponentiatedBy(pool?.poolState.baseReserve, tokenFrom.token.decimals).isLessThan(
-        tokenFrom.amount,
+      const isInsufficientLiquidity = exponentiatedBy(
+        tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? pool?.poolState.quoteReserve : pool?.poolState.baseReserve, 
+        tokenFrom.token.decimals
+      ).isLessThan(
+        tokenTo.amount,
       )
 
       return (

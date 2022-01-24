@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react'
-import { PublicKey, Connection } from '@solana/web3.js'
+import { AccountInfo, PublicKey, Connection } from '@solana/web3.js'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import BigNumber from 'bignumber.js'
 import tuple from 'immutable-tuple'
@@ -46,7 +46,7 @@ export function FarmPoolsProvider({ children }) {
             let key = farmInfos.keys[i]
             let poolInfo = farmInfos.array[i]
             const schema = schemas.find((s) => s.address.equals(new PublicKey(key)))
-            const { data } = parseFarmInfo(poolInfo)
+            const { data } = parseFarmInfo(poolInfo as AccountInfo<Buffer>)
             tempFarms.push({
               name: schema.name,
               publicKey: new PublicKey(key),

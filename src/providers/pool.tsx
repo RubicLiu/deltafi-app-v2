@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useMemo } from 'react'
-import { PublicKey } from '@solana/web3.js'
+import { AccountInfo, PublicKey } from '@solana/web3.js'
 
 import { PoolInfo, EntirePoolsContextValues } from './types'
 import { PoolSchema } from 'constants/pools'
@@ -42,7 +42,7 @@ export function EntirePoolsProvider({ children }) {
             let key = poolInfos.keys[i]
             let poolInfo = poolInfos.array[i]
             const schema = schemas.find((s) => s.address.equals(new PublicKey(key)))
-            const { data } = parseSwapInfo(poolInfo)
+            const { data } = parseSwapInfo(poolInfo as AccountInfo<Buffer>)
             tempPools.push({
               name: schema.name,
               publicKey: new PublicKey(key),

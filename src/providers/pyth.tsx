@@ -77,7 +77,7 @@ export function PythProvider({ children }) {
         setNumProducts(productAccountKeys.length)
         const productsInfos = await getMultipleAccounts(connection, productAccountKeys, 'confirmed')
         if (cancelled) return
-        const productsData = productsInfos.array.map((p) => parseProductData(p.data))
+        const productsData = productsInfos.array.map((p) => parseProductData(p.data as Buffer))
         const priceInfos = await getMultipleAccounts(
           connection,
           productsData.map((p) => p.priceAccountKey),
@@ -94,7 +94,7 @@ export function PythProvider({ children }) {
           const priceInfo = priceInfos.array[i]
 
           if ((!filters || filters.includes(symbol)) && !BAD_SYMBOLS.includes(symbol)) {
-            handlePriceInfo(symbol, product, priceInfo, setSymbolMap, priceAccountKey)
+            handlePriceInfo(symbol, product, priceInfo as AccountInfo<Buffer>, setSymbolMap, priceAccountKey)
 
             subscription_ids.push(
               connection.onAccountChange(priceAccountKey, (accountInfo) => {

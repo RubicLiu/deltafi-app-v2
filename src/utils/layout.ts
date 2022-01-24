@@ -1,4 +1,4 @@
-import { AccountInfo, PublicKey } from '@solana/web3.js'
+import { AccountInfo, PublicKey, ParsedAccountData } from '@solana/web3.js'
 import BigNumber from 'bignumber.js'
 import { blob, Layout, u8 } from 'buffer-layout'
 import { toBigIntLE, toBufferLE } from 'bigint-buffer'
