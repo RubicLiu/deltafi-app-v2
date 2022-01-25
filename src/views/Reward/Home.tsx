@@ -189,7 +189,8 @@ const Home: React.FC = props => {
   const classes = useStyles(props);
   const { setMenu } = useModal()
   const { connected: isConnectedWallet, publicKey} = useWallet()
-
+  
+  const [buttonText, setButtonText] = useState('Copy Link')
   const [referralLink, setReferralLink] = useState("");
   
   useEffect(() => {
@@ -235,9 +236,11 @@ const Home: React.FC = props => {
                   <CopyLinkButton
                     onClick={() => {
                       copy(referralLink);
+                      setButtonText('Copied!')
+                      setTimeout(() => setButtonText('Copy link'), 5000)
                     }}
                   >
-                    Copy Link
+                    {buttonText}
                   </CopyLinkButton>
                 </Box>
                 <Box className={classes.sharePanelRow}>
