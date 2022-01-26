@@ -14,6 +14,7 @@ export const RStatusBelowOne = 2
 export class PMMHelper {
   // return received quote amount (fee deducted)
   public querySellBase(amount: BigNumber, state: PMMState): BigNumber {
+    
     try {
       let result: BigNumber
       if (state.RStatus === RStatusOne) {
@@ -137,7 +138,7 @@ export const solveQuadraticFunctionForTrade = (
   if (delta.eq(0)) return delta
 
   if (k.eq(0)) {
-    return delta.multipliedBy(i).gt(V1) ? V1 : delta.multipliedBy(i)
+    return delta.multipliedBy(i); // do not need to not check if this is greater than the reserve
   }
 
   if (k.eq(1)) {
