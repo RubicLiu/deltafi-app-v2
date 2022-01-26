@@ -12,30 +12,30 @@ export interface TokenInfo {
 export const tokens: TokenInfo[] = [
   {
     chainId: 101,
-    address: 'HMufPL1V6SJAfSNfU1t2JP9S83FbcWv7dYes8QMPKrMT',
-    symbol: 'SOL',
-    name: 'Deltafi SOL',
-    decimals: 9,
+    address: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
+    symbol: 'SRM',
+    name: 'SRM',
+    decimals: 6,
     logoURI:
-      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png',
+      "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png",
   },
   {
     chainId: 101,
-    address: '64MqsbX14kao2UcyFT7J3MKwctfiifs5K4uZqJFfxe5',
-    symbol: 'SRM',
-    name: 'Deltafi SRM',
-    decimals: 9,
+    address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    symbol: 'USDC',
+    name: 'USDC',
+    decimals: 6,
     logoURI:
-      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png',
+    "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
   },
 ]
 
 export const lpTokens: TokenInfo[] = [
   {
     chainId: 101,
-    address: 'HC444K5NCA9V7uduxbEg61XLue7H6X3w6nUUbaCXYdMV',
-    symbol: 'SOL-SRM',
-    name: 'LP SOL-SRM',
+    address: 'GaT8mSsujTByV2VFzqcQuNtSvarSkKyn2k6Mqrvp2ddU',
+    symbol: 'SRM-USDC',
+    name: 'LP SRM-USDC',
     decimals: 9,
     logoURI: '',
   },

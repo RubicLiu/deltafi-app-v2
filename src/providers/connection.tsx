@@ -21,8 +21,8 @@ const ConnectionContext: React.Context<null | ConnectionContextValues> =
   React.createContext<null | ConnectionContextValues>(null)
 
 export function CustomConnectionProvider({ children }) {
-  const [endpoint, setEndpoint] = useLocalStorageState<string>('connectionEndpts', ENDPOINTS[1].endpoint)
-  const [network, setNetwork] = useLocalStorageState<string>('network', ENDPOINTS[1].name)
+  const [endpoint, setEndpoint] = useLocalStorageState<string>('connectionEndpts', ENDPOINTS[0].endpoint)
+  const [network, setNetwork] = useLocalStorageState<string>('network', ENDPOINTS[0].name)
 
   const handleSetNetwork = (network: string) => {
     const endpoint = ENDPOINTS.find((e) => e.name === network)

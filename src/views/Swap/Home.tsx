@@ -111,11 +111,11 @@ const Home: React.FC = (props) => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet()
   const { connection } = useConnection()
   const [tokenFrom, setTokenFrom] = useState<ISwapCard>({
-    token: getTokenInfo('SOL'),
+    token: getTokenInfo('SRM'),
     amount: '',
   })
   const [tokenTo, setTokenTo] = useState<ISwapCard>({
-    token: getTokenInfo('SRM'),
+    token: getTokenInfo('USDC'),
     amount: '',
   })
   const { config } = useConfig()
@@ -397,8 +397,9 @@ const Home: React.FC = (props) => {
 
   const actionButton = useMemo(() => {
     if (isConnectedWallet) {
+
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount)
-      const isInsufficientLiquidity = exponentiatedBy(
+      const isInsufficientLiquidity = (pool !== null) && exponentiatedBy(
         tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? pool?.poolState.quoteReserve : pool?.poolState.baseReserve, 
         tokenFrom.token.decimals
       ).isLessThan(
