@@ -37,6 +37,7 @@ import { getSwapOutAmount } from 'utils/swap'
 import { SwapCard as ISwapCard } from './components/types'
 import { tokens } from 'constants/tokens'
 import { useCustomConnection } from 'providers/connection'
+import BigNumber from 'bignumber.js'
 
 interface TransactionResult {
   status: boolean | null
@@ -143,6 +144,8 @@ const Home: React.FC = (props) => {
   const { setMenu } = useModal()
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && pool) {
+      pool.poolState.marketPrice = new BigNumber(basePrice / quotePrice); // market price from the chain is not up-to-date
+
       if (tokenFrom.token.symbol === pool?.baseTokenInfo.symbol) {
         return Number(basePrice / quotePrice).toFixed(pool.quoteTokenInfo.decimals)
       } else if (tokenFrom.token.symbol === pool?.quoteTokenInfo.symbol) {
@@ -243,7 +246,7 @@ const Home: React.FC = (props) => {
     }
 
     try {
-      // const { amountOutWithSlippage } = getSwapOutAmount(
+      // const { amountOutWithSlippage } = http://localhost:3000(
       //   pool,
       //   tokenFrom.token.address,
       //   tokenTo.token.address,
