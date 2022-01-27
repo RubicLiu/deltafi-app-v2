@@ -12,12 +12,12 @@ export interface TokenInfo {
 export const tokens: TokenInfo[] = [
   {
     chainId: 101,
-    address: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
-    symbol: 'SRM',
-    name: 'SRM',
+    address: 'So11111111111111111111111111111111111111112',
+    symbol: 'SOL',
+    name: 'Wrapped SOL',
     decimals: 6,
     logoURI:
-      "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png",
+      "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
   },
   {
     chainId: 101,
@@ -33,9 +33,9 @@ export const tokens: TokenInfo[] = [
 export const lpTokens: TokenInfo[] = [
   {
     chainId: 101,
-    address: 'GaT8mSsujTByV2VFzqcQuNtSvarSkKyn2k6Mqrvp2ddU',
-    symbol: 'SRM-USDC',
-    name: 'LP SRM-USDC',
+    address: 'B74ubeZiRaCyvJ7fMGmws4SbiAeP2EbXADVyj2EEg2cv',
+    symbol: 'Wrapped SOL-USDC',
+    name: 'LP Wrapped SOL-USDC',
     decimals: 9,
     logoURI: '',
   },
