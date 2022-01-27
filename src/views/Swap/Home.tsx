@@ -401,6 +401,14 @@ const Home: React.FC = (props) => {
   const actionButton = useMemo(() => {
     if (isConnectedWallet) {
 
+      console.log("token to", tokenTo.amount);
+      console.log("pool?.poolState.quoteReserve", exponentiatedBy(pool?.poolState.quoteReserve, tokenFrom.token.decimals).toNumber());
+      console.log("pool?.poolState.quoteTarget", exponentiatedBy(pool?.poolState.quoteTarget, tokenFrom.token.decimals).toNumber());
+      console.log("pool?.poolState.baseReserve", exponentiatedBy(pool?.poolState.baseReserve, tokenFrom.token.decimals).toNumber());
+      console.log("pool?.poolState.baseTarget", exponentiatedBy(pool?.poolState.baseTarget, tokenFrom.token.decimals).toNumber());
+      console.log("pool?.poolState.marketPrice", pool?.poolState.marketPrice.toNumber());
+      console.log("pool?.poolState.slope", pool?.poolState.slope.toNumber());
+      
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount)
       const isInsufficientLiquidity = (pool !== null) && exponentiatedBy(
         tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? pool?.poolState.quoteReserve : pool?.poolState.baseReserve, 

@@ -12,6 +12,15 @@ export interface TokenInfo {
 export const tokens: TokenInfo[] = [
   {
     chainId: 101,
+    address: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
+    symbol: 'SRM',
+    name: 'SRM',
+    decimals: 6,
+    logoURI:
+      "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png",
+  },
+  {
+    chainId: 101,
     address: 'So11111111111111111111111111111111111111112',
     symbol: 'SOL',
     name: 'Wrapped SOL',
@@ -39,4 +48,12 @@ export const lpTokens: TokenInfo[] = [
     decimals: 9,
     logoURI: '',
   },
+  {
+    chainId: 101,
+    address: 'GaT8mSsujTByV2VFzqcQuNtSvarSkKyn2k6Mqrvp2ddU',
+    symbol: 'SRM-USDC',
+    name: 'LP SRM-USDC',
+    decimals: 9,
+    logoURI: '',
+  }
 ]
