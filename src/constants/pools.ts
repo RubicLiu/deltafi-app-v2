@@ -16,6 +16,12 @@ export const pools: PoolSchema[] = [
     base: 'SOL',
     quote: 'USDC',
   },
+  {
+    name: 'SRM-USDC',
+    address: new PublicKey('HJrcEthNx8TGxJ6uTpxmumwDYbyNjJzjzcUvuXBmtY3P'), 
+    base: 'SRM',
+    quote: 'USDC',
+  }
 ]
 
 export const listSymbols = (pools: PoolSchema[]) => {
