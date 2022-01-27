@@ -112,7 +112,7 @@ const Home: React.FC = (props) => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet()
   const { connection } = useConnection()
   const [tokenFrom, setTokenFrom] = useState<ISwapCard>({
-    token: getTokenInfo('SRM'),
+    token: getTokenInfo('SOL'),
     amount: '',
   })
   const [tokenTo, setTokenTo] = useState<ISwapCard>({
