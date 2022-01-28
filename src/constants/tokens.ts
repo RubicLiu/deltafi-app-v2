@@ -24,7 +24,7 @@ export const tokens: TokenInfo[] = [
     address: 'So11111111111111111111111111111111111111112',
     symbol: 'SOL',
     name: 'Wrapped SOL',
-    decimals: 6,
+    decimals: 9,
     logoURI:
       "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
   },
