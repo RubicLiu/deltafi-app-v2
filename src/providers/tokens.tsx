@@ -128,7 +128,7 @@ export function useTokenFromMint(mintAddress: string | null | undefined) {
         if (tokens[i].effectiveMint.toBase58() === mintAddress) {
           return {
             ...tokens[i],
-            account: parseTokenAccountData(tokens[i].account.data),
+            account: !tokens[i].account ? null : parseTokenAccountData(tokens[i].account.data),
           }
         }
       }
