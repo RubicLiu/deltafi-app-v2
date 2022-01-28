@@ -86,7 +86,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
   const tokenAccount = useTokenFromMint(card.token?.address)
   const tokenBalance = useMemo(() => {
     if (tokenAccount && card) {
-      return exponentiatedBy(tokenAccount.account.amount, card.token.decimals)
+      return exponentiatedBy(tokenAccount.account.amount, card.token.decimals);
     }
     return null
   }, [tokenAccount, card])
