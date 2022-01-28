@@ -415,6 +415,7 @@ const Home: React.FC = (props) => {
     if (isConnectedWallet) {
 
       const unavailable = !pool;
+      const sourceAccountNonExist = !sourceBalance;
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount)
       const isInsufficientLiquidity = pool && exponentiatedBy(
         tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? pool?.poolState.quoteReserve : pool?.poolState.baseReserve, 
@@ -428,13 +429,18 @@ const Home: React.FC = (props) => {
           fullWidth
           size="large"
           variant="outlined"
-          disabled={unavailable || isInsufficientBalance || isInsufficientLiquidity}
+          disabled={unavailable || sourceAccountNonExist || isInsufficientBalance || isInsufficientLiquidity}
           onClick={handleSwap}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Swap, target: EnterAmount"
         >
-          {unavailable ? 'unavailable' : isInsufficientBalance ? 'Insufficient Balance' : isInsufficientLiquidity ? 'Insufficient Liquidity' : 'Swap'}
+          {
+            unavailable ? 'unavailable' : 
+            sourceAccountNonExist ? 'No ' + tokenFrom.token.symbol + ' Account in Wallet' : 
+            isInsufficientBalance ? 'Insufficient Balance' : 
+            isInsufficientLiquidity ? 'Insufficient Liquidity' : 'Swap'
+          }
         </ConnectButton>
       )
     }

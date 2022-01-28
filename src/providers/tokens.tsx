@@ -125,10 +125,10 @@ export function useTokenFromMint(mintAddress: string | null | undefined) {
   return useMemo(() => {
     if (mintAddress && tokens) {
       for (let i = 0; i < tokens.length; i++) {
-        if (tokens[i].effectiveMint.toBase58() === mintAddress) {
+        if (tokens[i].effectiveMint.toBase58() === mintAddress && tokens[i].account) {
           return {
             ...tokens[i],
-            account: !tokens[i].account ? null : parseTokenAccountData(tokens[i].account.data),
+            account: parseTokenAccountData(tokens[i].account.data),
           }
         }
       }
