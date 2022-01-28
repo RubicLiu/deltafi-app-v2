@@ -136,7 +136,7 @@ const Footer: React.FC = (props) => {
             </IconButton>
           </IconWrapper>
         </StyledDiv>
-        <Typography>© 2021 DeltaFi. All rights reserved</Typography>
+        <Typography>© 2022 DeltaFi. All rights reserved</Typography>
       </Container>
     </Box>
   )
