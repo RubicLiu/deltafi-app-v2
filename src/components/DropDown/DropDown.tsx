@@ -152,7 +152,7 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
           endIcon={disableDrop ? undefined : <ArrowDown isDark={isDark} width="10" height="6" />}
           className={classes.button}
         >
-          {value?.name}
+          {value?.symbol}
         </Button>
         {open ? (
           <Box className={classes.dropdownContainer}>

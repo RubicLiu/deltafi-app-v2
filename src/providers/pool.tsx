@@ -38,6 +38,9 @@ export function EntirePoolsProvider({ children }) {
             'confirmed',
           )
           const tempPools = []
+          
+          
+
           for (let i = 0; i < poolInfos.keys.length; i++) {
             let key = poolInfos.keys[i]
             let poolInfo = poolInfos.array[i]

@@ -14,7 +14,7 @@ export const tokens: TokenInfo[] = [
     chainId: 101,
     address: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
     symbol: 'SRM',
-    name: 'SRM',
+    name: 'Serum',
     decimals: 6,
     logoURI:
       "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png",
@@ -23,7 +23,7 @@ export const tokens: TokenInfo[] = [
     chainId: 101,
     address: 'So11111111111111111111111111111111111111112',
     symbol: 'SOL',
-    name: 'Wrapped SOL',
+    name: 'Wrapped Solana',
     decimals: 9,
     logoURI:
       "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
@@ -32,7 +32,7 @@ export const tokens: TokenInfo[] = [
     chainId: 101,
     address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     symbol: 'USDC',
-    name: 'USDC',
+    name: 'USD Coin',
     decimals: 6,
     logoURI:
     "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
@@ -43,8 +43,8 @@ export const lpTokens: TokenInfo[] = [
   {
     chainId: 101,
     address: 'B74ubeZiRaCyvJ7fMGmws4SbiAeP2EbXADVyj2EEg2cv',
-    symbol: 'Wrapped SOL-USDC',
-    name: 'LP Wrapped SOL-USDC',
+    symbol: 'SOL-USDC',
+    name: 'LP SOL-USDC',
     decimals: 9,
     logoURI: '',
   },

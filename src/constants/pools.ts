@@ -11,7 +11,7 @@ export interface PoolSchema {
 
 export const pools: PoolSchema[] = [
   {
-    name: 'Wrapped SOL-USDC',
+    name: 'SOL-USDC',
     address: new PublicKey('C4wqSxdzFX5mFg8Uhk6tHZGmduRE3GsYMf9iQNEHrzp5'), 
     base: 'SOL',
     quote: 'USDC',

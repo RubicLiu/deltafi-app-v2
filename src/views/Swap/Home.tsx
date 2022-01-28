@@ -25,7 +25,7 @@ import SettingsPanel from 'components/SettingsPanel/SettingsPanel'
 import SwapCard from './components/Card'
 import { useModal } from 'providers/modal'
 import { getTokenAccountInfo, getTokenInfo, parseTokenAccountData, useTokenFromMint } from 'providers/tokens'
-import { usePoolFromSymbols } from 'providers/pool'
+import { usePoolFromSymbols, usePools } from 'providers/pool'
 import { exponentiate, exponentiatedBy } from 'utils/decimal'
 import { swap } from 'utils/transactions/swap'
 import { useConfig } from 'providers/config'
@@ -35,7 +35,7 @@ import { SWAP_DIRECTION } from 'lib/instructions'
 import { sendSignedTransaction } from 'utils/transactions'
 import { getSwapOutAmount } from 'utils/swap'
 import { SwapCard as ISwapCard } from './components/types'
-import { tokens } from 'constants/tokens'
+import { TokenInfo, tokens } from 'constants/tokens'
 import { useCustomConnection } from 'providers/connection'
 import BigNumber from 'bignumber.js'
 
@@ -121,6 +121,7 @@ const Home: React.FC = (props) => {
   })
   const { config } = useConfig()
   const pool = usePoolFromSymbols(tokenFrom.token.symbol, tokenTo.token.symbol)
+  const { pools } = usePools();
   const sourceAccount = useTokenFromMint(tokenFrom.token.address)
   const destinationAccount = useTokenFromMint(tokenTo.token.address)
   const sourceBalance = useMemo(() => {
@@ -168,7 +169,19 @@ const Home: React.FC = (props) => {
   })
   const { network } = useCustomConnection()
 
-  useEffect(() => {}, [])
+  const filteredTokenList = (token: TokenInfo) => tokens.filter(
+    (t: TokenInfo) => 
+      pools.find(
+        p => 
+          p.baseTokenInfo.symbol.toLowerCase() === token.symbol.toLowerCase() && 
+          p.quoteTokenInfo.symbol.toLowerCase() === t.symbol.toLowerCase()
+          ||
+          p.baseTokenInfo.symbol.toLowerCase() === t.symbol.toLowerCase() && 
+          p.quoteTokenInfo.symbol.toLowerCase() === token.symbol.toLowerCase()
+      )
+      ||
+      t === token
+  );
 
   const handleSwapDirectionChange = () => {
     const temp = Object.assign({}, tokenFrom)
@@ -401,16 +414,9 @@ const Home: React.FC = (props) => {
   const actionButton = useMemo(() => {
     if (isConnectedWallet) {
 
-      console.log("token to", tokenTo.amount);
-      console.log("pool?.poolState.quoteReserve", exponentiatedBy(pool?.poolState.quoteReserve, tokenFrom.token.decimals).toNumber());
-      console.log("pool?.poolState.quoteTarget", exponentiatedBy(pool?.poolState.quoteTarget, tokenFrom.token.decimals).toNumber());
-      console.log("pool?.poolState.baseReserve", exponentiatedBy(pool?.poolState.baseReserve, tokenFrom.token.decimals).toNumber());
-      console.log("pool?.poolState.baseTarget", exponentiatedBy(pool?.poolState.baseTarget, tokenFrom.token.decimals).toNumber());
-      console.log("pool?.poolState.marketPrice", pool?.poolState.marketPrice.toNumber());
-      console.log("pool?.poolState.slope", pool?.poolState.slope.toNumber());
-      
+      const unavailable = !pool;
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount)
-      const isInsufficientLiquidity = (pool !== null) && exponentiatedBy(
+      const isInsufficientLiquidity = pool && exponentiatedBy(
         tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? pool?.poolState.quoteReserve : pool?.poolState.baseReserve, 
         tokenFrom.token.decimals
       ).isLessThan(
@@ -422,13 +428,13 @@ const Home: React.FC = (props) => {
           fullWidth
           size="large"
           variant="outlined"
-          disabled={isInsufficientBalance || isInsufficientLiquidity}
+          disabled={unavailable || isInsufficientBalance || isInsufficientLiquidity}
           onClick={handleSwap}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Swap, target: EnterAmount"
         >
-          {isInsufficientBalance ? 'Insufficient Balance' : isInsufficientLiquidity ? 'Insufficient Liquidity' : 'Swap'}
+          {unavailable ? 'unavailable' : isInsufficientBalance ? 'Insufficient Balance' : isInsufficientLiquidity ? 'Insufficient Liquidity' : 'Swap'}
         </ConnectButton>
       )
     }
@@ -440,7 +446,7 @@ const Home: React.FC = (props) => {
     )
   }, [isConnectedWallet, handleSwap, setMenu, sourceBalance, pool, tokenFrom])
 
-  if (!pool) return null
+  // if (!pool) return null
 
   const { open, vertical, horizontal } = state
 
