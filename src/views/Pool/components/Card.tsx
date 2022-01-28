@@ -34,7 +34,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
     width: '100%',
     background: palette.background.secondary,
-    padding: spacing(2),
+    marginBottom: spacing(2),
     borderRadius: 8,
     [breakpoints.up('sm')]: {
       padding: `${spacing(3)}px ${spacing(2.5)}px`,

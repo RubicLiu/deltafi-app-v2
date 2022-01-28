@@ -18,6 +18,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
     width: '100%',
     flex: 1,
     padding: `0px ${spacing(2)}px`,
+    marginBottom: spacing(2),
     [breakpoints.up('sm')]: {
       maxWidth: 560,
     },
