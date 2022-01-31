@@ -105,14 +105,14 @@ export async function withdraw({
     })
     transaction = mergeTransactions([createFarmUserTransaction, transaction])
     transaction.add(
-      createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [
+      createRefreshFarmInstruction(pool.publicKey, SWAP_PROGRAM_ID, [
         newFarmUser.publicKey,
       ]),
     )
     signers.push(newFarmUser)
   } else {
     transaction.add(
-      createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [farmUser]),
+      createRefreshFarmInstruction(pool.publicKey, SWAP_PROGRAM_ID, [farmUser]),
     )
   }
 

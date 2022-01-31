@@ -114,7 +114,7 @@ export async function stake({
       ),
     )
     .add(
-      createRefreshFarmInstruction(farmPool.poolAddress, farmPool.publicKey, farmPool.poolMintKey, SWAP_PROGRAM_ID, [
+      createRefreshFarmInstruction(farmPool.poolAddress, SWAP_PROGRAM_ID, [
         farmUser,
       ]),
     )
@@ -165,7 +165,7 @@ export async function unstake({
       ),
     )
     .add(
-      createRefreshFarmInstruction(farmPool.poolAddress, farmPool.publicKey, farmPool.poolMintKey, SWAP_PROGRAM_ID, [
+      createRefreshFarmInstruction(farmPool.poolAddress, SWAP_PROGRAM_ID, [
         farmUser,
       ]),
     )
@@ -235,7 +235,7 @@ export async function refresh({
   }
 
   const transaction = new Transaction()
-  transaction.add(createRefreshFarmInstruction(swap, farmPool, poolMint, SWAP_PROGRAM_ID, [farmUser]))
+  transaction.add(createRefreshFarmInstruction(swap, SWAP_PROGRAM_ID, [farmUser]))
 
   return await signTransaction({ transaction, feePayer: walletPubkey, connection })
 }

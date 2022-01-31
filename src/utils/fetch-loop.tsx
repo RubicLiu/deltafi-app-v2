@@ -97,16 +97,20 @@ class FetchLoopInternal<T = any> {
       return
     }
 
-    let errored = false
+    let errored = false;
+    let lastStatus = null;
+
     try {
       const data = await this.fn()
       if (!this.cacheNullValues && data === null) {
         console.log(`Not caching null value for ${this.cacheKey}`)
         // cached data has not changed so no need to re-render
         this.errors = 0
+        lastStatus = 200;
         return data
       } else {
         globalCache.set(this.cacheKey, data)
+        lastStatus = 200;
         this.errors = 0
         this.notifyListeners()
         return data
@@ -115,15 +119,17 @@ class FetchLoopInternal<T = any> {
       ++this.errors
       console.warn(error)
       errored = true
+      lastStatus = error instanceof Error ? error.stack?.includes("429 Too Many Requests") ? 429 : 404 : 404;
     } finally {
       if (!this.timeoutId && !this.stopped) {
         let waitTime = this.refreshInterval
+
         if (errored && this.refreshIntervalOnError && this.refreshIntervalOnError > 0) {
           waitTime = this.refreshIntervalOnError
         }
 
         // Back off on errors.
-        if (this.errors > 0) {
+        if (this.errors > 0 && lastStatus !== 429) {
           waitTime = Math.min(1000 * 2 ** (this.errors - 1), 60000)
         }
 
@@ -138,11 +144,10 @@ class FetchLoopInternal<T = any> {
           waitTime = 60000
         } else if (!document.hasFocus()) {
           waitTime *= 1.5
-        }
+        } 
 
         // Add jitter so we don't send all requests at the same time.
         waitTime *= 0.8 + 0.4 * Math.random()
-
         this.timeoutId = setTimeout(this.refresh, waitTime)
       }
     }
