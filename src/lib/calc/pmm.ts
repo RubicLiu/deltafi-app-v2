@@ -256,7 +256,7 @@ export class PMM implements PoolState {
     if (targetReserve.isLessThanOrEqualTo(0)) return new BigNumber(0)
     if (quoteAmount.isZero()) return new BigNumber(0)
     if (slope.isGreaterThan(1)) return
-    // console.log(marketPrice.toNumber())
+ 
     const fairAmount = quoteAmount.multipliedBy(marketPrice)
     if (slope.isZero()) return BigNumber.min(fairAmount, currentReserve)
     if (slope.isEqualTo(1)) {

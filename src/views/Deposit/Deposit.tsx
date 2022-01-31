@@ -661,7 +661,6 @@ const Deposit: React.FC = () => {
       )
     } else {
       if (base && quote && baseShare && quoteShare) {
-        console.log(baseShare.toString(), base.amount)
         if (baseShare.isLessThan(new BigNumber(base.amount)) || quoteShare.isLessThan(new BigNumber(quote.amount))) {
           return (
             <ConnectButton size="large" fullWidth disabled>

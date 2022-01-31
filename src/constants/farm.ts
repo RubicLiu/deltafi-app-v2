@@ -8,7 +8,7 @@ export interface FarmPoolSchema extends PoolSchema {
 
 export const farmPools: FarmPoolSchema[] = [
   {
-    name: 'SRM - USDC',
+    name: 'SRM-USDC',
     address: new PublicKey('6RVdK5GK65HT7RJuSCBwzrrPwKmT4Fo5MBj5uRnMBBsS'),
     poolAddress: new PublicKey('HJrcEthNx8TGxJ6uTpxmumwDYbyNjJzjzcUvuXBmtY3P'),
     base: 'SRM',

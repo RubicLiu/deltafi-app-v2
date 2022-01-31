@@ -121,18 +121,22 @@ export function useTokenAccounts(): [TokenAccount[] | null | undefined, boolean]
 }
 
 export function useTokenFromMint(mintAddress: string | null | undefined) {
+
   const [tokens] = useTokenAccounts()
   return useMemo(() => {
+
     if (mintAddress && tokens) {
       for (let i = 0; i < tokens.length; i++) {
         if (tokens[i].effectiveMint.toBase58() === mintAddress && tokens[i].account) {
-          return {
+          const res = {
             ...tokens[i],
             account: parseTokenAccountData(tokens[i].account.data),
           }
+          return res;
         }
       }
     }
-    return null
+    return null;
+
   }, [mintAddress, tokens])
 }

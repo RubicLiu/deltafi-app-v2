@@ -124,7 +124,7 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
   const filtered = farmUserAccountInfos
     .map(({ publicKey, accountInfo }) => ({ publicKey, farmUserInfo: parseFarmUser(accountInfo) }))
     .filter(({ farmUserInfo }) => !!farmUserInfo)
-
+  
   if (filtered.length === 0) return null
 
   const farmUserAddress = filtered[0].publicKey

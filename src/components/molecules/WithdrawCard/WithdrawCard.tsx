@@ -33,8 +33,7 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
 
   const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.replace(/[^\d.-]/g, '')
-    console.log(value)
-    console.log(parseFloat(value))
+   
     handleChangeCard({ ...card, amount: isNaN(parseFloat(value)) ? '' : value })
   }
 

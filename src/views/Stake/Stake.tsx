@@ -46,14 +46,17 @@ const Stake = (): ReactElement => {
   const classes = useStyles()
   const location = useLocation()
   const farmPoolId = location.pathname.split('/').pop()
+  const farmPool = useFarmPoolByAddress(farmPoolId);
+  
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet()
   const { connection } = useConnection()
   const { network } = useCustomConnection()
   const [openSettings, setOpenSettings] = useState(false)
   const [staking, setStaking] = useState({
-    token: getFarmTokenInfo('SOL-SRM'),
+    token: getFarmTokenInfo(farmPool?.name),
     amount: '',
   })
+
   const [priceImpact, setPriceImpact] = useState('2.0')
   const [isIncludeDecimal, setIsIncludeDecimal] = useState(true)
   const [method, switchMethod] = useState<'stake' | 'unstake'>('stake')
@@ -70,9 +73,8 @@ const Stake = (): ReactElement => {
   })
 
   const { config } = useConfig()
-  const farmPool = useFarmPoolByAddress(farmPoolId)
   const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58())
-  const lpMint = useTokenMintAccount(farmPool?.poolMintKey)
+  const lpMint = useTokenMintAccount(farmPool?.poolMintKey);
   const [farmUser] = useFarmUserAccount()
   const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58())
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
