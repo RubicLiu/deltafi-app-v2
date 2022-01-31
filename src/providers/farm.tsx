@@ -182,7 +182,7 @@ export function useFarmUserAccount() {
     getFarmUser,
     tuple('getFarmUser', connection, config?.publicKey.toBase58(), publicKey?.toBase58()),
     {
-      refreshInterval: 5000,
+      refreshInterval: 5000, refreshIntervalOnError: 10000
     },
   )
 }

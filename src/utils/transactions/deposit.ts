@@ -96,14 +96,14 @@ export async function deposit({
     })
     transaction = mergeTransactions([createFarmUserTransaction, transaction])
     transaction.add(
-      createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [
+      createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [
         newFarmUser.publicKey,
       ]),
     )
     signers.push(newFarmUser)
   } else {
     transaction.add(
-      createRefreshFarmInstruction(pool.publicKey, farmPool, pool.poolMintKey, SWAP_PROGRAM_ID, [farmUser]),
+      createRefreshFarmInstruction(farmPool, pool.poolMintKey, [farmUser])
     )
   }
 

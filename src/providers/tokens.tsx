@@ -117,7 +117,7 @@ export function useTokenAccounts(): [TokenAccount[] | null | undefined, boolean]
     }
     return await getTokenAccountInfo(connection, publicKey)
   }
-  return useAsyncData(getTokenAccounts, tuple('getTokenAccounts', publicKey, connected), { refreshInterval: 5000 })
+  return useAsyncData(getTokenAccounts, tuple('getTokenAccounts', publicKey, connected), { refreshInterval: 5000, refreshIntervalOnError: 10000 })
 }
 
 export function useTokenFromMint(mintAddress: string | null | undefined) {
