@@ -42,7 +42,7 @@ export const tokens: TokenInfo[] = [
 export const lpTokens: TokenInfo[] = [
   {
     chainId: 101,
-    address: 'B74ubeZiRaCyvJ7fMGmws4SbiAeP2EbXADVyj2EEg2cv',
+    address: '5oaagwfJiWMKrTyWnu6iUVckJA7HDfLqeyrQVfa48Tkf',
     symbol: 'SOL-USDC',
     name: 'LP SOL-USDC',
     decimals: 9,
@@ -50,7 +50,7 @@ export const lpTokens: TokenInfo[] = [
   },
   {
     chainId: 101,
-    address: 'GaT8mSsujTByV2VFzqcQuNtSvarSkKyn2k6Mqrvp2ddU',
+    address: '23Hw8AY1LFMoTw8nWsGw5MXLCUghDDxX9yr8R7bWFaJc',
     symbol: 'SRM-USDC',
     name: 'LP SRM-USDC',
     decimals: 9,

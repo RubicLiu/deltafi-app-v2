@@ -7,6 +7,7 @@ import { CardProps } from './types'
 import { getTokenInfo } from 'providers/tokens'
 import { useTokenFromMint } from 'providers/tokens'
 import { exponentiatedBy } from 'utils/decimal'
+import BigNumber from 'bignumber.js'
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -84,6 +85,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
   const { card, handleChangeCard, disabled, tokens, disableDrop, percentage } = props
   const classes = useStyles(props)
   const tokenAccount = useTokenFromMint(card.token?.address)
+
   const tokenBalance = useMemo(() => {
     if (tokenAccount && card) {
       return exponentiatedBy(tokenAccount.account.amount, card.token.decimals);
@@ -104,7 +106,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
     if (percentage && tokenBalance) {
       handleChangeCard({
         ...card,
-        amount: ((tokenBalance.toNumber() * percentage) / 100).toString(),
+        amount: tokenBalance.multipliedBy(new BigNumber(percentage)).dividedBy(new BigNumber(100)).toString(),
       })
     }
   }, [card, handleChangeCard, percentage, tokenBalance])
@@ -125,11 +127,16 @@ const SwapCard: React.FC<CardProps> = (props) => {
   }
 
   const value = useMemo(() => {
-    const pointIdx = card.amount.indexOf('.')
-    if (pointIdx > 0) {
-      return card.amount.slice(0, pointIdx) + card.amount.slice(pointIdx, pointIdx + 7)
+    if (card.amount === "") {
+      return "0";
     }
-    return card.amount
+
+    const amountNum = new BigNumber(card.amount);
+    if (amountNum < new BigNumber(1e-7)) {
+      return "0.0000000";
+    }
+
+    return amountNum.toFixed(7).toString();
   }, [card.amount])
 
   return (

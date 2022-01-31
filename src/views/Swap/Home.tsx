@@ -108,6 +108,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }))
 
 const Home: React.FC = (props) => {
+
   const classes = useStyles(props)
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet()
   const { connection } = useConnection()
@@ -136,7 +137,9 @@ const Home: React.FC = (props) => {
     }
     return null
   }, [destinationAccount, tokenTo])
-  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58())
+  
+  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
+
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol)
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol)
   const [priceImpact, setPriceImpact] = useState('2.0')
