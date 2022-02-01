@@ -10,6 +10,7 @@ import Footer from 'components/Footer'
 import { useConfig } from 'providers/config'
 import { usePools } from 'providers/pool'
 import { listSymbols, pools } from 'constants/pools'
+import { FilterCountry } from 'utils/checkJurisdiction'
 
 // import awsconfig from './aws-exports'
 import { MARKET_CONFIG_ADDRESS } from './constants'
@@ -37,6 +38,7 @@ const Pool = lazy(() => import('./views/Pool'))
 const Reward = lazy(() => import('./views/Reward'))
 const Deposit = lazy(() => import('./views/Deposit'))
 const Stake = lazy(() => import('./views/Stake'))
+const Unavailable = lazy(() => import('./views/Unavailable'))
 
 /**
  * Parse the query parameters from url
@@ -110,6 +112,7 @@ const App: React.FC<{params: string}> = ({ params }) => {
   const { setSchemas: setFarmSchema } = useFarmPools()
   const { setNetwork } = useCustomConnection()
   const { setFilters } = usePyth()
+  const validCountry = FilterCountry()
 
   const { connected: isConnectedWallet, publicKey} = useWallet();
 
@@ -130,16 +133,24 @@ const App: React.FC<{params: string}> = ({ params }) => {
       <BrowserRouter>
         <Header />
         <SuspenseWithChunkError fallback={<PageLoader />}>
-          <Switch>
-            <Redirect exact from="/" to="/swap" />
-            <Route path="/swap" exact component={Swap} />
-            <Route path="/pools" exact component={Pool} />
-            <Route path="/deposit/:poolAddress" exact component={Deposit} />
-            <Route path="/farms" exact component={Farm} />
-            <Route path="/rewards" exact component={Reward} />
-            <Route path="/stake/:id" exact component={Stake} />
-            <Redirect from="*" to="/swap" />
-          </Switch>
+          {validCountry ? (
+            <Switch>
+              <Redirect exact from="/" to="/swap" />
+              <Route path="/swap" exact component={Swap} />
+              <Route path="/pools" exact component={Pool} />
+              <Route path="/deposit/:poolAddress" exact component={Deposit} />
+              <Route path="/farms" exact component={Farm} />
+              <Route path="/rewards" exact component={Reward} />
+              <Route path="/stake/:id" exact component={Stake} />
+              <Redirect from="*" to="/swap" />
+            </Switch>
+          ) : (
+            <Switch>
+              <Redirect exact from="/" to="/unavailable" />
+              <Route path="/unavailable" exact component={Unavailable} />
+              <Redirect from="*" to="/unavailable" />
+            </Switch>
+          )}
         </SuspenseWithChunkError>
         <Footer />
       </BrowserRouter>
