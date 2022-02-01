@@ -247,7 +247,7 @@ const Deposit: React.FC = () => {
     status: null,
   })
   const { network } = useCustomConnection()
-
+  
   useEffect(() => {
     if (pool) {
       setBase((base) => ({ ...base, token: pool.baseTokenInfo }))
