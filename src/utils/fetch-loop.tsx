@@ -1,10 +1,12 @@
 import { useEffect, useReducer } from 'react'
 
 import assert from 'assert'
+import {Mutex, Semaphore, withTimeout} from 'async-mutex';
 
 const pageLoadTime = new Date()
 
 const globalCache: Map<any, any> = new Map()
+
 
 class FetchLoopListener<T = any> {
   cacheKey: any
@@ -40,6 +42,7 @@ class FetchLoopInternal<T = any> {
   cacheNullValues: Boolean = true
 
   constructor(cacheKey: any, fn: () => Promise<T>, cacheNullValues: Boolean) {
+
     this.cacheKey = cacheKey
     this.fn = fn
     this.timeoutId = null
@@ -100,8 +103,16 @@ class FetchLoopInternal<T = any> {
     let errored = false;
     let lastStatus = null;
 
+    const self = this;
+
     try {
-      const data = await this.fn()
+      const mutRelease = await globalLoops.mutex.acquire();
+
+      const [ semCount, semReleaser ] = await globalLoops.semaphore.acquire();
+      const data = await self.fn();
+      mutRelease();
+      setTimeout(semReleaser, 5000);
+
       if (!this.cacheNullValues && data === null) {
         console.log(`Not caching null value for ${this.cacheKey}`)
         // cached data has not changed so no need to re-render
@@ -156,8 +167,11 @@ class FetchLoopInternal<T = any> {
 
 class FetchLoops {
   loops = new Map()
+  semaphore = new Semaphore(5); 
+  mutex = new Mutex();
 
   addListener<T>(listener: FetchLoopListener<T>) {
+    const self = this;
     if (!this.loops.has(listener.cacheKey)) {
       this.loops.set(
         listener.cacheKey,
