@@ -11,6 +11,7 @@ import { convertDoller } from 'utils/utils'
 import { usePools } from 'providers/pool'
 import { PMM } from 'lib/calc'
 import usePyth from 'providers/pyth'
+import { useTokenAccounts } from 'providers/tokens'
 import { useCustomConnection } from 'providers/connection'
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
@@ -42,7 +43,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
 
 const Home: React.FC = () => {
   const classes = useStyles()
-  const { schemas, pools } = usePools()
+  const { schemas, pools } = usePools();
+  const [tokens] = useTokenAccounts();
+
   const { symbolMap } = usePyth()
   const { connected: isConnectedWallet } = useWallet()
   const { network } = useCustomConnection()
@@ -86,8 +89,10 @@ const Home: React.FC = () => {
           <Box className={classes.listContainer}>
             <Typography>Your Pools</Typography>
             <Box mt={3.5}>
-              {pools.map((pool) => (
-                <PoolCard isUserPool key={pool.publicKey.toString()} poolKey={pool.publicKey} />
+              {schemas
+              .filter(schema => tokens?.find(token => token.effectiveMint.toBase58() === schema.mintAddress.toBase58()))
+              .map(schema => (
+                <PoolCard isUserPool key={schema.address.toString()} poolKey={schema.address} />
               ))}
             </Box>
           </Box>
@@ -100,7 +105,9 @@ const Home: React.FC = () => {
           )}
           {schemas.length > 0 && (
             <Box className={classes.poolCardContainer}>
-              {schemas.map((schema: PoolSchema) => (
+              {schemas
+              .filter(schema => !tokens?.find(token => token.effectiveMint.toBase58() === schema.mintAddress.toBase58()))
+              .map((schema: PoolSchema) => (
                 <Box key={schema.address.toString()}>
                   <PoolCard poolKey={schema.address} />
                 </Box>

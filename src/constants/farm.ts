@@ -2,8 +2,12 @@ import { PublicKey } from '@solana/web3.js'
 
 import { PoolSchema } from './pools'
 
-export interface FarmPoolSchema extends PoolSchema {
+export interface FarmPoolSchema {
+  name: string
+  address: PublicKey
   poolAddress: PublicKey
+  base: string
+  quote: string
 }
 
 export const farmPools: FarmPoolSchema[] = [
