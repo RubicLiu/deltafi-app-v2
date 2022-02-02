@@ -127,16 +127,14 @@ const SwapCard: React.FC<CardProps> = (props) => {
   }
 
   const value = useMemo(() => {
-    if (card.amount === "") {
-      return "0";
+    const pointIdx = card.amount.indexOf('.')
+    if (pointIdx > 0) {
+      if (Number(card.amount) < 1e-6 && pointIdx < card.amount.length - 1 && card.amount.length - pointIdx > 7) {
+        return "0.000000";
+      }
+      return card.amount.slice(0, pointIdx) + card.amount.slice(pointIdx, pointIdx + 7)
     }
-
-    const amountNum = new BigNumber(card.amount);
-    if (amountNum < new BigNumber(1e-7)) {
-      return "0.0000000";
-    }
-
-    return amountNum.toFixed(7).toString();
+    return card.amount
   }, [card.amount])
 
   return (
