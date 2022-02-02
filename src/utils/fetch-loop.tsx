@@ -105,13 +105,10 @@ class FetchLoopInternal<T = any> {
 
     const self = this;
 
+    const mutRelease = await globalLoops.mutex.acquire();
+    const [ semCount, semReleaser ] = await globalLoops.semaphore.acquire();
     try {
-      const mutRelease = await globalLoops.mutex.acquire();
-
-      const [ semCount, semReleaser ] = await globalLoops.semaphore.acquire();
       const data = await self.fn();
-      mutRelease();
-      setTimeout(semReleaser, 5000);
 
       if (!this.cacheNullValues && data === null) {
         console.log(`Not caching null value for ${this.cacheKey}`)
@@ -132,6 +129,9 @@ class FetchLoopInternal<T = any> {
       errored = true
       lastStatus = error instanceof Error ? error.stack?.includes("429 Too Many Requests") ? 429 : 404 : 404;
     } finally {
+      mutRelease();
+      setTimeout(semReleaser, 5000);
+
       if (!this.timeoutId && !this.stopped) {
         let waitTime = this.refreshInterval
 
