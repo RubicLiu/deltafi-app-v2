@@ -73,35 +73,59 @@ export const getProgramAccountsCached = (() => {
     account: AccountInfo<Buffer>;
   }[]> = {};
 
-  return async (pubkey: PublicKey, connection: Connection, filters: any) => {
-    const filtersHash = hash.keys({filters: filters, pubkey: pubkey});
+  return async (pubkey: PublicKey, connection: Connection, configs: any) => {
+    const filtersHash = hash.keys({configs: configs, pubkey: pubkey});
     if (accountMapping[filtersHash]) {
       return accountMapping[filtersHash];
     }
 
-    const result = await connection.getProgramAccounts(pubkey, filters);
+    const result = await connection.getProgramAccounts(pubkey, configs);
     accountMapping[filtersHash] = result;
 
     return result;
   }
 })()
 
+const filteredProgramAccountsCache: Record<string, {
+  pubkey: PublicKey;
+  account: AccountInfo<Buffer>;
+}[]> = {};
+
 export async function getFilteredProgramAccounts(
   connection: Connection,
   programId: PublicKey,
   filters: any,
 ): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
+  let resp = null;
 
-  const resp = await getProgramAccountsCached(programId, connection, {
-    commitment: connection.commitment,
-    filters,
-    encoding: 'base64',
-  });
+  const keyHash = hash.keys({programId, filters});
+  if (filteredProgramAccountsCache[keyHash]) {
+    resp = filteredProgramAccountsCache[keyHash];
+  }
+  else {
+    // @ts-ignore
+    resp = await connection._rpcRequest('getProgramAccounts', [
+      programId.toBase58(),
+      {
+        commitment: connection.commitment,
+        filters,
+        encoding: 'base64',
+      },
+    ]);
 
-  return resp.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
+    if (resp.error) {
+      throw new Error(resp.error.message)
+    } 
+    else {
+      filteredProgramAccountsCache[keyHash] = resp;
+    }
+  }
+  
+  // @ts-ignore
+  return resp.result.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
     publicKey: new PublicKey(pubkey),
     accountInfo: {
-      data,
+      data: Buffer.from(data[0], 'base64'),
       executable,
       owner: new PublicKey(owner),
       lamports,

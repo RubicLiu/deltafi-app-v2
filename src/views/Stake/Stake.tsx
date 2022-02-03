@@ -17,8 +17,8 @@ import {
 import { Settings as SettingsIcon, Close as CloseIcon } from '@material-ui/icons'
 import BigNumber from 'bignumber.js'
 
-import SwapCard from 'views/Swap/components/Card'
-import { SwapCard as ISwapCard } from 'views/Swap/components/types'
+import StakeCard from 'views/Stake/components/Card'
+import { StakeCard as IStakeCard } from 'views/Stake/components/types'
 import Page from 'components/layout/Page'
 import SettingsPanel from 'components/SettingsPanel/SettingsPanel'
 import { ConnectButton, LinkIcon } from 'components'
@@ -39,7 +39,7 @@ interface TransactionResult {
   status: boolean | null
   action?: 'stake' | 'unstake' | 'claim'
   hash?: string
-  stake?: ISwapCard
+  stake?: IStakeCard
 }
 
 const Stake = (): ReactElement => {
@@ -52,14 +52,30 @@ const Stake = (): ReactElement => {
   const { connection } = useConnection()
   const { network } = useCustomConnection()
   const [openSettings, setOpenSettings] = useState(false)
+  const token = getFarmTokenInfo(farmPool?.name);
+  const tokenAccount = useTokenFromMint(token?.address)
+
   const [staking, setStaking] = useState({
-    token: getFarmTokenInfo(farmPool?.name),
+    isStake: true,
+    token: token,
+    balance: null,
     amount: '',
   })
 
+  const tokenBalance = useMemo(() => {
+    if (tokenAccount) {
+      const value = exponentiatedBy(tokenAccount.account.amount, staking.token.decimals);
+      if (staking.isStake) {
+        setStaking({...staking, balance: value});
+      }
+      return value;
+    }
+    return null
+  }, [tokenAccount])
+
+
   const [priceImpact, setPriceImpact] = useState('2.0')
   const [isIncludeDecimal, setIsIncludeDecimal] = useState(true)
-  const [method, switchMethod] = useState<'stake' | 'unstake'>('stake')
   const [percentage, setPercentage] = useState(0)
   const { setMenu } = useModal()
   const [state, setState] = useState<{
@@ -92,6 +108,10 @@ const Stake = (): ReactElement => {
 
   const depositAmount = useMemo(() => {
     if (position && lpMint) {
+      const value = exponentiatedBy(position.depositBalance, lpMint.decimals);
+      if (!staking.isStake) {
+        setStaking({...staking, balance: value});
+      }
       return exponentiatedBy(position.depositBalance, lpMint.decimals)
     }
     return new BigNumber(0)
@@ -111,17 +131,16 @@ const Stake = (): ReactElement => {
     }
   }, [farmPool, totalStaked])
 
-  const handleSwitchMethod = (method: 'stake' | 'unstake') => {
-    switchMethod(method)
+  const handleSwitchMethod = () => {
     setPercentage(0)
-    setStaking((staking) => ({ ...staking, amount: '' }))
+    setStaking((staking) => ({ ...staking, isStake: !staking.isStake, balance: !staking.isStake ? tokenBalance : depositAmount, amount: '' }))
   }
 
   const handleStake = useCallback(async () => {
     if (!connection || !farmPool || !walletPubkey || !lpMint || !lpToken) {
       return null
     }
-    if (method === 'stake') {
+    if (staking.isStake) {
       if (staking.amount === '' || new BigNumber(lpToken.account.amount).lt(staking.amount)) {
         return null
       }
@@ -205,7 +224,6 @@ const Stake = (): ReactElement => {
     lpMint,
     lpToken,
     signTransaction,
-    method,
     position,
     depositAmount,
   ])
@@ -393,15 +411,15 @@ const Stake = (): ReactElement => {
             <Box className={classes.tabs}>
               <Box>
                 <MUIButton
-                  className={method === 'stake' ? classes.activeBtn : classes.btn}
-                  onClick={() => handleSwitchMethod('stake')}
+                  className={staking.isStake ? classes.activeBtn : classes.btn}
+                  onClick={() => handleSwitchMethod()}
                 >
                   Stake
                 </MUIButton>
                 &nbsp;
                 <MUIButton
-                  className={method === 'unstake' ? classes.activeBtn : classes.btn}
-                  onClick={() => handleSwitchMethod('unstake')}
+                  className={!staking.isStake ? classes.activeBtn : classes.btn}
+                  onClick={() => handleSwitchMethod()}
                 >
                   Unstake
                 </MUIButton>
@@ -422,7 +440,7 @@ const Stake = (): ReactElement => {
 
           <ReactCardFlip isFlipped={openSettings}>
             <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <SwapCard
+              <StakeCard
                 card={staking}
                 handleChangeCard={setStaking}
                 tokens={lpTokens}
@@ -450,7 +468,7 @@ const Stake = (): ReactElement => {
                 data-amp-analytics-name="click"
                 data-amp-analytics-attrs="page: Deposit, target: Deposit"
               >
-                {method === 'stake' ? 'Stake' : 'Unstake'}
+                {staking.isStake ? 'Stake' : 'Unstake'}
               </ConnectButton>
             ) : (
               <ConnectButton size="large" fullWidth onClick={() => setMenu(true, 'connect')}>
