@@ -1,7 +1,6 @@
 import { useEffect, useReducer } from 'react'
 
 import assert from 'assert'
-import {Mutex, Semaphore, withTimeout} from 'async-mutex';
 
 const pageLoadTime = new Date()
 
@@ -104,9 +103,6 @@ class FetchLoopInternal<T = any> {
     let lastStatus = null;
 
     const self = this;
-
-    const mutRelease = await globalLoops.mutex.acquire();
-    const [ semCount, semReleaser ] = await globalLoops.semaphore.acquire();
     try {
       const data = await self.fn();
 
@@ -129,8 +125,6 @@ class FetchLoopInternal<T = any> {
       errored = true
       lastStatus = error instanceof Error ? error.stack?.includes("429 Too Many Requests") ? 429 : 404 : 404;
     } finally {
-      mutRelease();
-      setTimeout(semReleaser, 5000);
 
       if (!this.timeoutId && !this.stopped) {
         let waitTime = this.refreshInterval
@@ -167,8 +161,6 @@ class FetchLoopInternal<T = any> {
 
 class FetchLoops {
   loops = new Map()
-  semaphore = new Semaphore(5); 
-  mutex = new Mutex();
 
   addListener<T>(listener: FetchLoopListener<T>) {
     const self = this;

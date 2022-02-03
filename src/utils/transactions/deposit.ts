@@ -102,9 +102,9 @@ export async function deposit({
     )
     signers.push(newFarmUser)
   } else {
-    transaction.add(
-      createRefreshFarmInstruction(farmPool, pool.poolMintKey, [farmUser])
-    )
+    // transaction.add(
+    //   createRefreshFarmInstruction(farmPool, pool.poolMintKey, [farmUser])
+    // )
   }
 
   transaction = mergeTransactions([createAccountTransaction, transaction])
