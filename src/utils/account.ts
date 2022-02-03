@@ -8,7 +8,6 @@ import {
   TransactionSignature,
   Commitment,
 } from '@solana/web3.js'
-import { connect } from 'http2'
 
 import hash from 'object-hash'
 import { chunks } from './utils'
