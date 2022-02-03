@@ -46,12 +46,10 @@ const Home: React.FC = (props) => {
   return (
     <Page>
       <Typography variant="h1" align="center" paragraph className={classes.header}>
-        Sorry, Deltafi is not available in your country.
+      You are accessing DeltaFi from a restricted territory.
       </Typography>
       <Typography variant="h6" align="center" paragraph className={classes.content}>
-        Sorry https://www.deltafi.ai/ doesn't offer its service in your region.
-        <br />
-        If you think your access is restricted by mistake or have other questions, please contact us via:
+      Unfortunately, this means you will not be allowed to connect your wallet and use DeltaFi Protocol.
       </Typography>
       <Box display="flex" className={classes.socialLinks}>
         <Link

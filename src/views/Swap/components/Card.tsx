@@ -104,9 +104,10 @@ const SwapCard: React.FC<CardProps> = (props) => {
 
   useEffect(() => {
     if (percentage && tokenBalance) {
+      const realAmount = tokenBalance.multipliedBy(new BigNumber(percentage)).dividedBy(new BigNumber(100));
       handleChangeCard({
         ...card,
-        amount: tokenBalance.multipliedBy(new BigNumber(percentage)).dividedBy(new BigNumber(100)).toString(),
+        amount: realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString()
       })
     }
   }, [card, handleChangeCard, percentage, tokenBalance])
@@ -127,16 +128,11 @@ const SwapCard: React.FC<CardProps> = (props) => {
   }
 
   const value = useMemo(() => {
-    if (card.amount === "") {
-      return "0";
+    const pointIdx = card.amount.indexOf('.')
+    if (pointIdx > 0) {
+      return card.amount.slice(0, pointIdx) + card.amount.slice(pointIdx, pointIdx + 7)
     }
-
-    const amountNum = new BigNumber(card.amount);
-    if (amountNum < new BigNumber(1e-7)) {
-      return "0.0000000";
-    }
-
-    return amountNum.toFixed(7).toString();
+    return card.amount
   }, [card.amount])
 
   return (
