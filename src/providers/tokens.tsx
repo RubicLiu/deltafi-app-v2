@@ -5,7 +5,7 @@ import { TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
 import { useWallet, useConnection } from '@solana/wallet-adapter-react'
 import tuple from 'immutable-tuple'
 import { u8, struct, blob } from 'buffer-layout'
-
+import { getProgramAccountsCached } from 'utils/account'
 import { publicKey, u64 } from 'utils/layout'
 import { lpTokens, tokens } from 'constants/tokens'
 import { useAccountInfo } from './connection'
@@ -75,9 +75,9 @@ export async function getOwnedTokenAccounts(
   publicKey: PublicKey,
 ): Promise<Array<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }>> {
   let filters = getOwnedAccountsFilters(publicKey)
-  let resp = await connection.getProgramAccounts(TOKEN_PROGRAM_ID, {
-    filters,
-  })
+
+  let resp = await getProgramAccountsCached(TOKEN_PROGRAM_ID, connection, { filters });
+  
   return resp.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
     publicKey: new PublicKey(pubkey),
     accountInfo: {
@@ -117,24 +117,43 @@ export function useTokenAccounts(): [TokenAccount[] | null | undefined, boolean]
     }
     return await getTokenAccountInfo(connection, publicKey)
   }
-  return useAsyncData(getTokenAccounts, tuple('getTokenAccounts', publicKey, connected), { refreshInterval: 5000, refreshIntervalOnError: 10000 })
+  return useAsyncData(getTokenAccounts, tuple('getTokenAccounts', publicKey, connected), { refreshInterval: 1000, refreshIntervalOnError: 5000 })
 }
 
 export function useTokenFromMint(mintAddress: string | null | undefined) {
 
   const [tokens] = useTokenAccounts()
   return useMemo(() => {
-
+    
     if (mintAddress && tokens) {
-      for (let i = 0; i < tokens.length; i++) {
-        if (tokens[i].effectiveMint.toBase58() === mintAddress && tokens[i].account) {
-          const res = {
-            ...tokens[i],
-            account: parseTokenAccountData(tokens[i].account.data),
-          }
-          return res;
-        }
+      const targetTokens = tokens.filter(token => token.effectiveMint.toBase58() === mintAddress && token.account);
+
+      if (!targetTokens || targetTokens.length === 0) {
+        return null;
       }
+      const targetToken = targetTokens.reduce((a, b) => {
+        const accountA = parseTokenAccountData(a.account.data);
+        const accountB = parseTokenAccountData(b.account.data);
+        if (accountA.amount > accountB.amount) {
+          return a;
+        }
+        return b;
+      })
+      
+      return {
+        ...targetToken, 
+        account: parseTokenAccountData(targetToken.account.data)
+      }
+
+      // for (let i = 0; i < tokens.length; i++) {
+      //   if (tokens[i].effectiveMint.toBase58() === mintAddress && tokens[i].account) {
+      //     const res = {
+      //       ...tokens[i],
+      //       account: parseTokenAccountData(tokens[i].account.data),
+      //     }
+      //     return res;
+      //   }
+      // }
     }
     return null;
 

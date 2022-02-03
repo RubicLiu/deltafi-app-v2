@@ -58,7 +58,9 @@
     "typeface-rubik": "^1.1.13",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1", 
-    "async-mutex": "^0.3.2"
+    "async-mutex": "^0.3.2", 
+    "ts-md5": "^1.2.11", 
+    "object-hash": "^2.2.0"
   },
   "scripts": {
     "start": "PORT=3001 react-scripts --max_old_space_size=8128 start",

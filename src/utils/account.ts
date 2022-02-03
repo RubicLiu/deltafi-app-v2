@@ -8,7 +8,9 @@ import {
   TransactionSignature,
   Commitment,
 } from '@solana/web3.js'
+import { connect } from 'http2'
 
+import hash from 'object-hash'
 import { chunks } from './utils'
 
 export const loadAccount = async (
@@ -66,29 +68,41 @@ export const sendAndConfirmTransaction = async (
   return txSig
 }
 
+export const getProgramAccountsCached = (() => {
+  const accountMapping: Record<string, {
+    pubkey: PublicKey;
+    account: AccountInfo<Buffer>;
+  }[]> = {};
+
+  return async (pubkey: PublicKey, connection: Connection, filters: any) => {
+    const filtersHash = hash.keys({filters: filters, pubkey: pubkey});
+    if (accountMapping[filtersHash]) {
+      return accountMapping[filtersHash];
+    }
+
+    const result = await connection.getProgramAccounts(pubkey, filters);
+    accountMapping[filtersHash] = result;
+
+    return result;
+  }
+})()
+
 export async function getFilteredProgramAccounts(
   connection: Connection,
   programId: PublicKey,
   filters: any,
 ): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
-  // @ts-ignore
-  const resp = await connection._rpcRequest('getProgramAccounts', [
-    programId.toBase58(),
-    {
-      commitment: connection.commitment,
-      filters,
-      encoding: 'base64',
-    },
-  ])
 
-  if (resp.error) {
-    throw new Error(resp.error.message)
-  }
-  // @ts-ignore
-  return resp.result.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
+  const resp = await getProgramAccountsCached(programId, connection, {
+    commitment: connection.commitment,
+    filters,
+    encoding: 'base64',
+  });
+
+  return resp.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
     publicKey: new PublicKey(pubkey),
     accountInfo: {
-      data: Buffer.from(data[0], 'base64'),
+      data,
       executable,
       owner: new PublicKey(owner),
       lamports,
