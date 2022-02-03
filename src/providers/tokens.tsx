@@ -92,8 +92,6 @@ export async function getOwnedTokenAccounts(
     tokenAccountCache[keyHash] = resp;
   }
 
-  // const resp = t
-  // let resp = await getProgramAccountsCached(TOKEN_PROGRAM_ID, connection, { filters });
   tokenAccountCache[keyHash] = resp;
   
   return resp.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
