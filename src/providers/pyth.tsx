@@ -35,7 +35,7 @@ const handlePriceInfo = (
   priceAccountKey: PublicKey,
 ) => {
   if (!accountInfo || !accountInfo.data) return
-  const price = parsePriceData(accountInfo.data)
+  const price = parsePriceData(accountInfo.data);
   setSymbolMap(createSetSymbolMapUpdater(symbol, product, price, priceAccountKey))
 }
 
@@ -84,6 +84,7 @@ export function PythProvider({ children }) {
           productsData.map((p) => p.priceAccountKey),
           'confirmed',
         )
+
         if (cancelled) return
         for (let i = 0; i < productsInfos.keys.length; i++) {
           // const key = productsInfos.keys[i]
@@ -94,12 +95,15 @@ export function PythProvider({ children }) {
           const priceAccountKey = productData.priceAccountKey
           const priceInfo = priceInfos.array[i]
 
-          if ((!filters || filters.includes(symbol)) && !BAD_SYMBOLS.includes(symbol)) {
-            handlePriceInfo(symbol, product, priceInfo as AccountInfo<Buffer>, setSymbolMap, priceAccountKey)
+          const parsedSymbol = symbol.split(".");
+          const simpleSymbol = parsedSymbol[parsedSymbol.length - 1];
+
+          if ((!filters || filters.includes(simpleSymbol)) && !BAD_SYMBOLS.includes(symbol)) {
+            handlePriceInfo(simpleSymbol, product, priceInfo as AccountInfo<Buffer>, setSymbolMap, priceAccountKey)
 
             subscription_ids.push(
               connection.onAccountChange(priceAccountKey, (accountInfo) => {
-                handlePriceInfo(symbol, product, accountInfo, setSymbolMap, priceAccountKey)
+                handlePriceInfo(simpleSymbol, product, accountInfo, setSymbolMap, priceAccountKey)
               }),
             )
           }

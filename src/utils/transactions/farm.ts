@@ -165,7 +165,7 @@ export async function unstake({
       ),
     )
     .add(
-      createRefreshFarmInstruction(farmPool.poolAddress, SWAP_PROGRAM_ID, [
+      createRefreshFarmInstruction(farmPool.publicKey, SWAP_PROGRAM_ID, [
         farmUser,
       ]),
     )

@@ -131,9 +131,9 @@ const Stake = (): ReactElement => {
     }
   }, [farmPool, totalStaked])
 
-  const handleSwitchMethod = () => {
+  const handleSwitchMethod = (method: "stake" | "unstake") => {
     setPercentage(0)
-    setStaking((staking) => ({ ...staking, isStake: !staking.isStake, balance: !staking.isStake ? tokenBalance : depositAmount, amount: '' }))
+    setStaking((staking) => ({ ...staking, isStake: method === "stake" ? true : false, balance: method === "stake" ? tokenBalance : depositAmount, amount: '' }))
   }
 
   const handleStake = useCallback(async () => {
@@ -178,6 +178,7 @@ const Stake = (): ReactElement => {
       }
     } else {
       if (staking.amount === '' || !position || depositAmount.lt(staking.amount)) {
+        console.log("null unstake", staking.amount, position, depositAmount);
         return null
       }
 
@@ -412,14 +413,14 @@ const Stake = (): ReactElement => {
               <Box>
                 <MUIButton
                   className={staking.isStake ? classes.activeBtn : classes.btn}
-                  onClick={() => handleSwitchMethod()}
+                  onClick={() => handleSwitchMethod("stake")}
                 >
                   Stake
                 </MUIButton>
                 &nbsp;
                 <MUIButton
                   className={!staking.isStake ? classes.activeBtn : classes.btn}
-                  onClick={() => handleSwitchMethod()}
+                  onClick={() => handleSwitchMethod("unstake")}
                 >
                   Unstake
                 </MUIButton>
