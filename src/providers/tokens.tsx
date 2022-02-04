@@ -11,6 +11,7 @@ import { lpTokens, tokens } from 'constants/tokens'
 import { useAccountInfo } from './connection'
 import { MintInfo, TokenAccount, TokenAccountInfo } from './types'
 import { useAsyncData } from 'utils/fetch-loop'
+import hash from 'object-hash'
 
 // Mock for testnet development
 export function getTokenInfo(symbol: string) {
@@ -70,13 +71,28 @@ export function getOwnedAccountsFilters(publicKey: PublicKey) {
   ]
 }
 
+const tokenAccountCache: Record<string, {
+  pubkey: PublicKey;
+  account: AccountInfo<Buffer>;
+}[]> = {};
+
 export async function getOwnedTokenAccounts(
   connection: Connection,
   publicKey: PublicKey,
 ): Promise<Array<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }>> {
   let filters = getOwnedAccountsFilters(publicKey)
+  const keyHash = hash.keys({filters, publicKey});
 
-  let resp = await getProgramAccountsCached(TOKEN_PROGRAM_ID, connection, { filters });
+  let resp = null;
+  if (tokenAccountCache[keyHash]) {
+    resp = tokenAccountCache[keyHash];
+  }
+  else {
+    resp = await getProgramAccountsCached(TOKEN_PROGRAM_ID, connection, { filters });
+    tokenAccountCache[keyHash] = resp;
+  }
+
+  tokenAccountCache[keyHash] = resp;
   
   return resp.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
     publicKey: new PublicKey(pubkey),
