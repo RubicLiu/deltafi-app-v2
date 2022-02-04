@@ -142,6 +142,7 @@ const Home: React.FC = (props) => {
 
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol)
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol)
+
   const [priceImpact, setPriceImpact] = useState('2.0')
   const [isIncludeDecimal, setIsIncludeDecimal] = useState(true)
   const [openSettings, setOpenSettings] = useState(false)
