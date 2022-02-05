@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import { AccountInfo, PublicKey, Connection } from '@solana/web3.js'
-import { TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
+import { TOKEN_PROGRAM_ID, NATIVE_MINT, AccountLayout } from '@solana/spl-token'
 import { useWallet, useConnection } from '@solana/wallet-adapter-react'
 import tuple from 'immutable-tuple'
 import { u8, struct, blob } from 'buffer-layout'
@@ -117,6 +117,18 @@ export async function getTokenAccountInfo(connection: Connection, ownerAddress: 
       effectiveMint: parseTokenAccountData(accountInfo.data).mint,
     }
   })
+  // AccountInfo.data is empty for SPL, allocate buffer and encode it as a SOL token
+  let balance = await connection.getBalance(ownerAddress);
+  account.data = Buffer.alloc(ACCOUNT_LAYOUT.span);
+  ACCOUNT_LAYOUT.encode(
+    {
+      mint: NATIVE_MINT,
+      owner: ownerAddress,
+      amount: new BigNumber(balance),
+    },
+    account.data,
+  )
+
   return parsedSplAccounts.concat({
     pubkey: ownerAddress,
     account,

@@ -1,10 +1,11 @@
-import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
+import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
 import { createApproveInstruction, createSwapInstruction, SwapData, SWAP_DIRECTION } from 'lib/instructions'
 import { ExTokenAccount, MarketConfig, PoolInfo } from 'providers/types'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
+import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
 
 export async function swap({
   connection,
@@ -27,6 +28,66 @@ export async function swap({
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
     return null
+  }
+
+  const walletBalance = await connection.getBalance(walletPubkey);
+  const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
+  const tempAccountRefKeyPair = Keypair.generate();
+  let createWrappedTokenAccountTransaction: Transaction | undefined
+  let initializeWrappedTokenAccountTransaction: Transaction | undefined
+  let closeWrappedTokenAccountTransaction: Transaction | undefined
+
+
+  let buySol = (pool.quoteTokenInfo.symbol === 'SOL' && swapData.swapDirection === SWAP_DIRECTION.SellBase) || 
+  (pool.baseTokenInfo.symbol === 'SOL' && swapData.swapDirection === SWAP_DIRECTION.SellQuote)
+
+  let sellSol = (pool.quoteTokenInfo.symbol === 'SOL' && swapData.swapDirection === SWAP_DIRECTION.SellQuote) || 
+  (pool.baseTokenInfo.symbol === 'SOL' && swapData.swapDirection === SWAP_DIRECTION.SellBase)
+
+  let sourceRef: PublicKey = source.pubkey;
+
+  if ( buySol || sellSol) {
+      let tmpAccountLamport = buySol ? (lamports * 2) : (walletBalance - lamports * 2);
+
+      createWrappedTokenAccountTransaction = new Transaction()
+      createWrappedTokenAccountTransaction
+      .add(
+        SystemProgram.createAccount({
+          fromPubkey: walletPubkey,
+          newAccountPubkey: tempAccountRefKeyPair.publicKey,
+          lamports: tmpAccountLamport,
+          space: AccountLayout.span,
+          programId: TOKEN_PROGRAM_ID,
+        })
+      )
+
+      initializeWrappedTokenAccountTransaction = new Transaction()
+      initializeWrappedTokenAccountTransaction
+      .add(
+        Token.createInitAccountInstruction(
+          TOKEN_PROGRAM_ID,
+          NATIVE_MINT,
+          tempAccountRefKeyPair.publicKey,
+          walletPubkey,
+        )
+      )
+      
+      closeWrappedTokenAccountTransaction = new Transaction()
+      closeWrappedTokenAccountTransaction
+      .add(
+        Token.createCloseAccountInstruction(
+          TOKEN_PROGRAM_ID,
+          tempAccountRefKeyPair.publicKey,
+          walletPubkey,
+          walletPubkey,
+          []
+        )
+      )
+      if (buySol) {
+        destinationRef = tempAccountRefKeyPair.publicKey
+      } else {
+        sourceRef = tempAccountRefKeyPair.publicKey
+      }
   }
 
   let createDestinationAccountTransaction: Transaction | undefined
@@ -75,7 +136,7 @@ export async function swap({
 
   let transaction = new Transaction()
   transaction
-    .add(createApproveInstruction(source.pubkey, userTransferAuthority.publicKey, walletPubkey, swapData.amountIn))
+    .add(createApproveInstruction(sourceRef, userTransferAuthority.publicKey, walletPubkey, swapData.amountIn))
     .add(
       createSwapInstruction(
         config.publicKey,
@@ -83,7 +144,7 @@ export async function swap({
         marketAuthority,
         swapAuthority,
         userTransferAuthority.publicKey,
-        source.pubkey,
+        sourceRef,
         swapSource,
         swapDestination,
         destinationRef,
@@ -97,7 +158,10 @@ export async function swap({
       ),
     )
 
-  transaction = mergeTransactions([createDestinationAccountTransaction, createRewardAccountTransaction, transaction])
-
-  return await signTransaction({ transaction, feePayer: walletPubkey, signers: [userTransferAuthority], connection })
+  transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createDestinationAccountTransaction, createRewardAccountTransaction, transaction, closeWrappedTokenAccountTransaction])
+  if ( buySol || sellSol ) {
+      return await signTransaction({ transaction, feePayer: walletPubkey, signers: [userTransferAuthority, tempAccountRefKeyPair], connection })
+  } else {
+      return await signTransaction({ transaction, feePayer: walletPubkey, signers: [userTransferAuthority], connection })
+  }
 }

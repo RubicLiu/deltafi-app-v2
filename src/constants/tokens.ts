@@ -23,7 +23,7 @@ export const tokens: TokenInfo[] = [
     chainId: 101,
     address: 'So11111111111111111111111111111111111111112',
     symbol: 'SOL',
-    name: 'Wrapped Solana',
+    name: 'SOL',
     decimals: 9,
     logoURI:
       "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
@@ -55,5 +55,13 @@ export const lpTokens: TokenInfo[] = [
     name: 'LP SRM-USDC',
     decimals: 9,
     logoURI: '',
-  }
+  },
+  {
+    chainId: 101,
+    address: 'CmHe7bFBh44EnBY6s2vr8s1pDdwssPtQFqNfuebp52Ay',
+    symbol: 'SOL-SRM',
+    name: 'LP SOL-SRM',
+    decimals: 9,
+    logoURI: '',
+  },  
 ]

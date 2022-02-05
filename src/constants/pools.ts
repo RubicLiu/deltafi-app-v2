@@ -24,7 +24,14 @@ export const pools: PoolSchema[] = [
     mintAddress: new PublicKey('23Hw8AY1LFMoTw8nWsGw5MXLCUghDDxX9yr8R7bWFaJc'), 
     base: 'SRM',
     quote: 'USDC',
-  }
+  },
+  {
+    name: 'SOL-SRM',
+    address: new PublicKey('8VvDYTxmcTc52q6NoQwCpHe9b82q7HLL6rZhpCJfqLpn'),
+    mintAddress: new PublicKey('CmHe7bFBh44EnBY6s2vr8s1pDdwssPtQFqNfuebp52Ay'),
+    base: 'SOL',
+    quote: 'SRM',
+  },
 ]
 
 export const listSymbols = (pools: PoolSchema[]) => {

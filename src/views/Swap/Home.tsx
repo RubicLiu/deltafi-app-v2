@@ -423,7 +423,7 @@ const Home: React.FC = (props) => {
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount)
       const isInsufficientLiquidity = pool && exponentiatedBy(
         tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? pool?.poolState.quoteReserve : pool?.poolState.baseReserve, 
-        tokenFrom.token.decimals
+        tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? tokenTo.token.decimals : tokenFrom.token.decimals,
       ).isLessThan(
         tokenTo.amount,
       )

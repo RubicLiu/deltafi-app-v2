@@ -18,4 +18,12 @@ export const farmPools: FarmPoolSchema[] = [
     base: 'SRM',
     quote: 'USDC',
   },
+  
+  {
+    name: 'SOL - SRM',
+    address: new PublicKey('AsnEmr6TrFDbd2qJKU9iBrjNWQJCKGWLVzyZEEp75gCd'),
+    poolAddress: new PublicKey('8VvDYTxmcTc52q6NoQwCpHe9b82q7HLL6rZhpCJfqLpn'),
+    base: 'SOL',
+    quote: 'SRM',
+  },
 ]
