@@ -95,15 +95,12 @@ export function PythProvider({ children }) {
           const priceAccountKey = productData.priceAccountKey
           const priceInfo = priceInfos.array[i]
 
-          const parsedSymbol = symbol.split(".");
-          const simpleSymbol = parsedSymbol[parsedSymbol.length - 1];
-
-          if ((!filters || filters.includes(simpleSymbol)) && !BAD_SYMBOLS.includes(symbol)) {
-            handlePriceInfo(simpleSymbol, product, priceInfo as AccountInfo<Buffer>, setSymbolMap, priceAccountKey)
+          if ((!filters || filters.includes(symbol)) && !BAD_SYMBOLS.includes(symbol)) {
+            handlePriceInfo(symbol, product, priceInfo as AccountInfo<Buffer>, setSymbolMap, priceAccountKey)
 
             subscription_ids.push(
               connection.onAccountChange(priceAccountKey, (accountInfo) => {
-                handlePriceInfo(simpleSymbol, product, accountInfo, setSymbolMap, priceAccountKey)
+                handlePriceInfo(symbol, product, accountInfo, setSymbolMap, priceAccountKey)
               }),
             )
           }

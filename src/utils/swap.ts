@@ -18,10 +18,10 @@ export function getSwapOutAmount(
   const adminFeeNumerator1 = new BigNumber(adminTradeFeeNumerator.toString())
   const adminFeeDenominator1 = new BigNumber(adminTradeFeeDenominator.toString())
   const pmmState = new PMMState({
-    B: poolState.baseReserve,
-    Q: poolState.quoteReserve,
-    B0: poolState.baseTarget,
-    Q0: poolState.quoteTarget,
+    B: exponentiatedBy(poolState.baseReserve, baseTokenInfo.decimals),
+    Q: exponentiatedBy(poolState.quoteReserve, quoteTokenInfo.decimals),
+    B0: exponentiatedBy(poolState.baseTarget, baseTokenInfo.decimals),
+    Q0: exponentiatedBy(poolState.quoteTarget, quoteTokenInfo.decimals),
     R: poolState.multiplier as number,
     i: poolState.marketPrice,
     K: poolState.slope,
@@ -30,7 +30,7 @@ export function getSwapOutAmount(
   })
 
   if (fromTokenMint === baseTokenInfo.address && toTokenMint === quoteTokenInfo.address) {
-    const baseAmount = exponentiate(amount, baseTokenInfo.decimals)
+    const baseAmount = new BigNumber(amount);
     const quoteAmount = pmmHelper.querySellBase(baseAmount, pmmState)
     const fee = quoteAmount.multipliedBy(pmmState.mtFeeRate)
     const lpFee = fee.multipliedBy(pmmState.lpFeeRate)
@@ -40,52 +40,36 @@ export function getSwapOutAmount(
      */
     const baseBalance = poolState.baseReserve.plus(baseAmount)
     const quoteBalance = poolState.quoteReserve.minus(quoteAmount)
-    const beforePrice = exponentiate(
-      exponentiatedBy(poolState.quoteReserve, quoteTokenInfo.decimals).dividedBy(
-        exponentiatedBy(poolState.baseReserve, baseTokenInfo.decimals),
-      ),
-      quoteTokenInfo.decimals,
-    )
-    const afterPrice = exponentiate(
-      exponentiatedBy(quoteBalance, quoteTokenInfo.decimals).dividedBy(
-        exponentiatedBy(baseBalance, baseTokenInfo.decimals),
-      ),
-      quoteTokenInfo.decimals,
-    )
+    const beforePrice = poolState.quoteReserve.dividedBy(poolState.baseReserve);
+
+    const afterPrice = quoteBalance.dividedBy(baseBalance);
+
     const priceImpact = beforePrice.minus(afterPrice).abs().dividedBy(beforePrice).multipliedBy(100).toNumber()
     return {
       amountIn: parseFloat(amount),
-      amountOut: exponentiatedBy(quoteAmount, baseTokenInfo.decimals).toNumber(),
-      amountOutWithSlippage: exponentiatedBy(quoteAmountWithSlippage, quoteTokenInfo.decimals).toNumber(),
-      lpFee: exponentiatedBy(lpFee, quoteTokenInfo.decimals).toNumber(),
+      amountOut: quoteAmount.toNumber(),
+      amountOutWithSlippage: quoteAmountWithSlippage.toNumber(),
+      lpFee: lpFee.toNumber(),
       priceImpact,
     }
   } else {
-    const quoteAmount = exponentiate(amount, quoteTokenInfo.decimals)
+    const quoteAmount = new BigNumber(amount);
     const baseAmount = pmmHelper.querySellQuote(quoteAmount, pmmState)
     const fee = baseAmount.multipliedBy(tradeFeeNumerator1).dividedBy(tradeFeeDenominator1)
     const lpFee = fee.multipliedBy(adminFeeDenominator1.minus(adminFeeNumerator1)).dividedBy(adminFeeDenominator1)
     const baseAmountWithSlippage = baseAmount.multipliedBy(100 - slippage).dividedBy(100)
     const baseBalance = poolState.baseReserve.minus(baseAmount)
     const quoteBalance = poolState.quoteReserve.plus(quoteAmount)
-    const beforePrice = exponentiate(
-      exponentiatedBy(poolState.quoteReserve, quoteTokenInfo.decimals).dividedBy(
-        exponentiatedBy(poolState.baseReserve, baseTokenInfo.decimals),
-      ),
-      quoteTokenInfo.decimals,
-    )
-    const afterPrice = exponentiate(
-      exponentiatedBy(quoteBalance, quoteTokenInfo.decimals).dividedBy(
-        exponentiatedBy(baseBalance, baseTokenInfo.decimals),
-      ),
-      quoteTokenInfo.decimals,
-    )
+    const beforePrice = poolState.quoteReserve.dividedBy(poolState.baseReserve);
+
+    const afterPrice = quoteBalance.dividedBy(baseBalance);
+
     const priceImpact = beforePrice.minus(afterPrice).abs().dividedBy(beforePrice).multipliedBy(100).toNumber()
     return {
       amountIn: parseFloat(amount),
-      amountOut: exponentiatedBy(baseAmount, quoteTokenInfo.decimals).toNumber(),
-      amountOutWithSlippage: exponentiatedBy(baseAmountWithSlippage, quoteTokenInfo.decimals).toNumber(),
-      lpFee: exponentiatedBy(lpFee, quoteTokenInfo.decimals).toNumber(),
+      amountOut: baseAmount.toNumber(), 
+      amountOutWithSlippage: baseAmountWithSlippage.toNumber(), 
+      lpFee: lpFee.toNumber(), 
       priceImpact,
     }
   }
