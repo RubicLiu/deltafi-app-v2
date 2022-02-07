@@ -55,7 +55,7 @@ export function getSwapOutAmount(
     const priceImpact = beforePrice.minus(afterPrice).abs().dividedBy(beforePrice).multipliedBy(100).toNumber()
     return {
       amountIn: parseFloat(amount),
-      amountOut: exponentiatedBy(quoteAmount, quoteTokenInfo.decimals).toNumber(),
+      amountOut: exponentiatedBy(quoteAmount, baseTokenInfo.decimals).toNumber(),
       amountOutWithSlippage: exponentiatedBy(quoteAmountWithSlippage, quoteTokenInfo.decimals).toNumber(),
       lpFee: exponentiatedBy(lpFee, quoteTokenInfo.decimals).toNumber(),
       priceImpact,

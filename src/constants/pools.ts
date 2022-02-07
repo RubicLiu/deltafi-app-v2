@@ -36,12 +36,12 @@ export const pools: PoolSchema[] = [
 
 export const listSymbols = (pools: PoolSchema[]) => {
   let list = []
-  const prefix = network === 'mainnet-beta' ? '' : 'Crypto.'
+  const prefix = 'Crypto.'
   pools.forEach((pool) => {
-    if (!list.includes(pool.base)) {
+    if (!list.includes(`${prefix}${pool.base}/USD`)) {
       list.push(`${prefix}${pool.base}/USD`)
     }
-    if (!list.includes(pool.quote)) {
+    if (!list.includes(`${prefix}${pool.quote}/USD`)) {
       list.push(`${prefix}${pool.quote}/USD`)
     }
   })
