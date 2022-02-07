@@ -14,8 +14,6 @@ export const RStatusBelowOne = 2
 export class PMMHelper {
   // return received quote amount (fee deducted)
   public querySellBase(amount: BigNumber, state: PMMState): BigNumber {
-    console.log("q sell b amount", amount.toNumber());
-    console.log("q sell b rstatus", state.RStatus);
     try {
       let result: BigNumber
       if (state.RStatus === RStatusOne) {
