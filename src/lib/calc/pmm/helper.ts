@@ -14,7 +14,6 @@ export const RStatusBelowOne = 2
 export class PMMHelper {
   // return received quote amount (fee deducted)
   public querySellBase(amount: BigNumber, state: PMMState): BigNumber {
-    
     try {
       let result: BigNumber
       if (state.RStatus === RStatusOne) {
@@ -134,6 +133,7 @@ export const solveQuadraticFunctionForTrade = (
   i: BigNumber,
   k: BigNumber,
 ): BigNumber => {
+
   if (V0.lte(0)) throw new Error('TARGET_IS_ZERO')
   if (delta.eq(0)) return delta
 
