@@ -30,7 +30,6 @@ export async function swap({
     return null
   }
 
-  const walletBalance = await connection.getBalance(walletPubkey);
   const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
   const tempAccountRefKeyPair = Keypair.generate();
   let createWrappedTokenAccountTransaction: Transaction | undefined
@@ -47,7 +46,7 @@ export async function swap({
   let sourceRef: PublicKey = source.pubkey;
 
   if ( buySol || sellSol) {
-      let tmpAccountLamport = buySol ? (lamports * 2) : (walletBalance - lamports * 2);
+      let tmpAccountLamport = buySol ? (lamports * 2) : (Number(swapData.amountIn) + lamports * 2);
 
       createWrappedTokenAccountTransaction = new Transaction()
       createWrappedTokenAccountTransaction
