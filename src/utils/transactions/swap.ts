@@ -134,15 +134,10 @@ export async function swap({
     }
   })()
 
-  console.log("source mint", source.account.mint.toBase58());
   const mintInfo = await connection.getAccountInfo(source.account.mint);
   const mintdata = parseTokenMintData(mintInfo);
-  console.log("mint data", mintdata);
-  console.log("m", pool.baseTokenInfo.address);
-  console.log("is equal", pool.baseTokenInfo.address === source.account.mint.toBase58() ? pool.quoteTokenInfo.address : pool.baseTokenInfo.address);
   const mInfo = await connection.getAccountInfo(new PublicKey(pool.baseTokenInfo.address));
   const mData = parseTokenMintData(mInfo);
-  console.log("m data", mData);
 
   let transaction = new Transaction()
   transaction

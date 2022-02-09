@@ -36,7 +36,6 @@ export async function deposit({
   farmPool?: PublicKey
   farmUser?: PublicKey
 }) {
-  console.log("deposit");
   if (!connection || !walletPubkey || !pool || !baseAccount || !quoteAccount) {
     return null
   }
@@ -173,9 +172,6 @@ export async function deposit({
     signers.push(tempAccountRefKeyPair);
   }
 
-  console.log("final");
-  console.log("signers", signers);
-  console.log("farm pool", farmPool);
   return await signTransaction({ transaction, feePayer: walletPubkey, signers, connection })
   
 }

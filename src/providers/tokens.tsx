@@ -87,7 +87,6 @@ export async function getOwnedTokenAccounts(
     resp = tokenAccountCache[keyHash];
   }
   else {
-    console.log("run");
     resp = await connection.getProgramAccounts(TOKEN_PROGRAM_ID, { filters });
     tokenAccountCache[keyHash] = resp;
   }
