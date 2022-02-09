@@ -22,16 +22,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
       padding: `${spacing(3)}px ${spacing(2.5)}px`,
     },
   },
-  container: {
-    width: '100%',
-    background: palette.background.secondary,
-    marginBottom: spacing(2),
-    borderRadius: 8,
-    [breakpoints.up('sm')]: {
-      padding: `${spacing(3)}px ${spacing(2.5)}px`,
-      borderRadius: 16,
-    },
-  },
   content: {
     display: 'flex',
     alignItems: 'center',
@@ -114,7 +104,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
   if (!swapPool || !farmPool) return null
 
   return (
-    <Box className={classes.container}>
+    <Box className={classes.root}>
       <Box className={classes.content}>
         <Box display="flex" alignItems="center">
           <Img src={swapPool.baseTokenInfo.logoURI} alt={`${swapPool.baseTokenInfo.symbol} coin`} />

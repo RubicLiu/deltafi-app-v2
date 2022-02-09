@@ -112,12 +112,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     justifyContent: 'space-between',
     marginBottom: spacing(3),
   },
-  poolCardContainer: {
-    marginBottom: spacing(2),
-    '&:last-child': {
-      marginBottom: 0,
-    },
-  },
 }))
 
 const Home: React.FC = (props): ReactElement => {
