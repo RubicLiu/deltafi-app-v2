@@ -11,19 +11,19 @@ export interface FarmPoolSchema {
 }
 
 export const farmPools: FarmPoolSchema[] = [
-  // {
-  //   name: 'SRM-USDC',
-  //   address: new PublicKey('6RVdK5GK65HT7RJuSCBwzrrPwKmT4Fo5MBj5uRnMBBsS'),
-  //   poolAddress: new PublicKey('HJrcEthNx8TGxJ6uTpxmumwDYbyNjJzjzcUvuXBmtY3P'),
-  //   base: 'SRM',
-  //   quote: 'USDC',
-  // },
+  {
+    name: 'SRM-USDC',
+    address: new PublicKey('FRggPSFyyzgdEE7Dc4DBfZoi1z9bayAogHT2RpzjYpeQ'),
+    poolAddress: new PublicKey('AorxH9q8oMR1di6r8dWKCiBMKgY8vGCodfV5rm3acHz3'),
+    base: 'SRM',
+    quote: 'USDC',
+  },
   
-  // {
-  //   name: 'SOL-SRM',
-  //   address: new PublicKey('AsnEmr6TrFDbd2qJKU9iBrjNWQJCKGWLVzyZEEp75gCd'),
-  //   poolAddress: new PublicKey('8VvDYTxmcTc52q6NoQwCpHe9b82q7HLL6rZhpCJfqLpn'),
-  //   base: 'SOL',
-  //   quote: 'SRM',
-  // },
+  {
+    name: 'SOL-SRM',
+    address: new PublicKey('743hYJqTjc7DZYZqMS85nFAXwBb1GNHSF6Xhf4ZPdEPm'),
+    poolAddress: new PublicKey('6MUGmm3BpA6NTCL83KrbSRFiEs53YhQ1etnMd3Y23HYp'),
+    base: 'SOL',
+    quote: 'SRM',
+  },
 ]
