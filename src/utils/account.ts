@@ -67,24 +67,6 @@ export const sendAndConfirmTransaction = async (
   return txSig
 }
 
-export const getProgramAccountsCached = (() => {
-  const accountMapping: Record<string, {
-    pubkey: PublicKey;
-    account: AccountInfo<Buffer>;
-  }[]> = {};
-
-  return async (pubkey: PublicKey, connection: Connection, configs: any) => {
-    const filtersHash = hash.keys({configs: configs, pubkey: pubkey});
-    if (accountMapping[filtersHash]) {
-      return accountMapping[filtersHash];
-    }
-
-    const result = await connection.getProgramAccounts(pubkey, configs);
-    accountMapping[filtersHash] = result;
-
-    return result;
-  }
-})()
 
 const filteredProgramAccountsCache: Record<string, {
   pubkey: PublicKey;
@@ -98,7 +80,7 @@ export async function getFilteredProgramAccounts(
 ): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
   let resp = null;
 
-  const keyHash = hash.keys({programId, filters});
+  const keyHash = hash.keys({programId: programId, filters: filters});
   if (filteredProgramAccountsCache[keyHash]) {
     resp = filteredProgramAccountsCache[keyHash];
   }

@@ -327,12 +327,20 @@ const Deposit: React.FC = () => {
   const handleDeposit = useCallback(async () => {
     let transaction: Transaction
 
+    console.log("pool", pool);
+    console.log("baseTokenAccount", baseTokenAccount);
+    console.log("quoteTokenAccount", quoteTokenAccount);
+    console.log("walletPubkey", walletPubkey);
+
     if (!connection || !pool || !walletPubkey || !baseTokenAccount || !quoteTokenAccount) {
       return null
     }
 
-    try {
+    console.log("next");
+
+    // try {
       if (base.amount !== '' && quote.amount !== '') {
+        console.log("awaiting");
         transaction = await deposit({
           connection,
           walletPubkey,
@@ -372,9 +380,10 @@ const Deposit: React.FC = () => {
 
       setBase({ ...base, amount: '' })
       setQuote({ ...quote, amount: '' })
-    } catch (e) {
-      setTransactionResult({ status: false })
-    }
+    // } catch (e) {
+    //   console.log("error", e);
+    //   setTransactionResult({ status: false })
+    // }
 
     setState((state) => ({ ...state, open: true }))
   }, [

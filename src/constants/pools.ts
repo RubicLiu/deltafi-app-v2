@@ -13,22 +13,22 @@ export interface PoolSchema {
 export const pools: PoolSchema[] = [
   {
     name: 'SOL-USDC',
-    address: new PublicKey('C4wqSxdzFX5mFg8Uhk6tHZGmduRE3GsYMf9iQNEHrzp5'), 
-    mintAddress: new PublicKey('5oaagwfJiWMKrTyWnu6iUVckJA7HDfLqeyrQVfa48Tkf'), 
+    address: new PublicKey('3yULY47fwzXwu6nxuXnLtAQHyNN1iMDcszyxBPkiNNFt'), 
+    mintAddress: new PublicKey('B3DbGtEV9m6swD8ZHUZyrf3EEV1J4EkDDa6kn5ow1jxG'), 
     base: 'SOL',
     quote: 'USDC',
   },
   {
     name: 'SRM-USDC',
-    address: new PublicKey('HJrcEthNx8TGxJ6uTpxmumwDYbyNjJzjzcUvuXBmtY3P'), 
-    mintAddress: new PublicKey('23Hw8AY1LFMoTw8nWsGw5MXLCUghDDxX9yr8R7bWFaJc'), 
+    address: new PublicKey('AorxH9q8oMR1di6r8dWKCiBMKgY8vGCodfV5rm3acHz3'), 
+    mintAddress: new PublicKey('8Y22Dki1qVX7RbD5kPfZNR1g6LLnABTPQsY1Zidn6sdo'), 
     base: 'SRM',
     quote: 'USDC',
   },
   {
     name: 'SOL-SRM',
-    address: new PublicKey('8VvDYTxmcTc52q6NoQwCpHe9b82q7HLL6rZhpCJfqLpn'),
-    mintAddress: new PublicKey('CmHe7bFBh44EnBY6s2vr8s1pDdwssPtQFqNfuebp52Ay'),
+    address: new PublicKey('6MUGmm3BpA6NTCL83KrbSRFiEs53YhQ1etnMd3Y23HYp'),
+    mintAddress: new PublicKey('BY4fH4Dkjtv6MHH8WaPpBgrSySDpxNCMvAavyXG7ZYKd'),
     base: 'SOL',
     quote: 'SRM',
   },

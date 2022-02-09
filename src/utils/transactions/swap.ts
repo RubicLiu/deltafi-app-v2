@@ -6,6 +6,7 @@ import { ExTokenAccount, MarketConfig, PoolInfo } from 'providers/types'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
+import { parseTokenMintData } from 'providers/tokens'
 
 export async function swap({
   connection,
@@ -133,6 +134,16 @@ export async function swap({
     }
   })()
 
+  console.log("source mint", source.account.mint.toBase58());
+  const mintInfo = await connection.getAccountInfo(source.account.mint);
+  const mintdata = parseTokenMintData(mintInfo);
+  console.log("mint data", mintdata);
+  console.log("m", pool.baseTokenInfo.address);
+  console.log("is equal", pool.baseTokenInfo.address === source.account.mint.toBase58() ? pool.quoteTokenInfo.address : pool.baseTokenInfo.address);
+  const mInfo = await connection.getAccountInfo(new PublicKey(pool.baseTokenInfo.address));
+  const mData = parseTokenMintData(mInfo);
+  console.log("m data", mData);
+
   let transaction = new Transaction()
   transaction
     .add(createApproveInstruction(sourceRef, userTransferAuthority.publicKey, walletPubkey, swapData.amountIn))
@@ -145,8 +156,10 @@ export async function swap({
         userTransferAuthority.publicKey,
         sourceRef,
         swapSource,
+        source.account.mint, 
         swapDestination,
         destinationRef,
+        new PublicKey(pool.baseTokenInfo.address === source.account.mint.toBase58() ? pool.quoteTokenInfo.address : pool.baseTokenInfo.address),
         rewardTokenRef,
         config.deltafiMint,
         adminFeeDestination,

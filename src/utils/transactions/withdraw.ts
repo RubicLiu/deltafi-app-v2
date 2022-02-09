@@ -1,4 +1,4 @@
-import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
+import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
 import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
@@ -7,6 +7,7 @@ import { createTokenAccountTransaction, mergeTransactions, signTransaction } fro
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createRefreshFarmInstruction } from 'lib/instructions/farm'
 import { createFarmUser } from './farm'
+import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
 
 export async function withdraw({
   connection,
@@ -37,6 +38,61 @@ export async function withdraw({
 }) {
   if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
     return null
+  }
+
+  const baseSOL = pool.baseTokenInfo.symbol === "SOL";
+  const quoteSOL = pool.quoteTokenInfo.symbol === "SOL";
+
+  const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
+  const tempAccountRefKeyPair = Keypair.generate();
+  let createWrappedTokenAccountTransaction: Transaction | undefined
+  let initializeWrappedTokenAccountTransaction: Transaction | undefined
+  let closeWrappedTokenAccountTransaction: Transaction | undefined
+
+  if (baseSOL || quoteSOL) {
+    const tmpAccountLamport = lamports * 2;
+
+    createWrappedTokenAccountTransaction = new Transaction()
+    createWrappedTokenAccountTransaction
+    .add(
+      SystemProgram.createAccount({
+        fromPubkey: walletPubkey,
+        newAccountPubkey: tempAccountRefKeyPair.publicKey,
+        lamports: tmpAccountLamport,
+        space: AccountLayout.span,
+        programId: TOKEN_PROGRAM_ID,
+      })
+    )
+
+    initializeWrappedTokenAccountTransaction = new Transaction()
+    initializeWrappedTokenAccountTransaction
+    .add(
+      Token.createInitAccountInstruction(
+        TOKEN_PROGRAM_ID,
+        NATIVE_MINT,
+        tempAccountRefKeyPair.publicKey,
+        walletPubkey,
+      )
+    )
+    
+    closeWrappedTokenAccountTransaction = new Transaction()
+    closeWrappedTokenAccountTransaction
+    .add(
+      Token.createCloseAccountInstruction(
+        TOKEN_PROGRAM_ID,
+        tempAccountRefKeyPair.publicKey,
+        walletPubkey,
+        walletPubkey,
+        []
+      )
+    )
+
+    if (baseSOL) {
+      baseTokenRef = tempAccountRefKeyPair.publicKey;
+    }
+    else {
+      quteTokenRef = tempAccountRefKeyPair.publicKey;
+    }
   }
 
   let createBaseTokenTransaction: Transaction | undefined
@@ -116,7 +172,10 @@ export async function withdraw({
     )
   }
 
-  transaction = mergeTransactions([createBaseTokenTransaction, createQuoteTokenTransaction, transaction])
+  transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createBaseTokenTransaction, createQuoteTokenTransaction, transaction, closeWrappedTokenAccountTransaction]);
+  if (baseSOL || quoteSOL) {
+    signers.push(tempAccountRefKeyPair);
+  }
 
   return await signTransaction({ transaction, feePayer: walletPubkey, signers, connection })
 }

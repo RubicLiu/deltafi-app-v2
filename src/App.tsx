@@ -112,7 +112,7 @@ const App: React.FC<{params: string}> = ({ params }) => {
   const { setSchemas: setFarmSchema } = useFarmPools()
   const { setNetwork } = useCustomConnection()
   const { setFilters } = usePyth()
-  const validCountry = FilterCountry()
+  const validCountry = true;// FilterCountry()
 
   const { connected: isConnectedWallet, publicKey} = useWallet();
 
