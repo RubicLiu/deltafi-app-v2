@@ -166,6 +166,7 @@ export async function deposit({
     // )
   } 
 
+
   transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createAccountTransaction, transaction, closeWrappedTokenAccountTransaction]);
   if (baseSOL || quoteSOL) {
     signers.push(tempAccountRefKeyPair);
