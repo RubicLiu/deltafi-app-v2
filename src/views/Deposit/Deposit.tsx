@@ -373,6 +373,7 @@ const Deposit: React.FC = () => {
       setBase({ ...base, amount: '' })
       setQuote({ ...quote, amount: '' })
     } catch (e) {
+      console.log("error", e);
       setTransactionResult({ status: false })
     }
 

@@ -147,7 +147,7 @@ export async function deposit({
       ),
     )
   let signers = [userTransferAuthority]
-  if (!farmUser) {
+  if (!farmUser && farmPool) {
     const { transaction: createFarmUserTransaction, address: newFarmUser } = await createFarmUser({
       connection,
       walletPubkey,
@@ -165,6 +165,7 @@ export async function deposit({
     //   createRefreshFarmInstruction(farmPool, pool.poolMintKey, [farmUser])
     // )
   } 
+
 
   transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createAccountTransaction, transaction, closeWrappedTokenAccountTransaction]);
   if (baseSOL || quoteSOL) {

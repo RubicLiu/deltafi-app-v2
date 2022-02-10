@@ -5,7 +5,6 @@ import { TOKEN_PROGRAM_ID, NATIVE_MINT, AccountLayout } from '@solana/spl-token'
 import { useWallet, useConnection } from '@solana/wallet-adapter-react'
 import tuple from 'immutable-tuple'
 import { u8, struct, blob } from 'buffer-layout'
-import { getProgramAccountsCached } from 'utils/account'
 import { publicKey, u64 } from 'utils/layout'
 import { lpTokens, tokens } from 'constants/tokens'
 import { useAccountInfo } from './connection'
@@ -81,14 +80,14 @@ export async function getOwnedTokenAccounts(
   publicKey: PublicKey,
 ): Promise<Array<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }>> {
   let filters = getOwnedAccountsFilters(publicKey)
-  const keyHash = hash.keys({filters, publicKey});
+  const keyHash = hash.keys({filters: filters, publicKey: publicKey});
 
   let resp = null;
   if (tokenAccountCache[keyHash]) {
     resp = tokenAccountCache[keyHash];
   }
   else {
-    resp = await getProgramAccountsCached(TOKEN_PROGRAM_ID, connection, { filters });
+    resp = await connection.getProgramAccounts(TOKEN_PROGRAM_ID, { filters });
     tokenAccountCache[keyHash] = resp;
   }
 
