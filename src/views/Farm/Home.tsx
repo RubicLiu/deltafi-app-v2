@@ -70,6 +70,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   list: {
     background: palette.background.primary,
     borderRadius: spacing(2),
+    marginBottom: spacing(2),
     padding: `${spacing(3)}px ${spacing(2)}px`,
     [breakpoints.up('sm')]: {
       padding: `${spacing(5)}px ${spacing(4)}px`,
@@ -171,9 +172,9 @@ const Home: React.FC = (props): ReactElement => {
           <Typography variant="h6" color="primary" paragraph>
             Active Farms
           </Typography>
-          {schemas.map((farm: FarmPoolSchema) => (
-            <FarmCard key={farm.address.toBase58()} farm={farm} />
-          ))}
+            {schemas.map((farm: FarmPoolSchema) => (
+              <FarmCard key={farm.address.toBase58()} farm={farm} />
+            ))}
         </Box>
         {/* <Box className={classes.list}>
           <Typography variant="h6" color="primary" paragraph>
