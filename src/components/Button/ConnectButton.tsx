@@ -3,13 +3,13 @@ import { Button, ButtonProps, makeStyles, Theme } from '@material-ui/core'
 
 const useStyles = makeStyles(({ breakpoints, spacing, palette }: Theme) => ({
   button: {
-    backgroundImage: `linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), ${palette.gradient.btnCta}`,
+    backgroundImage: `linear-gradient(52.7deg, #1AFA9A -3.73%, #478EF0 48.34%, #9945FD 93.4%), ${palette.gradient.btnCta}`,
     color: palette.text.primary,
     borderRadius: 100,
     border: 'solid 1px transparent',
     backgroundOrigin: 'border-box',
-    backgroundClip: 'content-box, border-box',
-    boxShadow: `2px 1000px 1px ${palette.background.primary} inset`,
+    // backgroundClip: 'content-box, border-box',
+    boxShadow: `2px 1000px 1px ${palette.background.black} inset`,
     fontSize: 14,
     fontWeight: 500,
     textTransform: 'capitalize',
@@ -25,10 +25,11 @@ const useStyles = makeStyles(({ breakpoints, spacing, palette }: Theme) => ({
     },
   },
   buttonContained: {
-    background: palette.gradient.ctaContained,
+    backgroundImage: `linear-gradient(52.7deg, #1AFA9A -3.73%, #478EF0 48.34%, #9945FD 93.4%), ${palette.gradient.btnCta}`,
     boxShadow: 'none',
     border: 'none',
     '&:hover': { border: 0 },
+    fontWeight: 600,
   },
   buttonOutlined: {
     border: 0,

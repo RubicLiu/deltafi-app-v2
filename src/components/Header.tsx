@@ -14,17 +14,29 @@ interface ContainerProps extends AppBarProps {
 
 const useStyles = makeStyles(({ breakpoints, palette }: Theme) => ({
   ctaButton: {
-    backgroundImage: `linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), ${palette.gradient.cta}`,
-    color: palette.text.secondary,
+    backgroundImage: `linear-gradient(52.7deg, #1AFA9A -3.73%, #478EF0 48.34%, #9945FD 93.4%), ${palette.gradient.btnCta}`,
+    color: palette.text.primary,
     borderRadius: 100,
     border: 'solid 1px transparent',
     backgroundOrigin: 'border-box',
-    backgroundClip: 'content-box, border-box',
-    boxShadow: `2px 1000px 1px ${palette.background.primary} inset`,
+
+    height: 50,
+    width: 180,
+
+    fontSize: 16,
+    fontWeight: 600,
+    textTransform: 'none',
 
     '&:hover': {
       color: palette.text.primary,
       boxShadow: 'none',
+    },
+
+    [breakpoints.down('sm')]: {
+      fontSize: 16,
+      height: 45,
+      width: 180,
+      boxShadow: `2px 1000px 1px ${palette.background.black} inset`,
     },
   },
   toolbar: {
@@ -46,6 +58,15 @@ const useStyles = makeStyles(({ breakpoints, palette }: Theme) => ({
     display: 'flex',
     [breakpoints.up('md')]: {
       display: 'none',
+    },
+  },
+  logo: {
+    width: 150,
+    [breakpoints.down('sm')]: {
+      width: 100,
+    },
+    [breakpoints.down('md')]: {
+      width: 137,
     },
   },
 }))
@@ -95,7 +116,7 @@ const Header: React.FC = (props) => {
             data-amp-analytics-name="click"
             data-amp-analytics-attrs="page: Header, target: Logo"
           >
-            <img src="/horizontal 60.svg" alt="logo" />
+            <img src="/horizontal 60.svg" alt="logo" className={classes.logo}/>
           </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
@@ -106,7 +127,7 @@ const Header: React.FC = (props) => {
           {isConnectedWallet ? (
             <WalletButton />
           ) : (
-            <ConnectButton size="small" onClick={() => setMenu(true, 'connect')}>
+            <ConnectButton size="small" onClick={() => setMenu(true, 'connect')} className={classes.ctaButton}>
               Connect wallet
             </ConnectButton>
           )}
