@@ -28,7 +28,7 @@ export const pools: PoolSchema[] = [
   {
     name: 'SOL-SRM',
     address: new PublicKey('Bk2kKrSZgPUeESW6Bkwi2xVsq5awi5aXreXo5HXCPEGW'),
-    mintAddress: new PublicKey('Bk2kKrSZgPUeESW6Bkwi2xVsq5awi5aXreXo5HXCPEGW'),
+    mintAddress: new PublicKey('4wwRo3HFg3s17U4uFmCbZwReMcnyYByWet4JE1Xy5fQM'),
     base: 'SOL',
     quote: 'SRM',
   },
