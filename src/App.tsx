@@ -39,6 +39,7 @@ const Reward = lazy(() => import('./views/Reward'))
 const Deposit = lazy(() => import('./views/Deposit'))
 const Stake = lazy(() => import('./views/Stake'))
 const Unavailable = lazy(() => import('./views/Unavailable'))
+const Terms = lazy(() => import('./views/Terms'))
 
 /**
  * Parse the query parameters from url
@@ -142,6 +143,7 @@ const App: React.FC<{params: string}> = ({ params }) => {
               <Route path="/farms" exact component={Farm} />
               <Route path="/rewards" exact component={Reward} />
               <Route path="/stake/:id" exact component={Stake} />
+              <Route path="/terms" exact component={Terms} />
               <Redirect from="*" to="/swap" />
             </Switch>
           ) : (
