@@ -19,7 +19,7 @@ import { farmPools } from 'constants/farm'
 import { useCustomConnection } from 'providers/connection'
 import usePyth from 'providers/pyth'
 import { PublicKey } from '@solana/web3.js'
-
+import { network } from 'constants/config.json'
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
 //   enable: true,
@@ -113,7 +113,7 @@ const App: React.FC<{params: string}> = ({ params }) => {
   const { setSchemas: setFarmSchema } = useFarmPools()
   const { setNetwork } = useCustomConnection()
   const { setFilters } = usePyth()
-  const validCountry = FilterCountry()
+  const validCountry = true;//FilterCountry()
 
   const { connected: isConnectedWallet, publicKey} = useWallet();
 
@@ -121,7 +121,7 @@ const App: React.FC<{params: string}> = ({ params }) => {
     setConfigAddress(MARKET_CONFIG_ADDRESS)
     setSchemas(pools)
     setFarmSchema(farmPools)
-    setNetwork(process.env.REACT_APP_NETWORK ?? 'testnet')
+    setNetwork(network)
     setFilters(listSymbols(pools))
   },[setConfigAddress, setSchemas, setFarmSchema, setNetwork]);
 
