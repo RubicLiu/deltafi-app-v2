@@ -7,8 +7,12 @@ import { getMultipleAccounts } from 'utils/account'
 import { PythContextValue } from './types'
 import { ENDPOINTS, useCustomConnection } from './connection'
 
+import { network } from '../constants/config.json'; 
 // TODO: update pyth pubkey
-const oraclePublicKey = 'AHtgzX45WTKfkPG53L6WYhGEXwQkN1BVknET3sVsLL8J'
+const oraclePublicKey = {
+  "mainnet-beta": "AHtgzX45WTKfkPG53L6WYhGEXwQkN1BVknET3sVsLL8J", 
+  "testnet": "AFmdnt9ng1uVxqCmqwQJDAYC5cKTkw8gJKSM5PnzuF6z"
+}[network];
 
 const BAD_SYMBOLS = ['BCH/USD', 'LTC/USD']
 
