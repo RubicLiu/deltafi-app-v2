@@ -87,7 +87,6 @@ export const createStableSwapInstruction = (
     { pubkey: rewardToken, isSigner: false, isWritable: true },
     { pubkey: rewardMint, isSigner: false, isWritable: true },
     { pubkey: adminFeeDestination, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ]
 
@@ -131,7 +130,6 @@ export const createStableDepositInstruction = (
     { pubkey: swapTokenB, isSigner: false, isWritable: true },
     { pubkey: poolMint, isSigner: false, isWritable: true },
     { pubkey: destination, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ]
 
@@ -179,7 +177,6 @@ export const createStableWithdrawInstruction = (
     { pubkey: destinationTokenB, isSigner: false, isWritable: true },
     { pubkey: adminFeeA, isSigner: false, isWritable: true },
     { pubkey: adminFeeB, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ]
 

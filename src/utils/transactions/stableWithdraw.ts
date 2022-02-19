@@ -9,7 +9,7 @@ import { createRefreshFarmInstruction } from 'lib/instructions/farm'
 import { createFarmUser } from './farm'
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
 
-export async function withdraw({
+export async function stableWithdraw({
   connection,
   walletPubkey,
   poolTokenAccount,
@@ -159,14 +159,14 @@ export async function withdraw({
     })
     transaction = mergeTransactions([createFarmUserTransaction, transaction])
     transaction.add(
-      createRefreshFarmInstruction(pool.publicKey, SWAP_PROGRAM_ID, [
+      createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [
         newFarmUser.publicKey,
       ]),
     )
     signers.push(newFarmUser)
   } else {
     transaction.add(
-      createRefreshFarmInstruction(pool.publicKey, SWAP_PROGRAM_ID, [farmUser]),
+      createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [farmUser]),
     )
   }
 

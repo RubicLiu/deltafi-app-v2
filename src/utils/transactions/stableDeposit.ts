@@ -36,6 +36,7 @@ export async function stableDeposit({
   farmPool?: PublicKey
   farmUser?: PublicKey
 }) {
+  console.log("stable deposit");
   if (!connection || !walletPubkey || !pool || !baseAccount || !quoteAccount) {
     return null
   }
