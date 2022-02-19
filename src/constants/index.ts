@@ -1,9 +1,9 @@
 import { PublicKey } from '@solana/web3.js'
 import BigNumber from 'bignumber.js'
 
-export const SWAP_PROGRAM_ID = new PublicKey('4KKPonMmrpqbeAJtRzrhdoMipE6AZ1H9f2uLTsphxHi8')
-export const MARKET_CONFIG_ADDRESS = new PublicKey('3arF7xYvoJWm6bV62rZjLFxEhSWsq3CVCbDReGucUc2S')
-export const DELTAFI_TOKEN_MINT = new PublicKey('F3v9K697uc3vFpS7xBDpD6PCQNtFhDadcH2ZEBqy7XnA')
+export const SWAP_PROGRAM_ID = new PublicKey('8Y7g9EN4MQv5epFEU3aKpXrNcu1t2nkyM2jZpWkw6q1u')
+export const MARKET_CONFIG_ADDRESS = new PublicKey('ENiyiLY19K1HrxFTkPdGB4rgt2erfz8pfPJuQYquwUW4')
+export const DELTAFI_TOKEN_MINT = new PublicKey('68wumU8eiiLnKqfSVssQfxqhhbPRj7iFJ3fWErszfhqK')
 
 export const WAD_LENGTH = 12
 

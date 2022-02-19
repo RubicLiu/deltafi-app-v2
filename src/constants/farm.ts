@@ -13,16 +13,16 @@ export interface FarmPoolSchema {
 export const farmPools: FarmPoolSchema[] = [
   {
     name: 'SRM-USDC',
-    address: new PublicKey('FRggPSFyyzgdEE7Dc4DBfZoi1z9bayAogHT2RpzjYpeQ'),
-    poolAddress: new PublicKey('AorxH9q8oMR1di6r8dWKCiBMKgY8vGCodfV5rm3acHz3'),
+    address: new PublicKey('9L2RDwmyr8gV7aYzRECFQGKCPJjHqeQr58RdjVQbExxo'),
+    poolAddress: new PublicKey('Avkrs6DM5U7rgFtnzie7Fnux4TfEj911nJM3kSETh2Vb'),
     base: 'SRM',
     quote: 'USDC',
   },
   
   {
     name: 'SOL-SRM',
-    address: new PublicKey('743hYJqTjc7DZYZqMS85nFAXwBb1GNHSF6Xhf4ZPdEPm'),
-    poolAddress: new PublicKey('6MUGmm3BpA6NTCL83KrbSRFiEs53YhQ1etnMd3Y23HYp'),
+    address: new PublicKey('A5aeiYygNonQjZeNAbjqnLEx3VuBg4k1j4PjXjBbmpWW'),
+    poolAddress: new PublicKey('Bk2kKrSZgPUeESW6Bkwi2xVsq5awi5aXreXo5HXCPEGW'),
     base: 'SOL',
     quote: 'SRM',
   },
