@@ -1,5 +1,5 @@
 {
-    "network": "mainnet-beta", 
+    "network": "testnet", 
     "swapProgramId": "GTHFXBiyJNtQSuQ3HouWExrDiXEvqjrn5Hwbpe1bFB7U", 
     "marketConfigAddress": "EtycdsWTvcHgtk73hQFxX6JeoXSVuYJ46Hmm11KopFVj", 
     "deltafiTokenMint": "3HSvorZeYs9xDcTNLnnsFfC2imJxXks9S2B4zbnMySdf", 
