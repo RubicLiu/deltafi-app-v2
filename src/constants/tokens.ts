@@ -94,31 +94,3 @@ export const lpTokens: TokenInfo[] = POOLS.map(({name, mint}) => ({
   decimals: 9, 
   logoURI: " "
 }));
-
-// export const lpTokens: TokenInfo[] = 
-
-//   {
-//     chainId: 101,
-//     address: '2CJ4TQrHwQEnL2NxWuMS6PcCThHUPhSodxhCgktxnbMV',
-//     symbol: 'SOL-USDC',
-//     name: 'LP SOL-USDC',
-//     decimals: 9,
-//     logoURI: '',
-//   },
-//   {
-//     chainId: 101,
-//     address: '6j67oiD36Boy4WAVFUcfHn35Erkaj2KonLaxZerqDiNY',
-//     symbol: 'SRM-USDC',
-//     name: 'LP SRM-USDC',
-//     decimals: 9,
-//     logoURI: '',
-//   },
-//   {
-//     chainId: 101,
-//     address: 'AReArpTHYDyChvKDJVsukMfSTkZpojkVabiuMnQKPP1z',
-//     symbol: 'SOL-SRM',
-//     name: 'LP SOL-SRM',
-//     decimals: 9,
-//     logoURI: '',
-//   },  
-// ]
