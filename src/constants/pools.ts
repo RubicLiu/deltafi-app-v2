@@ -1,8 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
-import { POOLS } from './config.json'
-import { NETWORK } from './config.json'
-
-const network = NETWORK;
+import { poolInfo } from './config.json'
 
 export interface PoolSchema {
   name: string
@@ -12,7 +9,7 @@ export interface PoolSchema {
   quote: string
 }
 
-export const pools: PoolSchema[] = POOLS.map(({name, swap, mint}) => ({
+export const pools: PoolSchema[] = poolInfo.map(({name, swap, mint}) => ({
   name, 
   address: new PublicKey(swap), 
   mintAddress: new PublicKey(mint), 

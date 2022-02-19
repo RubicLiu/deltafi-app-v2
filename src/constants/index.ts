@@ -3,9 +3,9 @@ import BigNumber from 'bignumber.js'
 
 import configs from './config.json'
 
-export const SWAP_PROGRAM_ID = new PublicKey(configs.SWAP_PROGRAM_ID);
-export const MARKET_CONFIG_ADDRESS = new PublicKey(configs.MARKET_CONFIG_ADDRESS);
-export const DELTAFI_TOKEN_MINT = new PublicKey(configs.DELTAFI_TOKEN_MINT);
+export const SWAP_PROGRAM_ID = new PublicKey(configs.swapProgramId);
+export const MARKET_CONFIG_ADDRESS = new PublicKey(configs.marketConfigAddress);
+export const DELTAFI_TOKEN_MINT = new PublicKey(configs.deltafiTokenMint);
 
 export const WAD_LENGTH = 12
 

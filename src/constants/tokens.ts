@@ -1,5 +1,5 @@
 // Will replace with spl-token-registry in mainnet launch
-import { POOLS, NETWORK } from './config.json';
+import { poolInfo, network } from './config.json';
 
 export interface TokenInfo {
   chainId: number
@@ -82,11 +82,11 @@ export const tokens: TokenInfo[] =
       "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png",
     },
   ]
-}[NETWORK]
+}[network]
 
 
 
-export const lpTokens: TokenInfo[] = POOLS.map(({name, mint}) => ({
+export const lpTokens: TokenInfo[] = poolInfo.map(({name, mint}) => ({
   chainId: 101, 
   address: mint, 
   symbol: name, 
