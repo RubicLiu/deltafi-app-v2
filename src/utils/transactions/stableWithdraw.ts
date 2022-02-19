@@ -1,0 +1,179 @@
+import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import BN from 'bn.js'
+
+import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
+import { createApproveInstruction, createStableWithdrawInstruction, WithdrawData } from 'lib/instructions'
+import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
+import { SWAP_PROGRAM_ID } from 'constants/index'
+import { createRefreshFarmInstruction } from 'lib/instructions/farm'
+import { createFarmUser } from './farm'
+import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
+
+export async function withdraw({
+  connection,
+  walletPubkey,
+  poolTokenAccount,
+  pool,
+  baseTokenRef,
+  quteTokenRef,
+  basePricePythKey,
+  quotePricePythKey,
+  withdrawData,
+  config,
+  farmPool,
+  farmUser,
+}: {
+  connection: Connection
+  walletPubkey: PublicKey
+  poolTokenAccount: ExTokenAccount
+  pool: PoolInfo
+  baseTokenRef?: PublicKey
+  quteTokenRef?: PublicKey
+  basePricePythKey: PublicKey
+  quotePricePythKey: PublicKey
+  withdrawData: WithdrawData
+  config: MarketConfig
+  farmPool?: PublicKey
+  farmUser?: PublicKey
+}) {
+  if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
+    return null
+  }
+
+  const baseSOL = pool.baseTokenInfo.symbol === "SOL";
+  const quoteSOL = pool.quoteTokenInfo.symbol === "SOL";
+
+  const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
+  const tempAccountRefKeyPair = Keypair.generate();
+  let createWrappedTokenAccountTransaction: Transaction | undefined
+  let initializeWrappedTokenAccountTransaction: Transaction | undefined
+  let closeWrappedTokenAccountTransaction: Transaction | undefined
+
+  if (baseSOL || quoteSOL) {
+    const tmpAccountLamport = lamports * 2;
+
+    createWrappedTokenAccountTransaction = new Transaction()
+    createWrappedTokenAccountTransaction
+    .add(
+      SystemProgram.createAccount({
+        fromPubkey: walletPubkey,
+        newAccountPubkey: tempAccountRefKeyPair.publicKey,
+        lamports: tmpAccountLamport,
+        space: AccountLayout.span,
+        programId: TOKEN_PROGRAM_ID,
+      })
+    )
+
+    initializeWrappedTokenAccountTransaction = new Transaction()
+    initializeWrappedTokenAccountTransaction
+    .add(
+      Token.createInitAccountInstruction(
+        TOKEN_PROGRAM_ID,
+        NATIVE_MINT,
+        tempAccountRefKeyPair.publicKey,
+        walletPubkey,
+      )
+    )
+    
+    closeWrappedTokenAccountTransaction = new Transaction()
+    closeWrappedTokenAccountTransaction
+    .add(
+      Token.createCloseAccountInstruction(
+        TOKEN_PROGRAM_ID,
+        tempAccountRefKeyPair.publicKey,
+        walletPubkey,
+        walletPubkey,
+        []
+      )
+    )
+
+    if (baseSOL) {
+      baseTokenRef = tempAccountRefKeyPair.publicKey;
+    }
+    else {
+      quteTokenRef = tempAccountRefKeyPair.publicKey;
+    }
+  }
+
+  let createBaseTokenTransaction: Transaction | undefined
+  if (!baseTokenRef) {
+    const result = await createTokenAccountTransaction({
+      walletPubkey,
+      mintPublicKey: new PublicKey(pool.baseTokenInfo.address),
+    })
+    baseTokenRef = result?.newAccountPubkey
+    createBaseTokenTransaction = result?.transaction
+  }
+
+  let createQuoteTokenTransaction: Transaction | undefined
+  if (!quteTokenRef) {
+    const result = await createTokenAccountTransaction({
+      walletPubkey,
+      mintPublicKey: new PublicKey(pool.baseTokenInfo.address),
+    })
+    quteTokenRef = result?.newAccountPubkey
+    createQuoteTokenTransaction = result?.transaction
+  }
+
+  const userTransferAuthority = Keypair.generate()
+  const nonce = new BN(pool.nonce)
+  const swapAuthority = await PublicKey.createProgramAddress(
+    [pool.publicKey.toBuffer(), nonce.toArrayLike(Buffer, 'le', 1)],
+    SWAP_PROGRAM_ID,
+  )
+
+  let transaction = new Transaction()
+  transaction
+    .add(
+      createApproveInstruction(
+        poolTokenAccount.pubkey,
+        userTransferAuthority.publicKey,
+        walletPubkey,
+        withdrawData.amountPoolToken,
+      ),
+    )
+    .add(
+      createStableWithdrawInstruction(
+        pool.publicKey,
+        swapAuthority,
+        userTransferAuthority.publicKey,
+        poolTokenAccount.pubkey,
+        pool.base,
+        pool.quote,
+        baseTokenRef,
+        quteTokenRef,
+        pool.poolMintKey,
+        pool.baseFee,
+        pool.quoteFee,
+        withdrawData,
+        SWAP_PROGRAM_ID,
+      ),
+    )
+
+  let signers = [userTransferAuthority]
+  if (!farmUser) {
+    const { transaction: createFarmUserTransaction, address: newFarmUser } = await createFarmUser({
+      connection,
+      walletPubkey,
+      config,
+    })
+    transaction = mergeTransactions([createFarmUserTransaction, transaction])
+    transaction.add(
+      createRefreshFarmInstruction(pool.publicKey, SWAP_PROGRAM_ID, [
+        newFarmUser.publicKey,
+      ]),
+    )
+    signers.push(newFarmUser)
+  } else {
+    transaction.add(
+      createRefreshFarmInstruction(pool.publicKey, SWAP_PROGRAM_ID, [farmUser]),
+    )
+  }
+
+  transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createBaseTokenTransaction, createQuoteTokenTransaction, transaction, closeWrappedTokenAccountTransaction]);
+  if (baseSOL || quoteSOL) {
+    signers.push(tempAccountRefKeyPair);
+  }
+
+  return await signTransaction({ transaction, feePayer: walletPubkey, signers, connection })
+}
