@@ -3,6 +3,7 @@ import { PublicKey } from '@solana/web3.js'
 import { toBufferLE } from 'bigint-buffer'
 
 export * from './swap'
+export * from './stableSwap'
 
 export const createApproveInstruction = (account: PublicKey, delegate: PublicKey, owner: PublicKey, amount: bigint) => {
   return Token.createApproveInstruction(

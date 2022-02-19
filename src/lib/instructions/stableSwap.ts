@@ -3,14 +3,14 @@ import { PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruct
 import { struct, u8 } from 'buffer-layout'
 import { InitializeData, InitializeDataLayout, SwapData, SwapDataLayout, DepositData, DepositDataLayout, WithdrawData, WithdrawDataLayout} from './dataLayout'
 
-export enum SwapInstruction {
-  Initialize = 0,
+export enum StableSwapInstruction {
+  Initialize = 10,
   Swap,
   Deposit,
   Withdraw,
 }
 
-export const createInitSwapInstruction = (
+export const createInitStableSwapInstruction = (
   config: PublicKey,
   tokenSwap: PublicKey,
   authority: PublicKey,
@@ -20,10 +20,6 @@ export const createInitSwapInstruction = (
   tokenB: PublicKey,
   poolMint: PublicKey,
   poolToken: PublicKey,
-  pythProductA: PublicKey,
-  pythPriceA: PublicKey,
-  pythProductB: PublicKey,
-  pythPriceB: PublicKey,
   initData: InitializeData,
   programId: PublicKey,
 ): TransactionInstruction => {
@@ -37,10 +33,6 @@ export const createInitSwapInstruction = (
     { pubkey: tokenB, isSigner: false, isWritable: false },
     { pubkey: poolMint, isSigner: false, isWritable: true },
     { pubkey: poolToken, isSigner: false, isWritable: true },
-    { pubkey: pythProductA, isSigner: false, isWritable: false },
-    { pubkey: pythPriceA, isSigner: false, isWritable: false },
-    { pubkey: pythProductB, isSigner: false, isWritable: false },
-    { pubkey: pythPriceB, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
@@ -49,7 +41,7 @@ export const createInitSwapInstruction = (
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
     {
-      instruction: SwapInstruction.Initialize,
+      instruction: StableSwapInstruction.Initialize,
       initData,
     },
     data,
@@ -62,7 +54,7 @@ export const createInitSwapInstruction = (
   })
 }
 
-export const createSwapInstruction = (
+export const createStableSwapInstruction = (
   config: PublicKey,
   tokenSwap: PublicKey,
   marketAuthority: PublicKey,
@@ -77,8 +69,6 @@ export const createSwapInstruction = (
   rewardToken: PublicKey,
   rewardMint: PublicKey,
   adminFeeDestination: PublicKey,
-  pythA: PublicKey,
-  pythB: PublicKey,
   swapData: SwapData,
   programId: PublicKey,
 ) => {
@@ -97,8 +87,6 @@ export const createSwapInstruction = (
     { pubkey: rewardToken, isSigner: false, isWritable: true },
     { pubkey: rewardMint, isSigner: false, isWritable: true },
     { pubkey: adminFeeDestination, isSigner: false, isWritable: true },
-    { pubkey: pythA, isSigner: false, isWritable: false },
-    { pubkey: pythB, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ]
@@ -107,7 +95,7 @@ export const createSwapInstruction = (
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
     {
-      instruction: SwapInstruction.Swap,
+      instruction: StableSwapInstruction.Swap,
       swapData,
     },
     data,
@@ -120,7 +108,7 @@ export const createSwapInstruction = (
   })
 }
 
-export const createDepositInstruction = (
+export const createStableDepositInstruction = (
   tokenSwap: PublicKey,
   authority: PublicKey,
   userTransferAuthority: PublicKey,
@@ -130,8 +118,6 @@ export const createDepositInstruction = (
   swapTokenB: PublicKey,
   poolMint: PublicKey,
   destination: PublicKey,
-  pythA: PublicKey,
-  pythB: PublicKey,
   depositData: DepositData,
   programId: PublicKey,
 ) => {
@@ -145,8 +131,6 @@ export const createDepositInstruction = (
     { pubkey: swapTokenB, isSigner: false, isWritable: true },
     { pubkey: poolMint, isSigner: false, isWritable: true },
     { pubkey: destination, isSigner: false, isWritable: true },
-    { pubkey: pythA, isSigner: false, isWritable: false },
-    { pubkey: pythB, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ]
@@ -155,7 +139,7 @@ export const createDepositInstruction = (
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
     {
-      instruction: SwapInstruction.Deposit,
+      instruction: StableSwapInstruction.Deposit,
       depositData,
     },
     data,
@@ -168,7 +152,7 @@ export const createDepositInstruction = (
   })
 }
 
-export const createWithdrawInstruction = (
+export const createStableWithdrawInstruction = (
   tokenSwap: PublicKey,
   authority: PublicKey,
   userTransferAuthority: PublicKey,
@@ -180,8 +164,6 @@ export const createWithdrawInstruction = (
   poolMint: PublicKey,
   adminFeeA: PublicKey,
   adminFeeB: PublicKey,
-  pythA: PublicKey,
-  pythB: PublicKey,
   withdrawData: WithdrawData,
   programId: PublicKey,
 ) => {
@@ -197,8 +179,6 @@ export const createWithdrawInstruction = (
     { pubkey: destinationTokenB, isSigner: false, isWritable: true },
     { pubkey: adminFeeA, isSigner: false, isWritable: true },
     { pubkey: adminFeeB, isSigner: false, isWritable: true },
-    { pubkey: pythA, isSigner: false, isWritable: false },
-    { pubkey: pythB, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ]
@@ -207,7 +187,7 @@ export const createWithdrawInstruction = (
   const data = Buffer.alloc(dataLayout.span)
   dataLayout.encode(
     {
-      instruction: SwapInstruction.Withdraw,
+      instruction: StableSwapInstruction.Withdraw,
       withdrawData,
     },
     data,
