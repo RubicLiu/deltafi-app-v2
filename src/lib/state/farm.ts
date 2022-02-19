@@ -91,6 +91,7 @@ export const FarmPositionLayout = struct<FarmPosition>([
   u64('cumulativeInterest'),
   u64('lastUpdateTs'),
   u64('nextClaimTs'),
+  u64('latestDepositSlot')
 ])
 
 export const FARM_POSITION_SIZE = FarmPositionLayout.span
