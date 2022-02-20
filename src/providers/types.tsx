@@ -59,6 +59,7 @@ export interface MarketConfig {
   bumpSeed: number
   deltafiMint: PublicKey
   oracleProgramId: PublicKey
+  deltafiToken: PublicKey
 }
 
 export interface ConfigContextValues {

@@ -156,7 +156,7 @@ export async function stableSwap({
         destinationRef,
         new PublicKey(pool.baseTokenInfo.address === source.account.mint.toBase58() ? pool.quoteTokenInfo.address : pool.baseTokenInfo.address),
         rewardTokenRef,
-        config.deltafiMint,
+        config.deltafiToken,
         adminFeeDestination,
         swapData,
         SWAP_PROGRAM_ID,

@@ -157,7 +157,7 @@ export async function swap({
         destinationRef,
         new PublicKey(pool.baseTokenInfo.address === source.account.mint.toBase58() ? pool.quoteTokenInfo.address : pool.baseTokenInfo.address),
         rewardTokenRef,
-        config.deltafiMint,
+        config.deltafiToken,
         adminFeeDestination,
         pool.pythBase,
         pool.pythQuote,
