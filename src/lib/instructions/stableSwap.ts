@@ -10,50 +10,6 @@ export enum StableSwapInstruction {
   Withdraw,
 }
 
-export const createInitStableSwapInstruction = (
-  config: PublicKey,
-  tokenSwap: PublicKey,
-  authority: PublicKey,
-  adminFeeKeyA: PublicKey,
-  adminFeeKeyB: PublicKey,
-  tokenA: PublicKey,
-  tokenB: PublicKey,
-  poolMint: PublicKey,
-  poolToken: PublicKey,
-  initData: InitializeData,
-  programId: PublicKey,
-): TransactionInstruction => {
-  const keys = [
-    { pubkey: config, isSigner: false, isWritable: false },
-    { pubkey: tokenSwap, isSigner: false, isWritable: true },
-    { pubkey: authority, isSigner: false, isWritable: false },
-    { pubkey: adminFeeKeyA, isSigner: false, isWritable: false },
-    { pubkey: adminFeeKeyB, isSigner: false, isWritable: false },
-    { pubkey: tokenA, isSigner: false, isWritable: false },
-    { pubkey: tokenB, isSigner: false, isWritable: false },
-    { pubkey: poolMint, isSigner: false, isWritable: true },
-    { pubkey: poolToken, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
-  const dataLayout = struct([u8('instruction'), InitializeDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode(
-    {
-      instruction: StableSwapInstruction.Initialize,
-      initData,
-    },
-    data,
-  )
-
-  return new TransactionInstruction({
-    keys,
-    programId,
-    data,
-  })
-}
-
 export const createStableSwapInstruction = (
   config: PublicKey,
   tokenSwap: PublicKey,
