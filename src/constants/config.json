@@ -1,41 +1,4 @@
 {
-<<<<<<< HEAD
-    "network": "testnet", 
-    "swapProgramId": "GTHFXBiyJNtQSuQ3HouWExrDiXEvqjrn5Hwbpe1bFB7U", 
-    "marketConfigAddress": "EtycdsWTvcHgtk73hQFxX6JeoXSVuYJ46Hmm11KopFVj", 
-    "deltafiTokenMint": "3HSvorZeYs9xDcTNLnnsFfC2imJxXks9S2B4zbnMySdf", 
-    "poolInfo": [
-        {
-            "name": "SOL-USDC", 
-            "swap": "BGgt9cEez7KHvWs9tVednQfLbvHpCvgCBjhGNtUKQaoR", 
-            "mint": "3XG7GRnM56bWh6KUkr53wNSdScD8zkEZ3erH1huYKfh7", 
-            "farm": "FQkuAiGknJwNjEtnThrDHReqoCL834sbnbjt4WZ6wBmx", 
-            "token": "9hnj1MGhRfHLjeiHoZj48Sky7UXnCRdGAKnFw5n3SWSG"
-        }, 
-        {
-            "name": "SOL-SRM", 
-            "swap": "C6nWZRHSHva5wdtgoYLmZF8zanVvcsAedUqwstzp699D", 
-            "mint": "6unXWHAkB22pA6gLYxTtvfqmeDNKZpQ5nNs5KUcctNiF", 
-            "farm": "Co6WBZSk46w3DQskKfzHeH4icdddG6nC48hSSD56r4qZ", 
-            "token": "DfXnTDChEVK32mBwHsCBn5FgzLzVnNZDe2Gs7YLdc4UV"
-        }, 
-        {
-            "name": "SRM-USDC", 
-            "swap": "9D2YvHZfNuDq5QTohtSZy4CWCRxYnow9ZZtBMswHuJ7h", 
-            "mint": "D2TVubqrc28fgtXD4XqZQZdkX1ZrXghfpFWMa44ghsGy", 
-            "farm": "CD6peeUopKcKakgQs2QbN464vCr2oztDAMGgMWqrmjXA", 
-            "token": "7mQSycB9av84jXZ8zDCozEMXpUBVMyWTg7Pa6Airoujc"
-        }, 
-        {
-            "name": "USDC-USDT", 
-            "swap": "2Sx5b9CVKrGgjQsNWFXV1EeQABMw61zsn2gM26g6QQVs", 
-            "mint": "2VR1pV9VGpxgBvAX3rSDJUpYYkbmN6itw1DT25cbsuXn", 
-            "farm": "84FxPgvN5x8Erw4WN8d8ygUu711oUzMXUaiFNEdMUdoM", 
-            "token": "71CXGJ6bTSecAjZsAW1YxUv5e4ozGrVzj9ZjtzkFXsUf"
-        }
-    ]
-}
-=======
     "network": "testnet",
     "swapProgramId": "GTHFXBiyJNtQSuQ3HouWExrDiXEvqjrn5Hwbpe1bFB7U",
     "marketConfigAddress": "6XDDTFYDnK2nKhZ4sVbDeLKVhS1DXTTViyrgXSmBSrem",
@@ -79,4 +42,3 @@
         }
     ]
 }
->>>>>>> 61c564dda497a9444e0ea80bece839fab186ae00
