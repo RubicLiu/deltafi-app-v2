@@ -133,12 +133,8 @@ export async function deposit({
       ]),
     )
     signers.push(newFarmUser)
-  } else {
-    // transaction.add(
-    //   createRefreshFarmInstruction(farmPool, pool.poolMintKey, [farmUser])
-    // )
-  } 
-
+  }
+  // removed farm refresh after deposit
 
   transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createAccountTransaction, transaction, closeWrappedTokenAccountTransaction]);
   if (baseSOL || quoteSOL) {
