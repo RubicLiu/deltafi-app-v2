@@ -37,6 +37,7 @@ export async function withdraw({
   farmUser?: PublicKey
 }) {
   if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
+    console.error("withdraw failed with null parameter");
     return null
   }
 

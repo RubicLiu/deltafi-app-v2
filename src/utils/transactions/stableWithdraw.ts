@@ -37,6 +37,7 @@ export async function stableWithdraw({
   farmUser?: PublicKey
 }) {
   if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
+    console.error("stable withdraw failed with null parameter");
     return null
   }
 

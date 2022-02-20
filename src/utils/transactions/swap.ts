@@ -28,6 +28,7 @@ export async function swap({
   swapData: SwapData
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
+    console.error("swap failed with null parameter");
     return null
   }
 

@@ -37,6 +37,7 @@ export async function deposit({
   farmUser?: PublicKey
 }) {
   if (!connection || !walletPubkey || !pool || !baseAccount || !quoteAccount) {
+    console.error("deposit failed with null parameter");
     return null
   }
 

@@ -29,6 +29,7 @@ export async function stableSwap({
   swapData: SwapData
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
+    console.error("stable swap failed with null parameter");
     return null
   }
 
