@@ -67,7 +67,7 @@ export const createStableSwapInstruction = (
   destination: PublicKey,
   destinationMint: PublicKey,
   rewardToken: PublicKey,
-  rewardMint: PublicKey,
+  sourceRewardToken: PublicKey,
   adminFeeDestination: PublicKey,
   swapData: SwapData,
   programId: PublicKey,
@@ -85,7 +85,7 @@ export const createStableSwapInstruction = (
     { pubkey: destination, isSigner: false, isWritable: true },
     { pubkey: destinationMint, isSigner: false, isWritable: false },
     { pubkey: rewardToken, isSigner: false, isWritable: true },
-    { pubkey: rewardMint, isSigner: false, isWritable: true },
+    { pubkey: sourceRewardToken, isSigner: false, isWritable: true },
     { pubkey: adminFeeDestination, isSigner: false, isWritable: true },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ]

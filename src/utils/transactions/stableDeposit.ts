@@ -67,7 +67,6 @@ export async function stableDeposit({
   const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
 
   if (baseSOL || quoteSOL) {
-
     const tmpAccountLamport = baseSOL ? Number(depositData.amountTokenA) + lamports * 2 : Number(depositData.amountTokenB) + lamports * 2; 
     createWrappedTokenAccountTransaction = new Transaction()
     createWrappedTokenAccountTransaction
@@ -165,12 +164,10 @@ export async function stableDeposit({
     // )
   } 
 
-
   transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createAccountTransaction, transaction, closeWrappedTokenAccountTransaction]);
   if (baseSOL || quoteSOL) {
     signers.push(tempAccountRefKeyPair);
   }
 
   return await signTransaction({ transaction, feePayer: walletPubkey, signers, connection })
-  
 }

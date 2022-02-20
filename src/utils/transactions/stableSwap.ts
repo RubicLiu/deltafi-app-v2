@@ -38,7 +38,6 @@ export async function stableSwap({
   let initializeWrappedTokenAccountTransaction: Transaction | undefined
   let closeWrappedTokenAccountTransaction: Transaction | undefined
 
-
   let buySol = (pool.quoteTokenInfo.symbol === 'SOL' && swapData.swapDirection === SWAP_DIRECTION.SellBase) || 
   (pool.baseTokenInfo.symbol === 'SOL' && swapData.swapDirection === SWAP_DIRECTION.SellQuote)
 
@@ -47,7 +46,7 @@ export async function stableSwap({
 
   let sourceRef: PublicKey = source.pubkey;
 
-  if ( buySol || sellSol) {
+  if (buySol || sellSol) {
       let tmpAccountLamport = buySol ? (lamports * 2) : (Number(swapData.amountIn) + lamports * 2);
 
       createWrappedTokenAccountTransaction = new Transaction()
