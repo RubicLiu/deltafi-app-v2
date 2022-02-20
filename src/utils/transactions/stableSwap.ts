@@ -1,12 +1,12 @@
-import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
 import { createNativeSOLHandlingTransactions } from './utils'
-import { createApproveInstruction, createSwapInstruction, SwapData, SWAP_DIRECTION } from 'lib/instructions'
+import { createApproveInstruction, SwapData, SWAP_DIRECTION } from 'lib/instructions'
 import { ExTokenAccount, MarketConfig, PoolInfo } from 'providers/types'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
-import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
+import { AccountLayout } from '@solana/spl-token'
 import { parseTokenMintData } from 'providers/tokens'
 import { createStableSwapInstruction } from '../../lib/instructions/stableSwap'
 

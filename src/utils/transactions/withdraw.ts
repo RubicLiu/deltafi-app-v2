@@ -1,4 +1,4 @@
-import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
 import { createNativeSOLHandlingTransactions } from './utils'
@@ -8,7 +8,7 @@ import { createTokenAccountTransaction, mergeTransactions, signTransaction } fro
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createRefreshFarmInstruction } from 'lib/instructions/farm'
 import { createFarmUser } from './farm'
-import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
+import { AccountLayout } from '@solana/spl-token'
 
 export async function withdraw({
   connection,
