@@ -42,6 +42,9 @@ import { SOLSCAN_LINK } from 'constants/index'
 import { useCustomConnection } from 'providers/connection'
 import { useFarmByPoolAddress, useFarmUserAccount } from 'providers/farm'
 import { useConfig } from 'providers/config'
+import { SwapType } from 'lib/state'
+import { stableDeposit } from 'utils/transactions/stableDeposit'
+import { stableWithdraw } from 'utils/transactions/stableWithdraw'
 
 interface TransactionResult {
   status: boolean | null
@@ -333,7 +336,9 @@ const Deposit: React.FC = () => {
 
     try {
       if (base.amount !== '' && quote.amount !== '') {
-        transaction = await deposit({
+        console.log("pool swap type",  pool.swapType);
+        const depositMethod = pool.swapType === SwapType.Normal ? deposit : stableDeposit;
+        transaction = await depositMethod({
           connection,
           walletPubkey,
           pool,
@@ -404,7 +409,8 @@ const Deposit: React.FC = () => {
       if (base.amount !== '' && quote.amount !== '') {
         const percent = (100 + parseFloat(priceImpact)) / 100
 
-        transaction = await withdraw({
+        const withdrawMethod = pool.swapType === SwapType.Normal ? withdraw : stableWithdraw;
+        transaction = await withdrawMethod({
           connection,
           walletPubkey,
           poolTokenAccount,

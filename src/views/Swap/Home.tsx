@@ -38,6 +38,8 @@ import { SwapCard as ISwapCard } from './components/types'
 import { TokenInfo, tokens } from 'constants/tokens'
 import { useCustomConnection } from 'providers/connection'
 import BigNumber from 'bignumber.js'
+import { SwapType } from 'lib/state'
+import { stableSwap } from 'utils/transactions/stableSwap'
 
 interface TransactionResult {
   status: boolean | null
@@ -270,7 +272,8 @@ const Home: React.FC = (props) => {
       //   tokenFrom.amount ?? '0',
       //   parseFloat(priceImpact),
       // )
-      let transaction = await swap({
+      const swapMethod = pool.swapType === SwapType.Normal ? swap : stableSwap;
+      let transaction = await swapMethod({
         connection,
         walletPubkey,
         config,

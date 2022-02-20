@@ -26,6 +26,7 @@ export async function createFarmUser({
   config: MarketConfig
 }) {
   if (!connection || !walletPubkey) {
+    console.error("create farm user failed with null parameter");
     return null
   }
 
@@ -68,6 +69,7 @@ export async function stake({
   stakeData: FarmDepositData
 }) {
   if (!connection || !walletPubkey || !farmPool || !poolTokenAccount || !config || !stakeData) {
+    console.error("farm stake failed with null parameter");
     return null
   }
 
@@ -141,6 +143,7 @@ export async function unstake({
   unstakeData: FarmWithdrawData
 }) {
   if (!connection || !walletPubkey || !farmPool || !farmUser || !poolTokenAccount || !unstakeData) {
+    console.error("farm unstake failed with null parameter");
     return null
   }
 
@@ -189,6 +192,7 @@ export async function claim({
   claimDestination: PublicKey
 }) {
   if (!connection || !walletPubkey || !farmPool || !farmUser || !claimDestination) {
+    console.error("farm claim failed with null parameter");
     return null
   }
 
@@ -231,6 +235,7 @@ export async function refresh({
   farmUser: PublicKey
 }) {
   if (!connection || !farmPool || !poolMint || !walletPubkey || !farmUser) {
+    console.error("farm refresh failed with null parameter");
     return null
   }
 

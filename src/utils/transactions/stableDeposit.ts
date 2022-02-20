@@ -1,16 +1,16 @@
 import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
-import { createNativeSOLHandlingTransactions } from './utils'
+import { createNativeSOLHandlingTransactions } from './utils' 
 import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
-import { createApproveInstruction, createDepositInstruction, DepositData } from 'lib/instructions'
+import { createApproveInstruction, createStableDepositInstruction, DepositData } from 'lib/instructions'
 import { createTokenAccountTransaction, signTransaction, mergeTransactions } from '.'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createRefreshFarmInstruction } from 'lib/instructions/farm'
 import { createFarmUser } from './farm'
 import { AccountLayout } from '@solana/spl-token'
 
-export async function deposit({
+export async function stableDeposit({
   connection,
   walletPubkey,
   pool,
@@ -38,7 +38,7 @@ export async function deposit({
   farmUser?: PublicKey
 }) {
   if (!connection || !walletPubkey || !pool || !baseAccount || !quoteAccount) {
-    console.error("deposit failed with null parameter");
+    console.error("stable deposit failed with null parameter");
     return null
   }
 
@@ -68,7 +68,6 @@ export async function deposit({
   const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
 
   if (baseSOL || quoteSOL) {
-
     const tmpAccountLamport = baseSOL ? Number(depositData.amountTokenA) + lamports * 2 : Number(depositData.amountTokenB) + lamports * 2; 
 
     const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(tempAccountRefKeyPair.publicKey, tmpAccountLamport, walletPubkey);
@@ -103,7 +102,7 @@ export async function deposit({
       ),
     )
     .add(
-      createDepositInstruction(
+      createStableDepositInstruction(
         pool.publicKey,
         swapAuthority,
         userTransferAuthority.publicKey,
@@ -113,8 +112,6 @@ export async function deposit({
         pool.quote,
         pool.poolMintKey,
         poolTokenRef,
-        basePricePythKey,
-        quotePricePythKey,
         depositData,
         SWAP_PROGRAM_ID,
       ),
@@ -133,7 +130,7 @@ export async function deposit({
       ]),
     )
     signers.push(newFarmUser)
-  }
+  } 
   // removed farm refresh after deposit
 
   transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createAccountTransaction, transaction, closeWrappedTokenAccountTransaction]);
@@ -142,5 +139,4 @@ export async function deposit({
   }
 
   return await signTransaction({ transaction, feePayer: walletPubkey, signers, connection })
-  
 }

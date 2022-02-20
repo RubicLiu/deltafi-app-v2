@@ -1,13 +1,14 @@
-import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
+import { createNativeSOLHandlingTransactions } from './utils'
 import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
 import { createApproveInstruction, createWithdrawInstruction, WithdrawData } from 'lib/instructions'
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createRefreshFarmInstruction } from 'lib/instructions/farm'
 import { createFarmUser } from './farm'
-import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
+import { AccountLayout } from '@solana/spl-token'
 
 export async function withdraw({
   connection,
@@ -37,6 +38,7 @@ export async function withdraw({
   farmUser?: PublicKey
 }) {
   if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
+    console.error("withdraw failed with null parameter");
     return null
   }
 
@@ -52,40 +54,10 @@ export async function withdraw({
   if (baseSOL || quoteSOL) {
     const tmpAccountLamport = lamports * 2;
 
-    createWrappedTokenAccountTransaction = new Transaction()
-    createWrappedTokenAccountTransaction
-    .add(
-      SystemProgram.createAccount({
-        fromPubkey: walletPubkey,
-        newAccountPubkey: tempAccountRefKeyPair.publicKey,
-        lamports: tmpAccountLamport,
-        space: AccountLayout.span,
-        programId: TOKEN_PROGRAM_ID,
-      })
-    )
-
-    initializeWrappedTokenAccountTransaction = new Transaction()
-    initializeWrappedTokenAccountTransaction
-    .add(
-      Token.createInitAccountInstruction(
-        TOKEN_PROGRAM_ID,
-        NATIVE_MINT,
-        tempAccountRefKeyPair.publicKey,
-        walletPubkey,
-      )
-    )
-    
-    closeWrappedTokenAccountTransaction = new Transaction()
-    closeWrappedTokenAccountTransaction
-    .add(
-      Token.createCloseAccountInstruction(
-        TOKEN_PROGRAM_ID,
-        tempAccountRefKeyPair.publicKey,
-        walletPubkey,
-        walletPubkey,
-        []
-      )
-    )
+    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(tempAccountRefKeyPair.publicKey, tmpAccountLamport, walletPubkey);
+    createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
+    initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
+    closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
 
     if (baseSOL) {
       baseTokenRef = tempAccountRefKeyPair.publicKey;
@@ -161,14 +133,14 @@ export async function withdraw({
     })
     transaction = mergeTransactions([createFarmUserTransaction, transaction])
     transaction.add(
-      createRefreshFarmInstruction(pool.publicKey, SWAP_PROGRAM_ID, [
+      createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [
         newFarmUser.publicKey,
       ]),
     )
     signers.push(newFarmUser)
   } else {
     transaction.add(
-      createRefreshFarmInstruction(pool.publicKey, SWAP_PROGRAM_ID, [farmUser]),
+      createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [farmUser]),
     )
   }
 

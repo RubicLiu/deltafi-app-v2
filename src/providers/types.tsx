@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { AccountInfo, PublicKey } from '@solana/web3.js'
 
-import { Fees, PoolState, Rewards } from 'lib/state'
+import { Fees, PoolState, Rewards, SwapType} from 'lib/state'
 import { PoolSchema } from 'constants/pools'
 import { TokenInfo } from 'constants/tokens'
 import { FarmPoolSchema } from 'constants/farm'
@@ -59,6 +59,7 @@ export interface MarketConfig {
   bumpSeed: number
   deltafiMint: PublicKey
   oracleProgramId: PublicKey
+  deltafiToken: PublicKey
 }
 
 export interface ConfigContextValues {
@@ -88,7 +89,8 @@ export interface ConfigContextValues {
 }
 
 export interface PoolInfo {
-  name: string
+  name: string, 
+  swapType: SwapType,
   publicKey: PublicKey
   nonce: number
   isPaused: boolean

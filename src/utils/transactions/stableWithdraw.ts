@@ -3,50 +3,88 @@ import BN from 'bn.js'
 
 import { createNativeSOLHandlingTransactions } from './utils'
 import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
-import { createApproveInstruction, createDepositInstruction, DepositData } from 'lib/instructions'
-import { createTokenAccountTransaction, signTransaction, mergeTransactions } from '.'
+import { createApproveInstruction, createStableWithdrawInstruction, WithdrawData } from 'lib/instructions'
+import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createRefreshFarmInstruction } from 'lib/instructions/farm'
 import { createFarmUser } from './farm'
 import { AccountLayout } from '@solana/spl-token'
 
-export async function deposit({
+export async function stableWithdraw({
   connection,
   walletPubkey,
+  poolTokenAccount,
   pool,
-  baseAccount,
-  quoteAccount,
-  poolTokenRef = undefined,
+  baseTokenRef,
+  quteTokenRef,
   basePricePythKey,
   quotePricePythKey,
-  depositData,
+  withdrawData,
   config,
   farmPool,
   farmUser,
 }: {
   connection: Connection
   walletPubkey: PublicKey
+  poolTokenAccount: ExTokenAccount
   pool: PoolInfo
-  baseAccount: ExTokenAccount
-  quoteAccount: ExTokenAccount
-  poolTokenRef?: PublicKey
+  baseTokenRef?: PublicKey
+  quteTokenRef?: PublicKey
   basePricePythKey: PublicKey
   quotePricePythKey: PublicKey
-  depositData: DepositData
+  withdrawData: WithdrawData
   config: MarketConfig
   farmPool?: PublicKey
   farmUser?: PublicKey
 }) {
-  if (!connection || !walletPubkey || !pool || !baseAccount || !quoteAccount) {
-    console.error("deposit failed with null parameter");
+  if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
+    console.error("stable withdraw failed with null parameter");
     return null
   }
 
-  let createAccountTransaction: Transaction | undefined
-  if (!poolTokenRef) {
-    const result = await createTokenAccountTransaction({ walletPubkey, mintPublicKey: pool.poolMintKey })
-    poolTokenRef = result?.newAccountPubkey
-    createAccountTransaction = result?.transaction
+  const baseSOL = pool.baseTokenInfo.symbol === "SOL";
+  const quoteSOL = pool.quoteTokenInfo.symbol === "SOL";
+
+  const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
+  const tempAccountRefKeyPair = Keypair.generate();
+  let createWrappedTokenAccountTransaction: Transaction | undefined
+  let initializeWrappedTokenAccountTransaction: Transaction | undefined
+  let closeWrappedTokenAccountTransaction: Transaction | undefined
+
+  if (baseSOL || quoteSOL) {
+    const tmpAccountLamport = lamports * 2;
+
+    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(tempAccountRefKeyPair.publicKey, tmpAccountLamport, walletPubkey);
+    createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
+    initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
+    closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
+
+    if (baseSOL) {
+      baseTokenRef = tempAccountRefKeyPair.publicKey;
+    }
+    else {
+      quteTokenRef = tempAccountRefKeyPair.publicKey;
+    }
+  }
+
+  let createBaseTokenTransaction: Transaction | undefined
+  if (!baseTokenRef) {
+    const result = await createTokenAccountTransaction({
+      walletPubkey,
+      mintPublicKey: new PublicKey(pool.baseTokenInfo.address),
+    })
+    baseTokenRef = result?.newAccountPubkey
+    createBaseTokenTransaction = result?.transaction
+  }
+
+  let createQuoteTokenTransaction: Transaction | undefined
+  if (!quteTokenRef) {
+    const result = await createTokenAccountTransaction({
+      walletPubkey,
+      mintPublicKey: new PublicKey(pool.baseTokenInfo.address),
+    })
+    quteTokenRef = result?.newAccountPubkey
+    createQuoteTokenTransaction = result?.transaction
   }
 
   const userTransferAuthority = Keypair.generate()
@@ -55,72 +93,37 @@ export async function deposit({
     [pool.publicKey.toBuffer(), nonce.toArrayLike(Buffer, 'le', 1)],
     SWAP_PROGRAM_ID,
   )
-  
-  let baseSourceRef = baseAccount.pubkey;
-  let quoteSourceRef = quoteAccount.pubkey;
-  let createWrappedTokenAccountTransaction: Transaction | undefined
-  let initializeWrappedTokenAccountTransaction: Transaction | undefined
-  let closeWrappedTokenAccountTransaction: Transaction | undefined
-  
-  const baseSOL = pool.baseTokenInfo.symbol === "SOL";
-  const quoteSOL = pool.quoteTokenInfo.symbol === "SOL";
-  const tempAccountRefKeyPair = Keypair.generate();
-  const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
-
-  if (baseSOL || quoteSOL) {
-
-    const tmpAccountLamport = baseSOL ? Number(depositData.amountTokenA) + lamports * 2 : Number(depositData.amountTokenB) + lamports * 2; 
-
-    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(tempAccountRefKeyPair.publicKey, tmpAccountLamport, walletPubkey);
-    createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
-    initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
-    closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
-
-    if (baseSOL) {
-      baseSourceRef = tempAccountRefKeyPair.publicKey;
-    }
-    else {
-      quoteSourceRef = tempAccountRefKeyPair.publicKey;
-    }
-  }
 
   let transaction = new Transaction()
   transaction
     .add(
       createApproveInstruction(
-        baseSourceRef,
+        poolTokenAccount.pubkey,
         userTransferAuthority.publicKey,
         walletPubkey,
-        depositData.amountTokenA,
+        withdrawData.amountPoolToken,
       ),
     )
     .add(
-      createApproveInstruction(
-        quoteSourceRef,
-        userTransferAuthority.publicKey,
-        walletPubkey,
-        depositData.amountTokenB,
-      ),
-    )
-    .add(
-      createDepositInstruction(
+      createStableWithdrawInstruction(
         pool.publicKey,
         swapAuthority,
         userTransferAuthority.publicKey,
-        baseSourceRef,
-        quoteSourceRef,
+        poolTokenAccount.pubkey,
         pool.base,
         pool.quote,
+        baseTokenRef,
+        quteTokenRef,
         pool.poolMintKey,
-        poolTokenRef,
-        basePricePythKey,
-        quotePricePythKey,
-        depositData,
+        pool.baseFee,
+        pool.quoteFee,
+        withdrawData,
         SWAP_PROGRAM_ID,
       ),
     )
+
   let signers = [userTransferAuthority]
-  if (!farmUser && farmPool) {
+  if (!farmUser) {
     const { transaction: createFarmUserTransaction, address: newFarmUser } = await createFarmUser({
       connection,
       walletPubkey,
@@ -133,14 +136,16 @@ export async function deposit({
       ]),
     )
     signers.push(newFarmUser)
+  } else {
+    transaction.add(
+      createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [farmUser]),
+    )
   }
-  // removed farm refresh after deposit
 
-  transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createAccountTransaction, transaction, closeWrappedTokenAccountTransaction]);
+  transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createBaseTokenTransaction, createQuoteTokenTransaction, transaction, closeWrappedTokenAccountTransaction]);
   if (baseSOL || quoteSOL) {
     signers.push(tempAccountRefKeyPair);
   }
 
   return await signTransaction({ transaction, feePayer: walletPubkey, signers, connection })
-  
 }

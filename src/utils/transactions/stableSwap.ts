@@ -2,14 +2,15 @@ import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
 import { createNativeSOLHandlingTransactions } from './utils'
-import { createApproveInstruction, createSwapInstruction, SwapData, SWAP_DIRECTION } from 'lib/instructions'
+import { createApproveInstruction, SwapData, SWAP_DIRECTION } from 'lib/instructions'
 import { ExTokenAccount, MarketConfig, PoolInfo } from 'providers/types'
 import { SWAP_PROGRAM_ID } from 'constants/index'
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
 import { AccountLayout } from '@solana/spl-token'
 import { parseTokenMintData } from 'providers/tokens'
+import { createStableSwapInstruction } from '../../lib/instructions/stableSwap'
 
-export async function swap({
+export async function stableSwap({
   connection,
   walletPubkey,
   config,
@@ -29,17 +30,15 @@ export async function swap({
   swapData: SwapData
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
-    console.error("swap failed with null parameter");
+    console.error("stable swap failed with null parameter");
     return null
   }
 
-  console.log("pool info", pool.swapType);
   const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
   const tempAccountRefKeyPair = Keypair.generate();
   let createWrappedTokenAccountTransaction: Transaction | undefined
   let initializeWrappedTokenAccountTransaction: Transaction | undefined
   let closeWrappedTokenAccountTransaction: Transaction | undefined
-
 
   let buySol = (pool.quoteTokenInfo.symbol === 'SOL' && swapData.swapDirection === SWAP_DIRECTION.SellBase) || 
   (pool.baseTokenInfo.symbol === 'SOL' && swapData.swapDirection === SWAP_DIRECTION.SellQuote)
@@ -58,7 +57,7 @@ export async function swap({
     closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
 
     if (buySol) {
-      destinationRef = tempAccountRefKeyPair.publicKey
+       destinationRef = tempAccountRefKeyPair.publicKey
     } else {
       sourceRef = tempAccountRefKeyPair.publicKey
     }
@@ -117,7 +116,7 @@ export async function swap({
   transaction
     .add(createApproveInstruction(sourceRef, userTransferAuthority.publicKey, walletPubkey, swapData.amountIn))
     .add(
-      createSwapInstruction(
+      createStableSwapInstruction(
         config.publicKey,
         pool.publicKey,
         marketAuthority,
@@ -132,8 +131,6 @@ export async function swap({
         rewardTokenRef,
         config.deltafiToken,
         adminFeeDestination,
-        pool.pythBase,
-        pool.pythQuote,
         swapData,
         SWAP_PROGRAM_ID,
       ),

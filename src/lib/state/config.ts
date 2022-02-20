@@ -14,6 +14,7 @@ export interface ConfigInfo {
   oracleProgramId: PublicKey
   fees: Fees
   rewards: Rewards
+  deltafiToken: PublicKey
 }
 
 /** @internal */
@@ -26,6 +27,7 @@ export const ConfigInfoLayout = struct<ConfigInfo>(
     publicKey('oracleProgramId'),
     FeesLayout('fees'),
     RewardsLayout('rewards'),
+    publicKey('deltafiToken')
   ],
   'configInfo',
 )
