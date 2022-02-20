@@ -1,6 +1,7 @@
 import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
+import { createNativeSOLHandlingTransactions } from './utils'
 import { createApproveInstruction, createSwapInstruction, SwapData, SWAP_DIRECTION } from 'lib/instructions'
 import { ExTokenAccount, MarketConfig, PoolInfo } from 'providers/types'
 import { SWAP_PROGRAM_ID } from 'constants/index'
@@ -48,47 +49,18 @@ export async function stableSwap({
   let sourceRef: PublicKey = source.pubkey;
 
   if (buySol || sellSol) {
-      let tmpAccountLamport = buySol ? (lamports * 2) : (Number(swapData.amountIn) + lamports * 2);
+    let tmpAccountLamport = buySol ? (lamports * 2) : (Number(swapData.amountIn) + lamports * 2);
 
-      createWrappedTokenAccountTransaction = new Transaction()
-      createWrappedTokenAccountTransaction
-      .add(
-        SystemProgram.createAccount({
-          fromPubkey: walletPubkey,
-          newAccountPubkey: tempAccountRefKeyPair.publicKey,
-          lamports: tmpAccountLamport,
-          space: AccountLayout.span,
-          programId: TOKEN_PROGRAM_ID,
-        })
-      )
+    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(tempAccountRefKeyPair.publicKey, tmpAccountLamport, walletPubkey);
+    createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
+    initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
+    closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
 
-      initializeWrappedTokenAccountTransaction = new Transaction()
-      initializeWrappedTokenAccountTransaction
-      .add(
-        Token.createInitAccountInstruction(
-          TOKEN_PROGRAM_ID,
-          NATIVE_MINT,
-          tempAccountRefKeyPair.publicKey,
-          walletPubkey,
-        )
-      )
-      
-      closeWrappedTokenAccountTransaction = new Transaction()
-      closeWrappedTokenAccountTransaction
-      .add(
-        Token.createCloseAccountInstruction(
-          TOKEN_PROGRAM_ID,
-          tempAccountRefKeyPair.publicKey,
-          walletPubkey,
-          walletPubkey,
-          []
-        )
-      )
-      if (buySol) {
-        destinationRef = tempAccountRefKeyPair.publicKey
-      } else {
-        sourceRef = tempAccountRefKeyPair.publicKey
-      }
+    if (buySol) {
+       destinationRef = tempAccountRefKeyPair.publicKey
+    } else {
+      sourceRef = tempAccountRefKeyPair.publicKey
+    }
   }
 
   let createDestinationAccountTransaction: Transaction | undefined

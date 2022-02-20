@@ -1,16 +1,5 @@
 import { struct, u8 } from 'buffer-layout'
-import BigNumber from 'bignumber.js'
-
-import { decimal, u64 } from 'utils/layout'
-
-export interface InitializeData {
-  nonce: number
-  slope: number | bigint
-  midPrice: BigNumber
-}
-
-/** @internal */
-export const InitializeDataLayout = struct<InitializeData>([u8('nonce'), u64('slop'), decimal('midPrice')], 'initData')
+import { u64 } from 'utils/layout'
 
 export interface DepositData {
   amountTokenA: bigint

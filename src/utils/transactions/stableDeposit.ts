@@ -1,6 +1,7 @@
 import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import BN from 'bn.js'
 
+import { createNativeSOLHandlingTransactions } from './utils' 
 import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
 import { createApproveInstruction, createStableDepositInstruction, DepositData } from 'lib/instructions'
 import { createTokenAccountTransaction, signTransaction, mergeTransactions } from '.'
@@ -68,40 +69,11 @@ export async function stableDeposit({
 
   if (baseSOL || quoteSOL) {
     const tmpAccountLamport = baseSOL ? Number(depositData.amountTokenA) + lamports * 2 : Number(depositData.amountTokenB) + lamports * 2; 
-    createWrappedTokenAccountTransaction = new Transaction()
-    createWrappedTokenAccountTransaction
-    .add(
-      SystemProgram.createAccount({
-        fromPubkey: walletPubkey,
-        newAccountPubkey: tempAccountRefKeyPair.publicKey,
-        lamports: tmpAccountLamport,
-        space: AccountLayout.span,
-        programId: TOKEN_PROGRAM_ID,
-      })
-    )
 
-    initializeWrappedTokenAccountTransaction = new Transaction()
-    initializeWrappedTokenAccountTransaction
-    .add(
-      Token.createInitAccountInstruction(
-        TOKEN_PROGRAM_ID,
-        NATIVE_MINT,
-        tempAccountRefKeyPair.publicKey,
-        walletPubkey,
-      )
-    )
-    
-    closeWrappedTokenAccountTransaction = new Transaction()
-    closeWrappedTokenAccountTransaction
-    .add(
-      Token.createCloseAccountInstruction(
-        TOKEN_PROGRAM_ID,
-        tempAccountRefKeyPair.publicKey,
-        walletPubkey,
-        walletPubkey,
-        []
-      )
-    )
+    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(tempAccountRefKeyPair.publicKey, tmpAccountLamport, walletPubkey);
+    createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
+    initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
+    closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
 
     if (baseSOL) {
       baseSourceRef = tempAccountRefKeyPair.publicKey;

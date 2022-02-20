@@ -27,7 +27,7 @@ export const ConfigInfoLayout = struct<ConfigInfo>(
     publicKey('oracleProgramId'),
     FeesLayout('fees'),
     RewardsLayout('rewards'),
-    publicKey('oracleProgramId')
+    publicKey('deltafiToken')
   ],
   'configInfo',
 )
