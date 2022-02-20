@@ -9,21 +9,12 @@ export interface PoolSchema {
   quote: string
 }
 
-<<<<<<< HEAD
-export const pools: PoolSchema[] = poolInfo.map(({name, swap, mint}) => ({
-  name, 
-  address: new PublicKey(swap), 
-  mintAddress: new PublicKey(mint), 
-  base: name.split("-")[0], 
-  quote: name.split("-")[1]
-=======
 export const pools: PoolSchema[] = poolInfo.map(({name, swap, mint, base, quote}) => ({
   name, 
   address: new PublicKey(swap), 
   mintAddress: new PublicKey(mint), 
   base,
   quote
->>>>>>> 61c564dda497a9444e0ea80bece839fab186ae00
 }))
 
 console.log(pools);
