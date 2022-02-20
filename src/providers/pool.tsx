@@ -48,6 +48,7 @@ export function EntirePoolsProvider({ children }) {
             const { data } = parseSwapInfo(poolInfo as AccountInfo<Buffer>)
             tempPools.push({
               name: schema.name,
+              swapType: data.swapType,
               publicKey: new PublicKey(key),
               nonce: data.nonce,
               isPaused: data.isPaused,
@@ -70,6 +71,7 @@ export function EntirePoolsProvider({ children }) {
                 const { data } = parseSwapInfo(accountInfo)
                 updatePool({
                   name: schema.name,
+                  swapType: data.swapType,
                   publicKey: new PublicKey(key),
                   nonce: data.nonce,
                   isPaused: data.isPaused,
