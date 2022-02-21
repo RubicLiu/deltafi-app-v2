@@ -3,6 +3,8 @@ import BigNumber from 'bignumber.js'
 import { Multiplier } from 'lib/state'
 import { PoolInfo } from 'providers/types'
 
+const SOL_TOKEN_RESERVED_RENT = 2039280
+
 export function getPrice(pool: PoolInfo) {
   const { poolState } = pool
   const { multiplier, baseReserve, baseTarget, quoteReserve, quoteTarget, marketPrice, slope } = poolState
@@ -26,7 +28,9 @@ export function getOutAmount(
   slippage: number,
 ) {
   const { baseTokenInfo, quoteTokenInfo } = pool
-  const price = pool.poolState.quoteReserve.dividedBy(pool.poolState.baseReserve);
+  const baseReserve = pool.poolState.baseReserve.minus(baseTokenInfo.symbol == "SOL" ? SOL_TOKEN_RESERVED_RENT : 0);
+  const quoteReserve = pool.poolState.quoteReserve.minus(quoteTokenInfo.symbol == "SOL" ? SOL_TOKEN_RESERVED_RENT : 0);
+  const price = quoteReserve.dividedBy(baseReserve);
   const fromAmount = new BigNumber(amount)
   let outAmount = new BigNumber(0)
   const percent = new BigNumber(100).plus(slippage).dividedBy(100)
