@@ -1,44 +1,44 @@
 {
     "network": "testnet",
     "swapProgramId": "GTHFXBiyJNtQSuQ3HouWExrDiXEvqjrn5Hwbpe1bFB7U",
-    "marketConfigAddress": "6XDDTFYDnK2nKhZ4sVbDeLKVhS1DXTTViyrgXSmBSrem",
-    "deltafiTokenMint": "8f5ah4kxmSL9A1YXZXJqf1i6PaAjFu1j6DCT4DyiF9Xt",
+    "marketConfigAddress": "2DtECpBbjSzSLpvSaPbEnRHYdumdTLyGTxtatuinNuSc",
+    "deltafiTokenMint": "EkzSXG99ngsVx8SSWCszMYivRXN1SZhhxsWhryzEuHgg",
     "poolInfo": [
-        {
-            "name": "SOL-SRM",
-            "base": "SOL",
-            "quote": "SRM",
-            "swap": "Agjibd25Vvr3TkKgbdHnq4PuEtom6nFzJc7uqEozLFnY",
-            "mint": "7xXLdT1NNih2t44NinbrQ6Pw51KUMqCeYvV74ZjHBL3D",
-            "farm": "F9SsdfeFi4E1NcNUaKgBR5bRBzRZgiW49tV8DxDaaxcR",
-            "token": "5R5pWEd9GHfyT5mcmZzEqF7rvotZfvAbF4zQ3HA6P1Bh"
-        },
-        {
-            "name": "SOL-USDC",
-            "base": "SOL",
-            "quote": "USDC",
-            "swap": "CCzVqX6DfD9uMd8TjsUpadytTwAQghgcj4cPvCPVAyiE",
-            "mint": "FFPeT2HDfK5gsapJAUiyHEkDCvgG6fwBrCJsAq6EtcAv",
-            "farm": "FsM9qedbgYVqMP6YRvE3LLE1FsJaaxmZjA6rnPnhzZKf",
-            "token": "F4GSZBZxArmFHsMavbqaYmuouZkA5WhZnCy9qsVDghRw"
-        },
-        {
-            "name": "SRM-USDC",
-            "base": "SRM",
-            "quote": "USDC",
-            "swap": "B87DzsnwSb3GY1UofeZiEQtVnbf23N8Ld2xfYS6cavPS",
-            "mint": "B1Q2kmJBJByNgRPQau6rChvTdJW4g8NJka6gd26ofD6k",
-            "farm": "7kixYEP6UwJQDj7kDbEcJ548M1XtNAT17nq4fvHj1UAY",
-            "token": "Fr8nkzqnrBoTqnWDebCqY56eHBnzjE33WYdNgqLxbv6p"
-        },
-        {
-            "name": "USDC-USDT",
-            "base": "USDC",
-            "quote": "USDT",
-            "swap": "8g7BRKaepyX4JcyjMVi5MLPWTLBioecWheMUCCMW5SEt",
-            "mint": "3B2xUGH6kuxMdPA1zAEcC9BNi3yXhEL89fSzpCFJSM8r",
-            "farm": "DGDnuqPTVuvBqVcTKrpwRLRWvVrw234AYRTDDPyK2TQ6",
-            "token": "3xueyCqUVRXUxWjdmABA1ADHvQcFRRugpBG5PAAfRqpP"
-        }
+      {
+        "name": "SOL-SRM",
+        "base": "SOL",
+        "quote": "SRM",
+        "swap": "FD6tSMeVM5zRYkMkuG8TQbipx1Eb9P2bwakYvBYhJARS",
+        "mint": "Hq9TYvmSjebYPWg7msmyVz8cT3yc5KY4NSeTeepLUZfo",
+        "farm": "HqonS8q1GAy8AqEAHjqX9cXWqmhtSS7EzQrFYUH5Q27p",
+        "token": "FgYYEuFXZxiiRLhLtVgNnzTwx7SXQLwrdASnzTGn1Q9A"
+      },
+      {
+        "name": "SOL-USDC",
+        "base": "SOL",
+        "quote": "USDC",
+        "swap": "EWDmk4Putm7qZfZDF5scfXNGU5x7u3Bm2qzPigNfR34f",
+        "mint": "5hq94mpXUb9QjTmVyANhUQxA3MxVg5BQvaDSMWTjTzaF",
+        "farm": "2eW8npcAmCypwAQhQCkyuz4CBosF2gtdRNjFQJBX4Qpv",
+        "token": "GvFEL2QJ2UkMC5DwmJzjv614m366YnbwFenXBwEqrZ1T"
+      },
+      {
+        "name": "SRM-USDC",
+        "base": "SRM",
+        "quote": "USDC",
+        "swap": "E14NodM1EniAQDLNtsYpL7eKbJm16rV2g2puc7PvZW6E",
+        "mint": "7LBTHck3WQkVKM8pR6Geo8Txd2htfyArpuJ8QSWYtjR9",
+        "farm": "4CjmnNZXLPhVcDUnoTgrWfHJKCAoBfUxGReqco3WMo4Y",
+        "token": "FBwgevmUsZc7iBFzzuVN3C6H3bmKYjefiHUvEtJaWcHk"
+      },
+      {
+        "name": "USDC-USDT",
+        "base": "USDC",
+        "quote": "USDT",
+        "swap": "GqnSDy43aRTqjC7Nk3Stwrhw8DL8dnAypo2VuRf8aibb",
+        "mint": "8nBpmQ3AeTCt1Hpdz5Q9UyainPtURCqYiJRSpa47LXKD",
+        "farm": "97yQf63cDiWrAQNM7zYNXtDF7sLHF8fjjwHZREiGCWY",
+        "token": "GpLaEdQMwtyzoznvi5ag9yn6nDQfDrQgT9Yi6bNZwnEN"
+      }
     ]
-}
+  }
