@@ -30,7 +30,7 @@ export function getOutAmount(
   const { baseTokenInfo, quoteTokenInfo } = pool
   const baseReserve = pool.poolState.baseReserve.minus(baseTokenInfo.symbol == "SOL" ? SOL_TOKEN_RESERVED_RENT : 0);
   const quoteReserve = pool.poolState.quoteReserve.minus(quoteTokenInfo.symbol == "SOL" ? SOL_TOKEN_RESERVED_RENT : 0);
-  const price = quoteReserve.dividedBy(baseReserve);
+  const price = quoteReserve.dividedBy(baseReserve).times(10 ** baseTokenInfo.decimals).dividedBy(10 ** quoteTokenInfo.decimals);
   const fromAmount = new BigNumber(amount)
   let outAmount = new BigNumber(0)
   const percent = new BigNumber(100).plus(slippage).dividedBy(100)
