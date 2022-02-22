@@ -26,8 +26,6 @@ export function getOutAmount(
   slippage: number,
 ) {
   const { baseTokenInfo, quoteTokenInfo } = pool
-  console.log(pool.poolState.baseReserve + "");
-  console.log(pool.poolState.quoteReserve + "");
   const baseReserve = pool.poolState.baseReserve;
   const quoteReserve = pool.poolState.quoteReserve;
   const price = quoteReserve.dividedBy(baseReserve).times(10 ** baseTokenInfo.decimals).dividedBy(10 ** quoteTokenInfo.decimals);
