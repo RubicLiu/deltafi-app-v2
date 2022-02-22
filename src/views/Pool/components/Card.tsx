@@ -90,7 +90,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const tvl = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.tvl(basePrice, quotePrice)
+      return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals)
     }
     return new BigNumber(0)
   }, [pmm, basePrice, quotePrice])
@@ -104,7 +104,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const sharePrice = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.tvl(basePrice, quotePrice).multipliedBy(share).div(100)
+      return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals).multipliedBy(share).div(100)
     }
     return new BigNumber(0)
   }, [pmm, basePrice, quotePrice, share])
@@ -135,12 +135,12 @@ const PoolCard: React.FC<CardProps> = (props) => {
       </Box>
       <Box display="flex" justifyContent="space-between">
         <Typography className={classes.label}>Total Deposits</Typography>
-        <Typography className={classes.label}>{convertDoller(tvl.toString())}</Typography>
+        <Typography className={classes.label}>{convertDoller(tvl.toFixed(2).toString())}</Typography>
       </Box>
       {connected && props.isUserPool && (
         <Box display="flex" justifyContent="space-between">
           <Typography className={classes.label}>Your deposits</Typography>
-          <Typography className={classes.label}>{convertDoller(sharePrice?.toString())}</Typography>
+          <Typography className={classes.label}>{convertDoller(sharePrice?.toFixed(2).toString())}</Typography>
         </Box>
       )}
     </Box>

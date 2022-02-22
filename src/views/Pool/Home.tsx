@@ -42,6 +42,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
 }))
 
 const Home: React.FC = () => {
+  console.log('pool');
   const classes = useStyles()
   const { schemas, pools } = usePools();
   const [tokens] = useTokenAccounts();
@@ -61,11 +62,13 @@ const Home: React.FC = () => {
           const basePrice = ((symbolMap[baseSymbol] as any).price as PriceData).price
             ? ((symbolMap[baseSymbol] as any).price as PriceData).price
             : ((symbolMap[baseSymbol] as any).price as PriceData).previousPrice
+          const baseDecimals = ((symbolMap[baseSymbol] as any).price as PriceData).exponent;
           const quotePrice = ((symbolMap[quoteSymbol] as any).price as PriceData).price
             ? ((symbolMap[quoteSymbol] as any).price as PriceData).price
             : ((symbolMap[quoteSymbol] as any).price as PriceData).previousPrice
+          const quoteDecimals = ((symbolMap[quoteSymbol] as any).price as PriceData).exponent;
 
-          volumn = pmm.tvl(basePrice, quotePrice)
+          volumn = pmm.tvl(basePrice, quotePrice, baseDecimals, quoteDecimals)
         }
         return p.plus(volumn)
       }, new BigNumber(0)) as BigNumber

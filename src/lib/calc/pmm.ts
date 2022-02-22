@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
-
+import { exponentiate, exponentiatedBy } from 'utils/decimal'
+import { decimal } from 'utils/layout'
 import { PoolState, Multiplier } from '../state'
 
 let BN = BigNumber.clone({ DECIMAL_PLACES: 2 })
@@ -31,31 +32,27 @@ export class PMM implements PoolState {
     this.adjustTarget()
   }
 
-  static exponentiate(num: BigNumber): BigNumber {
-    return num.div(new BN('1e+9'))
+  baseTotalValue(basePrice: number, decimals: number): BigNumber {
+    return exponentiatedBy(this.baseReserve.multipliedBy(basePrice), decimals);
   }
 
-  baseTotalValue(basePrice: number): BigNumber {
-    return PMM.exponentiate(this.baseReserve.multipliedBy(basePrice))
+  quoteTotalValue(quotePrice: number, decimals: number): BigNumber {
+    return exponentiatedBy(this.quoteReserve.multipliedBy(quotePrice), decimals);
   }
 
-  quoteTotalValue(quotePrice: number): BigNumber {
-    return PMM.exponentiate(this.quoteReserve.multipliedBy(quotePrice))
+  tvl(basePrice: number, quotePrice: number, baseDecimals: number, quoteDecimals: number): BigNumber {
+    return this.baseTotalValue(basePrice, baseDecimals).plus(this.quoteTotalValue(quotePrice, quoteDecimals));
   }
 
-  tvl(basePrice: number, quotePrice: number): BigNumber {
-    return this.baseTotalValue(basePrice).plus(this.quoteTotalValue(quotePrice))
-  }
-
-  basePercent(basePrice: number, quotePrice: number): BigNumber {
-    const tvl = this.tvl(basePrice, quotePrice)
-    const baseTotalValue = this.baseTotalValue(basePrice)
+  basePercent(basePrice: number, quotePrice: number, baseDecimals: number, quoteDecimals: number): BigNumber {
+    const tvl = this.tvl(basePrice, quotePrice, baseDecimals, quoteDecimals)
+    const baseTotalValue = this.baseTotalValue(basePrice, baseDecimals);
     return baseTotalValue.dividedBy(tvl).multipliedBy(100)
   }
 
-  quotePercent(basePrice: number, quotePrice: number): BigNumber {
-    const tvl = this.tvl(basePrice, quotePrice)
-    const quoteTotalValue = this.quoteTotalValue(quotePrice)
+  quotePercent(basePrice: number, quotePrice: number, quoteDecimals: number, baseDecimals): BigNumber {
+    const tvl = this.tvl(basePrice, quotePrice, baseDecimals, quoteDecimals);
+    const quoteTotalValue = this.quoteTotalValue(quotePrice, quoteDecimals);
     return quoteTotalValue.dividedBy(tvl).multipliedBy(100)
   }
 
@@ -75,9 +72,9 @@ export class PMM implements PoolState {
     return this.baseReserve.multipliedBy(new BigNumber(quote).div(this.quoteReserve))
   }
 
-  amountFromShare(share: number): [BigNumber, BigNumber] {
-    const base = PMM.exponentiate(this.baseReserve.multipliedBy((share / 100) * 0.98))
-    const quote = PMM.exponentiate(this.quoteReserve.multipliedBy((share / 100) * 0.98))
+  amountFromShare(share: number, baseDecimals: number, quoteDecimals: number): [BigNumber, BigNumber] {
+    const base = exponentiatedBy(this.baseReserve.multipliedBy((share / 100) * 0.98), baseDecimals);
+    const quote = exponentiatedBy(this.quoteReserve.multipliedBy((share / 100) * 0.98), quoteDecimals);
     return [base, quote]
   }
 

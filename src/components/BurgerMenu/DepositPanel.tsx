@@ -75,7 +75,7 @@ const DepositPanel = (props: IDepositPanelProps): ReactElement => {
   const sharePrice = useMemo(() => {
     if (pool && basePrice && quotePrice) {
       const pmm = new PMM(pool.poolState)
-      return pmm.tvl(basePrice, quotePrice).multipliedBy(share).div(100)
+      return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals).multipliedBy(share).div(100)
     }
     return 0
   }, [pool, basePrice, quotePrice, share])

@@ -89,7 +89,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
 
   const tvl = useMemo(() => {
     if (swapPool && farmPool && basePrice && quotePrice && lpMint && pmm) {
-      return pmm.tvl(basePrice, quotePrice).multipliedBy(farmPool.reservedAmount.toString()).dividedBy(lpMint.supply)
+      return pmm.tvl(basePrice, quotePrice, swapPool.baseTokenInfo.decimals, swapPool.quoteTokenInfo.decimals).multipliedBy(farmPool.reservedAmount.toString()).dividedBy(lpMint.supply)
     }
     return 0
   }, [swapPool, farmPool, basePrice, quotePrice, pmm, lpMint])

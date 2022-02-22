@@ -108,7 +108,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   statsPanel: {
     padding: `${spacing(3)}px ${spacing(2)}px`,
     [breakpoints.up('sm')]: {
-      padding: `${spacing(5)}px ${spacing(4)}px`,
+      padding: `${spacing(3)}px ${spacing(2)}px`,
     },
   },
   marketCondition: {
@@ -156,7 +156,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     borderBottomRightRadius: 16,
     padding: spacing(2),
     [breakpoints.up('sm')]: {
-      padding: spacing(4),
+      padding: spacing(2),
     },
   },
   address: {
@@ -267,14 +267,14 @@ const Deposit: React.FC = () => {
 
   const basePercent = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.basePercent(basePrice, quotePrice)
+      return pmm.basePercent(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
     }
     return null
   }, [pmm, basePrice, quotePrice])
 
   const quotePercent = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.quotePercent(basePrice, quotePrice)
+      return pmm.quotePercent(basePrice, quotePrice, pool.quoteTokenInfo.decimals, pool.baseTokenInfo.decimals);
     }
     return null
   }, [pmm, basePrice, quotePrice])
@@ -288,21 +288,21 @@ const Deposit: React.FC = () => {
 
   const [baseShare, quoteShare] = useMemo(() => {
     if (share && pmm) {
-      return pmm.amountFromShare(share.toNumber())
+      return pmm.amountFromShare(share.toNumber(), pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
     }
     return [null, null]
   }, [share, pmm])
 
   const sharePrice = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.tvl(basePrice, quotePrice).multipliedBy(share).div(100)
+      return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals).multipliedBy(share).div(100)
     }
     return new BigNumber(0)
   }, [pmm, basePrice, quotePrice, share])
 
   const tvl = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.tvl(basePrice, quotePrice)
+      return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
     }
     return new BigNumber(0)
   }, [pmm, basePrice, quotePrice])
@@ -554,7 +554,7 @@ const Deposit: React.FC = () => {
   const handleWithdrawSlider = useCallback(
     (value: number) => {
       if (pmm && share) {
-        const [baseAmount, quoteAmount] = pmm.amountFromShare((share.toNumber() * value) / 100)
+        const [baseAmount, quoteAmount] = pmm.amountFromShare((share.toNumber() * value) / 100, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals)
         setBase({ ...base, amount: baseAmount.toString() })
         setQuote({ ...quote, amount: quoteAmount.toString() })
       }
@@ -839,22 +839,14 @@ const Deposit: React.FC = () => {
                   </Box>
                 </Box>
               </Box>
-              <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                <Typography className={classes.label}>Total Reserves</Typography>
-                <Typography className={classes.label}>{convertDoller(tvl.toString())}</Typography>
-              </Box>
-              <Box display="flex" justifyContent="space-between" marginBottom={2}>
+              <Box display="flex" justifyContent="space-between" marginBottom={1}>
                 <Typography className={classes.label}>Virtual Price</Typography>
                 <Typography className={classes.label}>{pool.poolState.marketPrice.toFormat(4)}</Typography>
-              </Box>
-              <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                <Typography className={classes.label}>A</Typography>
-                <Typography className={classes.label}>50</Typography>
               </Box>
             </Box>
           </Box>
           <Box className={classes.statsBottom}>
-            <Box display="flex" justifyContent="space-between" marginBottom={2}>
+            <Box display="flex" justifyContent="space-between" marginBottom={1}>
               <Typography className={classes.label}>Swap Fee</Typography>
               <Typography className={classes.label}>{swapFee.toString()}%</Typography>
             </Box>
