@@ -44,7 +44,7 @@ const Terms = lazy(() => import('./views/Terms'))
 /**
  * Parse the query parameters from url
  * currently used for parsing referral link
- * @param the parameter string 
+ * @param the parameter string
  * @returns a json data of params' keys and values
  */
 const parseQueryParams = (params: string) => {
@@ -68,7 +68,7 @@ const parseQueryParams = (params: string) => {
  * a function that links to a closure variable walletAddress
  * this function is called whenever the wallet connection state is changed
  * and it will update to wallet to the backend
- * if the wallet is connected for the first time, 
+ * if the wallet is connected for the first time,
  * the backend will record the address and its referrer (if any)
  */
 const updateWallet = (() => {
@@ -113,7 +113,7 @@ const App: React.FC<{params: string}> = ({ params }) => {
   const { setSchemas: setFarmSchema } = useFarmPools()
   const { setNetwork } = useCustomConnection()
   const { setFilters } = usePyth()
-  const validCountry = FilterCountry()
+  const validCountry = true //FilterCountry()
 
   const { connected: isConnectedWallet, publicKey} = useWallet();
 

@@ -3,8 +3,6 @@ import BigNumber from 'bignumber.js'
 import { Multiplier } from 'lib/state'
 import { PoolInfo } from 'providers/types'
 
-const SOL_TOKEN_RESERVED_RENT = 2039280
-
 export function getPrice(pool: PoolInfo) {
   const { poolState } = pool
   const { multiplier, baseReserve, baseTarget, quoteReserve, quoteTarget, marketPrice, slope } = poolState
