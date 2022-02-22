@@ -26,7 +26,9 @@ export function getOutAmount(
   slippage: number,
 ) {
   const { baseTokenInfo, quoteTokenInfo } = pool
-  const price = pool.poolState.quoteReserve.dividedBy(pool.poolState.baseReserve);
+  const baseReserve = pool.poolState.baseReserve;
+  const quoteReserve = pool.poolState.quoteReserve;
+  const price = quoteReserve.dividedBy(baseReserve).times(10 ** baseTokenInfo.decimals).dividedBy(10 ** quoteTokenInfo.decimals);
   const fromAmount = new BigNumber(amount)
   let outAmount = new BigNumber(0)
   const percent = new BigNumber(100).plus(slippage).dividedBy(100)
