@@ -42,7 +42,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
 }))
 
 const Home: React.FC = () => {
-  console.log('pool');
   const classes = useStyles()
   const { schemas, pools } = usePools();
   const [tokens] = useTokenAccounts();

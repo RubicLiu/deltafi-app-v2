@@ -733,7 +733,7 @@ const Deposit: React.FC = () => {
             Total Share
           </Typography>
           <Typography variant="body1" color="primary">
-            {convertDoller(sharePrice.toString())}
+            {convertDoller(sharePrice.toFixed(2).toString())}
           </Typography>
         </Box>
         <Paper className={classes.root}>
@@ -839,9 +839,9 @@ const Deposit: React.FC = () => {
                   </Box>
                 </Box>
               </Box>
-              <Box display="flex" justifyContent="space-between" marginBottom={1}>
-                <Typography className={classes.label}>Virtual Price</Typography>
-                <Typography className={classes.label}>{pool.poolState.marketPrice.toFormat(4)}</Typography>
+              <Box display="flex" justifyContent="space-between" marginBottom={2}>
+                <Typography className={classes.label}>Total Reserves</Typography>
+                <Typography className={classes.label}>{convertDoller(tvl.toFixed(2).toString())}</Typography>
               </Box>
             </Box>
           </Box>
