@@ -28,8 +28,10 @@ export function getOutAmount(
   slippage: number,
 ) {
   const { baseTokenInfo, quoteTokenInfo } = pool
-  const baseReserve = pool.poolState.baseReserve.minus(baseTokenInfo.symbol == "SOL" ? SOL_TOKEN_RESERVED_RENT : 0);
-  const quoteReserve = pool.poolState.quoteReserve.minus(quoteTokenInfo.symbol == "SOL" ? SOL_TOKEN_RESERVED_RENT : 0);
+  console.log(pool.poolState.baseReserve + "");
+  console.log(pool.poolState.quoteReserve + "");
+  const baseReserve = pool.poolState.baseReserve;
+  const quoteReserve = pool.poolState.quoteReserve;
   const price = quoteReserve.dividedBy(baseReserve).times(10 ** baseTokenInfo.decimals).dividedBy(10 ** quoteTokenInfo.decimals);
   const fromAmount = new BigNumber(amount)
   let outAmount = new BigNumber(0)

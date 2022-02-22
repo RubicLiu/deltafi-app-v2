@@ -9,19 +9,19 @@
       "name": "SOL-SRM",
       "base": "SOL",
       "quote": "SRM",
-      "swap": "8zuxwrMYKdU6Ysb5zJBneSAAVXTYDSddt4rxB6i9C3ma",
-      "mint": "CtywFGrNL9PyScb3GZdppmQ7LC4D5RHoUTvPRs37CZxJ",
-      "farm": "DTkKmcgt2kLgppnjxaHfTzjesDCPPnYiEZUbAjEGZF9p",
-      "token": "E7BH64wKXT9jyS38bNUr1qFH7D7DnqiaCh2rWGGyNbdj"
+      "swap": "FU31zqLHowUTpTQPsqNgYavRNqG5YcfdHFrp6jc1YSTy",
+      "mint": "38YvvFBsKZEXcdmF38kMPDiS7cUknaKWqPU7TzziNfQz",
+      "farm": "Hp9PB4V2EwSAyuBnyMTEQctZzY8MhVUiwbSbTJaL2sLa",
+      "token": "H1n8pN9X7hVnB96amAx1EK4x4vxAPUCCv6SCmYAfonBZ"
     },
     {
       "name": "SOL-USDC",
       "base": "SOL",
       "quote": "USDC",
-      "swap": "2r5MMWp9th5tQff3rxZNdoi2eZKf28zg39ZFD8KPYrHa",
-      "mint": "Afo3oTjaCHPZC4d83ZzqaEtgEsVHCS38PdUEeGmNYSZh",
-      "farm": "7vDvvgD6DzPwzxwfowZEBer5m2BAdQ1viKCd8rrke5zo",
-      "token": "AmArzsWqYDWgKALFTBzBecaHh9HXMGr8ti2EzojoRw3s"
+      "swap": "9BRpZ26zJHL6B7X3GGNPKYu2wLQgms9CkrJfeCH3KUt7",
+      "mint": "381DE35hEhSv5mq66HaGd4ByFLvSnE1XRv1BpNdyc4Ge",
+      "farm": "CCd3pysnss8ike1wsoDaR6uKytR7UKdnYWKc9eUuHp8R",
+      "token": "AbEz17MgYWTY18CnU48HqeTmBSZiZ3LtNNQufeTM2Rma"
     },
     {
       "name": "SRM-USDC",
