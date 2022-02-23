@@ -1,6 +1,6 @@
-import React from 'react'
+import React from "react";
 
-import { SvgProps } from '../types'
+import { SvgProps } from "../types";
 
 interface BlogProps extends SvgProps {}
 
@@ -19,7 +19,7 @@ const Icon: React.FC<BlogProps> = ({ ...props }) => {
         </clipPath>
       </defs>
     </svg>
-  )
-}
+  );
+};
 
-export default Icon
+export default Icon;

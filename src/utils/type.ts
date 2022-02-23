@@ -1,4 +1,4 @@
 export enum ConnectorNames {
-  Injected = 'injected',
-  WalletConnect = 'walletconnect',
+  Injected = "injected",
+  WalletConnect = "walletconnect",
 }

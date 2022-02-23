@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo } from "react";
 import {
   getCoin98Wallet,
   getLedgerWallet,
@@ -8,13 +8,13 @@ import {
   getSolflareWebWallet,
   getSolletExtensionWallet,
   getSolletWallet,
-} from '@solana/wallet-adapter-wallets'
-import { WalletProvider } from '@solana/wallet-adapter-react'
-import { WalletAdapterNetwork, WalletError } from '@solana/wallet-adapter-base'
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
+} from "@solana/wallet-adapter-wallets";
+import { WalletProvider } from "@solana/wallet-adapter-react";
+import { WalletAdapterNetwork, WalletError } from "@solana/wallet-adapter-base";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 
 export function CustomWalletProvider({ children }) {
-  const network = process.env.REACT_APP_NETWORK as WalletAdapterNetwork
+  const network = process.env.REACT_APP_NETWORK as WalletAdapterNetwork;
   const wallets = useMemo(
     () => [
       getPhantomWallet(),
@@ -27,14 +27,14 @@ export function CustomWalletProvider({ children }) {
       // getSafePalWallet(),
     ],
     [network],
-  )
+  );
   const onErrorWallet = (error: WalletError) => {
-    console.error(error)
-  }
+    console.error(error);
+  };
 
   return (
     <WalletProvider wallets={wallets} onError={onErrorWallet} autoConnect>
       <WalletModalProvider>{children}</WalletModalProvider>
     </WalletProvider>
-  )
+  );
 }

@@ -1,31 +1,31 @@
-import { Theme, makeStyles, Typography, Box, Link } from '@material-ui/core'
-import Page from 'components/layout/Page'
+import { Theme, makeStyles, Typography, Box, Link } from "@material-ui/core";
+import Page from "components/layout/Page";
 
-import 'typeface-rubik'
+import "typeface-rubik";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
-    margin: '0 auto',
-    [breakpoints.up('sm')]: {
+    margin: "0 auto",
+    [breakpoints.up("sm")]: {
       maxWidth: 560,
     },
   },
   header: {
-    fontFamily: 'rubik',
+    fontFamily: "rubik",
     fontWeight: 600,
     fontSize: 35,
     paddingBottom: 10,
   },
   content: {
-    fontFamily: 'rubik',
-    fontWeight: 'normal',
+    fontFamily: "rubik",
+    fontWeight: "normal",
     fontSize: 20,
   },
   socialLinks: {
     paddingTop: 5,
-    '& a': {
+    "& a": {
       marginRight: spacing(3),
-      [breakpoints.down('sm')]: {
+      [breakpoints.down("sm")]: {
         marginRight: spacing(1.5),
       },
     },
@@ -33,15 +33,15 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   shareButton: {
     width: 29,
     height: 29,
-    [breakpoints.down('sm')]: {
+    [breakpoints.down("sm")]: {
       width: 24,
       height: 24,
     },
   },
-}))
+}));
 
 const Home: React.FC = (props) => {
-  const classes = useStyles(props)
+  const classes = useStyles(props);
 
   return (
     <Page>
@@ -60,7 +60,7 @@ const Home: React.FC = (props) => {
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Reward, target: Twitter"
         >
-          <img src={'images/twitter.svg'} />
+          <img src={"images/twitter.svg"} alt="" />
         </Link>
 
         <Link
@@ -71,7 +71,7 @@ const Home: React.FC = (props) => {
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Reward, target: Discord"
         >
-          <img src={'images/discord.svg'} />
+          <img src={"images/discord.svg"} alt="" />
         </Link>
         <Link
           href="https://t.me/deltafi_ai"
@@ -81,7 +81,7 @@ const Home: React.FC = (props) => {
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Reward, target: Telegram"
         >
-          <img src={'images/telegram.svg'} />
+          <img src={"images/telegram.svg"} alt="" />
         </Link>
         <Link
           href="https://medium.com/deltafi"
@@ -91,10 +91,10 @@ const Home: React.FC = (props) => {
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Reward, target: Medium"
         >
-          <img src={'images/medium.svg'} />
+          <img src={"images/medium.svg"} alt="" />
         </Link>
       </Box>
     </Page>
-  )
-}
-export default Home
+  );
+};
+export default Home;

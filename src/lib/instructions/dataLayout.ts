@@ -1,5 +1,5 @@
-import { struct, u8 } from 'buffer-layout'
-import { u64 } from 'utils/layout'
+import { struct, u8 } from "buffer-layout";
+import { u64 } from "utils/layout";
 
 export interface DepositData {
   amountTokenA: bigint
@@ -20,9 +20,9 @@ export enum SWAP_DIRECTION {
 
 /** @internal */
 export const SwapDataLayout = struct<SwapData>(
-  [u64('amountIn'), u64('minimumAmountOut'), u8('swapDirection')],
-  'swapData',
-)
+  [u64("amountIn"), u64("minimumAmountOut"), u8("swapDirection")],
+  "swapData",
+);
   
 
 export interface DepositData {
@@ -33,9 +33,9 @@ export interface DepositData {
 
 /** @internal */
 export const DepositDataLayout = struct<DepositData>(
-  [u64('amountTokenA'), u64('amountTokenB'), u64('amountMintMin')],
-  'depositData',
-)
+  [u64("amountTokenA"), u64("amountTokenB"), u64("amountMintMin")],
+  "depositData",
+);
 
 export interface WithdrawData {
   amountPoolToken: bigint
@@ -45,6 +45,6 @@ export interface WithdrawData {
 
 /** @internal */
 export const WithdrawDataLayout = struct<WithdrawData>(
-  [u64('amountPoolToken'), u64('minAmountTokenA'), u64('minAmountTokenB')],
-  'withdrawData',
-)
+  [u64("amountPoolToken"), u64("minAmountTokenA"), u64("minAmountTokenB")],
+  "withdrawData",
+);

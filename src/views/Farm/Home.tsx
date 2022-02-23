@@ -1,30 +1,30 @@
-import React, { ReactElement } from 'react'
-import { Box, Link, makeStyles, Theme, Typography } from '@material-ui/core'
+import React, { ReactElement } from "react";
+import { Box, Link, makeStyles, Theme, Typography } from "@material-ui/core";
 
-import Page from 'components/layout/Page'
-import { LinkIcon } from 'components'
-import FarmCard from './components/Card'
-import { useDarkMode } from 'providers/theme'
-import { useFarmPools } from 'providers/farm'
-import { FarmPoolSchema } from 'constants/farm'
+import Page from "components/layout/Page";
+import { LinkIcon } from "components";
+import FarmCard from "./components/Card";
+import { useDarkMode } from "providers/theme";
+import { useFarmPools } from "providers/farm";
+import { FarmPoolSchema } from "constants/farm";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
-    width: '100%',
+    width: "100%",
     flex: 1,
     padding: `0px ${spacing(2)}px`,
-    [breakpoints.up('sm')]: {
+    [breakpoints.up("sm")]: {
       maxWidth: 600,
       padding: 0,
     },
   },
   title: {
-    fontFamily: 'Inter',
+    fontFamily: "Inter",
     fontSize: 14,
     fontWeight: 500,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     marginBottom: spacing(2),
-    [breakpoints.up('sm')]: {
+    [breakpoints.up("sm")]: {
       fontSize: 21,
     },
   },
@@ -32,7 +32,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontSize: 12,
     fontWeight: 500,
     marginLeft: spacing(1),
-    [breakpoints.up('sm')]: {
+    [breakpoints.up("sm")]: {
       fontSize: 18,
       fontWeight: 500,
     },
@@ -41,16 +41,16 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginLeft: spacing(1),
     width: 12,
     height: 12,
-    [breakpoints.up('sm')]: {
+    [breakpoints.up("sm")]: {
       width: 16,
       height: 16,
     },
   },
   descContainer: {
-    border: `2px solid #3E3E3E`,
+    border: "2px solid #3E3E3E",
     padding: spacing(2),
     borderRadius: spacing(2),
-    [breakpoints.up('sm')]: {
+    [breakpoints.up("sm")]: {
       padding: spacing(4),
       borderRadius: spacing(3),
       marginBottom: spacing(3),
@@ -58,12 +58,12 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   },
   description: {
     fontSize: 12,
-    lineHeight: '18px',
+    lineHeight: "18px",
     fontWeight: 400,
-    color: '#F6F6F6',
-    [breakpoints.up('sm')]: {
+    color: "#F6F6F6",
+    [breakpoints.up("sm")]: {
       fontSize: 14,
-      lineHeight: '21px',
+      lineHeight: "21px",
       fontWeight: 500,
     },
   },
@@ -72,22 +72,22 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     borderRadius: spacing(2),
     marginBottom: spacing(2),
     padding: `${spacing(3)}px ${spacing(2)}px`,
-    [breakpoints.up('sm')]: {
+    [breakpoints.up("sm")]: {
       padding: `${spacing(5)}px ${spacing(4)}px`,
       borderRadius: spacing(3),
     },
   },
   iconGroup: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
     marginRight: spacing(2),
   },
   coinIcon: {
     width: 28,
     height: 28,
-    borderRadius: '50%',
-    boxShadow: 'rgb(0 0 0 / 8%) 0px 6px 10px',
-    color: 'rgb(86, 90, 105)',
+    borderRadius: "50%",
+    boxShadow: "rgb(0 0 0 / 8%) 0px 6px 10px",
+    color: "rgb(86, 90, 105)",
   },
   firstCoin: {
     marginRight: -5,
@@ -107,17 +107,17 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginTop: spacing(2),
   },
   yourFarmsCardHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: spacing(3),
   },
-}))
+}));
 
 const Home: React.FC = (props): ReactElement => {
-  const classes = useStyles(props)
-  const { isDark } = useDarkMode()
-  const { schemas } = useFarmPools()
+  const classes = useStyles(props);
+  const { isDark } = useDarkMode();
+  const { schemas } = useFarmPools();
 
   return (
     <Page>
@@ -186,7 +186,7 @@ const Home: React.FC = (props): ReactElement => {
         </Box> */}
       </Box>
     </Page>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

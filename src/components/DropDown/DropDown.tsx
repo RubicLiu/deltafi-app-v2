@@ -1,135 +1,135 @@
-import { ReactNode, useState, useMemo } from 'react'
-import { Avatar, Button, ClickAwayListener, makeStyles, Box, Theme, Typography, InputBase } from '@material-ui/core'
-import { SearchOutlined } from '@material-ui/icons'
+import { ReactNode, useState, useMemo } from "react";
+import { Avatar, Button, ClickAwayListener, makeStyles, Box, Theme, Typography, InputBase } from "@material-ui/core";
+import { SearchOutlined } from "@material-ui/icons";
 
-import { DropDownProps } from './types'
-import { TokenInfo } from 'constants/tokens'
-import { ArrowDown } from 'components'
-import { useDarkMode } from 'providers/theme'
+import { DropDownProps } from "./types";
+import { TokenInfo } from "constants/tokens";
+import { ArrowDown } from "components";
+import { useDarkMode } from "providers/theme";
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
     borderRadius: 28,
     backgroundColor: theme.palette.background.tertiary,
     padding: `${theme.spacing(0.75)}px ${theme.spacing(2)}px`,
-    fontFamily: 'Inter',
+    fontFamily: "Inter",
     fontSize: 12,
-    textTransform: 'capitalize',
-    [theme.breakpoints.up('sm')]: {
+    textTransform: "capitalize",
+    [theme.breakpoints.up("sm")]: {
       fontSize: 16,
       padding: `${theme.spacing(1)}px ${theme.spacing(3)}px`,
     },
     minWidth: 100,
-    '&:disabled': {
+    "&:disabled": {
       color: theme.palette.primary.main,
     },
   },
   icon: {
     width: theme.spacing(2.5),
     height: theme.spacing(2.5),
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up("sm")]: {
       width: theme.spacing(4),
       height: theme.spacing(4),
     },
   },
   dropdownContainer: {
     minWidth: 320,
-    position: 'absolute',
+    position: "absolute",
     zIndex: theme.zIndex.modal,
     marginTop: theme.spacing(1),
     backgroundColor: theme.palette.background.tertiary,
-    border: '1px solid #3e3e3e',
+    border: "1px solid #3e3e3e",
     borderRadius: theme.spacing(2),
     padding: `${theme.spacing(3)}px ${theme.spacing(2)}px`,
   },
   inputContainer: {
-    position: 'relative',
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
+    position: "relative",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
     color: theme.palette.text.primary,
     zIndex: 0,
-    padding: '.5rem 1rem',
-    textTransform: 'inherit',
+    padding: ".5rem 1rem",
+    textTransform: "inherit",
     borderRadius: 100,
-    backgroundColor: 'transparent',
-    boxShadow: `2px 1000px 1px transparent inset`,
-    '&:hover': {
-      backgroundColor: 'transparent',
+    backgroundColor: "transparent",
+    boxShadow: "2px 1000px 1px transparent inset",
+    "&:hover": {
+      backgroundColor: "transparent",
     },
-    '& i': {
+    "& i": {
       content: "''",
-      position: 'absolute',
+      position: "absolute",
       zIndex: -1,
       top: 0,
       left: 0,
       bottom: 0,
       right: 0,
-      padding: '1px',
+      padding: "1px",
       borderRadius: 100,
       /* the below will do the magic */
-      '-webkit-mask':
-        'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) padding-box' /* this will cover the content and the padding */,
+      "-webkit-mask":
+        "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) padding-box" /* this will cover the content and the padding */,
       /* needed for old browsers until the below is more supported */
-      '-webkit-mask-composite': 'destination-out',
+      "-webkit-mask-composite": "destination-out",
       /* this will exclude the first layer from the second so only the padding area will be kept visible */
-      maskComposite: 'destination-out',
-      '&::before': {
+      maskComposite: "destination-out",
+      "&::before": {
         content: "''",
-        position: 'absolute',
-        left: '50%',
-        top: '50%',
-        width: '100%',
-        height: '100%',
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        width: "100%",
+        height: "100%",
         background: theme.palette.gradient.btnCta,
-        transform: 'translate(-50%, -50%) rotate(0deg)',
+        transform: "translate(-50%, -50%) rotate(0deg)",
       },
     },
   },
   searchInput: {
-    width: '100%',
+    width: "100%",
     marginLeft: 4,
   },
   optionItem: {
     marginTop: 10,
-    textAlign: 'left',
+    textAlign: "left",
   },
   optionItemIcon: {
     width: theme.spacing(3.5),
     height: theme.spacing(3.5),
   },
   symbol: {
-    fontFamily: 'Inter',
+    fontFamily: "Inter",
     fontSize: theme.typography.subtitle1.fontSize,
     lineHeight: 1,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     marginBottom: 2,
   },
   optionLabel: {
-    fontFamily: 'Inter',
+    fontFamily: "Inter",
     fontSize: 12,
-    textTransform: 'capitalize',
-    [theme.breakpoints.up('md')]: {
+    textTransform: "capitalize",
+    [theme.breakpoints.up("md")]: {
       fontSize: 16,
     },
   },
-}))
+}));
 
 const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: ReactNode }) => {
-  const classes = useStyles()
-  const { value, options, onChange, inputProps, disableDrop } = props
-  const { isDark } = useDarkMode()
-  const [open, setOpen] = useState(false)
-  const [searchValue, setSearchValue] = useState('')
+  const classes = useStyles();
+  const { value, options, onChange, inputProps, disableDrop } = props;
+  const { isDark } = useDarkMode();
+  const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   const handleClickItem = (value: T) => {
-    setOpen((pv) => !pv)
-    onChange(value)
-  }
+    setOpen((pv) => !pv);
+    onChange(value);
+  };
 
-  const handleOpen = () => setOpen((prev) => !prev)
-  const handleClickAway = () => setOpen(false)
+  const handleOpen = () => setOpen((prev) => !prev);
+  const handleClickAway = () => setOpen(false);
 
   const optionList = useMemo(
     () =>
@@ -138,7 +138,7 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
           option.name.toLowerCase().includes(searchValue) || option.symbol.toLowerCase().includes(searchValue),
       ),
     [options, searchValue],
-  )
+  );
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
@@ -176,15 +176,15 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
                   fullWidth
                   onClick={() => handleClickItem(option)}
                 >
-                  <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+                  <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", width: "100%" }}>
                     <Avatar src={option.logoURI} alt={option.symbol} className={classes.optionItemIcon} />
                     <Box
                       sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '100%',
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "100%",
                         ml: 1,
                       }}
                     >
@@ -194,7 +194,7 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
                       </Box>
                       {option.symbol && (
                         <Typography className={classes.optionLabel}>
-                          {'0.00'} {option.symbol}
+                          {"0.00"} {option.symbol}
                         </Typography>
                       )}
                     </Box>
@@ -206,13 +206,13 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
         ) : null}
       </Box>
     </ClickAwayListener>
-  )
-}
+  );
+};
 
 DropDown.defaultProps = {
   value: null,
   options: [],
   onChange: () => {},
-}
+};
 
-export default DropDown
+export default DropDown;

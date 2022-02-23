@@ -1,8 +1,8 @@
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruction } from '@solana/web3.js'
-import { struct, u8 } from 'buffer-layout'
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruction } from "@solana/web3.js";
+import { struct, u8 } from "buffer-layout";
 
-import { u64 } from 'utils/layout'
+import { u64 } from "utils/layout";
 
 export enum FarmInstruction {
   Initialize = 20,
@@ -23,9 +23,9 @@ export interface FarmInitializeData {
 
 /** @internal */
 export const FarmInitializeDataLayout = struct<FarmInitializeData>(
-  [u64('feeNumerator'), u64('feeDenominator'), u64('rewardsNumerator'), u64('rewardsDenominator'), u8('bumpSeed')],
-  'initData',
-)
+  [u64("feeNumerator"), u64("feeDenominator"), u64("rewardsNumerator"), u64("rewardsDenominator"), u8("bumpSeed")],
+  "initData",
+);
 
 // Instruction for initialize farm
 export const createInitFarmInstruction = (
@@ -45,25 +45,25 @@ export const createInitFarmInstruction = (
     { pubkey: poolToken, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction'), FarmInitializeDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
-  dataLayout.encode({ instruction: FarmInstruction.Initialize, initData }, data)
+  const dataLayout = struct([u8("instruction"), FarmInitializeDataLayout]);
+  const data = Buffer.alloc(dataLayout.span);
+  dataLayout.encode({ instruction: FarmInstruction.Initialize, initData }, data);
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};
 
 export interface FarmDepositData {
   amount: bigint
 }
 
 /** @internal */
-export const FarmDepositDataLayout = struct<FarmDepositData>([u64('amount')], 'depositData')
+export const FarmDepositDataLayout = struct<FarmDepositData>([u64("amount")], "depositData");
 
 // Instruction for deposit farm
 export const createFarmDepositInstruction = (
@@ -85,31 +85,31 @@ export const createFarmDepositInstruction = (
     { pubkey: farmOwner, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction'), FarmDepositDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction"), FarmDepositDataLayout]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: FarmInstruction.Deposit,
       depositData,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};
 
 export interface FarmWithdrawData {
   amount: bigint
 }
 
 /** @internal */
-export const FarmWithdrawDataLayout = struct<FarmWithdrawData>([u64('amount')], 'withdrawData')
+export const FarmWithdrawDataLayout = struct<FarmWithdrawData>([u64("amount")], "withdrawData");
 
 // Instruction for withdraw farm
 export const createFarmWithdrawInstruction = (
@@ -130,24 +130,24 @@ export const createFarmWithdrawInstruction = (
     { pubkey: destination, isSigner: false, isWritable: true },
     { pubkey: farmOwner, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction'), FarmWithdrawDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction"), FarmWithdrawDataLayout]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: FarmInstruction.Withdraw,
       withdrawData,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};
 
 // Instruction for initialize farm user
 export const createInitFarmUserInstruction = (
@@ -161,23 +161,23 @@ export const createInitFarmUserInstruction = (
     { pubkey: farmUser, isSigner: false, isWritable: true },
     { pubkey: farmOwner, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction')])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction")]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: FarmInstruction.InitializeFarmUser,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};
 
 // Instruction for claim farm
 export const createClaimFarmInstruction = (
@@ -199,23 +199,23 @@ export const createClaimFarmInstruction = (
     { pubkey: claimDestination, isSigner: false, isWritable: true },
     { pubkey: claimMint, isSigner: false, isWritable: true },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction')])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction")]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: FarmInstruction.Claim,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};
 
 // Instruction for refresh farm
 export const createRefreshFarmInstruction = (
@@ -227,20 +227,20 @@ export const createRefreshFarmInstruction = (
     { pubkey: farmPool, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     ...farmUsers.map((farmUser) => ({ pubkey: farmUser, isSigner: false, isWritable: true })),
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction')])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction")]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: FarmInstruction.Refresh,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};

@@ -1,4 +1,4 @@
-import { TokenInfo } from 'constants/tokens'
+import { TokenInfo } from "constants/tokens";
 
 export interface SettingsProps {
   priceImpact: string

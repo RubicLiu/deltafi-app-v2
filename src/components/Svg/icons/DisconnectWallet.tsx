@@ -1,6 +1,6 @@
-import React from 'react'
+import React from "react";
 
-import { SvgProps } from '../types'
+import { SvgProps } from "../types";
 
 interface BlogProps extends SvgProps {
   isDark: boolean
@@ -16,7 +16,7 @@ const Icon: React.FC<BlogProps> = ({ isDark, ...props }) => {
         fill="white"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default Icon
+export default Icon;

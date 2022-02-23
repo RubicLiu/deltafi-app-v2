@@ -1,15 +1,15 @@
-import React, { useMemo } from 'react'
-import CurrencyInput from 'react-currency-input-field'
-import Box from '@material-ui/core/Box'
-import Paper from '@material-ui/core/Paper'
-import Typography from '@material-ui/core/Typography'
-import clx from 'classnames'
+import React, { useMemo } from "react";
+import CurrencyInput from "react-currency-input-field";
+import Box from "@material-ui/core/Box";
+import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
+import clx from "classnames";
 
-import { tokens } from 'constants/tokens'
-import { DropDown } from 'components'
-import useStyles from './styles'
-import { SwapCard } from 'views/Swap/components/types'
-import { getTokenInfo } from 'providers/tokens'
+import { tokens } from "constants/tokens";
+import { DropDown } from "components";
+import useStyles from "./styles";
+import { SwapCard } from "views/Swap/components/types";
+import { getTokenInfo } from "providers/tokens";
 
 export interface SettingsProps {
   priceImpact: string
@@ -28,27 +28,27 @@ export interface CardProps {
 }
 
 const WithdrawCard: React.FC<CardProps> = (props) => {
-  const { card, handleChangeCard, disableDrop, withdrawal } = props
-  const classes = useStyles(props)
+  const { card, handleChangeCard, disableDrop, withdrawal } = props;
+  const classes = useStyles(props);
 
   const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.replace(/[^\d.-]/g, '')
+    const value = event.target.value.replace(/[^\d.-]/g, "");
    
-    handleChangeCard({ ...card, amount: isNaN(parseFloat(value)) ? '' : value })
-  }
+    handleChangeCard({ ...card, amount: isNaN(parseFloat(value)) ? "" : value });
+  };
 
   const handleChangeToken = (token) => {
-    const newToken = getTokenInfo(token.symbol)
-    handleChangeCard({ ...card, token: newToken })
-  }
+    const newToken = getTokenInfo(token.symbol);
+    handleChangeCard({ ...card, token: newToken });
+  };
 
   const value = useMemo(() => {
-    const pointIdx = card.amount.indexOf('.')
+    const pointIdx = card.amount.indexOf(".");
     if (pointIdx > 0) {
-      return card.amount.slice(0, pointIdx) + card.amount.slice(pointIdx, pointIdx + 7)
+      return card.amount.slice(0, pointIdx) + card.amount.slice(pointIdx, pointIdx + 7);
     }
-    return card.amount
-  }, [card.amount])
+    return card.amount;
+  }, [card.amount]);
 
   return (
     <Paper className={classes.root}>
@@ -58,7 +58,7 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
           options={tokens}
           disableDrop={disableDrop}
           onChange={handleChangeToken}
-          inputProps={{ placeholder: 'token name, symbol' }}
+          inputProps={{ placeholder: "token name, symbol" }}
         />
         <CurrencyInput
           name="currency"
@@ -85,7 +85,7 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
         <Typography className={classes.tokenBalance}>%--</Typography>
       </Box>
     </Paper>
-  )
-}
+  );
+};
 
-export default WithdrawCard
+export default WithdrawCard;

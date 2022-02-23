@@ -1,24 +1,24 @@
-import { Theme, makeStyles, Typography, Box, Link } from '@material-ui/core'
-import Page from 'components/layout/Page'
+import { Theme, makeStyles, Typography, Box } from "@material-ui/core";
+import Page from "components/layout/Page";
 
 const useStyles = makeStyles(({ breakpoints, mixins, palette, spacing }: Theme) => ({
   root: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column',
-    minHeight: 'calc(100vh - 82px)',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "column",
+    minHeight: "calc(100vh - 82px)",
     paddingTop: mixins.toolbar.minHeight,
-    position: 'relative',
+    position: "relative",
     backgroundColor: palette.background.tertiary,
   },
   content: {
     padding: 50,
     maxWidth: 1300,
-    [breakpoints.down('md')]: {
+    [breakpoints.down("md")]: {
       maxWidth: 900,
     },
-    [breakpoints.down('sm')]: {
+    [breakpoints.down("sm")]: {
       maxWidth: 600,
     },
   },
@@ -29,7 +29,7 @@ const useStyles = makeStyles(({ breakpoints, mixins, palette, spacing }: Theme) 
   header: {
     fontSize: 25,
     paddingBottom: 30,
-    color: '#1AFA9A',
+    color: "#1AFA9A",
   },
   secondary: {
     fontWeight: 400,
@@ -45,10 +45,10 @@ const useStyles = makeStyles(({ breakpoints, mixins, palette, spacing }: Theme) 
     color: palette.text.secondary,
     paddingBottom: 25,
   }
-}))
+}));
 
 const Home: React.FC = (props) => {
-  const classes = useStyles(props)
+  const classes = useStyles(props);
 
   return (
     <Page className={classes.root}>
@@ -89,12 +89,12 @@ const Home: React.FC = (props) => {
         </Typography>
         <Typography variant="h6" align="left" className={classes.text}>
           Your use of, and participation in, certain Services may be subject to additional terms
-          <text style={{ fontWeight: 'bold', color: 'white' }}> (“Supplemental Terms”) </text>
+          <text style={{ fontWeight: "bold", color: "white" }}> (“Supplemental Terms”) </text>
           and such Supplemental Terms will either be notified to you in the Interface  or presented to you for your acceptance when
           you sign up to use the supplemental Service.  If these Terms of Use are inconsistent with the Supplemental Terms, the
           Supplemental Terms shall control with respect to such Service.  These Terms of Use and any applicable Supplemental
           Terms are referred to herein as the
-          <text style={{ fontWeight: 'bold', color: 'white' }}> “Agreement.” </text>
+          <text style={{ fontWeight: "bold", color: "white" }}> “Agreement.” </text>
         </Typography>
         <Typography variant="h6" align="left" className={classes.description}>
           PLEASE NOTE THAT THE AGREEMENT IS SUBJECT TO CHANGE BY DELTAFI IN ITS SOLE DISCRETION AT ANY TIME.  WHEN CHANGES
@@ -121,12 +121,12 @@ const Home: React.FC = (props) => {
         <Typography variant="h6" align="left" className={classes.text}>
           The Interface, the Services, and the information and content available on the Interface and the Services, including
           the Software (each, a
-          <text style={{ fontWeight: 'bold', color: 'white' }}> “DeltaFi Property” </text>
+          <text style={{ fontWeight: "bold", color: "white" }}> “DeltaFi Property” </text>
           and collectively, the
-          <text style={{ fontWeight: 'bold', color: 'white' }}> “DeltaFi Properties” </text>
+          <text style={{ fontWeight: "bold", color: "white" }}> “DeltaFi Properties” </text>
           ) are owned by DeltaFi and its suppliers, and are protected by intellectual property laws throughout the world.
           Use of any software and associated documentation that is made available via the Services
-          <text style={{ fontWeight: 'bold', color: 'white' }}> (“Software”) </text>
+          <text style={{ fontWeight: "bold", color: "white" }}> (“Software”) </text>
           , other than the Protocol (which is comprised of open source software running on the public Solana blockchain),
           is governed by the Agreement.  Subject to your compliance with the Agreement, DeltaFi grants you a non-assignable,
           non-transferable, non-sublicensable, revocable, non-exclusive license to use the Software for the sole purpose of
@@ -167,7 +167,7 @@ const Home: React.FC = (props) => {
           The rights granted to you in the Agreement are subject to the following restrictions:
         </Typography>
         <Typography variant="h6" align="left" className={classes.text}>
-          <text style={{ fontWeight: 'bold', color: 'white' }}>(a) Usage.  </text>
+          <text style={{ fontWeight: "bold", color: "white" }}>(a) Usage.  </text>
           You shall not: (a) license, sell, rent, lease, transfer, assign, reproduce, distribute, host or otherwise commercially 
           exploit any DeltaFi Properties, including the Interface; (b) frame or utilize framing techniques to enclose any trademark, 
           logo, or other DeltaFi Properties (including images, text, page layout or form); (c) use any metatags or other “hidden text” 
@@ -185,7 +185,7 @@ const Home: React.FC = (props) => {
           licenses granted by DeltaFi pursuant to the Agreement.
         </Typography>
         <Typography variant="h6" align="left" className={classes.text}>
-          <text style={{ fontWeight: 'bold', color: 'white' }}>(b) Conduct.  </text>
+          <text style={{ fontWeight: "bold", color: "white" }}>(b) Conduct.  </text>
           You agree that you may not, directly or indirectly, make available any information, data, text, software, music, sound, 
           photographs, graphics, video, messages, tags and other materials (collectively, “Content”) on or through any of the DeltaFi 
           Properties that: (i) infringes, misappropriates or otherwise violates any intellectual property right, right of publicity, 
@@ -200,30 +200,30 @@ const Home: React.FC = (props) => {
           including by means of overloading, “flooding,” “spamming,” “mail bombing,” or “crashing” any DeltaFi Properties.
         </Typography>
         <Typography variant="h6" align="left" className={classes.text}>
-          <text style={{ fontWeight: 'bold', color: 'white' }}>(c) Cyberattacks.  </text>
+          <text style={{ fontWeight: "bold", color: "white" }}>(c) Cyberattacks.  </text>
           In connection with your use of the DeltaFi Properties, you shall not engage in any activity that seeks to interfere with or 
           compromise the integrity, security, or proper functioning of any computer, server, network, personal device, or other information 
           technology system, including, but not limited to, the deployment of viruses and denial of service attacks. 
         </Typography>
         <Typography variant="h6" align="left" className={classes.text}>
-          <text style={{ fontWeight: 'bold', color: 'white' }}>(d) Fraud or Misrepresentation.  </text>
+          <text style={{ fontWeight: "bold", color: "white" }}>(d) Fraud or Misrepresentation.  </text>
           You shall not engage in any activity that seeks to defraud DeltaFi or any other person or entity, including, but not limited to, 
           providing any false, inaccurate, or misleading information in order to unlawfully obtain the property of another. You shall not, 
           in any manner, make attempts or efforts to obtain the private key, password, account, or other security information of any other 
           user, including, but not limited to, information about digital wallets or private keys.
         </Typography>
         <Typography variant="h6" align="left" className={classes.text}>
-          <text style={{ fontWeight: 'bold', color: 'white' }}>(e) Market Manipulation.  </text>
+          <text style={{ fontWeight: "bold", color: "white" }}>(e) Market Manipulation.  </text>
           You shall not engage in any activity that violates any applicable law, rule, or regulation concerning the integrity of trading 
           markets, including, but not limited to, the manipulative tactics commonly known as spoofing and wash trading.
         </Typography>
         <Typography variant="h6" align="left" className={classes.text}>
-          <text style={{ fontWeight: 'bold', color: 'white' }}>(f) Securities and Derivatives Violations. </text>
+          <text style={{ fontWeight: "bold", color: "white" }}>(f) Securities and Derivatives Violations. </text>
           You shall not engage in any activity that violates any applicable law, rule, or regulation concerning the trading of securities or 
           derivatives.
         </Typography>
         <Typography variant="h6" align="left" className={classes.text}>
-          <text style={{ fontWeight: 'bold', color: 'white' }}>(g) Any Other Unlawful Conduct.  </text>
+          <text style={{ fontWeight: "bold", color: "white" }}>(g) Any Other Unlawful Conduct.  </text>
           You shall not engage in any activity that violates any applicable law, rule, or regulation of the United States or another relevant 
           jurisdiction, including, but not limited to, the restrictions and regulatory requirements imposed by U.S. law.
         </Typography>
@@ -232,7 +232,7 @@ const Home: React.FC = (props) => {
         </Typography>
         <Typography variant="h6" align="left" className={classes.text}>
           We may designate the Services, or a feature of the Services, as a prerelease or beta version 
-          <text style={{ fontWeight: 'bold', color: 'white' }}> (“Beta Version”)</text>
+          <text style={{ fontWeight: "bold", color: "white" }}> (“Beta Version”)</text>
           . A Beta Version does not 
           represent the final product and may contain bugs that may cause system or other failure and data loss. We may choose not to release a 
           commercial version of the Beta Version. Without limiting any disclaimer of warranty or other limitation stated in the Agreement, you 
@@ -250,9 +250,9 @@ const Home: React.FC = (props) => {
         <Typography variant="h6" align="left" className={classes.text}>
           In order to access or use certain features of the DeltaFi Properties you will be required to become a Registered User.  For purposes of 
           the Agreement, a 
-          <text style={{ fontWeight: 'bold', color: 'white' }}> “Registered User” </text>
+          <text style={{ fontWeight: "bold", color: "white" }}> “Registered User” </text>
           is a user who has registered an account with DeltaFi on the Interface 
-          <text style={{ fontWeight: 'bold', color: 'white' }}> (“Account”)</text>.
+          <text style={{ fontWeight: "bold", color: "white" }}> (“Account”)</text>.
         </Typography>
         <Typography variant="h6" align="left" className={classes.secondary}>
           2.2. Registration Data. 
@@ -260,7 +260,7 @@ const Home: React.FC = (props) => {
         <Typography variant="h6" align="left" className={classes.text}>
           In registering an account on the Interface, you agree to (a) provide true, accurate, current and complete information about yourself and 
           if applicable, the entity you represent, as prompted by the registration form (the 
-          <text style={{ fontWeight: 'bold', color: 'white' }}> “Registration Data”</text>
+          <text style={{ fontWeight: "bold", color: "white" }}> “Registration Data”</text>
           ); and (b) maintain and promptly update the Registration Data to keep it true, accurate, current and complete.  You represent that you 
           are (i) at least eighteen (18) years old; (ii) of legal age to form a binding contract; and (iii) not a person barred from using any of 
           the DeltaFi Properties under the laws of the United States, your place of residence or any other applicable jurisdiction.  You are 
@@ -381,7 +381,7 @@ const Home: React.FC = (props) => {
         <Typography variant="h6" align="left" className={classes.text}>
           You agree that submission of any ideas, suggestions, documents, and/or proposals to DeltaFi through its suggestion, feedback, wiki, 
           forum, or similar pages 
-          <text style={{ fontWeight: 'bold', color: 'white' }}> (“Feedback”) </text>
+          <text style={{ fontWeight: "bold", color: "white" }}> (“Feedback”) </text>
           is at your own risk and that DeltaFi has no obligations (including without limitation obligations of confidentiality) with respect to 
           such Feedback.  You represent and warrant that you have all rights necessary to submit the Feedback.  You hereby grant to DeltaFi a 
           fully paid, royalty-free, perpetual, irrevocable, worldwide, non-exclusive, and fully sublicensable right and license to use, reproduce, 
@@ -656,7 +656,7 @@ const Home: React.FC = (props) => {
           14. DISPUTE RESOLUTION.
         </Typography>
         <Typography variant="h6" align="left" className={classes.text}>
-          <text style={{ fontWeight: 'bold', color: 'white' }}>
+          <text style={{ fontWeight: "bold", color: "white" }}>
             Please read the following arbitration agreement (“Arbitration Agreement) in this Section 14 (Dispute Resolution) carefully.  It requires users to arbitrate 
             disputes with DeltaFi and limits the manner in which you can seek relief from us.
           </text>
@@ -670,7 +670,7 @@ const Home: React.FC = (props) => {
           the DeltaFi Parties may seek equitable relief in court for infringement or other misuse of intellectual property rights (such as trademarks, trade dress, 
           domain names, trade secrets, copyrights, and patents). 
           < br/>
-          <text style={{ fontWeight: 'bold', color: 'white' }}>
+          <text style={{ fontWeight: "bold", color: "white" }}>
             This Arbitration Agreement shall apply, without limitation, to all claims that arose or were asserted before the effective date of this Agreement or any prior 
             version of the Agreement.
           </text>
@@ -768,7 +768,7 @@ const Home: React.FC = (props) => {
           and conditions, agreements, notices, disclosures, and other communications that DeltaFi provides to you electronically satisfy any legal requirement that 
           such communications would satisfy if it were to be in writing.  The foregoing does not affect your statutory rights, including but not limited to the 
           Electronic Signatures in Global and National Commerce Act at 15 U.S.C. §7001 et seq. 
-          <text style={{ fontWeight: 'bold', color: 'white' }}> (“E-Sign”)</text>.
+          <text style={{ fontWeight: "bold", color: "white" }}> (“E-Sign”)</text>.
         </Typography>
         <Typography variant="h6" align="left" className={classes.secondary}>
           15.2. Release. 
@@ -861,6 +861,6 @@ const Home: React.FC = (props) => {
       </Box>
 
     </Page>
-  )
-}
-export default Home
+  );
+};
+export default Home;

@@ -1,8 +1,7 @@
-import { ReactElement, useState, useMemo, useCallback } from 'react'
-import { useLocation } from 'react-router-dom'
-import ReactCardFlip from 'react-card-flip'
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import clx from 'classnames'
+import { ReactElement, useState, useMemo, useCallback } from "react";
+import { useLocation } from "react-router-dom";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import clx from "classnames";
 import {
   Snackbar,
   SnackbarContent,
@@ -13,54 +12,52 @@ import {
   IconButton,
   Link,
   Container,
-} from '@material-ui/core'
-import { Settings as SettingsIcon, Close as CloseIcon } from '@material-ui/icons'
-import BigNumber from 'bignumber.js'
+} from "@material-ui/core";
+import { Close as CloseIcon } from "@material-ui/icons";
+import BigNumber from "bignumber.js";
 
-import StakeCard from 'views/Stake/components/Card'
-import { StakeCard as IStakeCard } from 'views/Stake/components/types'
-import Page from 'components/layout/Page'
-import SettingsPanel from 'components/SettingsPanel/SettingsPanel'
-import { ConnectButton, LinkIcon } from 'components'
+import StakeCard from "views/Stake/components/Card";
+import { StakeCard as IStakeCard } from "views/Stake/components/types";
+import Page from "components/layout/Page";
+import { ConnectButton, LinkIcon } from "components";
 
-import useStyles from './styles'
-import { getFarmTokenInfo, useTokenFromMint, useTokenMintAccount } from 'providers/tokens'
-import { useFarmPoolByAddress, useFarmUserAccount } from 'providers/farm'
-import { lpTokens } from 'constants/tokens'
-import { useModal } from 'providers/modal'
-import { useConfig } from 'providers/config'
-import { sendSignedTransaction, claim, stake, unstake, refresh } from 'utils/transactions'
-import { exponentiate, exponentiatedBy } from 'utils/decimal'
-import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK } from 'constants/index'
-import { useCustomConnection } from 'providers/connection'
-import Slider from './components/Slider'
+import useStyles from "./styles";
+import { getFarmTokenInfo, useTokenFromMint, useTokenMintAccount } from "providers/tokens";
+import { useFarmPoolByAddress, useFarmUserAccount } from "providers/farm";
+import { lpTokens } from "constants/tokens";
+import { useModal } from "providers/modal";
+import { useConfig } from "providers/config";
+import { sendSignedTransaction, claim, stake, unstake } from "utils/transactions";
+import { exponentiate, exponentiatedBy } from "utils/decimal";
+import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK } from "constants/index";
+import { useCustomConnection } from "providers/connection";
+import Slider from "./components/Slider";
 
 interface TransactionResult {
   status: boolean | null
-  action?: 'stake' | 'unstake' | 'claim'
+  action?: "stake" | "unstake" | "claim"
   hash?: string
   stake?: IStakeCard
 }
 
 const Stake = (): ReactElement => {
-  const classes = useStyles()
-  const location = useLocation()
-  const farmPoolId = location.pathname.split('/').pop()
+  const classes = useStyles();
+  const location = useLocation();
+  const farmPoolId = location.pathname.split("/").pop();
   const farmPool = useFarmPoolByAddress(farmPoolId);
   
-  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet()
-  const { connection } = useConnection()
-  const { network } = useCustomConnection()
-  const [openSettings, setOpenSettings] = useState(false)
+  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
+  const { connection } = useConnection();
+  const { network } = useCustomConnection();
   const token = getFarmTokenInfo(farmPool?.name);
-  const tokenAccount = useTokenFromMint(token?.address)
+  const tokenAccount = useTokenFromMint(token?.address);
 
   const [staking, setStaking] = useState({
     isStake: true,
     token: token,
     balance: null,
-    amount: '',
-  })
+    amount: "",
+  });
 
   const tokenBalance = useMemo(() => {
     if (tokenAccount) {
@@ -70,41 +67,38 @@ const Stake = (): ReactElement => {
       }
       return value;
     }
-    return null
-  }, [tokenAccount])
+    return null;
+  }, [tokenAccount, staking]);
 
-
-  const [priceImpact, setPriceImpact] = useState('2.0')
-  const [isIncludeDecimal, setIsIncludeDecimal] = useState(true)
-  const [percentage, setPercentage] = useState(0)
-  const { setMenu } = useModal()
+  const [percentage, setPercentage] = useState(0);
+  const { setMenu } = useModal();
   const [state, setState] = useState<{
     open: boolean
-    vertical: 'bottom' | 'top'
-    horizontal: 'left' | 'center' | 'right'
+    vertical: "bottom" | "top"
+    horizontal: "left" | "center" | "right"
   }>({
     open: false,
-    vertical: 'bottom',
-    horizontal: 'left',
-  })
+    vertical: "bottom",
+    horizontal: "left",
+  });
 
-  const { config } = useConfig()
-  const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58())
+  const { config } = useConfig();
+  const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58());
   const lpMint = useTokenMintAccount(farmPool?.poolMintKey);
-  const [farmUser] = useFarmUserAccount()
-  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58())
+  const [farmUser] = useFarmUserAccount();
+  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
-  })
+  });
 
   const totalStaked = useMemo(() => {
     if (farmPool && lpMint) {
-      return exponentiatedBy(farmPool.reservedAmount.toString(), lpMint.decimals)
+      return exponentiatedBy(farmPool.reservedAmount.toString(), lpMint.decimals);
     }
-    return new BigNumber(0)
-  }, [farmPool, lpMint])
+    return new BigNumber(0);
+  }, [farmPool, lpMint]);
 
-  const position = useMemo(() => farmUser?.positions[farmPoolId], [farmUser, farmPoolId])
+  const position = useMemo(() => farmUser?.positions[farmPoolId], [farmUser, farmPoolId]);
 
   const depositAmount = useMemo(() => {
     if (position && lpMint) {
@@ -112,37 +106,37 @@ const Stake = (): ReactElement => {
       if (!staking.isStake) {
         setStaking({...staking, balance: value});
       }
-      return exponentiatedBy(position.depositBalance, lpMint.decimals)
+      return exponentiatedBy(position.depositBalance, lpMint.decimals);
     }
-    return new BigNumber(0)
-  }, [position, lpMint])
+    return new BigNumber(0);
+  }, [position, lpMint, staking]);
   const unclaimedReward = useMemo(() => {
     if (position && lpMint) {
-      return exponentiatedBy(position.rewardDebt, lpMint.decimals)
+      return exponentiatedBy(position.rewardDebt, lpMint.decimals);
     }
-    return new BigNumber(0)
-  }, [position, lpMint])
+    return new BigNumber(0);
+  }, [position, lpMint]);
   const poolRate = useMemo(() => {
     if (farmPool && totalStaked) {
       const apr = new BigNumber(farmPool.aprNumerator.toString())
         .dividedBy(farmPool.aprDenominator.toString())
-        .toFixed(3)
-      return totalStaked.multipliedBy(apr).toFixed(3)
+        .toFixed(3);
+      return totalStaked.multipliedBy(apr).toFixed(3);
     }
-  }, [farmPool, totalStaked])
+  }, [farmPool, totalStaked]);
 
   const handleSwitchMethod = (method: "stake" | "unstake") => {
-    setPercentage(0)
-    setStaking((staking) => ({ ...staking, isStake: method === "stake" ? true : false, balance: method === "stake" ? tokenBalance : depositAmount, amount: '' }))
-  }
+    setPercentage(0);
+    setStaking((staking) => ({ ...staking, isStake: method === "stake" ? true : false, balance: method === "stake" ? tokenBalance : depositAmount, amount: "" }));
+  };
 
   const handleStake = useCallback(async () => {
     if (!connection || !farmPool || !walletPubkey || !lpMint || !lpToken) {
-      return null
+      return null;
     }
     if (staking.isStake) {
-      if (staking.amount === '' || new BigNumber(lpToken.account.amount).lt(staking.amount)) {
-        return null
+      if (staking.amount === "" || new BigNumber(lpToken.account.amount).lt(staking.amount)) {
+        return null;
       }
 
       try {
@@ -156,30 +150,30 @@ const Stake = (): ReactElement => {
           stakeData: {
             amount: BigInt(exponentiate(staking.amount, lpMint.decimals).integerValue().toString()),
           },
-        })
+        });
 
-        const signedTransaction = await signTransaction(transaction)
+        const signedTransaction = await signTransaction(transaction);
 
         const hash = await sendSignedTransaction({
           signedTransaction,
           connection,
-        })
+        });
 
         setTransactionResult({
           status: true,
-          action: 'stake',
+          action: "stake",
           hash,
           stake: staking,
-        })
+        });
 
-        setStaking({ ...staking, amount: '' })
+        setStaking({ ...staking, amount: "" });
       } catch (e) {
-        setTransactionResult({ status: false })
+        setTransactionResult({ status: false });
       }
     } else {
-      if (staking.amount === '' || !position || depositAmount.lt(staking.amount)) {
+      if (staking.amount === "" || !position || depositAmount.lt(staking.amount)) {
         console.log("null unstake", staking.amount, position, depositAmount);
-        return null
+        return null;
       }
 
       try {
@@ -192,29 +186,29 @@ const Stake = (): ReactElement => {
           unstakeData: {
             amount: BigInt(exponentiate(staking.amount, lpMint.decimals).integerValue().toString()),
           },
-        })
+        });
 
-        const signedTransaction = await signTransaction(transaction)
+        const signedTransaction = await signTransaction(transaction);
 
         const hash = await sendSignedTransaction({
           signedTransaction,
           connection,
-        })
+        });
 
         setTransactionResult({
           status: true,
-          action: 'unstake',
+          action: "unstake",
           hash,
           stake: staking,
-        })
+        });
 
-        setStaking({ ...staking, amount: '' })
+        setStaking({ ...staking, amount: "" });
       } catch (e) {
-        setTransactionResult({ status: false })
+        setTransactionResult({ status: false });
       }
     }
 
-    setState((state) => ({ ...state, open: true }))
+    setState((state) => ({ ...state, open: true }));
   }, [
     connection,
     walletPubkey,
@@ -227,11 +221,11 @@ const Stake = (): ReactElement => {
     signTransaction,
     position,
     depositAmount,
-  ])
+  ]);
 
   const handleClaim = useCallback(async () => {
     if (!connection || !farmPool || !walletPubkey || !lpMint || !lpToken) {
-      return null
+      return null;
     }
 
     try {
@@ -242,41 +236,41 @@ const Stake = (): ReactElement => {
         farmPool,
         farmUser: farmUser.publicKey,
         claimDestination: rewardsAccount?.pubkey,
-      })
-      const signedTransaction = await signTransaction(transaction)
+      });
+      const signedTransaction = await signTransaction(transaction);
       const hash = await sendSignedTransaction({
         signedTransaction,
         connection,
-      })
+      });
 
       setTransactionResult({
         status: true,
-        action: 'claim',
+        action: "claim",
         hash,
-      })
+      });
     } catch (e) {
-      console.log(e)
-      setTransactionResult({ status: false })
+      console.log(e);
+      setTransactionResult({ status: false });
     }
-  }, [config, connection, farmPool, farmUser, lpMint, lpToken, signTransaction, walletPubkey, rewardsAccount])
+  }, [config, connection, farmPool, farmUser, lpMint, lpToken, signTransaction, walletPubkey, rewardsAccount]);
 
   const handleSnackBarClose = useCallback(() => {
-    setState((state) => ({ ...state, open: false }))
-  }, [])
+    setState((state) => ({ ...state, open: false }));
+  }, []);
 
   const snackAction = useMemo(() => {
     return (
       <IconButton size="small" onClick={handleSnackBarClose} className={classes.snackBarClose}>
         <CloseIcon />
       </IconButton>
-    )
-  }, [handleSnackBarClose, classes])
+    );
+  }, [handleSnackBarClose, classes]);
 
   const snackMessasge = useMemo(() => {
     if (!transactionResult.status) {
       return (
         <Box display="flex" alignItems="center">
-          <img src={`/images/snack-fail.svg`} alt="snack-status-icon" className={classes.snackBarIcon} />
+          <img src={"/images/snack-fail.svg"} alt="snack-status-icon" className={classes.snackBarIcon} />
           <Box>
             <Typography variant="h6" color="primary">
               Transaction failed(try again later)
@@ -288,14 +282,14 @@ const Stake = (): ReactElement => {
             </Box>
           </Box>
         </Box>
-      )
+      );
     }
 
-    const { hash, action, stake } = transactionResult
+    const { hash, action, stake } = transactionResult;
 
     return (
       <Box display="flex" alignItems="center">
-        <img src={`/images/snack-success.svg`} alt="snack-status-icon" className={classes.snackBarIcon} />
+        <img src={"/images/snack-success.svg"} alt="snack-status-icon" className={classes.snackBarIcon} />
         <Box>
           {stake && (
             <Typography variant="body1" color="primary">
@@ -313,17 +307,17 @@ const Stake = (): ReactElement => {
               target="_blank"
               href={`${SOLSCAN_LINK}/tx/${hash}?cluster=${network}`}
             >
-              {hash.slice(0, 7) + '...' + hash.slice(-7)}
+              {hash.slice(0, 7) + "..." + hash.slice(-7)}
             </Link>
           </Box>
         </Box>
       </Box>
-    )
-  }, [transactionResult, classes, network])
+    );
+  }, [transactionResult, classes, network]);
 
-  if (!farmPool) return null
+  if (!farmPool) return null;
 
-  const { vertical, horizontal, open } = state
+  const { vertical, horizontal, open } = state;
 
   return (
     <Page>
@@ -451,10 +445,10 @@ const Stake = (): ReactElement => {
                 data-amp-analytics-name="click"
                 data-amp-analytics-attrs="page: Deposit, target: Deposit"
               >
-                {staking.isStake ? 'Stake' : 'Unstake'}
+                {staking.isStake ? "Stake" : "Unstake"}
               </ConnectButton>
             ) : (
-              <ConnectButton size="large" fullWidth onClick={() => setMenu(true, 'connect')}>
+              <ConnectButton size="large" fullWidth onClick={() => setMenu(true, "connect")}>
                 Connect Wallet
               </ConnectButton>
             )}
@@ -475,7 +469,7 @@ const Stake = (): ReactElement => {
         />
       </Snackbar>
     </Page>
-  )
-}
+  );
+};
 
-export default Stake
+export default Stake;

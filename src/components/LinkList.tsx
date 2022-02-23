@@ -1,6 +1,6 @@
-import React from 'react'
-import styled from 'styled-components'
-import { BLOG_LINK, TWITTER_LINK, GITHUB_LINK, DISCORD_LINK } from 'constants/index'
+import React from "react";
+import styled from "styled-components";
+import { BLOG_LINK, TWITTER_LINK, GITHUB_LINK, DISCORD_LINK } from "constants/index";
 
 interface Props {
   isDark: boolean
@@ -11,17 +11,17 @@ export const StyledLink = styled.a`
   font-size: 18px;
   color: ${(props) => props.color};
   padding: 0 10px;
-`
+`;
 
 const StyledDiv = styled.div`
   display: none;
-  ${({ theme }) => theme.muibreakpoints.down('lg')} {
+  ${({ theme }) => theme.muibreakpoints.down("lg")} {
     display: flex;
   }
-`
+`;
 
 const LinkList: React.FC<Props> = ({ isDark }) => {
-  const textColor = isDark ? '#AEA7A7' : '#6F6F6F'
+  const textColor = isDark ? "#AEA7A7" : "#6F6F6F";
   return (
     <StyledDiv>
       <StyledLink
@@ -45,7 +45,7 @@ const LinkList: React.FC<Props> = ({ isDark }) => {
         Github
       </StyledLink>
     </StyledDiv>
-  )
-}
+  );
+};
 
-export default React.memo(LinkList, (prev, next) => prev.isDark === next.isDark)
+export default React.memo(LinkList, (prev, next) => prev.isDark === next.isDark);

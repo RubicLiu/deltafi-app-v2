@@ -1,7 +1,7 @@
-import React from 'react'
+import React from "react";
 // import { useTheme } from '@material-ui/core'
-import Svg from '../Svg'
-import { SvgProps } from '../types'
+import Svg from "../Svg";
+import { SvgProps } from "../types";
 
 interface LogoProps extends SvgProps {}
 
@@ -30,7 +30,7 @@ const Icon: React.FC<LogoProps> = (props) => {
         </clipPath>
       </defs>
     </Svg>
-  )
-}
+  );
+};
 
-export default Icon
+export default Icon;

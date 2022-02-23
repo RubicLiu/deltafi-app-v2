@@ -1,50 +1,50 @@
-import React from 'react'
-import styled from 'styled-components'
-import { Box, Container, makeStyles, Theme, Typography, IconButton } from '@material-ui/core'
+import React from "react";
+import styled from "styled-components";
+import { Box, Container, makeStyles, Theme, Typography, IconButton } from "@material-ui/core";
 
-import { BLOG_LINK, TWITTER_LINK, TELEGRAM_LINK, DISCORD_LINK, GITHUB_LINK } from 'constants/index'
-import { TwitterIcon, TelegramIcon, MediumIcon, GithubIcon, DiscordIcon } from 'components'
-import { useDarkMode } from 'providers/theme'
+import { BLOG_LINK, TWITTER_LINK, TELEGRAM_LINK, DISCORD_LINK, GITHUB_LINK } from "constants/index";
+import { TwitterIcon, TelegramIcon, MediumIcon, GithubIcon, DiscordIcon } from "components";
+import { useDarkMode } from "providers/theme";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
     background: palette.background.lightBlack,
   },
   container: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingTop: spacing(3),
     paddingBottom: spacing(3),
 
-    [breakpoints.down('sm')]: {
-      flexDirection: 'column',
-      justifyContent: 'center',
+    [breakpoints.down("sm")]: {
+      flexDirection: "column",
+      justifyContent: "center",
     },
   },
   iconButton: {
     width: 38.17,
     height: 38.17,
-    borderRadius: '50%',
-    backgroundColor: 'rgba(242, 242, 242, 0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: "50%",
+    backgroundColor: "rgba(242, 242, 242, 0.1)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
-}))
+}));
 
 const StyledDiv = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 0;
-  ${({ theme }) => theme.muibreakpoints.down('sm')} {
+  ${({ theme }) => theme.muibreakpoints.down("sm")} {
     margin-bottom: 10px;
   }
-`
+`;
 const IconWrapper = styled.div`
   margin: 0 16px;
-  ${({ theme }) => theme.muibreakpoints.down('lg')} {
+  ${({ theme }) => theme.muibreakpoints.down("lg")} {
     margin: 0 6px;
   }
   &:first-child {
@@ -56,11 +56,11 @@ const IconWrapper = styled.div`
   a {
     padding: 0;
   }
-`
+`;
 
 const Footer: React.FC = (props) => {
-  const { isDark } = useDarkMode()
-  const classes = useStyles(props)
+  const { isDark } = useDarkMode();
+  const classes = useStyles(props);
   return (
     <Box className={classes.root}>
       <Container className={classes.container}>
@@ -139,7 +139,7 @@ const Footer: React.FC = (props) => {
         <Typography>© 2022 DeltaFi. All rights reserved</Typography>
       </Container>
     </Box>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

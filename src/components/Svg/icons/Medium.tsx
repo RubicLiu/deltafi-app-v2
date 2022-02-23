@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 interface Props {}
 
@@ -17,7 +17,7 @@ const Medium = (props: Props) => {
         </clipPath>
       </defs>
     </svg>
-  )
-}
+  );
+};
 
-export default Medium
+export default Medium;

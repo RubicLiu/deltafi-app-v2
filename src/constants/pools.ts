@@ -1,5 +1,5 @@
-import { PublicKey } from '@solana/web3.js'
-import { poolInfo } from './config.json'
+import { PublicKey } from "@solana/web3.js";
+import { poolInfo } from "./config.json";
 
 export interface PoolSchema {
   name: string
@@ -15,21 +15,21 @@ export const pools: PoolSchema[] = poolInfo.map(({name, swap, mint, base, quote}
   mintAddress: new PublicKey(mint), 
   base,
   quote
-}))
+}));
 
 console.log(pools);
 
 
 export const listSymbols = (pools: PoolSchema[]) => {
-  let list = []
-  const prefix = 'Crypto.'
+  let list = [];
+  const prefix = "Crypto.";
   pools.forEach((pool) => {
     if (!list.includes(`${prefix}${pool.base}/USD`)) {
-      list.push(`${prefix}${pool.base}/USD`)
+      list.push(`${prefix}${pool.base}/USD`);
     }
     if (!list.includes(`${prefix}${pool.quote}/USD`)) {
-      list.push(`${prefix}${pool.quote}/USD`)
+      list.push(`${prefix}${pool.quote}/USD`);
     }
-  })
-  return list
-}
+  });
+  return list;
+};

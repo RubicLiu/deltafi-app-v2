@@ -1,13 +1,12 @@
-import { ReactElement, ReactNode } from 'react'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { Box, IconButton, makeStyles, Theme, Typography } from '@material-ui/core'
-import CloseIcon from '@material-ui/icons/Close'
-import { PublicKey } from '@solana/web3.js'
+import { ReactElement, ReactNode } from "react";
+import { Box, IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
 
-import { ConnectButton } from 'components'
 
-import { useModal } from 'providers/modal'
-import { usePoolFromAddress } from 'providers/pool'
+import { ConnectButton } from "components";
+
+import { useModal } from "providers/modal";
+import { usePoolFromAddress } from "providers/pool";
 
 interface IWithdrawPanelProps {
   children?: ReactNode
@@ -19,30 +18,30 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginTop: 32,
   },
   sectionDesktop: {
-    display: 'none',
-    [breakpoints.up('md')]: {
+    display: "none",
+    [breakpoints.up("md")]: {
       width: 450,
-      display: 'flex',
+      display: "flex",
     },
   },
   sectionMobile: {
-    display: 'flex',
-    width: 'auto',
-    [breakpoints.up('md')]: {
-      display: 'none',
+    display: "flex",
+    width: "auto",
+    [breakpoints.up("md")]: {
+      display: "none",
     },
   },
   img: {
     marginRight: 4,
     width: 24,
     height: 24,
-    borderRadius: '50%',
+    borderRadius: "50%",
   },
   bottomText: {
     marginBottom: 52,
     marginTop: 52,
     maxWidth: 400,
-    textAlign: 'center',
+    textAlign: "center",
   },
   estimatedAmount: {
     marginBottom: 36,
@@ -53,21 +52,20 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   success: {
     color: palette.text.success,
   },
-}))
+}));
 
 const WithdrawPanel = (props: IWithdrawPanelProps): ReactElement => {
-  const { disconnect, publicKey } = useWallet()
-  const { setMenu, address } = useModal()
-  const pool = usePoolFromAddress(address)
+  const { setMenu, address } = useModal();
+  const pool = usePoolFromAddress(address);
 
-  const classes = useStyles(props)
+  const classes = useStyles(props);
 
   const handleWithdrawal = () => {
-    setMenu(false, '')
+    setMenu(false, "");
     // handle withdraw
-  }
+  };
 
-  if (!pool) return null
+  if (!pool) return null;
 
   return (
     <Box width="100%">
@@ -75,7 +73,7 @@ const WithdrawPanel = (props: IWithdrawPanelProps): ReactElement => {
         <Typography variant="h6" color="primary">
           Review Withdraw
         </Typography>
-        <IconButton size="small" onClick={() => setMenu(false, '')}>
+        <IconButton size="small" onClick={() => setMenu(false, "")}>
           <CloseIcon />
         </IconButton>
       </Box>
@@ -153,7 +151,7 @@ const WithdrawPanel = (props: IWithdrawPanelProps): ReactElement => {
         </ConnectButton>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default WithdrawPanel
+export default WithdrawPanel;

@@ -1,5 +1,5 @@
 // Will replace with spl-token-registry in mainnet launch
-import { poolInfo, network } from './config.json';
+import { poolInfo, network } from "./config.json";
 
 export interface TokenInfo {
   chainId: number
@@ -16,27 +16,27 @@ export const tokens: TokenInfo[] =
   [
     {
       chainId: 101,
-      address: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
-      symbol: 'SRM',
-      name: 'Serum',
+      address: "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt",
+      symbol: "SRM",
+      name: "Serum",
       decimals: 6,
       logoURI:
         "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png",
     },
     {
       chainId: 101,
-      address: 'So11111111111111111111111111111111111111112',
-      symbol: 'SOL',
-      name: 'SOL',
+      address: "So11111111111111111111111111111111111111112",
+      symbol: "SOL",
+      name: "SOL",
       decimals: 9,
       logoURI:
         "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
     },
     {
       chainId: 101,
-      address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      symbol: 'USDC',
-      name: 'USD Coin',
+      address: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      symbol: "USDC",
+      name: "USD Coin",
       decimals: 6,
       logoURI:
       "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
@@ -47,42 +47,42 @@ export const tokens: TokenInfo[] =
   [
     {
       chainId: 101,
-      address: 'HMCW6tEvAJirwTGbdhpcsv8eFBiNS4Ti6rwMbf5VyAUv',
-      symbol: 'SRM',
-      name: 'SRM',
+      address: "HMCW6tEvAJirwTGbdhpcsv8eFBiNS4Ti6rwMbf5VyAUv",
+      symbol: "SRM",
+      name: "SRM",
       decimals: 9,
       logoURI:
         "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png",
     },
     {
       chainId: 101,
-      address: 'So11111111111111111111111111111111111111112',
-      symbol: 'SOL',
-      name: 'SOL',
+      address: "So11111111111111111111111111111111111111112",
+      symbol: "SOL",
+      name: "SOL",
       decimals: 9,
       logoURI:
         "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
     },
     {
       chainId: 101,
-      address: '9ZiQNDXaiC7TQAfKcha4hjiSPdxDJfw7pKKsJT49mjfe',
-      symbol: 'USDC',
-      name: 'USDC',
+      address: "9ZiQNDXaiC7TQAfKcha4hjiSPdxDJfw7pKKsJT49mjfe",
+      symbol: "USDC",
+      name: "USDC",
       decimals: 9,
       logoURI:
       "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
     },
     {
       chainId: 101,
-      address: '44PHKq7n7ymWc2aBj4JS97hZHRT9Uc25Aa4kaLJhaMck',
-      symbol: 'USDT',
-      name: 'USDT',
+      address: "44PHKq7n7ymWc2aBj4JS97hZHRT9Uc25Aa4kaLJhaMck",
+      symbol: "USDT",
+      name: "USDT",
       decimals: 9,
       logoURI:
       "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png",
     },
   ]
-}[network]
+}[network];
 
 
 

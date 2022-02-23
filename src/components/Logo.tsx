@@ -1,27 +1,10 @@
-import React from 'react'
-import styled from 'styled-components'
-import { Box, Link } from '@material-ui/core'
+import React from "react";
+import { Box, Link } from "@material-ui/core";
 
 interface Props {
   isDark: boolean
   href: string
 }
-
-const StyledLink = styled.a`
-  display: flex;
-  align-items: center;
-`
-
-const Img = styled.img`
-  width: 153px;
-  height: 37px;
-  padding-right: 12px;
-
-  ${({ theme }) => theme.muibreakpoints.down('md')} {
-    width: 108px;
-    height: 26px;
-  }
-`
 
 const Logo: React.FC<Props> = ({ isDark, href }) => {
   return (
@@ -30,7 +13,7 @@ const Logo: React.FC<Props> = ({ isDark, href }) => {
         <img src="/horizontal 60.svg" alt="logo" />
       </Link>
     </Box>
-  )
-}
+  );
+};
 
-export default React.memo(Logo, (prev, next) => prev.isDark === next.isDark)
+export default React.memo(Logo, (prev, next) => prev.isDark === next.isDark);

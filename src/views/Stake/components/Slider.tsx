@@ -1,14 +1,14 @@
-import React from 'react'
-import { Box, Typography, Slider } from '@material-ui/core'
-import { Theme, makeStyles } from '@material-ui/core'
-import { withStyles } from '@material-ui/styles'
+import React from "react";
+import { Box, Typography, Slider } from "@material-ui/core";
+import { Theme, makeStyles } from "@material-ui/core";
+import { withStyles } from "@material-ui/styles";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
     background: palette.background.secondary,
     padding: spacing(2),
     borderRadius: 16,
-    [breakpoints.up('md')]: {
+    [breakpoints.up("md")]: {
       padding: `${spacing(3)}px ${spacing(2.5)}px`,
     },
   },
@@ -18,7 +18,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     borderRadius: 28,
     marginRight: 25,
   },
-}))
+}));
 
 const CustomSlider = withStyles((theme: Theme) => ({
   root: {
@@ -29,11 +29,11 @@ const CustomSlider = withStyles((theme: Theme) => ({
     height: 20,
     width: 20,
     backgroundColor: theme.palette.text.link,
-    border: '1px solid white',
+    border: "1px solid white",
     marginTop: -6,
     marginLeft: -10,
-    '&:focus, &:hover': {
-      boxShadow: 'inherit',
+    "&:focus, &:hover": {
+      boxShadow: "inherit",
     },
   },
   rail: {
@@ -44,7 +44,7 @@ const CustomSlider = withStyles((theme: Theme) => ({
     height: 8,
     borderRadius: 4,
   },
-}))(Slider)
+}))(Slider);
 
 interface SliderProps {
   value: number
@@ -52,12 +52,12 @@ interface SliderProps {
 }
 
 const PercentageSlider: React.FC<SliderProps> = (props) => {
-  const classes = useStyles()
-  const { value, onChange } = props
+  const classes = useStyles();
+  const { value, onChange } = props;
 
   const handleChange = (_: any, newValue: number | number[]) => {
-    onChange(newValue as number)
-  }
+    onChange(newValue as number);
+  };
 
   return (
     <Box className={classes.root}>
@@ -69,7 +69,7 @@ const PercentageSlider: React.FC<SliderProps> = (props) => {
         <CustomSlider value={value} onChange={handleChange} aria-labelledby="continuous-slider" step={0.01} />
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default PercentageSlider
+export default PercentageSlider;

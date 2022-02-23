@@ -1,7 +1,7 @@
-import BigNumber from 'bignumber.js'
+import BigNumber from "bignumber.js";
 
-import { struct, u8 } from 'buffer-layout'
-import { decimal, u64 } from 'utils/layout'
+import { struct, u8 } from "buffer-layout";
+import { decimal, u64 } from "utils/layout";
 
 /** @internal */
 export enum Multiplier {
@@ -30,16 +30,16 @@ export interface PoolState {
 export const PoolStateLayout = (property: string) =>
   struct<PoolState>(
     [
-      decimal('marketPrice'),
-      decimal('slope'),
-      decimal('baseReserve'),
-      decimal('quoteReserve'),
-      decimal('baseTarget'),
-      decimal('quoteTarget'),
-      u64('totalSupply'),
-      u8('multiplier'),
-      decimal('lastPythPrice'),
-      u64('lastValidPythPriceSlot'),
+      decimal("marketPrice"),
+      decimal("slope"),
+      decimal("baseReserve"),
+      decimal("quoteReserve"),
+      decimal("baseTarget"),
+      decimal("quoteTarget"),
+      u64("totalSupply"),
+      u8("multiplier"),
+      decimal("lastPythPrice"),
+      u64("lastValidPythPriceSlot"),
     ],
     property,
-  )
+  );

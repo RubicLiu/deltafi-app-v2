@@ -1,13 +1,13 @@
-import React from 'react'
-import Svg from '../Svg'
-import { SvgProps } from '../types'
+import React from "react";
+import Svg from "../Svg";
+import { SvgProps } from "../types";
 
 interface TwitterProps extends SvgProps {
   isDark: boolean
 }
 
 const Icon: React.FC<TwitterProps> = ({ isDark, ...props }) => {
-  const textColor = isDark ? '#FFFFFF' : '#000000'
+  const textColor = isDark ? "#FFFFFF" : "#000000";
   return (
     <Svg viewBox="0 0 20 16" {...props}>
       <path
@@ -17,7 +17,7 @@ const Icon: React.FC<TwitterProps> = ({ isDark, ...props }) => {
         fill={textColor}
       />
     </Svg>
-  )
-}
+  );
+};
 
-export default Icon
+export default Icon;

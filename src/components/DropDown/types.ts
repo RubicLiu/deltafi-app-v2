@@ -1,6 +1,6 @@
-import { InputBaseProps } from '@material-ui/core'
+import { InputBaseProps } from "@material-ui/core";
 
-import { TokenInfo } from 'constants/tokens'
+import { TokenInfo } from "constants/tokens";
 
 export interface DropDownProps<T extends TokenInfo> {
   value: T

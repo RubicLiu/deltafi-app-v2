@@ -2,16 +2,16 @@ import {
   PublicKey,
   Transaction,
   SystemProgram
-} from '@solana/web3.js'
+} from "@solana/web3.js";
 
-import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from '@solana/spl-token'
+import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from "@solana/spl-token";
 
 export function createNativeSOLHandlingTransactions(tempAccountRefPubkey: PublicKey, tmpAccountLamport: number, walletPubkey: PublicKey): {
   createWrappedTokenAccountTransaction: Transaction,
   initializeWrappedTokenAccountTransaction: Transaction,
   closeWrappedTokenAccountTransaction: Transaction,
 } {
-  const createWrappedTokenAccountTransaction = new Transaction()
+  const createWrappedTokenAccountTransaction = new Transaction();
   createWrappedTokenAccountTransaction
   .add(
     SystemProgram.createAccount({
@@ -23,7 +23,7 @@ export function createNativeSOLHandlingTransactions(tempAccountRefPubkey: Public
     })
   );
 
-  const initializeWrappedTokenAccountTransaction = new Transaction()
+  const initializeWrappedTokenAccountTransaction = new Transaction();
   initializeWrappedTokenAccountTransaction
   .add(
     Token.createInitAccountInstruction(
@@ -34,7 +34,7 @@ export function createNativeSOLHandlingTransactions(tempAccountRefPubkey: Public
     )
   );
   
-  const closeWrappedTokenAccountTransaction = new Transaction()
+  const closeWrappedTokenAccountTransaction = new Transaction();
   closeWrappedTokenAccountTransaction
   .add(
     Token.createCloseAccountInstruction(

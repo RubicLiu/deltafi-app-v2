@@ -1,5 +1,5 @@
-import React from 'react'
-import styled from 'styled-components'
+import React from "react";
+import styled from "styled-components";
 import {
   Box,
   Typography,
@@ -9,181 +9,181 @@ import {
   AccordionDetails,
   AccordionSummary,
   Paper,
-} from '@material-ui/core'
-import { withStyles, createStyles } from '@material-ui/core/styles'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+} from "@material-ui/core";
+import { withStyles, createStyles } from "@material-ui/core/styles";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
-import Table from '@material-ui/core/Table'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableContainer from '@material-ui/core/TableContainer'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
 
-import LinearProgress from '@material-ui/core/LinearProgress'
+import LinearProgress from "@material-ui/core/LinearProgress";
 
-import { MyRewardProps } from './types'
+import { MyRewardProps } from "./types";
 
 const useStyles = makeStyles(({ breakpoints }: Theme) => ({
   textColor: {
-    color: '#D3D3D3',
-    [breakpoints.down('sm')]: {
+    color: "#D3D3D3",
+    [breakpoints.down("sm")]: {
       fontSize: 10,
     },
   },
   barColorPrimary: {
-    backgroundColor: '#C94A75',
+    backgroundColor: "#C94A75",
   },
   tableContainer: {
-    backgroundColor: '#2F2C3E',
-    borderRadius: '16px',
-    padding: '0px 24px 24px 24px',
-    '& .MuiTableHead-root': {
+    backgroundColor: "#2F2C3E",
+    borderRadius: "16px",
+    padding: "0px 24px 24px 24px",
+    "& .MuiTableHead-root": {
       paddingBottom: 20,
-      '& .MuiTableCell-head': {
-        padding: '20px 16px',
-        [breakpoints.down('sm')]: {
-          padding: '0 0 20px',
+      "& .MuiTableCell-head": {
+        padding: "20px 16px",
+        [breakpoints.down("sm")]: {
+          padding: "0 0 20px",
         },
       },
     },
-    '& .MuiTableBody-root': {
-      '& .MuiTableRow-root': {
-        '& .MuiTableCell-root': {
-          fontSize: '14px',
-          borderBottomWidth: '0px',
-          color: '#F7F7F7',
-          padding: '10px 16px',
-          [breakpoints.down('sm')]: {
-            fontSize: '10px',
-            padding: '6px 0',
+    "& .MuiTableBody-root": {
+      "& .MuiTableRow-root": {
+        "& .MuiTableCell-root": {
+          fontSize: "14px",
+          borderBottomWidth: "0px",
+          color: "#F7F7F7",
+          padding: "10px 16px",
+          [breakpoints.down("sm")]: {
+            fontSize: "10px",
+            padding: "6px 0",
           },
         },
-        '&:first-child .MuiTableCell-root': {
-          padding: '16px 16px 10px',
-          [breakpoints.down('sm')]: {
-            padding: '21px 0px 6px',
+        "&:first-child .MuiTableCell-root": {
+          padding: "16px 16px 10px",
+          [breakpoints.down("sm")]: {
+            padding: "21px 0px 6px",
           }
         }
       },
     },
-    [breakpoints.down('sm')]: {
-      padding: '24px 8px',
+    [breakpoints.down("sm")]: {
+      padding: "24px 8px",
     },
   },
   accordionDetails: {
-    padding: '0px 40px 32px',
-    [breakpoints.down('md')]: {
-      padding: '0px 16px 32px 16px',
+    padding: "0px 40px 32px",
+    [breakpoints.down("md")]: {
+      padding: "0px 16px 32px 16px",
     },
-    [breakpoints.down('sm')]: {
-      padding: '0px 8px 32px 8px',
+    [breakpoints.down("sm")]: {
+      padding: "0px 8px 32px 8px",
     },
   },
   progressDesc: {
-    fontSize: '14px',
-    color: '#F7F7F7',
-    [breakpoints.down('sm')]: {
-      fontSize: '10px',
+    fontSize: "14px",
+    color: "#F7F7F7",
+    [breakpoints.down("sm")]: {
+      fontSize: "10px",
     },
   },
   progressBar: {
-    width: '140px',
-    marginRight: '8px',
-    [breakpoints.down('sm')]: {
+    width: "140px",
+    marginRight: "8px",
+    [breakpoints.down("sm")]: {
       width: 76,
     },
   },
   lockupBox: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
   },
   subTitle: {
-    [breakpoints.down('sm')]: {
+    [breakpoints.down("sm")]: {
       fontSize: 14,
     },
   },
-}))
+}));
 
 const RewardAccordion = withStyles((theme: Theme) =>
   createStyles({
     root: {
       borderRadius: 24,
-      backgroundColor: '#1D1A27',
-      boxShadow: 'none',
-      '&:last-child': {
+      backgroundColor: "#1D1A27",
+      boxShadow: "none",
+      "&:last-child": {
         borderRadius: 24,
-        marginBottom: '0px',
+        marginBottom: "0px",
       },
-      '&:not(:last-child)': {
+      "&:not(:last-child)": {
         borderBottom: 0,
       },
-      '&:before': {
-        display: 'none',
+      "&:before": {
+        display: "none",
       },
-      '&$expanded': {
+      "&$expanded": {
         //disable spacing when expand
-        marginBottom: '16px',
+        marginBottom: "16px",
       },
-      marginBottom: '16px',
+      marginBottom: "16px",
     },
     expanded: {},
   }),
-)(Accordion)
+)(Accordion);
 
 const RewardAccordionSummary = withStyles((theme: Theme) => ({
   root: {
     minHeight: 96,
-    margin: '0px 40px',
+    margin: "0px 40px",
     padding: 0,
-    '&$expanded': {
+    "&$expanded": {
       minHeight: 96,
     },
-    [theme.breakpoints.down('sm')]: {
-      margin: '0px 16px',
+    [theme.breakpoints.down("sm")]: {
+      margin: "0px 16px",
       minHeight: 86,
     },
   },
   content: {
-    '&$expanded': {},
+    "&$expanded": {},
   },
   expanded: {},
-}))(AccordionSummary)
+}))(AccordionSummary);
 
 const MainSpan = styled.div`
   font-size: 32px;
   line-height: 1;
-  ${({ theme }) => theme.muibreakpoints.down('sm')} {
+  ${({ theme }) => theme.muibreakpoints.down("sm")} {
     font-size: 24px;
   }
-`
+`;
 
 const SubSpan = styled.span`
   font-size: 18px;
   line-height: 1;
   color: #d3d3d3;
-  ${({ theme }) => theme.muibreakpoints.down('sm')} {
+  ${({ theme }) => theme.muibreakpoints.down("sm")} {
     font-size: 16px;
   }
-`
+`;
 
 const SpotSpan = styled.span`
   color: #c94a75;
-`
+`;
 
 const MyReward: React.FC<MyRewardProps> = (props) => {
-  const classes = useStyles(props)
+  const classes = useStyles(props);
 
-  const { detail } = props
+  const { detail } = props;
 
   return (
     <RewardAccordion TransitionProps={{ unmountOnExit: true }}>
       <RewardAccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" style={{ width: '100%' }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" style={{ width: "100%" }}>
           <Typography variant="subtitle1" className={classes.subTitle}>
             {detail.name}
           </Typography>
-          <Box style={{ textAlign: 'right' }}>
+          <Box style={{ textAlign: "right" }}>
             <MainSpan>
               <SpotSpan>{detail.claimedAmount}</SpotSpan> / <SubSpan>{detail.totalAmount}DLT</SubSpan>
             </MainSpan>
@@ -217,7 +217,7 @@ const MyReward: React.FC<MyRewardProps> = (props) => {
                         className={classes.progressBar}
                       />
                       <Typography className={classes.progressDesc}>
-                        {100 - row.lockup > 0 ? 100 - row.lockup + ' days left' : 'Claimed'}{' '}
+                        {100 - row.lockup > 0 ? 100 - row.lockup + " days left" : "Claimed"}{" "}
                       </Typography>
                     </Box>
                   </TableCell>
@@ -228,6 +228,6 @@ const MyReward: React.FC<MyRewardProps> = (props) => {
         </TableContainer>
       </AccordionDetails>
     </RewardAccordion>
-  )
-}
-export default MyReward
+  );
+};
+export default MyReward;

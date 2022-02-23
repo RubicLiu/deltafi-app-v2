@@ -1,1 +1,1 @@
-export { default } from './WithdrawCard';
+export { default } from "./WithdrawCard";

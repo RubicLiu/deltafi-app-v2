@@ -1,5 +1,5 @@
-import { Connection, Keypair, PublicKey, Transaction, SystemProgram } from '@solana/web3.js'
-import BN from 'bn.js'
+import { Connection, Keypair, PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
+import BN from "bn.js";
 
 import {
   createClaimFarmInstruction,
@@ -9,12 +9,12 @@ import {
   createRefreshFarmInstruction,
   FarmDepositData,
   FarmWithdrawData,
-} from 'lib/instructions/farm'
-import { FARM_USER_SIZE } from 'lib/state/farm'
-import { ExTokenAccount, FarmPoolInfo, MarketConfig } from 'providers/types'
-import { SWAP_PROGRAM_ID } from 'constants/index'
-import { createApproveInstruction } from 'lib/instructions'
-import { mergeTransactions, signTransaction } from '.'
+} from "lib/instructions/farm";
+import { FARM_USER_SIZE } from "lib/state/farm";
+import { ExTokenAccount, FarmPoolInfo, MarketConfig } from "providers/types";
+import { SWAP_PROGRAM_ID } from "constants/index";
+import { createApproveInstruction } from "lib/instructions";
+import { mergeTransactions, signTransaction } from ".";
 
 export async function createFarmUser({
   connection,
@@ -27,12 +27,12 @@ export async function createFarmUser({
 }) {
   if (!connection || !walletPubkey) {
     console.error("create farm user failed with null parameter");
-    return null
+    return null;
   }
 
-  const stakeAccount = Keypair.generate()
+  const stakeAccount = Keypair.generate();
 
-  const balanceForStakeAccount = await connection.getMinimumBalanceForRentExemption(FARM_USER_SIZE)
+  const balanceForStakeAccount = await connection.getMinimumBalanceForRentExemption(FARM_USER_SIZE);
   let transaction = new Transaction()
     .add(
       SystemProgram.createAccount({
@@ -43,12 +43,12 @@ export async function createFarmUser({
         programId: SWAP_PROGRAM_ID,
       }),
     )
-    .add(createInitFarmUserInstruction(config.publicKey, stakeAccount.publicKey, walletPubkey, SWAP_PROGRAM_ID))
+    .add(createInitFarmUserInstruction(config.publicKey, stakeAccount.publicKey, walletPubkey, SWAP_PROGRAM_ID));
 
   return {
     transaction,
     address: stakeAccount,
-  }
+  };
 }
 
 export async function stake({
@@ -70,14 +70,14 @@ export async function stake({
 }) {
   if (!connection || !walletPubkey || !farmPool || !poolTokenAccount || !config || !stakeData) {
     console.error("farm stake failed with null parameter");
-    return null
+    return null;
   }
 
-  let createFarmUserAccountTransaction: Transaction
-  let signers = []
+  let createFarmUserAccountTransaction: Transaction;
+  let signers = [];
   if (!farmUser) {
-    const farmUserAccount = Keypair.generate()
-    const balance = await connection.getMinimumBalanceForRentExemption(FARM_USER_SIZE)
+    const farmUserAccount = Keypair.generate();
+    const balance = await connection.getMinimumBalanceForRentExemption(FARM_USER_SIZE);
     createFarmUserAccountTransaction = new Transaction()
       .add(
         SystemProgram.createAccount({
@@ -88,12 +88,12 @@ export async function stake({
           programId: SWAP_PROGRAM_ID,
         }),
       )
-      .add(createInitFarmUserInstruction(config.publicKey, farmUserAccount.publicKey, walletPubkey, SWAP_PROGRAM_ID))
-    farmUser = farmUserAccount.publicKey
-    signers.push(farmUserAccount)
+      .add(createInitFarmUserInstruction(config.publicKey, farmUserAccount.publicKey, walletPubkey, SWAP_PROGRAM_ID));
+    farmUser = farmUserAccount.publicKey;
+    signers.push(farmUserAccount);
   }
 
-  const userTransferAuthority = Keypair.generate()
+  const userTransferAuthority = Keypair.generate();
   let transaction = new Transaction()
     .add(
       createApproveInstruction(
@@ -119,12 +119,12 @@ export async function stake({
       createRefreshFarmInstruction(farmPool.publicKey, SWAP_PROGRAM_ID, [
         farmUser,
       ]),
-    )
-  signers.push(userTransferAuthority)
+    );
+  signers.push(userTransferAuthority);
 
-  transaction = mergeTransactions([createFarmUserAccountTransaction, transaction])
+  transaction = mergeTransactions([createFarmUserAccountTransaction, transaction]);
 
-  return await signTransaction({ transaction, feePayer: walletPubkey, signers, connection })
+  return signTransaction({ transaction, feePayer: walletPubkey, signers, connection });
 }
 
 export async function unstake({
@@ -144,16 +144,16 @@ export async function unstake({
 }) {
   if (!connection || !walletPubkey || !farmPool || !farmUser || !poolTokenAccount || !unstakeData) {
     console.error("farm unstake failed with null parameter");
-    return null
+    return null;
   }
 
-  let nonce = new BN(farmPool.bumpSeed)
+  let nonce = new BN(farmPool.bumpSeed);
   const farmPoolAuthority = await PublicKey.createProgramAddress(
-    [farmPool.publicKey.toBuffer(), nonce.toArrayLike(Buffer, 'le', 1)],
+    [farmPool.publicKey.toBuffer(), nonce.toArrayLike(Buffer, "le", 1)],
     SWAP_PROGRAM_ID,
-  )
+  );
 
-  let transaction = new Transaction()
+  let transaction = new Transaction();
   transaction
     .add(
       createFarmWithdrawInstruction(
@@ -171,9 +171,9 @@ export async function unstake({
       createRefreshFarmInstruction(farmPool.publicKey, SWAP_PROGRAM_ID, [
         farmUser,
       ]),
-    )
+    );
 
-  return await signTransaction({ transaction, feePayer: walletPubkey, connection })
+  return signTransaction({ transaction, feePayer: walletPubkey, connection });
 }
 
 export async function claim({
@@ -193,16 +193,16 @@ export async function claim({
 }) {
   if (!connection || !walletPubkey || !farmPool || !farmUser || !claimDestination) {
     console.error("farm claim failed with null parameter");
-    return null
+    return null;
   }
 
-  const nonce = new BN(config.bumpSeed)
+  const nonce = new BN(config.bumpSeed);
   const marketAuthority = await PublicKey.createProgramAddress(
-    [config.publicKey.toBuffer(), nonce.toArrayLike(Buffer, 'le', 1)],
+    [config.publicKey.toBuffer(), nonce.toArrayLike(Buffer, "le", 1)],
     SWAP_PROGRAM_ID,
-  )
+  );
 
-  const transaction = new Transaction()
+  const transaction = new Transaction();
   transaction.add(
     createClaimFarmInstruction(
       config.publicKey,
@@ -214,9 +214,9 @@ export async function claim({
       config.deltafiMint,
       SWAP_PROGRAM_ID,
     ),
-  )
+  );
 
-  return await signTransaction({ transaction, feePayer: walletPubkey, connection })
+  return signTransaction({ transaction, feePayer: walletPubkey, connection });
 }
 
 export async function refresh({
@@ -236,11 +236,11 @@ export async function refresh({
 }) {
   if (!connection || !farmPool || !poolMint || !walletPubkey || !farmUser) {
     console.error("farm refresh failed with null parameter");
-    return null
+    return null;
   }
 
-  const transaction = new Transaction()
-  transaction.add(createRefreshFarmInstruction(swap, SWAP_PROGRAM_ID, [farmUser]))
+  const transaction = new Transaction();
+  transaction.add(createRefreshFarmInstruction(swap, SWAP_PROGRAM_ID, [farmUser]));
 
-  return await signTransaction({ transaction, feePayer: walletPubkey, connection })
+  return signTransaction({ transaction, feePayer: walletPubkey, connection });
 }

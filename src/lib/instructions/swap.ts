@@ -1,7 +1,7 @@
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from '@solana/web3.js'
-import { struct, u8 } from 'buffer-layout'
-import { SwapData, SwapDataLayout, DepositData, DepositDataLayout, WithdrawData, WithdrawDataLayout} from './dataLayout'
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from "@solana/web3.js";
+import { struct, u8 } from "buffer-layout";
+import { SwapData, SwapDataLayout, DepositData, DepositDataLayout, WithdrawData, WithdrawDataLayout} from "./dataLayout";
 
 export enum SwapInstruction {
   Initialize = 0,
@@ -49,24 +49,24 @@ export const createSwapInstruction = (
     { pubkey: pythB, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction'), SwapDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction"), SwapDataLayout]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: SwapInstruction.Swap,
       swapData,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};
 
 export const createDepositInstruction = (
   tokenSwap: PublicKey,
@@ -97,24 +97,24 @@ export const createDepositInstruction = (
     { pubkey: pythB, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction'), DepositDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction"), DepositDataLayout]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: SwapInstruction.Deposit,
       depositData,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};
 
 export const createWithdrawInstruction = (
   tokenSwap: PublicKey,
@@ -149,21 +149,21 @@ export const createWithdrawInstruction = (
     { pubkey: pythB, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction'), WithdrawDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction"), WithdrawDataLayout]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: SwapInstruction.Withdraw,
       withdrawData,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};

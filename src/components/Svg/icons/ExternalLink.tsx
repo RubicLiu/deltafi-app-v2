@@ -1,14 +1,14 @@
-import React from 'react'
-import Svg from '../Svg'
-import { SvgProps } from '../types'
+import React from "react";
+import Svg from "../Svg";
+import { SvgProps } from "../types";
 
 interface LinkProps extends SvgProps {
   isDark: boolean
 }
 
 const Icon: React.FC<LinkProps> = ({ isDark, ...props }) => {
-  const textColor = isDark ? '#F6F6F6' : '#15161D'
-  const opacity = isDark ? 1 : 0.8
+  const textColor = isDark ? "#F6F6F6" : "#15161D";
+  const opacity = isDark ? 1 : 0.8;
   return (
     <Svg viewBox="0 0 16 16" {...props}>
       <path
@@ -17,7 +17,7 @@ const Icon: React.FC<LinkProps> = ({ isDark, ...props }) => {
         fillOpacity={opacity}
       />
     </Svg>
-  )
-}
+  );
+};
 
-export default Icon
+export default Icon;

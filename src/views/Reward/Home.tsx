@@ -1,94 +1,93 @@
-import React, { useEffect, useState } from 'react'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { Box, Typography, makeStyles, Theme, Grid, Paper, Link } from '@material-ui/core'
-import Page from 'components/layout/Page'
-import { ConnectButton } from 'components'
-import { useModal } from 'providers/modal'
-import ReferralCard from './components/ReferralCard'
-import MyReward from './components/MyReward'
-import CopyLinkButton from './components/CopyLinkButton'
-import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from 'components'
-import copy from 'copy-to-clipboard';
-import { getJsonWalletAddress } from 'ethers/lib/utils'
+import React, { useEffect, useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { Box, Typography, makeStyles, Theme, Grid, Paper, Link } from "@material-ui/core";
+import Page from "components/layout/Page";
+import { ConnectButton } from "components";
+import { useModal } from "providers/modal";
+import ReferralCard from "./components/ReferralCard";
+import MyReward from "./components/MyReward";
+import CopyLinkButton from "./components/CopyLinkButton";
+import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from "components";
+import copy from "copy-to-clipboard";
 
 /*
  * mockup test data for reward page
  */
 const referralIntroCard = [
   {
-    caption: 'Get a referral link',
-    detail: 'Connect a wallet and generate a referral link to share.',
-    image: '/images/get_referral_link.png',
+    caption: "Get a referral link",
+    detail: "Connect a wallet and generate a referral link to share.",
+    image: "/images/get_referral_link.png",
   },
   {
-    caption: 'Share with friends',
-    detail: 'Invite your friends to register via your referral link.',
-    image: '/images/share_friends.png',
+    caption: "Share with friends",
+    detail: "Invite your friends to register via your referral link.",
+    image: "/images/share_friends.png",
   },
   {
-    caption: 'Earn crypto',
-    detail: 'Get referral rewards from your friends’ earnings & swaps.',
-    image: '/images/earn_crypto.png',
+    caption: "Earn crypto",
+    detail: "Get referral rewards from your friends’ earnings & swaps.",
+    image: "/images/earn_crypto.png",
   },
-]
+];
 
 const myRewards = [
   {
-    name: 'REFERRAL',
+    name: "REFERRAL",
     totalAmount: 1000,
     claimedAmount: 200,
     claimed: 10,
     history: [
-      { date: '18.Sep.2021', rewards: 10, lockup: 60 },
-      { date: '18.Sep.2021', rewards: 10, lockup: 60 },
-      { date: '18.Sep.2021', rewards: 10, lockup: 60 },
-      { date: '18.Sep.2021', rewards: 10, lockup: 60 },
+      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
+      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
+      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
+      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
 
-      { date: '18.Feb.2021', rewards: 10, lockup: 100 },
-      { date: '18.Feb.2021', rewards: 10, lockup: 100 },
-      { date: '18.Feb.2021', rewards: 10, lockup: 100 },
-      { date: '18.Feb.2021', rewards: 10, lockup: 100 },
+      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
+      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
+      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
+      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
     ],
   },
   {
-    name: 'AIRDROPS',
+    name: "AIRDROPS",
     totalAmount: 1000,
     claimedAmount: 500,
     claimed: 50,
     history: [
-      { date: '18.Sep.2021', rewards: 10, lockup: 60 },
-      { date: '18.Sep.2021', rewards: 10, lockup: 60 },
-      { date: '18.Sep.2021', rewards: 10, lockup: 60 },
-      { date: '18.Sep.2021', rewards: 10, lockup: 60 },
+      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
+      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
+      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
+      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
 
-      { date: '18.Feb.2021', rewards: 10, lockup: 100 },
-      { date: '18.Feb.2021', rewards: 10, lockup: 100 },
-      { date: '18.Feb.2021', rewards: 10, lockup: 100 },
-      { date: '18.Feb.2021', rewards: 10, lockup: 100 },
+      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
+      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
+      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
+      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
     ],
   },
-]
+];
 
 const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   root: {
     padding: `${spacing(10)}px 0px`,
     maxWidth: 792,
-    width: '100%',
-    [breakpoints.down('md')]: {
-      padding: '0 1rem',
+    width: "100%",
+    [breakpoints.down("md")]: {
+      padding: "0 1rem",
     },
   },
   defaultWrapper: {
-    [breakpoints.down('sm')]: {
+    [breakpoints.down("sm")]: {
       maxWidth: 248,
-      margin: '0 auto',
+      margin: "0 auto",
     },
   },
   fontBold: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   subContent: {
-    color: '#F7F7F7',
+    color: "#F7F7F7",
   },
   subContentMargin2: {
     marginBottom: spacing(2),
@@ -108,54 +107,54 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     marginBottom: spacing(8),
   },
   sharePanelRow: {
-    display: 'flex',
+    display: "flex",
   },
   shareLabel: {
     marginRight: spacing(3),
-    [breakpoints.down('sm')]: {
+    [breakpoints.down("sm")]: {
       marginRight: spacing(1.5),
     },
   },
   sharePannel: {
-    backgroundColor: '#1D1A27',
-    padding: '40px 50px 40px 50px',
-    borderRadius: '1rem',
-    [breakpoints.down('sm')]: {
-      padding: '2rem 1rem',
+    backgroundColor: "#1D1A27",
+    padding: "40px 50px 40px 50px",
+    borderRadius: "1rem",
+    [breakpoints.down("sm")]: {
+      padding: "2rem 1rem",
     },
   },
   shareButton: {
     width: 29,
     height: 29,
-    [breakpoints.down('sm')]: {
+    [breakpoints.down("sm")]: {
       width: 24,
       height: 24,
     },
   },
   socialLinks: {
-    '& a': {
+    "& a": {
       marginRight: spacing(3),
-      [breakpoints.down('sm')]: {
+      [breakpoints.down("sm")]: {
         marginRight: spacing(1.5),
       },
     },
   },
   inputLink: {
     borderRadius: 12,
-    background: 'transparent',
-    border: '1px solid #B7B4C7',
-    padding: '16px 24px',
-    color: 'white',
-    marginRight: '16px',
+    background: "transparent",
+    border: "1px solid #B7B4C7",
+    padding: "16px 24px",
+    color: "white",
+    marginRight: "16px",
     flex: 1,
-    outline: 'none',
-    [breakpoints.down('sm')]: {
-      padding: '12px',
-      marginRight: '8px',
-      fontSize: '10px',
+    outline: "none",
+    [breakpoints.down("sm")]: {
+      padding: "12px",
+      marginRight: "8px",
+      fontSize: "10px",
     },
   },
-}))
+}));
 
 /**
  * a function that links to 2 closure variables, 
@@ -182,15 +181,15 @@ const getReferralLink = (() => {
       setLink(referralLink);  
     }
     return referralLink;
-  }
+  };
 })();
 
 const Home: React.FC = props => {
   const classes = useStyles(props);
-  const { setMenu } = useModal()
-  const { connected: isConnectedWallet, publicKey} = useWallet()
+  const { setMenu } = useModal();
+  const { connected: isConnectedWallet, publicKey} = useWallet();
   
-  const [buttonText, setButtonText] = useState('Copy Link')
+  const [buttonText, setButtonText] = useState("Copy Link");
   const [referralLink, setReferralLink] = useState("");
   
   useEffect(() => {
@@ -214,7 +213,7 @@ const Home: React.FC = props => {
               <Typography variant="subtitle1" align="center" className={classes.subContent} paragraph>
                 Before referral, you need to connect your wallet
               </Typography>
-              <ConnectButton onClick={() => setMenu(true, 'connect')}>Connect Wallet</ConnectButton>
+              <ConnectButton onClick={() => setMenu(true, "connect")}>Connect Wallet</ConnectButton>
             </Box>
           )}
         </Box>
@@ -236,8 +235,8 @@ const Home: React.FC = props => {
                   <CopyLinkButton
                     onClick={() => {
                       copy(referralLink);
-                      setButtonText('Copied!')
-                      setTimeout(() => setButtonText('Copy link'), 5000)
+                      setButtonText("Copied!");
+                      setTimeout(() => setButtonText("Copy link"), 5000);
                     }}
                   >
                     {buttonText}
@@ -321,7 +320,7 @@ const Home: React.FC = props => {
           <Typography variant="h5" color="primary" align="center" paragraph>
             How to invite friends
           </Typography>
-          <Grid container spacing={2} style={{ width: '100%', margin: 0 }}>
+          <Grid container spacing={2} style={{ width: "100%", margin: 0 }}>
             {referralIntroCard.map((item, index) => (
               <Grid item xs={12} sm={4} md={4} key={index}>
                 <ReferralCard caption={item.caption} detail={item.detail} image={item.image} />
@@ -331,6 +330,6 @@ const Home: React.FC = props => {
         </Box>
       </Box>
     </Page>
-  )
-}
+  );
+};
 export default Home;

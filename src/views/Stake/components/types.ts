@@ -1,5 +1,5 @@
-import BigNumber from 'bignumber.js';
-import { TokenInfo } from 'constants/tokens'
+import BigNumber from "bignumber.js";
+import { TokenInfo } from "constants/tokens";
 
 export interface SettingsProps {
   priceImpact: string

@@ -1,13 +1,13 @@
-import { ReactElement, ReactNode, useMemo } from 'react'
-import { Box, IconButton, makeStyles, Theme, Typography } from '@material-ui/core'
-import CloseIcon from '@material-ui/icons/Close'
+import { ReactElement, ReactNode, useMemo } from "react";
+import { Box, IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
 
-import { ConnectButton } from 'components'
+import { ConnectButton } from "components";
 
-import { useModal } from 'providers/modal'
-import { usePoolFromSymbols } from 'providers/pool'
-import { getSwapOutAmount } from 'utils/swap'
-import { fixedNumber } from 'utils/utils'
+import { useModal } from "providers/modal";
+import { usePoolFromSymbols } from "providers/pool";
+import { getSwapOutAmount } from "utils/swap";
+import { fixedNumber } from "utils/utils";
 
 interface IConfirmSwapPanelProps {
   children?: ReactNode
@@ -19,30 +19,30 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginTop: 32,
   },
   sectionDesktop: {
-    display: 'none',
-    [breakpoints.up('md')]: {
+    display: "none",
+    [breakpoints.up("md")]: {
       width: 450,
-      display: 'flex',
+      display: "flex",
     },
   },
   sectionMobile: {
-    display: 'flex',
-    width: 'auto',
-    [breakpoints.up('md')]: {
-      display: 'none',
+    display: "flex",
+    width: "auto",
+    [breakpoints.up("md")]: {
+      display: "none",
     },
   },
   img: {
     marginRight: 4,
     width: 24,
     height: 24,
-    borderRadius: '50%',
+    borderRadius: "50%",
   },
   bottomText: {
     marginBottom: 52,
     marginTop: 52,
     maxWidth: 400,
-    textAlign: 'center',
+    textAlign: "center",
   },
   estimatedAmount: {
     marginBottom: 36,
@@ -54,31 +54,31 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     color: palette.text.success,
   },
   footer: {},
-}))
+}));
 
 const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
-  const classes = useStyles(props)
-  const { setMenu, data } = useModal()
-  const pool = usePoolFromSymbols(data?.tokenFrom.token.symbol, data?.tokenTo.token.symbol)
+  const classes = useStyles(props);
+  const { setMenu, data } = useModal();
+  const pool = usePoolFromSymbols(data?.tokenFrom.token.symbol, data?.tokenTo.token.symbol);
 
   const swapOut = useMemo(() => {
     if (pool && data) {
-      const { tokenFrom, tokenTo, slippage } = data
+      const { tokenFrom, tokenTo, slippage } = data;
       return getSwapOutAmount(
         pool,
         tokenFrom.token.address,
         tokenTo.token.address,
         tokenFrom.amount,
         parseFloat(slippage),
-      )
+      );
     }
-    return null
-  }, [pool, data])
+    return null;
+  }, [pool, data]);
 
   const handleConfirm = () => {
-    data?.callback()
-    setMenu(false, '')
-  }
+    data?.callback();
+    setMenu(false, "");
+  };
 
   return (
     <Box width="100%">
@@ -86,7 +86,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
         <Typography variant="h6" color="textSecondary">
           Review Swap
         </Typography>
-        <IconButton size="small" onClick={() => setMenu(false, '')}>
+        <IconButton size="small" onClick={() => setMenu(false, "")}>
           <CloseIcon />
         </IconButton>
       </Box>
@@ -156,7 +156,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
         </ConnectButton>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default ConfirmSwapPanel
+export default ConfirmSwapPanel;

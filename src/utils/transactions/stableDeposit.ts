@@ -1,14 +1,14 @@
-import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
-import BN from 'bn.js'
+import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import BN from "bn.js";
 
-import { createNativeSOLHandlingTransactions } from './utils' 
-import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
-import { createApproveInstruction, createStableDepositInstruction, DepositData } from 'lib/instructions'
-import { createTokenAccountTransaction, signTransaction, mergeTransactions } from '.'
-import { SWAP_PROGRAM_ID } from 'constants/index'
-import { createRefreshFarmInstruction } from 'lib/instructions/farm'
-import { createFarmUser } from './farm'
-import { AccountLayout } from '@solana/spl-token'
+import { createNativeSOLHandlingTransactions } from "./utils"; 
+import { PoolInfo, ExTokenAccount, MarketConfig } from "providers/types";
+import { createApproveInstruction, createStableDepositInstruction, DepositData } from "lib/instructions";
+import { createTokenAccountTransaction, signTransaction, mergeTransactions } from ".";
+import { SWAP_PROGRAM_ID } from "constants/index";
+import { createRefreshFarmInstruction } from "lib/instructions/farm";
+import { createFarmUser } from "./farm";
+import { AccountLayout } from "@solana/spl-token";
 
 export async function stableDeposit({
   connection,
@@ -39,28 +39,28 @@ export async function stableDeposit({
 }) {
   if (!connection || !walletPubkey || !pool || !baseAccount || !quoteAccount) {
     console.error("stable deposit failed with null parameter");
-    return null
+    return null;
   }
 
-  let createAccountTransaction: Transaction | undefined
+  let createAccountTransaction: Transaction | undefined;
   if (!poolTokenRef) {
-    const result = await createTokenAccountTransaction({ walletPubkey, mintPublicKey: pool.poolMintKey })
-    poolTokenRef = result?.newAccountPubkey
-    createAccountTransaction = result?.transaction
+    const result = await createTokenAccountTransaction({ walletPubkey, mintPublicKey: pool.poolMintKey });
+    poolTokenRef = result?.newAccountPubkey;
+    createAccountTransaction = result?.transaction;
   }
 
-  const userTransferAuthority = Keypair.generate()
-  const nonce = new BN(pool.nonce)
+  const userTransferAuthority = Keypair.generate();
+  const nonce = new BN(pool.nonce);
   const swapAuthority = await PublicKey.createProgramAddress(
-    [pool.publicKey.toBuffer(), nonce.toArrayLike(Buffer, 'le', 1)],
+    [pool.publicKey.toBuffer(), nonce.toArrayLike(Buffer, "le", 1)],
     SWAP_PROGRAM_ID,
-  )
+  );
   
   let baseSourceRef = baseAccount.pubkey;
   let quoteSourceRef = quoteAccount.pubkey;
-  let createWrappedTokenAccountTransaction: Transaction | undefined
-  let initializeWrappedTokenAccountTransaction: Transaction | undefined
-  let closeWrappedTokenAccountTransaction: Transaction | undefined
+  let createWrappedTokenAccountTransaction: Transaction | undefined;
+  let initializeWrappedTokenAccountTransaction: Transaction | undefined;
+  let closeWrappedTokenAccountTransaction: Transaction | undefined;
   
   const baseSOL = pool.baseTokenInfo.symbol === "SOL";
   const quoteSOL = pool.quoteTokenInfo.symbol === "SOL";
@@ -83,7 +83,7 @@ export async function stableDeposit({
     }
   }
 
-  let transaction = new Transaction()
+  let transaction = new Transaction();
   transaction
     .add(
       createApproveInstruction(
@@ -115,21 +115,21 @@ export async function stableDeposit({
         depositData,
         SWAP_PROGRAM_ID,
       ),
-    )
-  let signers = [userTransferAuthority]
+    );
+  let signers = [userTransferAuthority];
   if (!farmUser && farmPool) {
     const { transaction: createFarmUserTransaction, address: newFarmUser } = await createFarmUser({
       connection,
       walletPubkey,
       config,
-    })
-    transaction = mergeTransactions([createFarmUserTransaction, transaction])
+    });
+    transaction = mergeTransactions([createFarmUserTransaction, transaction]);
     transaction.add(
       createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [
         newFarmUser.publicKey,
       ]),
-    )
-    signers.push(newFarmUser)
+    );
+    signers.push(newFarmUser);
   } 
   // removed farm refresh after deposit
 
@@ -138,5 +138,5 @@ export async function stableDeposit({
     signers.push(tempAccountRefKeyPair);
   }
 
-  return await signTransaction({ transaction, feePayer: walletPubkey, signers, connection })
+  return signTransaction({ transaction, feePayer: walletPubkey, signers, connection });
 }

@@ -1,6 +1,5 @@
-import { PublicKey } from '@solana/web3.js'
-import { poolInfo } from './config.json'
-import { PoolSchema } from './pools'
+import { PublicKey } from "@solana/web3.js";
+import { poolInfo } from "./config.json";
 
 export interface FarmPoolSchema {
   name: string
@@ -16,4 +15,4 @@ export const farmPools: FarmPoolSchema[] = poolInfo.map(({name, swap, farm, base
   poolAddress: new PublicKey(swap),
   base,
   quote,
-}))
+}));

@@ -4,7 +4,7 @@ import {
   Connection,
   Transaction,
   TransactionSignature,
-} from '@solana/web3.js';
+} from "@solana/web3.js";
 
 export const sendAndConfirmTransaction = async (
   title: string,
@@ -17,8 +17,8 @@ export const sendAndConfirmTransaction = async (
 
   const txSig = await realSendAndConfirmTransaction(connection, transaction, signers, {
     skipPreflight: false,
-    commitment: connection.commitment || 'recent',
-    preflightCommitment: connection.commitment || 'recent',
+    commitment: connection.commitment || "recent",
+    preflightCommitment: connection.commitment || "recent",
   });
   console.info(`TxSig: ${txSig}`);
   return txSig;

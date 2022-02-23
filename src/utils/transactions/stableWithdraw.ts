@@ -1,14 +1,14 @@
-import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js'
-import BN from 'bn.js'
+import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import BN from "bn.js";
 
-import { createNativeSOLHandlingTransactions } from './utils'
-import { PoolInfo, ExTokenAccount, MarketConfig } from 'providers/types'
-import { createApproveInstruction, createStableWithdrawInstruction, WithdrawData } from 'lib/instructions'
-import { createTokenAccountTransaction, mergeTransactions, signTransaction } from '.'
-import { SWAP_PROGRAM_ID } from 'constants/index'
-import { createRefreshFarmInstruction } from 'lib/instructions/farm'
-import { createFarmUser } from './farm'
-import { AccountLayout } from '@solana/spl-token'
+import { createNativeSOLHandlingTransactions } from "./utils";
+import { PoolInfo, ExTokenAccount, MarketConfig } from "providers/types";
+import { createApproveInstruction, createStableWithdrawInstruction, WithdrawData } from "lib/instructions";
+import { createTokenAccountTransaction, mergeTransactions, signTransaction } from ".";
+import { SWAP_PROGRAM_ID } from "constants/index";
+import { createRefreshFarmInstruction } from "lib/instructions/farm";
+import { createFarmUser } from "./farm";
+import { AccountLayout } from "@solana/spl-token";
 
 export async function stableWithdraw({
   connection,
@@ -39,7 +39,7 @@ export async function stableWithdraw({
 }) {
   if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
     console.error("stable withdraw failed with null parameter");
-    return null
+    return null;
   }
 
   const baseSOL = pool.baseTokenInfo.symbol === "SOL";
@@ -47,9 +47,9 @@ export async function stableWithdraw({
 
   const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
   const tempAccountRefKeyPair = Keypair.generate();
-  let createWrappedTokenAccountTransaction: Transaction | undefined
-  let initializeWrappedTokenAccountTransaction: Transaction | undefined
-  let closeWrappedTokenAccountTransaction: Transaction | undefined
+  let createWrappedTokenAccountTransaction: Transaction | undefined;
+  let initializeWrappedTokenAccountTransaction: Transaction | undefined;
+  let closeWrappedTokenAccountTransaction: Transaction | undefined;
 
   if (baseSOL || quoteSOL) {
     const tmpAccountLamport = lamports * 2;
@@ -67,34 +67,34 @@ export async function stableWithdraw({
     }
   }
 
-  let createBaseTokenTransaction: Transaction | undefined
+  let createBaseTokenTransaction: Transaction | undefined;
   if (!baseTokenRef) {
     const result = await createTokenAccountTransaction({
       walletPubkey,
       mintPublicKey: new PublicKey(pool.baseTokenInfo.address),
-    })
-    baseTokenRef = result?.newAccountPubkey
-    createBaseTokenTransaction = result?.transaction
+    });
+    baseTokenRef = result?.newAccountPubkey;
+    createBaseTokenTransaction = result?.transaction;
   }
 
-  let createQuoteTokenTransaction: Transaction | undefined
+  let createQuoteTokenTransaction: Transaction | undefined;
   if (!quteTokenRef) {
     const result = await createTokenAccountTransaction({
       walletPubkey,
       mintPublicKey: new PublicKey(pool.baseTokenInfo.address),
-    })
-    quteTokenRef = result?.newAccountPubkey
-    createQuoteTokenTransaction = result?.transaction
+    });
+    quteTokenRef = result?.newAccountPubkey;
+    createQuoteTokenTransaction = result?.transaction;
   }
 
-  const userTransferAuthority = Keypair.generate()
-  const nonce = new BN(pool.nonce)
+  const userTransferAuthority = Keypair.generate();
+  const nonce = new BN(pool.nonce);
   const swapAuthority = await PublicKey.createProgramAddress(
-    [pool.publicKey.toBuffer(), nonce.toArrayLike(Buffer, 'le', 1)],
+    [pool.publicKey.toBuffer(), nonce.toArrayLike(Buffer, "le", 1)],
     SWAP_PROGRAM_ID,
-  )
+  );
 
-  let transaction = new Transaction()
+  let transaction = new Transaction();
   transaction
     .add(
       createApproveInstruction(
@@ -120,26 +120,26 @@ export async function stableWithdraw({
         withdrawData,
         SWAP_PROGRAM_ID,
       ),
-    )
+    );
 
-  let signers = [userTransferAuthority]
+  let signers = [userTransferAuthority];
   if (!farmUser) {
     const { transaction: createFarmUserTransaction, address: newFarmUser } = await createFarmUser({
       connection,
       walletPubkey,
       config,
-    })
-    transaction = mergeTransactions([createFarmUserTransaction, transaction])
+    });
+    transaction = mergeTransactions([createFarmUserTransaction, transaction]);
     transaction.add(
       createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [
         newFarmUser.publicKey,
       ]),
-    )
-    signers.push(newFarmUser)
+    );
+    signers.push(newFarmUser);
   } else {
     transaction.add(
       createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [farmUser]),
-    )
+    );
   }
 
   transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createBaseTokenTransaction, createQuoteTokenTransaction, transaction, closeWrappedTokenAccountTransaction]);
@@ -147,5 +147,5 @@ export async function stableWithdraw({
     signers.push(tempAccountRefKeyPair);
   }
 
-  return await signTransaction({ transaction, feePayer: walletPubkey, signers, connection })
+  return signTransaction({ transaction, feePayer: walletPubkey, signers, connection });
 }

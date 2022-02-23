@@ -1,14 +1,14 @@
-import styled from 'styled-components'
-import { useState } from 'react'
-import CurrencyInput from 'react-currency-input-field'
-import { useWallet } from '@solana/wallet-adapter-react'
+import styled from "styled-components";
+import { useState } from "react";
+import CurrencyInput from "react-currency-input-field";
+import { useWallet } from "@solana/wallet-adapter-react";
 
-import { Button, ViewTransactionIcon, ErrorIcon, StakeTransactionIcon, ConnectButton } from 'components'
-import { Text } from 'components/Text'
+import { Button, ViewTransactionIcon, ErrorIcon, StakeTransactionIcon, ConnectButton } from "components";
+import { Text } from "components/Text";
 
-import { useDarkMode } from 'providers/theme'
-import { useModal } from 'providers/modal'
-import { Box, Typography } from '@material-ui/core'
+import { useDarkMode } from "providers/theme";
+import { useModal } from "providers/modal";
+import { Box, Typography } from "@material-ui/core";
 
 const InputBlock = styled.div`
   margin-top: 8px;
@@ -48,13 +48,13 @@ const InputBlock = styled.div`
   .drop-down {
     cursor: pointer;
   }
-`
+`;
 const FlexWrapper = styled.div`
   display: flex;
   width: 100%;
-`
+`;
 
-const Wrapper = styled.div``
+const Wrapper = styled.div``;
 const ExternalLink = styled.a`
   color: #88809c;
   outline: none;
@@ -66,7 +66,7 @@ const ExternalLink = styled.a`
     align-items: flex-end;
     margin: 0 5px;
   }
-`
+`;
 
 const IconWrapper = styled.div`
   background: linear-gradient(180deg, #ff5e79 0%, #dc0640 100%);
@@ -76,33 +76,34 @@ const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-`
+`;
 
 const UnstakeTransaction = ({ ...props }) => {
-  const farm = props.farm
-  const maxWithdrawal = 120
+  const farm = props.farm;
+  const maxWithdrawal = 120;
 
-  const { connected: isConnectedWallet } = useWallet()
-  const { isDark } = useDarkMode()
-  const [stakingPercentage, setStakingPercentage] = useState(0)
-  const [earningAmount, setEarningAmount] = useState('')
+  const { connected: isConnectedWallet } = useWallet();
+  const { isDark } = useDarkMode();
+  // !TODO: why stakingPercentage is not used
+  const [stakingPercentage, setStakingPercentage] = useState(0); // eslint-disable-line
+  const [earningAmount, setEarningAmount] = useState("");
 
-  const { setMenu } = useModal()
+  const { setMenu } = useModal();
 
   const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.replace(/[^\d.-]/g, '')
+    const value = event.target.value.replace(/[^\d.-]/g, "");
     if (isNaN(parseFloat(value))) {
-      setEarningAmount('')
-      setStakingPercentage(0)
+      setEarningAmount("");
+      setStakingPercentage(0);
     } else {
-      setEarningAmount(value)
+      setEarningAmount(value);
       if (Math.round((parseFloat(value) / maxWithdrawal) * 100) > 100) {
-        setStakingPercentage(100)
+        setStakingPercentage(100);
       } else {
-        setStakingPercentage(Math.round((parseFloat(value) / maxWithdrawal) * 100))
+        setStakingPercentage(Math.round((parseFloat(value) / maxWithdrawal) * 100));
       }
     }
-  }
+  };
 
   return (
     <>
@@ -113,11 +114,11 @@ const UnstakeTransaction = ({ ...props }) => {
               <StakeTransactionIcon />
             </IconWrapper>
             <Wrapper className="unit">
-              <Text color={isDark ? '#FFFFFF' : '#000000'} fontFamily="'Inter', sans-serif" className="stake-symbol">
+              <Text color={isDark ? "#FFFFFF" : "#000000"} fontFamily="'Inter', sans-serif" className="stake-symbol">
                 DLT
               </Text>
-              <Text color={isDark ? '#999999' : '#999999'} fontFamily="'Inter', sans-serif" className="stake-unit">
-                {farm?.stakingToken?.symbol || ''} - {farm?.earningToken?.symbol || ''} Del...
+              <Text color={isDark ? "#999999" : "#999999"} fontFamily="'Inter', sans-serif" className="stake-unit">
+                {farm?.stakingToken?.symbol || ""} - {farm?.earningToken?.symbol || ""} Del...
               </Text>
             </Wrapper>
           </FlexWrapper>
@@ -134,10 +135,10 @@ const UnstakeTransaction = ({ ...props }) => {
           />
         </FlexWrapper>
         <FlexWrapper className="info">
-          <Text color={isDark ? '#515369' : '#515369'} fontFamily="'Inter', sans-serif" className="stake-symbol">
+          <Text color={isDark ? "#515369" : "#515369"} fontFamily="'Inter', sans-serif" className="stake-symbol">
             Balance: --
           </Text>
-          <Text color={isDark ? '#515369' : '#515369'} fontFamily="'Inter', sans-serif" className="stake-unit">
+          <Text color={isDark ? "#515369" : "#515369"} fontFamily="'Inter', sans-serif" className="stake-unit">
             %--
           </Text>
         </FlexWrapper>
@@ -155,11 +156,11 @@ const UnstakeTransaction = ({ ...props }) => {
             </Button>
             {parseFloat(earningAmount) > maxWithdrawal && (
               <FlexWrapper className="failed">
-                <FlexWrapper style={{ justifyContent: 'center' }}>
+                <FlexWrapper style={{ justifyContent: "center" }}>
                   <ErrorIcon isDark={isDark} isSelected className="icon" />
                   <Text
                     small
-                    color={isDark ? '#515369' : '#515369'}
+                    color={isDark ? "#515369" : "#515369"}
                     fontFamily="'Inter', sans-serif"
                     className="transaction-failed"
                   >
@@ -184,7 +185,7 @@ const UnstakeTransaction = ({ ...props }) => {
           <Box marginY={2}>
             <ConnectButton
               fullWidth
-              onClick={() => setMenu(true, 'connect')}
+              onClick={() => setMenu(true, "connect")}
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
               data-amp-analytics-attrs="page: Untake, target: ConnectWallet"
@@ -206,7 +207,7 @@ const UnstakeTransaction = ({ ...props }) => {
                 <ErrorIcon isDark={isDark} isSelected={true} className="icon" />
                 <Typography color="error">Sorry, Transaction Failed!</Typography>
               </FlexWrapper>
-              <Text color={isDark ? '#88809C' : '#6B7280'} className="view" fontFamily="'Inter', sans-serif">
+              <Text color={isDark ? "#88809C" : "#6B7280"} className="view" fontFamily="'Inter', sans-serif">
                 <ExternalLink
                   href="/VIEWTRANSACTION"
                   target="_blank"
@@ -224,7 +225,7 @@ const UnstakeTransaction = ({ ...props }) => {
         </>
       )}
     </>
-  )
-}
+  );
+};
 
-export default UnstakeTransaction
+export default UnstakeTransaction;

@@ -1,25 +1,25 @@
-import React, { lazy, useEffect } from 'react'
-import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
+import React, { lazy, useEffect } from "react";
+import { Route, Switch, BrowserRouter, Redirect } from "react-router-dom";
 // import Amplify, { Analytics } from 'aws-amplify'
 
-import { useWallet } from '@solana/wallet-adapter-react'
-import SuspenseWithChunkError from './components/SuspenseWithChunkError'
-import PageLoader from 'components/PageLoader'
-import Header from 'components/Header'
-import Footer from 'components/Footer'
-import { useConfig } from 'providers/config'
-import { usePools } from 'providers/pool'
-import { listSymbols, pools } from 'constants/pools'
-import { FilterCountry } from 'utils/checkJurisdiction'
+import { useWallet } from "@solana/wallet-adapter-react";
+import SuspenseWithChunkError from "./components/SuspenseWithChunkError";
+import PageLoader from "components/PageLoader";
+import Header from "components/Header";
+import Footer from "components/Footer";
+import { useConfig } from "providers/config";
+import { usePools } from "providers/pool";
+import { listSymbols, pools } from "constants/pools";
+import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
-import { MARKET_CONFIG_ADDRESS } from './constants'
-import { useFarmPools } from 'providers/farm'
-import { farmPools } from 'constants/farm'
-import { useCustomConnection } from 'providers/connection'
-import usePyth from 'providers/pyth'
-import { PublicKey } from '@solana/web3.js'
-import { network } from 'constants/config.json'
+import { MARKET_CONFIG_ADDRESS } from "./constants";
+import { useFarmPools } from "providers/farm";
+import { farmPools } from "constants/farm";
+import { useCustomConnection } from "providers/connection";
+import usePyth from "providers/pyth";
+import { PublicKey } from "@solana/web3.js";
+import { network } from "constants/config.json";
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
 //   enable: true,
@@ -32,14 +32,14 @@ import { network } from 'constants/config.json'
 // })
 // Analytics.record({ name: 'App' })
 
-const Farm = lazy(() => import('./views/Farm'))
-const Swap = lazy(() => import('./views/Swap'))
-const Pool = lazy(() => import('./views/Pool'))
-const Reward = lazy(() => import('./views/Reward'))
-const Deposit = lazy(() => import('./views/Deposit'))
-const Stake = lazy(() => import('./views/Stake'))
-const Unavailable = lazy(() => import('./views/Unavailable'))
-const Terms = lazy(() => import('./views/Terms'))
+const Farm = lazy(() => import("./views/Farm"));
+const Swap = lazy(() => import("./views/Swap"));
+const Pool = lazy(() => import("./views/Pool"));
+const Reward = lazy(() => import("./views/Reward"));
+const Deposit = lazy(() => import("./views/Deposit"));
+const Stake = lazy(() => import("./views/Stake"));
+const Unavailable = lazy(() => import("./views/Unavailable"));
+const Terms = lazy(() => import("./views/Terms"));
 
 /**
  * Parse the query parameters from url
@@ -48,7 +48,7 @@ const Terms = lazy(() => import('./views/Terms'))
  * @returns a json data of params' keys and values
  */
 const parseQueryParams = (params: string) => {
-  if (params.length == 0 || params[0] !== "?") {
+  if (params.length === 0 || params[0] !== "?") {
     return { referral_code: null };
   }
 
@@ -56,13 +56,13 @@ const parseQueryParams = (params: string) => {
   let res = { referral_code: null };
   paramsArray.forEach((paramStr: string) => {
     const param = paramStr.split("=");
-    if (param.length == 2) {
+    if (param.length === 2) {
       res[param[0]] = param[1];
     }
   });
 
   return res;
-}
+};
 
 /**
  * a function that links to a closure variable walletAddress
@@ -87,15 +87,15 @@ const updateWallet = (() => {
 
         const updateRes = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/new_wallet", {
           headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            "Accept": "application/json",
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
             wallet_address: address.toString(),
             referral_code: referralCode
           }),
-          method: 'POST',
-          credentials: 'include'
+          method: "POST",
+          credentials: "include"
         });
 
         if (updateRes.ok) {
@@ -103,31 +103,31 @@ const updateWallet = (() => {
         }
       }
     }
-  }
+  };
 })();
 
 const App: React.FC<{params: string}> = ({ params }) => {
 
-  const { setConfigAddress } = useConfig()
-  const { setSchemas } = usePools()
-  const { setSchemas: setFarmSchema } = useFarmPools()
-  const { setNetwork } = useCustomConnection()
-  const { setFilters } = usePyth()
-  const validCountry = FilterCountry()
+  const { setConfigAddress } = useConfig();
+  const { setSchemas } = usePools();
+  const { setSchemas: setFarmSchema } = useFarmPools();
+  const { setNetwork } = useCustomConnection();
+  const { setFilters } = usePyth();
+  const validCountry = FilterCountry();
 
   const { connected: isConnectedWallet, publicKey} = useWallet();
 
   useEffect(() => {
-    setConfigAddress(MARKET_CONFIG_ADDRESS)
-    setSchemas(pools)
-    setFarmSchema(farmPools)
-    setNetwork(network)
-    setFilters(listSymbols(pools))
-  },[setConfigAddress, setSchemas, setFarmSchema, setNetwork]);
+    setConfigAddress(MARKET_CONFIG_ADDRESS);
+    setSchemas(pools);
+    setFarmSchema(farmPools);
+    setNetwork(network);
+    setFilters(listSymbols(pools));
+  },[setConfigAddress, setSchemas, setFarmSchema, setNetwork, setFilters]);
 
   useEffect(() => {
     updateWallet(publicKey, parseQueryParams(params).referral_code);
-  }, [isConnectedWallet, publicKey]);
+  }, [isConnectedWallet, publicKey, params]);
 
   return (
     <React.Fragment>
@@ -157,7 +157,7 @@ const App: React.FC<{params: string}> = ({ params }) => {
         <Footer />
       </BrowserRouter>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default React.memo(App)
+export default React.memo(App);

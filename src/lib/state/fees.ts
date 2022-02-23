@@ -1,5 +1,5 @@
-import { struct } from 'buffer-layout'
-import { bool, u64 } from 'utils/layout'
+import { struct } from "buffer-layout";
+import { bool, u64 } from "utils/layout";
 
 export interface Fees {
   isInitialized: boolean
@@ -14,18 +14,18 @@ export interface Fees {
 }
 
 /** @internal */
-export const FeesLayout = (property = 'fees') =>
+export const FeesLayout = (property = "fees") =>
   struct<Fees>(
     [
-      bool('isInitialized'),
-      u64('adminTradeFeeNumerator'),
-      u64('adminTradeFeeDenominator'),
-      u64('adminWithdrawFeeNumerator'),
-      u64('adminWithdrawFeeDenominator'),
-      u64('tradeFeeNumerator'),
-      u64('tradeFeeDenominator'),
-      u64('withdrawFeeNumerator'),
-      u64('withdrawFeeDenominator'),
+      bool("isInitialized"),
+      u64("adminTradeFeeNumerator"),
+      u64("adminTradeFeeDenominator"),
+      u64("adminWithdrawFeeNumerator"),
+      u64("adminWithdrawFeeDenominator"),
+      u64("tradeFeeNumerator"),
+      u64("tradeFeeDenominator"),
+      u64("withdrawFeeNumerator"),
+      u64("withdrawFeeDenominator"),
     ],
     property,
-  )
+  );

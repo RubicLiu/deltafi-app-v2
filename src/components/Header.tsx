@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import styled from 'styled-components'
-import { AppBar, makeStyles, Theme, Container, Toolbar, Link, AppBarProps } from '@material-ui/core'
-import { useWallet } from '@solana/wallet-adapter-react'
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { AppBar, makeStyles, Theme, Container, Toolbar, Link, AppBarProps } from "@material-ui/core";
+import { useWallet } from "@solana/wallet-adapter-react";
 
-import { ConnectButton, TabMenu, WalletButton } from 'components'
-import { useModal } from 'providers/modal'
-import { HOMEPAGE_LINK } from 'constants/index'
+import { ConnectButton, TabMenu, WalletButton } from "components";
+import { useModal } from "providers/modal";
+import { HOMEPAGE_LINK } from "constants/index";
 
 interface ContainerProps extends AppBarProps {
   theme: any
@@ -17,22 +17,22 @@ const useStyles = makeStyles(({ breakpoints, palette }: Theme) => ({
     backgroundImage: `linear-gradient(52.7deg, #1AFA9A -3.73%, #478EF0 48.34%, #9945FD 93.4%), ${palette.gradient.btnCta}`,
     color: palette.text.primary,
     borderRadius: 100,
-    border: 'solid 1px transparent',
-    backgroundOrigin: 'border-box',
+    border: "solid 1px transparent",
+    backgroundOrigin: "border-box",
 
     height: 50,
     width: 180,
 
     fontSize: 16,
     fontWeight: 600,
-    textTransform: 'none',
+    textTransform: "none",
 
-    '&:hover': {
+    "&:hover": {
       color: palette.text.primary,
-      boxShadow: 'none',
+      boxShadow: "none",
     },
 
-    [breakpoints.down('sm')]: {
+    [breakpoints.down("sm")]: {
       fontSize: 16,
       height: 45,
       width: 180,
@@ -40,70 +40,70 @@ const useStyles = makeStyles(({ breakpoints, palette }: Theme) => ({
     },
   },
   toolbar: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
     minHeight: 96,
   },
   grow: {
     flexGrow: 1,
   },
   sectionDesktop: {
-    display: 'none',
-    [breakpoints.up('md')]: {
-      display: 'flex',
+    display: "none",
+    [breakpoints.up("md")]: {
+      display: "flex",
     },
   },
   sectionMobile: {
-    display: 'flex',
-    [breakpoints.up('md')]: {
-      display: 'none',
+    display: "flex",
+    [breakpoints.up("md")]: {
+      display: "none",
     },
   },
   logo: {
     width: 150,
-    [breakpoints.down('sm')]: {
+    [breakpoints.down("sm")]: {
       width: 100,
     },
-    [breakpoints.down('md')]: {
+    [breakpoints.down("md")]: {
       width: 137,
     },
   },
-}))
+}));
 
 const HeaderWrapper = styled(AppBar)<ContainerProps>`
-  background-color: ${({ theme, shrunk }) => (shrunk ? theme.palette.background.primary : 'none')};
+  background-color: ${({ theme, shrunk }) => (shrunk ? theme.palette.background.primary : "none")};
   box-shadow: none;
-`
+`;
 
 const Header: React.FC = (props) => {
-  const classes = useStyles(props)
-  const { connected: isConnectedWallet } = useWallet()
-  const { setMenu } = useModal()
-  const [isShrunk, setShrunk] = useState(false)
+  const classes = useStyles(props);
+  const { connected: isConnectedWallet } = useWallet();
+  const { setMenu } = useModal();
+  const [isShrunk, setShrunk] = useState(false);
 
   useEffect(() => {
-    if (isConnectedWallet) setMenu(false, '')
-  }, [isConnectedWallet, setMenu])
+    if (isConnectedWallet) setMenu(false, "");
+  }, [isConnectedWallet, setMenu]);
 
   useEffect(() => {
     const onScroll = () => {
       setShrunk((isShrunk) => {
         if (!isShrunk && (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50)) {
-          return true
+          return true;
         }
 
         if (isShrunk && document.body.scrollTop < 4 && document.documentElement.scrollTop < 4) {
-          return false
+          return false;
         }
 
-        return isShrunk
-      })
-    }
+        return isShrunk;
+      });
+    };
 
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <HeaderWrapper position="fixed" color="transparent" shrunk={isShrunk ? 1 : 0}>
@@ -127,7 +127,7 @@ const Header: React.FC = (props) => {
           {isConnectedWallet ? (
             <WalletButton />
           ) : (
-            <ConnectButton size="small" onClick={() => setMenu(true, 'connect')} className={classes.ctaButton}>
+            <ConnectButton size="small" onClick={() => setMenu(true, "connect")} className={classes.ctaButton}>
               Connect wallet
             </ConnectButton>
           )}
@@ -190,7 +190,7 @@ const Header: React.FC = (props) => {
       </DesktopWrapper> */}
       {/* {isConnectedWallet && <WalletSetting open={menuOpen} setOpen={setMenuOpen} />} */}
     </HeaderWrapper>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

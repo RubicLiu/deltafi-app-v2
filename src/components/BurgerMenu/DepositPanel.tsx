@@ -1,14 +1,14 @@
-import { ReactElement, ReactNode, useMemo } from 'react'
-import { Box, IconButton, makeStyles, Theme, Typography } from '@material-ui/core'
-import CloseIcon from '@material-ui/icons/Close'
+import { ReactElement, ReactNode, useMemo } from "react";
+import { Box, IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
 
-import { usePoolFromAddress } from 'providers/pool'
-import { useTokenFromMint, useTokenMintAccount } from 'providers/tokens'
-import { useModal } from 'providers/modal'
-import { usePriceBySymbol } from 'providers/pyth'
-import { PMM } from 'lib/calc'
-import { rate } from 'utils/decimal'
-import { ConnectButton } from 'components'
+import { usePoolFromAddress } from "providers/pool";
+import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
+import { useModal } from "providers/modal";
+import { usePriceBySymbol } from "providers/pyth";
+import { PMM } from "lib/calc";
+import { rate } from "utils/decimal";
+import { ConnectButton } from "components";
 
 interface IDepositPanelProps {
   children?: ReactNode
@@ -20,30 +20,30 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginTop: 32,
   },
   sectionDesktop: {
-    display: 'none',
-    [breakpoints.up('md')]: {
+    display: "none",
+    [breakpoints.up("md")]: {
       width: 450,
-      display: 'flex',
+      display: "flex",
     },
   },
   sectionMobile: {
-    display: 'flex',
-    width: 'auto',
-    [breakpoints.up('md')]: {
-      display: 'none',
+    display: "flex",
+    width: "auto",
+    [breakpoints.up("md")]: {
+      display: "none",
     },
   },
   img: {
     marginRight: 4,
     width: 24,
     height: 24,
-    borderRadius: '50%',
+    borderRadius: "50%",
   },
   bottomText: {
     marginBottom: 52,
     marginTop: 52,
     maxWidth: 400,
-    textAlign: 'center',
+    textAlign: "center",
   },
   estimatedAmount: {
     marginBottom: 36,
@@ -54,38 +54,38 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   success: {
     color: palette.text.success,
   },
-}))
+}));
 
 const DepositPanel = (props: IDepositPanelProps): ReactElement => {
-  const classes = useStyles(props)
-  const { address, setMenu } = useModal()
-  const pool = usePoolFromAddress(address)
-  const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58())
-  const poolMint = useTokenMintAccount(pool?.poolMintKey)
-  const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol)
-  const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol)
+  const classes = useStyles(props);
+  const { address, setMenu } = useModal();
+  const pool = usePoolFromAddress(address);
+  const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
+  const poolMint = useTokenMintAccount(pool?.poolMintKey);
+  const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
+  const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
 
   const share = useMemo(() => {
     if (pool && poolTokenAccount && poolMint) {
-      return rate(poolTokenAccount.account.amount, poolMint.supply)
+      return rate(poolTokenAccount.account.amount, poolMint.supply);
     }
-    return 0
-  }, [pool, poolTokenAccount, poolMint])
+    return 0;
+  }, [pool, poolTokenAccount, poolMint]);
 
   const sharePrice = useMemo(() => {
     if (pool && basePrice && quotePrice) {
-      const pmm = new PMM(pool.poolState)
-      return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals).multipliedBy(share).div(100)
+      const pmm = new PMM(pool.poolState);
+      return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals).multipliedBy(share).div(100);
     }
-    return 0
-  }, [pool, basePrice, quotePrice, share])
+    return 0;
+  }, [pool, basePrice, quotePrice, share]);
 
-  if (!pool) return null
+  if (!pool) return null;
 
   const handleDeposit = () => {
-    setMenu(false, '')
+    setMenu(false, "");
     // handle deposit
-  }
+  };
 
   return (
     <Box width="100%">
@@ -162,7 +162,7 @@ const DepositPanel = (props: IDepositPanelProps): ReactElement => {
         </ConnectButton>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default DepositPanel
+export default DepositPanel;

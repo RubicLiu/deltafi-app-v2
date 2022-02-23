@@ -1,13 +1,13 @@
-import React from 'react'
-import Svg from '../Svg'
-import { SvgProps } from '../types'
+import React from "react";
+import Svg from "../Svg";
+import { SvgProps } from "../types";
 
 interface GithubProps extends SvgProps {
   isDark: boolean
 }
 
 const Icon: React.FC<GithubProps> = ({ isDark, ...props }) => {
-  const textColor = isDark ? '#FFFFFF' : '#000000'
+  const textColor = isDark ? "#FFFFFF" : "#000000";
   return (
     <Svg width={23} height={22} fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
@@ -15,7 +15,7 @@ const Icon: React.FC<GithubProps> = ({ isDark, ...props }) => {
         fill={textColor}
       />
     </Svg>
-  )
-}
+  );
+};
 
-export default Icon
+export default Icon;

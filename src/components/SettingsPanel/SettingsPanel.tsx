@@ -1,63 +1,63 @@
-import { useEffect, useRef } from 'react'
-import styled from 'styled-components'
-import { Box, Divider, IconButton, makeStyles, Paper, Theme, Typography } from '@material-ui/core'
-import CloseIcon from '@material-ui/icons/Close'
-import CurrencyInput from 'react-currency-input-field'
+import { useEffect, useRef } from "react";
+import styled from "styled-components";
+import { Box, Divider, IconButton, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
+import CurrencyInput from "react-currency-input-field";
 
-import { Button, SwitchButton } from 'components/Button'
-import { SettingsProps } from './types'
+import { Button, SwitchButton } from "components/Button";
+import { SettingsProps } from "./types";
 
-const PRICE_LIST = ['0.5', '1.0', '2.0']
+const PRICE_LIST = ["0.5", "1.0", "2.0"];
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
     background: palette.background.secondary,
     padding: spacing(2),
     borderRadius: 16,
-    [breakpoints.up('sm')]: {
+    [breakpoints.up("sm")]: {
       padding: spacing(3),
     },
   },
   currencyInput: {
-    textAlign: 'center',
-    outline: 'none',
+    textAlign: "center",
+    outline: "none",
     fontSize: 14,
-    fontWeight: 'bold',
-    fontFamily: 'Inter',
-    width: '100%',
-    border: 'none',
+    fontWeight: "bold",
+    fontFamily: "Inter",
+    width: "100%",
+    border: "none",
     backgroundColor: palette.text.crypto,
     color: palette.text.dark,
     borderRadius: 2,
 
-    '&::placeholder': {
+    "&::placeholder": {
       color: palette.text.dark,
     },
-    '&:focus': {
-      border: '1px solid #9D9D9D',
-      backgroundColor: '#000',
+    "&:focus": {
+      border: "1px solid #9D9D9D",
+      backgroundColor: "#000",
       color: palette.text.primary,
     },
   },
   priceImpact: {
     padding: `${spacing(1.5)}px 0px`,
-    [breakpoints.up('sm')]: {
+    [breakpoints.up("sm")]: {
       padding: `${spacing(2)}px 0px`,
     },
   },
   description: {
-    fontFamily: 'Inter',
+    fontFamily: "Inter",
     fontSize: 12,
-    lineHeight: '15px',
-    color: '#F7F7F7',
+    lineHeight: "15px",
+    color: "#F7F7F7",
     marginBottom: spacing(1.5),
-    [breakpoints.up('sm')]: {
+    [breakpoints.up("sm")]: {
       fontSize: 16,
-      lineHeight: '19px',
+      lineHeight: "19px",
       marginBottom: spacing(2),
     },
   },
-}))
+}));
 
 const PriceList = styled.ul`
   padding: 0px;
@@ -71,10 +71,10 @@ const PriceList = styled.ul`
     grid-template-columns: 1fr 1fr 1fr;
   }
 
-  ${({ theme }) => theme.muibreakpoints.up('sm')} {
+  ${({ theme }) => theme.muibreakpoints.up("sm")} {
     margin-top: ${({ theme }) => theme.spacing(2)}px;
   }
-`
+`;
 const PriceItem = styled.li`
   list-style: none;
   background: ${({ theme }) => theme.palette.text.crypto};
@@ -88,7 +88,7 @@ const PriceItem = styled.li`
     &.small {
       grid-column: 1 / 4;
     }
-    ${({ theme }) => theme.muibreakpoints.down('md')} {
+    ${({ theme }) => theme.muibreakpoints.down("md")} {
       grid-column: 1 / 4;
     }
   }
@@ -97,24 +97,24 @@ const PriceItem = styled.li`
     background: ${({ theme }) => theme.palette.background.black};
     border: 1px solid #9d9d9d;
   }
-`
+`;
 
 const SettingsPanel = (props: SettingsProps): JSX.Element => {
-  const { priceImpact, isIncludeDecimal, isSmall, handleChangeImpact, handleChangeInclude, handleClose } = props
-  const classes = useStyles(props)
-  const currencyInputRef = useRef<HTMLInputElement>()
+  const { priceImpact, isIncludeDecimal, isSmall, handleChangeImpact, handleChangeInclude, handleClose } = props;
+  const classes = useStyles(props);
+  const currencyInputRef = useRef<HTMLInputElement>();
 
   useEffect(() => {
     if (props.isOpen && !PRICE_LIST.includes(priceImpact)) {
-      currencyInputRef.current?.focus()
+      currencyInputRef.current?.focus();
     }
-  }, [props.isOpen, priceImpact])
+  }, [props.isOpen, priceImpact]);
 
   const handleChangeInput = (value: string) => {
-    if (isNaN(parseFloat(value)) && value !== '') return
-    if (parseFloat(value) > 100) return
-    handleChangeImpact(value)
-  }
+    if (isNaN(parseFloat(value)) && value !== "") return;
+    if (parseFloat(value) > 100) return;
+    handleChangeImpact(value);
+  };
 
   return (
     <Paper className={classes.root}>
@@ -131,11 +131,11 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
         <Typography variant="body1" color="textPrimary">
           Max Price Impact
         </Typography>
-        <PriceList className={isSmall ? 'small' : ''}>
+        <PriceList className={isSmall ? "small" : ""}>
           {PRICE_LIST.map((price) => (
             <PriceItem
               key={`item-${price}`}
-              className={`${priceImpact === price ? 'active' : ''} ${isSmall ? 'small' : ''}`}
+              className={`${priceImpact === price ? "active" : ""} ${isSmall ? "small" : ""}`}
               onClick={() => handleChangeImpact(price)}
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
@@ -173,16 +173,16 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
         />
       </Box>
     </Paper>
-  )
-}
+  );
+};
 
 SettingsPanel.defaultProps = {
-  priceImpact: '2.0%',
+  priceImpact: "2.0%",
   isIncludeDecimal: true,
   isSmall: false,
   handleChangeImpact: () => {},
   handleChangeInclude: () => {},
   handleClose: () => {},
-}
+};
 
-export default SettingsPanel
+export default SettingsPanel;

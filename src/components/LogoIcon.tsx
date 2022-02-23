@@ -1,17 +1,17 @@
-import React, { SVGProps } from 'react'
-import { Box, makeStyles } from '@material-ui/core'
-import { LogoIcon as SVGLogo } from './Svg'
+import React, { SVGProps } from "react";
+import { Box, makeStyles } from "@material-ui/core";
+import { LogoIcon as SVGLogo } from "./Svg";
 
 const useStyles = makeStyles((theme) => ({
   container: {
     background: theme.palette.gradient.logo,
   },
-}))
+}));
 
 interface Props extends SVGProps<HTMLOrSVGElement> {}
 
 const LogoIcon = (props: Props) => {
-  const classes = useStyles()
+  const classes = useStyles();
   return (
     <Box
       width={props.width}
@@ -24,10 +24,10 @@ const LogoIcon = (props: Props) => {
     >
       <SVGLogo {...props} width="50%" height="50%" />
     </Box>
-  )
-}
+  );
+};
 
 LogoIcon.defaultProps = {
   width: 40,
-}
-export default LogoIcon
+};
+export default LogoIcon;

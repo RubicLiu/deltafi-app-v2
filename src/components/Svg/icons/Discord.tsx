@@ -1,14 +1,14 @@
-import React from 'react'
-import Svg from '../Svg'
-import { SvgProps } from '../types'
+import React from "react";
+import Svg from "../Svg";
+import { SvgProps } from "../types";
 
 interface BlogProps extends SvgProps {
   isDark: boolean
 }
 
 const Icon: React.FC<BlogProps> = ({ isDark, ...props }) => {
-  const textColor = isDark ? '#FFFFFF' : '#23242F'
-  const opacity = isDark ? 1.0 : 0.8
+  const textColor = isDark ? "#FFFFFF" : "#23242F";
+  const opacity = isDark ? 1.0 : 0.8;
   return (
     <Svg width={24} height={18} fill={textColor} xmlns="http://www.w3.org/2000/svg" opacity={opacity} {...props}>
       <path
@@ -16,7 +16,7 @@ const Icon: React.FC<BlogProps> = ({ isDark, ...props }) => {
         fill={textColor}
       />
     </Svg>
-  )
-}
+  );
+};
 
-export default Icon
+export default Icon;

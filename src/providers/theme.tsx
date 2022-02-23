@@ -1,14 +1,14 @@
-import React, { useMemo, useState, useContext } from 'react'
-import { ThemeProvider as SCThemeProvider } from 'styled-components'
-import { CssBaseline, ThemeProvider as MuiThemeProvider, StylesProvider, Theme } from '@material-ui/core'
-import { darkTheme, lightTheme } from 'theme'
-import GlobalStyle from 'style/Global'
+import React, { useMemo, useState, useContext } from "react";
+import { ThemeProvider as SCThemeProvider } from "styled-components";
+import { CssBaseline, ThemeProvider as MuiThemeProvider, StylesProvider, Theme } from "@material-ui/core";
+import { darkTheme, lightTheme } from "theme";
+import GlobalStyle from "style/Global";
 
-const ThemeContext = React.createContext({ isDark: null, toggleDarkMode: () => null })
+const ThemeContext = React.createContext({ isDark: null, toggleDarkMode: () => null });
 
 const ThemeContextProvider = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>(darkTheme)
-  const isDark = useMemo(() => theme.palette.type === 'dark', [theme])
+  const [theme, setTheme] = useState<Theme>(darkTheme);
+  const isDark = useMemo(() => theme.palette.type === "dark", [theme]);
   const sctheme = useMemo(
     () => ({
       ...theme,
@@ -16,11 +16,11 @@ const ThemeContextProvider = ({ children }) => {
       breakpoints: Object.values(theme.breakpoints.values).map((breakpoint) => `${breakpoint}px`),
     }),
     [theme],
-  )
+  );
 
   const toggleDarkMode = () => {
-    setTheme(isDark ? { ...lightTheme } : { ...darkTheme })
-  }
+    setTheme(isDark ? { ...lightTheme } : { ...darkTheme });
+  };
 
   return (
     <ThemeContext.Provider value={{ isDark, toggleDarkMode }}>
@@ -34,12 +34,12 @@ const ThemeContextProvider = ({ children }) => {
         </MuiThemeProvider>
       </StylesProvider>
     </ThemeContext.Provider>
-  )
-}
+  );
+};
 
 const useDarkMode = () => {
-  const { isDark, toggleDarkMode } = useContext(ThemeContext)
-  return { isDark, toggleDarkMode }
-}
+  const { isDark, toggleDarkMode } = useContext(ThemeContext);
+  return { isDark, toggleDarkMode };
+};
 
-export { ThemeContext, ThemeContextProvider, useDarkMode }
+export { ThemeContext, ThemeContextProvider, useDarkMode };

@@ -1,7 +1,7 @@
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { struct, u8 } from 'buffer-layout'
-import { SwapData, SwapDataLayout, DepositData, DepositDataLayout, WithdrawData, WithdrawDataLayout} from './dataLayout'
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { PublicKey, TransactionInstruction } from "@solana/web3.js";
+import { struct, u8 } from "buffer-layout";
+import { SwapData, SwapDataLayout, DepositData, DepositDataLayout, WithdrawData, WithdrawDataLayout} from "./dataLayout";
 
 export enum StableSwapInstruction {
   Initialize = 10,
@@ -44,24 +44,24 @@ export const createStableSwapInstruction = (
     { pubkey: sourceRewardToken, isSigner: false, isWritable: true },
     { pubkey: adminFeeDestination, isSigner: false, isWritable: true },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction'), SwapDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction"), SwapDataLayout]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: StableSwapInstruction.Swap,
       swapData,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};
 
 export const createStableDepositInstruction = (
   tokenSwap: PublicKey,
@@ -87,24 +87,24 @@ export const createStableDepositInstruction = (
     { pubkey: poolMint, isSigner: false, isWritable: true },
     { pubkey: destination, isSigner: false, isWritable: true },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction'), DepositDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction"), DepositDataLayout]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: StableSwapInstruction.Deposit,
       depositData,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};
 
 export const createStableWithdrawInstruction = (
   tokenSwap: PublicKey,
@@ -134,21 +134,21 @@ export const createStableWithdrawInstruction = (
     { pubkey: adminFeeA, isSigner: false, isWritable: true },
     { pubkey: adminFeeB, isSigner: false, isWritable: true },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ]
+  ];
 
-  const dataLayout = struct([u8('instruction'), WithdrawDataLayout])
-  const data = Buffer.alloc(dataLayout.span)
+  const dataLayout = struct([u8("instruction"), WithdrawDataLayout]);
+  const data = Buffer.alloc(dataLayout.span);
   dataLayout.encode(
     {
       instruction: StableSwapInstruction.Withdraw,
       withdrawData,
     },
     data,
-  )
+  );
 
   return new TransactionInstruction({
     keys,
     programId,
     data,
-  })
-}
+  });
+};

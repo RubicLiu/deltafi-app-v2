@@ -1,10 +1,10 @@
-import BigNumber from 'bignumber.js'
-import { AccountInfo, PublicKey } from '@solana/web3.js'
+import BigNumber from "bignumber.js";
+import { AccountInfo, PublicKey } from "@solana/web3.js";
 
-import { Fees, PoolState, Rewards, SwapType} from 'lib/state'
-import { PoolSchema } from 'constants/pools'
-import { TokenInfo } from 'constants/tokens'
-import { FarmPoolSchema } from 'constants/farm'
+import { Fees, PoolState, Rewards, SwapType} from "lib/state";
+import { PoolSchema } from "constants/pools";
+import { TokenInfo } from "constants/tokens";
+import { FarmPoolSchema } from "constants/farm";
 
 export interface ConnectionContextValues {
   endpoint: string

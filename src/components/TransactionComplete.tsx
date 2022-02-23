@@ -1,9 +1,9 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
-import { ViewTransactionIcon, StartTransactionIcon } from 'components'
-import { Text } from 'components/Text'
+import { ViewTransactionIcon, StartTransactionIcon } from "components";
+import { Text } from "components/Text";
 
-import { useDarkMode } from 'providers/theme'
+import { useDarkMode } from "providers/theme";
 
 const TransactionDiv = styled.div`
   display: flex;
@@ -32,12 +32,12 @@ const TransactionDiv = styled.div`
   .start-transaction {
     color: #88809c;
   }
-`
+`;
 const Img = styled.img`
   width: 187px;
   height: 187px;
   margin-top: 24px;
-`
+`;
 const ExternalLink = styled.a`
   color: #88809c;
   outline: none;
@@ -49,21 +49,21 @@ const ExternalLink = styled.a`
     align-items: flex-end;
     margin: 0 5px;
   }
-`
+`;
 
 const TransactionComplete = ({ ...props }) => {
-  const { isDark } = useDarkMode()
+  const { isDark } = useDarkMode();
 
   return (
     <>
       <TransactionDiv>
-        <Text color={isDark ? '#EBECF1' : '#88809C'} className="congrat" fontFamily="'Inter', sans-serif">
+        <Text color={isDark ? "#EBECF1" : "#88809C"} className="congrat" fontFamily="'Inter', sans-serif">
           Congratulations!
         </Text>
-        <Text color={isDark ? '#EBECF1' : '#88809C'} className="complete" fontFamily="'Inter', sans-serif">
+        <Text color={isDark ? "#EBECF1" : "#88809C"} className="complete" fontFamily="'Inter', sans-serif">
           Your transaction is complete
         </Text>
-        <Text color={isDark ? '#88809C' : '#6B7280'} className="view-transaction" fontFamily="'Inter', sans-serif">
+        <Text color={isDark ? "#88809C" : "#6B7280"} className="view-transaction" fontFamily="'Inter', sans-serif">
           <ExternalLink
             href="/VIEWTRANSACTION"
             target="_blank"
@@ -76,8 +76,8 @@ const TransactionComplete = ({ ...props }) => {
             <ViewTransactionIcon className="external-link" isDark={isDark} width="18px" />
           </ExternalLink>
         </Text>
-        <Img src={'/images/transaction-complete.png'} alt="Transaction Working" />
-        <Text color={isDark ? '#EFCBD7' : '#1B0D3F'} className="view-transaction" fontFamily="'Inter', sans-serif">
+        <Img src={"/images/transaction-complete.png"} alt="Transaction Working" />
+        <Text color={isDark ? "#EFCBD7" : "#1B0D3F"} className="view-transaction" fontFamily="'Inter', sans-serif">
           <ExternalLink
             href="/VIEWTRANSACTION"
             className="start-transaction"
@@ -93,7 +93,7 @@ const TransactionComplete = ({ ...props }) => {
         </Text>
       </TransactionDiv>
     </>
-  )
-}
+  );
+};
 
-export default TransactionComplete
+export default TransactionComplete;
