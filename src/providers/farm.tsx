@@ -140,6 +140,8 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
       depositBalance,
       rewardDebt: new BigNumber(position.rewardsOwed.toString()),
       rewardEstimated: new BigNumber(position.rewardsEstimated.toString()),
+      lastUpdateTs: new BigNumber(position.lastUpdateTs.toString()), 
+      nextClaimTs: new BigNumber(position.nextClaimTs.toString())
     };
   });
 

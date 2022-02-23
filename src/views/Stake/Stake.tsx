@@ -40,6 +40,31 @@ interface TransactionResult {
   stake?: IStakeCard
 }
 
+const SECONDS_OF_YEAR = 31556926;
+
+const getUnclaimedReward = (
+  apr : BigNumber, 
+  lastUpdateTs: BigNumber, 
+  nextClaimTs: BigNumber, 
+  rewardDebt: BigNumber, 
+  rewardEstimated: BigNumber, 
+  depositBalance: BigNumber,
+  deltafiTokenDecimals: number
+) => {
+  const currentTs: BigNumber = (new BigNumber(Date.now())).div(new BigNumber(1000));
+  if (currentTs <= nextClaimTs) {
+    return exponentiatedBy(rewardDebt, deltafiTokenDecimals);
+  }
+  const unTrackedReward: BigNumber = 
+    currentTs
+    .minus(lastUpdateTs)
+    .div(new BigNumber(SECONDS_OF_YEAR))
+    .multipliedBy(depositBalance)
+    .multipliedBy(apr);
+  
+  return exponentiatedBy(unTrackedReward.plus(rewardDebt).plus(rewardEstimated), deltafiTokenDecimals);
+};
+
 const Stake = (): ReactElement => {
   const classes = useStyles();
   const location = useLocation();
@@ -85,6 +110,7 @@ const Stake = (): ReactElement => {
   const { config } = useConfig();
   const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58());
   const lpMint = useTokenMintAccount(farmPool?.poolMintKey);
+  const deltafiTokenMint = useTokenMintAccount(DELTAFI_TOKEN_MINT);
   const [farmUser] = useFarmUserAccount();
   const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
@@ -99,7 +125,9 @@ const Stake = (): ReactElement => {
   }, [farmPool, lpMint]);
 
   const position = useMemo(() => farmUser?.positions[farmPoolId], [farmUser, farmPoolId]);
+  const apr = (new BigNumber(farmPool.aprNumerator.toString())).div(new BigNumber(farmPool.aprDenominator.toString()));
 
+  /*eslint-disable */
   const depositAmount = useMemo(() => {
     if (position && lpMint) {
       const value = exponentiatedBy(position.depositBalance, lpMint.decimals);
@@ -109,13 +137,24 @@ const Stake = (): ReactElement => {
       return exponentiatedBy(position.depositBalance, lpMint.decimals);
     }
     return new BigNumber(0);
-  }, [position, lpMint, staking]);
+  }, [position, lpMint]);
+  /*eslint-enable */
+
   const unclaimedReward = useMemo(() => {
-    if (position && lpMint) {
-      return exponentiatedBy(position.rewardDebt, lpMint.decimals);
+    if (position && deltafiTokenMint) {
+      return getUnclaimedReward(
+        apr, 
+        position.lastUpdateTs, 
+        position.nextClaimTs, 
+        position.rewardDebt, 
+        position.rewardEstimated, 
+        position.depositBalance, 
+        deltafiTokenMint.decimals
+      );
     }
     return new BigNumber(0);
-  }, [position, lpMint]);
+  }, [position, deltafiTokenMint, apr]);
+
   const poolRate = useMemo(() => {
     if (farmPool && totalStaked) {
       const apr = new BigNumber(farmPool.aprNumerator.toString())
@@ -393,7 +432,7 @@ const Stake = (): ReactElement => {
             </ConnectButton>
           </Box>
           <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>{unclaimedReward.toString()}</Typography>
+            <Typography className={classes.amount}>{deltafiTokenMint ? unclaimedReward.toFixed(deltafiTokenMint.decimals) : "--"}</Typography>
             <Typography className={classes.amount}>0 / Day</Typography>
           </Box>
         </Box>

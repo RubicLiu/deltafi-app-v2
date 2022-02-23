@@ -148,6 +148,8 @@ export interface StakeAccount {
   depositBalance: BigNumber
   rewardDebt: BigNumber
   rewardEstimated: BigNumber
+  lastUpdateTs: BigNumber
+  nextClaimTs: BigNumber
 }
 
 interface ISymbolMap {
