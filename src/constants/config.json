@@ -1,36 +1,36 @@
 {
   "network": "mainnet-beta",
   "swapProgramId": "8Y7g9EN4MQv5epFEU3aKpXrNcu1t2nkyM2jZpWkw6q1u",
-  "marketConfigAddress": "BjJbeyuHKQCY6vWaZg4yLWfyX3vDprp8PQcVtVepnjGK",
-  "deltafiTokenMint": "C7vyCioq4X3cDYM2e3rXYrfkTKWos3kHBM9T5hLS8tKz",
-  "deltafiToken": "Ai5Ja4GvMCbVciQVkuoFaeB1UAM81fdnMUoh9SCCZt8i",
+  "marketConfigAddress": "HsxTa945PpbwmjjdhNB659EExm8r7gw1khezsLV6FpFk",
+  "deltafiTokenMint": "tstpB7nAg8n7ynm5C5mfRkQ73Q8dSTcyxkjNvR2Bspt",
+  "deltafiToken": "4xzNADUekWUYKen7Z3hsMYKaYhr7TyAoHr96xULS573C",
   "poolInfo": [
     {
       "name": "SOL-SRM",
       "base": "SOL",
       "quote": "SRM",
-      "swap": "FU31zqLHowUTpTQPsqNgYavRNqG5YcfdHFrp6jc1YSTy",
-      "mint": "38YvvFBsKZEXcdmF38kMPDiS7cUknaKWqPU7TzziNfQz",
-      "farm": "Hp9PB4V2EwSAyuBnyMTEQctZzY8MhVUiwbSbTJaL2sLa",
-      "token": "H1n8pN9X7hVnB96amAx1EK4x4vxAPUCCv6SCmYAfonBZ"
+      "swap": "EBHwQaSZ8hEgrpvEMfBYre93FY4cABZswg7xZLRiy4GQ",
+      "mint": "9jVSLsHvPweSsdwZjLL4yXaRBZw2DHLWpUrdkUK8F7g5",
+      "farm": "E69f6F2y6ktwDQr3cK7gU2zthrCE2PNbVzACi7Di726h",
+      "token": "3MRZKY9jazQvbhpeDsNd5zoGgjAUH7WGajvkVbdCkjYh"
     },
     {
       "name": "SOL-USDC",
       "base": "SOL",
       "quote": "USDC",
-      "swap": "9BRpZ26zJHL6B7X3GGNPKYu2wLQgms9CkrJfeCH3KUt7",
-      "mint": "381DE35hEhSv5mq66HaGd4ByFLvSnE1XRv1BpNdyc4Ge",
-      "farm": "CCd3pysnss8ike1wsoDaR6uKytR7UKdnYWKc9eUuHp8R",
-      "token": "AbEz17MgYWTY18CnU48HqeTmBSZiZ3LtNNQufeTM2Rma"
+      "swap": "B3q28w9RTXArw5rYfwVyZP3zif32iGe7Gj21LD4gYPUD",
+      "mint": "6Vt1Rw2mtXFWnEgpUegeL6QdPBNutt4wevdnC7ro4RLe",
+      "farm": "6TdPUMsTdnDFkRvDj1R6RcYSHSHkE6omgqyJUuiyVvSB",
+      "token": "Hg1vEY5d2EYovmUUAkKSTnuMynnJi2xwc6y1EuiyLZR1"
     },
     {
       "name": "SRM-USDC",
       "base": "SRM",
       "quote": "USDC",
-      "swap": "4Zzxo8aeuseghqqdyTN13ZkRpMSXDjwMfcna2gbXuGaY",
-      "mint": "4BbXTsPr6JMs5ZFNNa9GtVXyjN2jzGRiwSTAVskG7hsQ",
-      "farm": "6E9qzJRsz5DKte1h7T2gW6nMokFq82ij6AsNqmNzMkhm",
-      "token": "FttgAcQSz6SxyGKFn1pjW3bwj6ZG9n51FWGqihC7i2La"
+      "swap": "4hSXwvBkN7nabDy4MQqzsSAKJrKvRHKcBwcYn5WiU4V8",
+      "mint": "5WpJ7LuWW532NQKyZA4NnZmUe31rezwajB5CDJBAshPi",
+      "farm": "38GoR9Yv7LzaBc7rcQcNGojxoNZ7wPpqgxG5nci2WNBi",
+      "token": "HkFEXH5ktMsUPkEmxp7BvrFqxB21wqgxENh5pycFkUPF"
     }
   ]
 }
