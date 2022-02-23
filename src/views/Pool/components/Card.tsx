@@ -93,7 +93,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
       return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
     }
     return new BigNumber(0);
-  }, [pmm, basePrice, quotePrice]);
+  }, [pmm, basePrice, quotePrice, pool]);
 
   const share = useMemo(() => {
     if (pool && poolTokenAccount && poolMint) {
@@ -107,7 +107,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
       return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals).multipliedBy(share).div(100);
     }
     return new BigNumber(0);
-  }, [pmm, basePrice, quotePrice, share]);
+  }, [pmm, basePrice, quotePrice, share, pool]);
 
   if (!pool) return null;
 

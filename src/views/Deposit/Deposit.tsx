@@ -264,14 +264,14 @@ const Deposit: React.FC = () => {
       return pmm.basePercent(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
     }
     return null;
-  }, [pmm, basePrice, quotePrice]);
+  }, [pmm, basePrice, quotePrice, pool]);
 
   const quotePercent = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
       return pmm.quotePercent(basePrice, quotePrice, pool.quoteTokenInfo.decimals, pool.baseTokenInfo.decimals);
     }
     return null;
-  }, [pmm, basePrice, quotePrice]);
+  }, [pmm, basePrice, quotePrice, pool]);
 
   const share = useMemo(() => {
     if (pool && poolTokenAccount && poolMint) {
@@ -285,21 +285,21 @@ const Deposit: React.FC = () => {
       return pmm.amountFromShare(share.toNumber(), pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
     }
     return [null, null];
-  }, [share, pmm]);
+  }, [share, pmm, pool]);
 
   const sharePrice = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
       return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals).multipliedBy(share).div(100);
     }
     return new BigNumber(0);
-  }, [pmm, basePrice, quotePrice, share]);
+  }, [pmm, basePrice, quotePrice, share, pool]);
 
   const tvl = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
       return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
     }
     return new BigNumber(0);
-  }, [pmm, basePrice, quotePrice]);
+  }, [pmm, basePrice, quotePrice, pool]);
 
   const swapFee = useMemo(() => {
     if (pool) {
@@ -549,7 +549,7 @@ const Deposit: React.FC = () => {
       }
       setWithdrawPercentage(value);
     },
-    [pmm, share, base, quote],
+    [pmm, share, base, quote, pool],
   );
 
   const handleSwitchMethod = (method: string) => {
