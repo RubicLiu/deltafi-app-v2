@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import { Box, makeStyles, Theme, Typography } from "@material-ui/core";
 import BigNumber from "bignumber.js";
 
+import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { ConnectButton, Text } from "components";
 import { CardProps } from "./types";
 import { PMM } from "lib/calc";
@@ -12,6 +13,8 @@ import { usePoolFromAddress } from "providers/pool";
 import { usePriceBySymbol } from "providers/pyth";
 import { useTokenMintAccount } from "providers/tokens";
 import { useFarmPoolByAddress } from "providers/farm";
+
+const deltafiTokenDecimals = 6;
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -96,7 +99,12 @@ const FarmCard: React.FC<CardProps> = (props) => {
 
   const apy = useMemo(() => {
     if (farmPool) {
-      const apr = new BigNumber(farmPool.aprNumerator.toString()).div(new BigNumber(farmPool.aprDenominator.toString()));
+      const apr = exponentiatedBy(
+        exponentiate(
+          new BigNumber(farmPool.aprNumerator.toString()).div(new BigNumber(farmPool.aprDenominator.toString())),
+          swapPool.baseTokenInfo.decimals),
+        deltafiTokenDecimals
+      );
       return new BigNumber(1).plus(apr.dividedBy(365)).pow(365).minus(1).multipliedBy(100).toFixed(2);
     }
     return 0;
