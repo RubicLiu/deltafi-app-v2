@@ -14,9 +14,7 @@ import {
   Link,
 } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
-import SettingsIcon from '@material-ui/icons/Settings'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import ReactCardFlip from 'react-card-flip'
 import { useParams } from 'react-router'
 import clx from 'classnames'
 import BigNumber from 'bignumber.js'
@@ -25,7 +23,6 @@ import SwapCard from 'views/Swap/components/Card'
 import { ConnectButton, CopyAddressIcon } from 'components'
 import Page from 'components/layout/Page'
 import { SwapCard as ISwapCard } from 'views/Swap/components/types'
-import SettingsPanel from 'components/SettingsPanel/SettingsPanel'
 import { WithdrawSelectCard } from 'components/molecules'
 import WithdrawCard from 'components/molecules/WithdrawCard'
 
@@ -219,9 +216,6 @@ const Deposit: React.FC = () => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet()
   const { connection } = useConnection()
   const { setMenu } = useModal()
-  const [openSettings, setOpenSettings] = useState(false)
-  const [priceImpact, setPriceImpact] = useState('2.0')
-  const [isIncludeDecimal, setIsIncludeDecimal] = useState(true)
   const [withdrawPercentage, setWithdrawPercentage] = useState(0)
   const [state, setState] = useState<{
     open: boolean
@@ -336,7 +330,6 @@ const Deposit: React.FC = () => {
 
     try {
       if (base.amount !== '' && quote.amount !== '') {
-        console.log("pool swap type",  pool.swapType);
         const depositMethod = pool.swapType === SwapType.Normal ? deposit : stableDeposit;
         transaction = await depositMethod({
           connection,
@@ -407,8 +400,6 @@ const Deposit: React.FC = () => {
 
     try {
       if (base.amount !== '' && quote.amount !== '') {
-        const percent = (100 + parseFloat(priceImpact)) / 100
-
         const withdrawMethod = pool.swapType === SwapType.Normal ? withdraw : stableWithdraw;
         transaction = await withdrawMethod({
           connection,
@@ -424,7 +415,6 @@ const Deposit: React.FC = () => {
               new BigNumber(poolTokenAccount.account.amount)
                 .multipliedBy(withdrawPercentage)
                 .div(100)
-                .multipliedBy(percent)
                 .integerValue()
                 .toString(),
             ),
@@ -470,7 +460,6 @@ const Deposit: React.FC = () => {
     base,
     quote,
     signTransaction,
-    priceImpact,
     baseTokenAccount?.pubkey,
     quoteTokenAccount?.pubkey,
     withdrawPercentage,
@@ -488,14 +477,14 @@ const Deposit: React.FC = () => {
       setBase(card)
       if (!quote.token) return
 
-      if (pool && priceImpact) {
+      if (pool) {
         if (method === 'deposit') {
           const outAmount = getOutAmount(
             pool,
             card.amount,
             card.token.address,
             quote.token.address,
-            parseFloat(priceImpact),
+            0.0,
           )
           setQuote({
             ...quote,
@@ -514,7 +503,7 @@ const Deposit: React.FC = () => {
         }
       }
     },
-    [pool, pmm, share, priceImpact, method, quote],
+    [pool, pmm, share, method, quote],
   )
 
   const handleTokenToInput = useCallback(
@@ -522,14 +511,14 @@ const Deposit: React.FC = () => {
       setQuote(card)
       if (!base.token) return
 
-      if (pool && priceImpact) {
+      if (pool) {
         if (method === 'deposit') {
           const outAmount = getOutAmount(
             pool,
             card.amount,
             card.token.address,
             base.token.address,
-            parseFloat(priceImpact),
+            0.0,
           )
           setBase({
             ...base,
@@ -548,7 +537,7 @@ const Deposit: React.FC = () => {
         }
       }
     },
-    [pool, pmm, share, priceImpact, method, base],
+    [pool, pmm, share, method, base],
   )
 
   const handleWithdrawSlider = useCallback(
@@ -756,31 +745,22 @@ const Deposit: React.FC = () => {
                   Withdraw
                 </MUIButton>
               </Box>
-              <IconButton
-                onClick={() => setOpenSettings(!openSettings)}
-                data-amp-analytics-on="click"
-                data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Swap, target: Settings"
-              >
-                <SettingsIcon color="primary" />
-              </IconButton>
             </Box>
           </Box>
-          <ReactCardFlip isFlipped={openSettings}>
-            {method === 'withdraw' ? (
+          {method === 'withdraw' ? (
               <Box display="flex" flexDirection="column" alignItems="flex-end">
                 <WithdrawSelectCard percentage={withdrawPercentage} onUpdatePercentage={handleWithdrawSlider} />
                 <WithdrawCard
                   card={base}
                   handleChangeCard={handleTokenFromInput}
-                  withdrawal={baseShare?.toString()}
+                  withdrawal={baseShare?.toFixed(6).toString()}
                   disableDrop={true}
                 />
                 <Box mt={1} />
                 <WithdrawCard
                   card={quote}
                   handleChangeCard={handleTokenToInput}
-                  withdrawal={quoteShare?.toString()}
+                  withdrawal={quoteShare?.toFixed(6).toString()}
                   disableDrop={true}
                 />
               </Box>
@@ -791,15 +771,6 @@ const Deposit: React.FC = () => {
                 <SwapCard card={quote} handleChangeCard={handleTokenToInput} disableDrop={true} />
               </Box>
             )}
-            <SettingsPanel
-              isOpen={openSettings}
-              priceImpact={priceImpact}
-              isIncludeDecimal={isIncludeDecimal}
-              handleChangeImpact={(value: string) => setPriceImpact(value)}
-              handleChangeInclude={() => setIsIncludeDecimal(!isIncludeDecimal)}
-              handleClose={() => setOpenSettings(!openSettings)}
-            />
-          </ReactCardFlip>
           <Box mt={3} width="100%" sx={{ position: 'relative', zIndex: 1 }}>
             {actionButton}
           </Box>

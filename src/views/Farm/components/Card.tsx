@@ -129,7 +129,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
       </Box>
       <Box display="flex" justifyContent="space-between">
         <Typography className={classes.label}>Total Staked:</Typography>
-        <Typography className={classes.label}>{convertDoller(tvl)}</Typography>
+        <Typography className={classes.label}>{convertDoller(tvl.toFixed(2))}</Typography>
       </Box>
       <Box display="flex" justifyContent="space-between" mt={1.5}>
         <Typography className={classes.label}>APY</Typography>

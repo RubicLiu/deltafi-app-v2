@@ -29,7 +29,7 @@ import { useFarmPoolByAddress, useFarmUserAccount } from 'providers/farm'
 import { lpTokens } from 'constants/tokens'
 import { useModal } from 'providers/modal'
 import { useConfig } from 'providers/config'
-import { sendSignedTransaction, claim, stake, unstake } from 'utils/transactions'
+import { sendSignedTransaction, claim, stake, unstake, refresh } from 'utils/transactions'
 import { exponentiate, exponentiatedBy } from 'utils/decimal'
 import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK } from 'constants/index'
 import { useCustomConnection } from 'providers/connection'
@@ -342,7 +342,7 @@ const Stake = (): ReactElement => {
         <Box display="flex" justifyContent="space-between" pb={4}>
           <Box>
             <Typography>Total Staked</Typography>
-            <Typography>{`${totalStaked.toNumber()} ${farmPool.name}`}</Typography>
+            <Typography>{`${totalStaked.toFixed(2).toString()} ${farmPool.name}`}</Typography>
           </Box>
           <Box>
             <Typography>Pool Rate</Typography>
@@ -425,39 +425,21 @@ const Stake = (): ReactElement => {
                   Unstake
                 </MUIButton>
               </Box>
-              <IconButton
-                onClick={() => setOpenSettings(!openSettings)}
-                data-amp-analytics-on="click"
-                data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Swap, target: Settings"
-              >
-                <SettingsIcon color="primary" />
-              </IconButton>
             </Box>
           </Box>
           <Box mb={1}>
             <Slider value={percentage} onChange={setPercentage} />
           </Box>
 
-          <ReactCardFlip isFlipped={openSettings}>
-            <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <StakeCard
-                card={staking}
-                handleChangeCard={setStaking}
-                tokens={lpTokens}
-                disableDrop
-                percentage={percentage}
-              />
-            </Box>
-            <SettingsPanel
-              isOpen={openSettings}
-              priceImpact={priceImpact}
-              isIncludeDecimal={isIncludeDecimal}
-              handleChangeImpact={(value: string) => setPriceImpact(value)}
-              handleChangeInclude={() => setIsIncludeDecimal(!isIncludeDecimal)}
-              handleClose={() => setOpenSettings(!openSettings)}
+          <Box display="flex" flexDirection="column" alignItems="flex-end">
+            <StakeCard
+              card={staking}
+              handleChangeCard={setStaking}
+              tokens={lpTokens}
+              disableDrop
+              percentage={percentage}
             />
-          </ReactCardFlip>
+          </Box>
           <Box marginTop={2} width="100%">
             {isConnectedWallet ? (
               <ConnectButton
