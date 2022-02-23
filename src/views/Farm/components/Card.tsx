@@ -108,7 +108,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
       return new BigNumber(1).plus(apr.dividedBy(365)).pow(365).minus(1).multipliedBy(100).toFixed(2);
     }
     return 0;
-  }, [farmPool]);
+  }, [farmPool, swapPool]);
 
   if (!swapPool || !farmPool) return null;
 

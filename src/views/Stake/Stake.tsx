@@ -84,6 +84,7 @@ const Stake = (): ReactElement => {
     amount: "",
   });
 
+  /*eslint-disable */
   const tokenBalance = useMemo(() => {
     if (tokenAccount) {
       const value = exponentiatedBy(tokenAccount.account.amount, staking.token.decimals);
@@ -93,7 +94,8 @@ const Stake = (): ReactElement => {
       return value;
     }
     return null;
-  }, [tokenAccount, staking]);
+  }, [tokenAccount]);
+  /*eslint-enable */
 
   const [percentage, setPercentage] = useState(0);
   const { setMenu } = useModal();

@@ -17,9 +17,6 @@ export const pools: PoolSchema[] = poolInfo.map(({name, swap, mint, base, quote}
   quote
 }));
 
-console.log(pools);
-
-
 export const listSymbols = (pools: PoolSchema[]) => {
   let list = [];
   const prefix = "Crypto.";
