@@ -211,7 +211,7 @@ export async function claim({
       walletPubkey,
       marketAuthority,
       claimDestination,
-      config.deltafiMint,
+      config.deltafiToken,
       SWAP_PROGRAM_ID,
     ),
   );

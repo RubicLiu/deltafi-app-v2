@@ -10,7 +10,7 @@ export interface TokenInfo {
   logoURI: string
 }
 
-export const tokens: TokenInfo[] = 
+export const tokens: TokenInfo[] =
 {
   "mainnet-beta":
   [
@@ -41,9 +41,18 @@ export const tokens: TokenInfo[] =
       logoURI:
       "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
     },
-  ], 
+    {
+      chainId: 101,
+      address: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+      symbol: "USDT",
+      name: "USDT",
+      decimals: 6,
+      logoURI:
+      "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png",
+    },
+  ],
 
-  "testnet": 
+  "testnet":
   [
     {
       chainId: 101,
@@ -85,12 +94,11 @@ export const tokens: TokenInfo[] =
 }[network];
 
 
-
-export const lpTokens: TokenInfo[] = poolInfo.map(({name, mint}) => ({
-  chainId: 101, 
-  address: mint, 
-  symbol: name, 
-  name: "LP " + name, 
-  decimals: 9, 
+export const lpTokens: TokenInfo[] = poolInfo.map(({name, mint, decimals}) => ({
+  chainId: 101,
+  address: mint,
+  symbol: name,
+  name: "LP " + name,
+  decimals: decimals,
   logoURI: " "
 }));

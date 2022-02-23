@@ -43,11 +43,11 @@ interface TransactionResult {
 const SECONDS_OF_YEAR = 31556926;
 
 const getUnclaimedReward = (
-  apr : BigNumber, 
-  lastUpdateTs: BigNumber, 
-  nextClaimTs: BigNumber, 
-  rewardDebt: BigNumber, 
-  rewardEstimated: BigNumber, 
+  apr : BigNumber,
+  lastUpdateTs: BigNumber,
+  nextClaimTs: BigNumber,
+  rewardDebt: BigNumber,
+  rewardEstimated: BigNumber,
   depositBalance: BigNumber,
   deltafiTokenDecimals: number
 ) => {
@@ -55,13 +55,13 @@ const getUnclaimedReward = (
   if (currentTs <= nextClaimTs) {
     return exponentiatedBy(rewardDebt, deltafiTokenDecimals);
   }
-  const unTrackedReward: BigNumber = 
+  const unTrackedReward: BigNumber =
     currentTs
     .minus(lastUpdateTs)
     .div(new BigNumber(SECONDS_OF_YEAR))
     .multipliedBy(depositBalance)
     .multipliedBy(apr);
-  
+
   return exponentiatedBy(unTrackedReward.plus(rewardDebt).plus(rewardEstimated), deltafiTokenDecimals);
 };
 
@@ -70,7 +70,7 @@ const Stake = (): ReactElement => {
   const location = useLocation();
   const farmPoolId = location.pathname.split("/").pop();
   const farmPool = useFarmPoolByAddress(farmPoolId);
-  
+
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
   const { network } = useCustomConnection();
@@ -145,12 +145,12 @@ const Stake = (): ReactElement => {
   const unclaimedReward = useMemo(() => {
     if (position && deltafiTokenMint) {
       return getUnclaimedReward(
-        apr, 
-        position.lastUpdateTs, 
-        position.nextClaimTs, 
-        position.rewardDebt, 
-        position.rewardEstimated, 
-        position.depositBalance, 
+        apr,
+        position.lastUpdateTs,
+        position.nextClaimTs,
+        position.rewardDebt,
+        position.rewardEstimated,
+        position.depositBalance,
         deltafiTokenMint.decimals
       );
     }
