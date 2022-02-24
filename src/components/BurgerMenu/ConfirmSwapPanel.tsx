@@ -101,7 +101,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
           <Typography color="textSecondary" variant="body2">
             Estimated Received
           </Typography>
-          <Typography>{`${fixedNumber(swapOut.amountOutWithSlippage) ?? 0} ${data?.tokenTo.token.symbol}`}</Typography>
+          <Typography>{`${fixedNumber(swapOut.amountOut) ?? 0} ${data?.tokenTo.token.symbol}`}</Typography>
         </Box>
         <Box>
           <Box display="flex" justifyContent="space-between" className={classes.row}>
