@@ -198,6 +198,7 @@ export const createClaimFarmInstruction = (
     { pubkey: marketAuthority, isSigner: false, isWritable: false },
     { pubkey: claimDestination, isSigner: false, isWritable: true },
     { pubkey: claimMint, isSigner: false, isWritable: true },
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 
