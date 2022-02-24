@@ -75,7 +75,7 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000;
 };
 
-const DEFAULT_TIMEOUT = 15000;
+const DEFAULT_TIMEOUT = 30000;
 
 export async function sendSignedTransaction({
   signedTransaction,
@@ -98,17 +98,6 @@ export async function sendSignedTransaction({
   const txid: TransactionSignature = await connection.sendRawTransaction(rawTransaction, { skipPreflight: true });
   console.info(sentMessage);
 
-  // let done = false
-
-  // ;(async () => {
-  //   while (!done && getUnixTs() - startTime < timeout) {
-  //     connection.sendRawTransaction(rawTransaction, {
-  //       skipPreflight: true,
-  //     })
-  //     await sleep(500)
-  //   }
-  // })()
-
   try {
     await awaitTransactionSignatureConfirmation(txid, timeout, connection);
   } catch (err: any) {
@@ -118,7 +107,9 @@ export async function sendSignedTransaction({
     let simulateResult: SimulatedTransactionResponse | null = null;
     try {
       simulateResult = (await simulateTransaction(connection, signedTransaction, "single")).value;
-    } catch (e) {}
+    } catch (e) {
+      console.warn("Failed to execute simulated transaction");
+    }
 
     if (simulateResult && simulateResult.err) {
       if (simulateResult.logs) {
@@ -135,8 +126,6 @@ export async function sendSignedTransaction({
       }
     }
     throw new Error("Transaction failed");
-  } finally {
-    // done = true
   }
 
   console.info(successMessage);
@@ -156,6 +145,7 @@ async function awaitTransactionSignatureConfirmation(
         if (done) {
           return;
         }
+
         done = true;
         console.log("Timed out for txid", txid);
         reject({ timeout: true });
@@ -205,7 +195,7 @@ async function awaitTransactionSignatureConfirmation(
             }
           }
         })();
-        await sleep(300);
+        await sleep(1000);
       }
     })();
   });
