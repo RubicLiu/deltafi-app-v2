@@ -75,7 +75,8 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000;
 };
 
-const DEFAULT_TIMEOUT = 30000;
+const DEFAULT_TIMEOUT = 15000;
+const DEFAULT_MAX_RETRIES = 3;
 
 export async function sendSignedTransaction({
   signedTransaction,
@@ -84,6 +85,7 @@ export async function sendSignedTransaction({
   sentMessage = "Transaction sent",
   successMessage = "Transaction confirmed",
   timeout = DEFAULT_TIMEOUT,
+  maxRetries = DEFAULT_MAX_RETRIES,
 }: {
   signedTransaction: Transaction;
   connection: Connection;
@@ -91,46 +93,59 @@ export async function sendSignedTransaction({
   sentMessage?: string;
   successMessage?: string;
   timeout?: number;
+  maxRetries?: number;
 }) {
   const rawTransaction = signedTransaction.serialize();
   const startTime = getUnixTs();
-  console.info(sendingMessage);
-  const txid: TransactionSignature = await connection.sendRawTransaction(rawTransaction, { skipPreflight: true });
-  console.info(sentMessage);
 
-  try {
-    await awaitTransactionSignatureConfirmation(txid, timeout, connection);
-  } catch (err: any) {
-    if (err.timeout) {
-      throw new Error("Timed out awaiting confirmation on transaction");
-    }
-    let simulateResult: SimulatedTransactionResponse | null = null;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      simulateResult = (await simulateTransaction(connection, signedTransaction, "single")).value;
-    } catch (e) {
-      console.warn("Failed to execute simulated transaction");
-    }
+      console.info(sendingMessage);
+      const txid: TransactionSignature = await connection.sendRawTransaction(rawTransaction, {
+        skipPreflight: false,
+        maxRetries: 5,
+      });
+      console.info(sentMessage);
 
-    if (simulateResult && simulateResult.err) {
-      if (simulateResult.logs) {
-        for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
-          const line = simulateResult.logs[i];
-          if (line.startsWith("Program log: ")) {
-            throw new Error("Transaction failed: " + line.slice("Program log: ".length));
+      await awaitTransactionSignatureConfirmation(txid, timeout, connection);
+      console.info(successMessage);
+      console.info("latency", txid, getUnixTs() - startTime);
+      return txid;
+    } catch (err: any) {
+      if (err.timeout) {
+        if (attempt < maxRetries - 1) {
+          console.warn("Retry on timeout, attempt " + (attempt + 1));
+          continue;
+        }
+        throw new Error("Timed out awaiting confirmation on transaction");
+      }
+
+      let simulateResult: SimulatedTransactionResponse | null = null;
+      try {
+        simulateResult = (await simulateTransaction(connection, signedTransaction, "single")).value;
+      } catch (e) {
+        console.warn("Failed to execute simulated transaction");
+        throw e;
+      }
+
+      if (simulateResult && simulateResult.err) {
+        if (simulateResult.logs) {
+          for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
+            const line = simulateResult.logs[i];
+            if (line.startsWith("Program log: ")) {
+              throw new Error("Transaction failed: " + line.slice("Program log: ".length));
+            }
           }
+        }
+
+        if (typeof simulateResult.err == "object" && "InstructionError" in simulateResult.err) {
+          throw new Error(JSON.stringify(simulateResult.err));
         }
       }
 
-      if (typeof simulateResult.err == "object" && "InstructionError" in simulateResult.err) {
-        throw new Error(JSON.stringify(simulateResult.err));
-      }
+      throw new Error("Transaction failed");
     }
-    throw new Error("Transaction failed");
   }
-
-  console.info(successMessage);
-  console.info("latency", txid, getUnixTs() - startTime);
-  return txid;
 }
 
 async function awaitTransactionSignatureConfirmation(
