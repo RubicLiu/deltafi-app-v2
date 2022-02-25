@@ -115,7 +115,7 @@ export function usePools() {
   return context;
 }
 
-export function usePoolFromAddress(address: PublicKey) {
+export function usePoolFromAddress(address: PublicKey): PoolInfo {
   const { pools } = usePools();
   if (address && pools) {
     return pools.find((p) => p.publicKey.equals(address));

@@ -104,7 +104,7 @@ const updateWallet = (() => {
           walletAddress = address.toString();
         }
       } catch (err) {
-        console.warn(err);
+        console.warn("err : >> ", err);
       }
     }
   };

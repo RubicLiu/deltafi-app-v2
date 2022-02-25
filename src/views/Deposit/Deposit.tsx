@@ -20,7 +20,7 @@ import clx from "classnames";
 import BigNumber from "bignumber.js";
 
 import SwapCard from "views/Swap/components/Card";
-import { ConnectButton, CopyAddressIcon } from "components";
+import { ConnectButton } from "components";
 import Page from "components/layout/Page";
 import { SwapCard as ISwapCard } from "views/Swap/components/types";
 import { WithdrawSelectCard } from "components/molecules";
@@ -34,7 +34,7 @@ import { PMM } from "lib/calc";
 import { rate, exponentiate, exponentiatedBy } from "utils/decimal";
 import { getOutAmount } from "utils/liquidity";
 import { deposit, withdraw, sendSignedTransaction } from "utils/transactions";
-import { convertDoller, formatPubkey } from "utils/utils";
+import { convertDoller } from "utils/utils";
 import { SOLSCAN_LINK } from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import { useFarmByPoolAddress, useFarmUserAccount } from "providers/farm";
@@ -42,6 +42,7 @@ import { useConfig } from "providers/config";
 import { SwapType } from "lib/state";
 import { stableDeposit } from "utils/transactions/stableDeposit";
 import { stableWithdraw } from "utils/transactions/stableWithdraw";
+import { PoolInformation } from "./PoolInformation";
 
 interface TransactionResult {
   status: boolean | null;
@@ -87,15 +88,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: spacing(3),
-  },
-  swapIcon: {
-    transform: "rotate(90deg)",
-    marginLeft: "auto",
-    marginRight: "auto",
-    marginTop: -16,
-    marginBottom: -16,
-    backgroundColor: palette.background.secondary,
-    border: `3px solid ${palette.background.primary}`,
   },
   ratePanel: {
     display: "flex",
@@ -155,21 +147,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     [breakpoints.up("sm")]: {
       padding: spacing(2),
     },
-  },
-  address: {
-    marginRight: 4,
-    color: palette.text.blue,
-    fontSize: 12,
-    lineHeight: "14.52px",
-    [breakpoints.up("sm")]: {
-      fontSize: 14,
-      lineHeight: "16.94px",
-    },
-  },
-  addressIcon: {
-    cursor: "pointer",
-    width: 20,
-    height: 20,
   },
   snackBarContent: {
     maxWidth: 421,
@@ -823,66 +800,7 @@ const Deposit: React.FC = () => {
           </Box>
         </Paper>
 
-        <Paper className={classes.root}>
-          <Box className={classes.ratePanel}>
-            <Typography className={classes.marketCondition}>ACCOUNT INFORMATION</Typography>
-            <div className={classes.divider} />
-            <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom={2}>
-              <Typography className={classes.label}>Swap Account</Typography>
-              <Box display="flex" alignItems="center">
-                <Typography color="textSecondary" variant="body1" className={classes.address}>
-                  {formatPubkey(pool.publicKey)}
-                </Typography>
-                <CopyAddressIcon width="20px" className={classes.addressIcon} />
-              </Box>
-            </Box>
-            <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom={2}>
-              <Typography className={classes.label}>Pool token Address</Typography>
-              <Box display="flex" alignItems="center">
-                <Typography color="textSecondary" variant="body1" className={classes.address}>
-                  {formatPubkey(pool.poolMintKey)}
-                </Typography>
-                <CopyAddressIcon width="20px" className={classes.addressIcon} />
-              </Box>
-            </Box>
-            <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom={2}>
-              <Typography className={classes.label}>{pool.baseTokenInfo.symbol} Address</Typography>
-              <Box display="flex" alignItems="center">
-                <Typography color="textSecondary" variant="body1" className={classes.address}>
-                  {formatPubkey(new PublicKey(pool.baseTokenInfo.address))}
-                </Typography>
-                <CopyAddressIcon width="20px" className={classes.addressIcon} />
-              </Box>
-            </Box>
-            <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom={2}>
-              <Typography className={classes.label}>{pool.quoteTokenInfo.symbol} Address</Typography>
-              <Box display="flex" alignItems="center">
-                <Typography color="textSecondary" variant="body1" className={classes.address}>
-                  {formatPubkey(new PublicKey(pool.quoteTokenInfo.address))}
-                </Typography>
-                <CopyAddressIcon width="20px" className={classes.addressIcon} />
-              </Box>
-            </Box>
-            <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom={2}>
-              <Typography className={classes.label}>{pool.baseTokenInfo.symbol} Reserves</Typography>
-              <Box display="flex" alignItems="center">
-                <Typography color="textSecondary" variant="body1" className={classes.address}>
-                  {formatPubkey(pool.base)}
-                </Typography>
-                <CopyAddressIcon width="20px" className={classes.addressIcon} />
-              </Box>
-            </Box>
-            <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom={2}>
-              <Typography className={classes.label}>{pool.quoteTokenInfo.symbol} Reserves</Typography>
-              <Box display="flex" alignItems="center">
-                <Typography color="textSecondary" variant="body1" className={classes.address}>
-                  {formatPubkey(pool.quote)}
-                </Typography>
-                <CopyAddressIcon width="20px" className={classes.addressIcon} />
-              </Box>
-            </Box>
-          </Box>
-        </Paper>
+        <PoolInformation pool={pool} />
       </Container>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
