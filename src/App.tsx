@@ -75,11 +75,13 @@ const updateWallet = (() => {
   let walletAddress = null;
 
   return async (address: PublicKey, referralCode: string) => {
-
     if (address !== null && !walletAddress) {
+      try {
+        const res = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/check_record/" + address.toString());
+        if (!res.ok) {
+          return;
+        }
 
-      const res = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/check_record/" + address.toString());
-      if (res.ok) {
         const resJson = await res.json();
         if (resJson.exist) {
           return;
@@ -87,35 +89,36 @@ const updateWallet = (() => {
 
         const updateRes = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/new_wallet", {
           headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            Accept: "application/json",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             wallet_address: address.toString(),
-            referral_code: referralCode
+            referral_code: referralCode,
           }),
           method: "POST",
-          credentials: "include"
+          credentials: "include",
         });
 
         if (updateRes.ok) {
           walletAddress = address.toString();
         }
+      } catch (err) {
+        console.warn(err);
       }
     }
   };
 })();
 
-const App: React.FC<{params: string}> = ({ params }) => {
-
+const App: React.FC<{ params: string }> = ({ params }) => {
   const { setConfigAddress } = useConfig();
   const { setSchemas } = usePools();
   const { setSchemas: setFarmSchema } = useFarmPools();
   const { setNetwork } = useCustomConnection();
   const { setFilters } = usePyth();
-  const validCountry = FilterCountry();
+  const validCountry = window.location.origin.includes("localhost") || FilterCountry();
 
-  const { connected: isConnectedWallet, publicKey} = useWallet();
+  const { connected: isConnectedWallet, publicKey } = useWallet();
 
   useEffect(() => {
     setConfigAddress(MARKET_CONFIG_ADDRESS);
@@ -123,40 +126,38 @@ const App: React.FC<{params: string}> = ({ params }) => {
     setFarmSchema(farmPools);
     setNetwork(network);
     setFilters(listSymbols(pools));
-  },[setConfigAddress, setSchemas, setFarmSchema, setNetwork, setFilters]);
+  }, [setConfigAddress, setSchemas, setFarmSchema, setNetwork, setFilters]);
 
   useEffect(() => {
     updateWallet(publicKey, parseQueryParams(params).referral_code);
   }, [isConnectedWallet, publicKey, params]);
 
   return (
-    <React.Fragment>
-      <BrowserRouter>
-        <Header />
-        <SuspenseWithChunkError fallback={<PageLoader />}>
-          {validCountry ? (
-            <Switch>
-              <Redirect exact from="/" to="/swap" />
-              <Route path="/swap" exact component={Swap} />
-              <Route path="/pools" exact component={Pool} />
-              <Route path="/deposit/:poolAddress" exact component={Deposit} />
-              <Route path="/farms" exact component={Farm} />
-              <Route path="/rewards" exact component={Reward} />
-              <Route path="/stake/:id" exact component={Stake} />
-              <Route path="/terms" exact component={Terms} />
-              <Redirect from="*" to="/swap" />
-            </Switch>
-          ) : (
-            <Switch>
-              <Redirect exact from="/" to="/unavailable" />
-              <Route path="/unavailable" exact component={Unavailable} />
-              <Redirect from="*" to="/unavailable" />
-            </Switch>
-          )}
-        </SuspenseWithChunkError>
-        <Footer />
-      </BrowserRouter>
-    </React.Fragment>
+    <BrowserRouter>
+      <Header />
+      <SuspenseWithChunkError fallback={<PageLoader />}>
+        {validCountry ? (
+          <Switch>
+            <Redirect exact from="/" to="/swap" />
+            <Route path="/swap" exact component={Swap} />
+            <Route path="/pools" exact component={Pool} />
+            <Route path="/deposit/:poolAddress" exact component={Deposit} />
+            <Route path="/farms" exact component={Farm} />
+            <Route path="/rewards" exact component={Reward} />
+            <Route path="/stake/:id" exact component={Stake} />
+            <Route path="/terms" exact component={Terms} />
+            <Redirect from="*" to="/swap" />
+          </Switch>
+        ) : (
+          <Switch>
+            <Redirect exact from="/" to="/unavailable" />
+            <Route path="/unavailable" exact component={Unavailable} />
+            <Redirect from="*" to="/unavailable" />
+          </Switch>
+        )}
+      </SuspenseWithChunkError>
+      <Footer />
+    </BrowserRouter>
   );
 };
 

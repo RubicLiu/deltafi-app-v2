@@ -44,11 +44,11 @@ import { stableDeposit } from "utils/transactions/stableDeposit";
 import { stableWithdraw } from "utils/transactions/stableWithdraw";
 
 interface TransactionResult {
-  status: boolean | null
-  action?: "deposit" | "withdraw"
-  hash?: string
-  base?: ISwapCard
-  quote?: ISwapCard
+  status: boolean | null;
+  action?: "deposit" | "withdraw";
+  hash?: string;
+  base?: ISwapCard;
+  quote?: ISwapCard;
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
@@ -218,9 +218,9 @@ const Deposit: React.FC = () => {
   const { setMenu } = useModal();
   const [withdrawPercentage, setWithdrawPercentage] = useState(0);
   const [state, setState] = useState<{
-    open: boolean
-    vertical: "bottom" | "top"
-    horizontal: "left" | "center" | "right"
+    open: boolean;
+    vertical: "bottom" | "top";
+    horizontal: "left" | "center" | "right";
   }>({
     open: false,
     vertical: "bottom",
@@ -244,7 +244,7 @@ const Deposit: React.FC = () => {
     status: null,
   });
   const { network } = useCustomConnection();
-  
+
   useEffect(() => {
     if (pool) {
       setBase((base) => ({ ...base, token: pool.baseTokenInfo }));
@@ -289,7 +289,10 @@ const Deposit: React.FC = () => {
 
   const sharePrice = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals).multipliedBy(share).div(100);
+      return pmm
+        .tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals)
+        .multipliedBy(share)
+        .div(100);
     }
     return new BigNumber(0);
   }, [pmm, basePrice, quotePrice, share, pool]);
@@ -479,13 +482,7 @@ const Deposit: React.FC = () => {
 
       if (pool) {
         if (method === "deposit") {
-          const outAmount = getOutAmount(
-            pool,
-            card.amount,
-            card.token.address,
-            quote.token.address,
-            0.0,
-          );
+          const outAmount = getOutAmount(pool, card.amount, card.token.address, quote.token.address, 0.0);
           setQuote({
             ...quote,
             amount: isNaN(outAmount) ? "" : Number(outAmount).toString(),
@@ -513,13 +510,7 @@ const Deposit: React.FC = () => {
 
       if (pool) {
         if (method === "deposit") {
-          const outAmount = getOutAmount(
-            pool,
-            card.amount,
-            card.token.address,
-            base.token.address,
-            0.0,
-          );
+          const outAmount = getOutAmount(pool, card.amount, card.token.address, base.token.address, 0.0);
           setBase({
             ...base,
             amount: isNaN(outAmount) ? "" : Number(outAmount).toString(),
@@ -543,7 +534,11 @@ const Deposit: React.FC = () => {
   const handleWithdrawSlider = useCallback(
     (value: number) => {
       if (pmm && share) {
-        const [baseAmount, quoteAmount] = pmm.amountFromShare((share.toNumber() * value) / 100, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
+        const [baseAmount, quoteAmount] = pmm.amountFromShare(
+          (share.toNumber() * value) / 100,
+          pool.baseTokenInfo.decimals,
+          pool.quoteTokenInfo.decimals,
+        );
         setBase({ ...base, amount: baseAmount.toString() });
         setQuote({ ...quote, amount: quoteAmount.toString() });
       }
@@ -748,29 +743,29 @@ const Deposit: React.FC = () => {
             </Box>
           </Box>
           {method === "withdraw" ? (
-              <Box display="flex" flexDirection="column" alignItems="flex-end">
-                <WithdrawSelectCard percentage={withdrawPercentage} onUpdatePercentage={handleWithdrawSlider} />
-                <WithdrawCard
-                  card={base}
-                  handleChangeCard={handleTokenFromInput}
-                  withdrawal={baseShare?.toFixed(6).toString()}
-                  disableDrop={true}
-                />
-                <Box mt={1} />
-                <WithdrawCard
-                  card={quote}
-                  handleChangeCard={handleTokenToInput}
-                  withdrawal={quoteShare?.toFixed(6).toString()}
-                  disableDrop={true}
-                />
-              </Box>
-            ) : (
-              <Box display="flex" flexDirection="column" alignItems="flex-end">
-                <SwapCard card={base} handleChangeCard={handleTokenFromInput} disableDrop={true} />
-                <Box mt={1} />
-                <SwapCard card={quote} handleChangeCard={handleTokenToInput} disableDrop={true} />
-              </Box>
-            )}
+            <Box display="flex" flexDirection="column" alignItems="flex-end">
+              <WithdrawSelectCard percentage={withdrawPercentage} onUpdatePercentage={handleWithdrawSlider} />
+              <WithdrawCard
+                card={base}
+                handleChangeCard={handleTokenFromInput}
+                withdrawal={baseShare?.toFixed(6).toString()}
+                disableDrop={true}
+              />
+              <Box mt={1} />
+              <WithdrawCard
+                card={quote}
+                handleChangeCard={handleTokenToInput}
+                withdrawal={quoteShare?.toFixed(6).toString()}
+                disableDrop={true}
+              />
+            </Box>
+          ) : (
+            <Box display="flex" flexDirection="column" alignItems="flex-end">
+              <SwapCard card={base} handleChangeCard={handleTokenFromInput} disableDrop={true} />
+              <Box mt={1} />
+              <SwapCard card={quote} handleChangeCard={handleTokenToInput} disableDrop={true} />
+            </Box>
+          )}
           <Box mt={3} width="100%" sx={{ position: "relative", zIndex: 1 }}>
             {actionButton}
           </Box>
