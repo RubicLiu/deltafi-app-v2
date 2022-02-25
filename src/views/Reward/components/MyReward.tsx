@@ -185,7 +185,7 @@ const MyReward: React.FC<MyRewardProps> = (props) => {
           </Typography>
           <Box style={{ textAlign: "right" }}>
             <MainSpan>
-              <SpotSpan>{detail.claimedAmount}</SpotSpan> / <SubSpan>{detail.totalAmount}DLT</SubSpan>
+              <SpotSpan>{detail.claimedAmount}</SpotSpan> / <SubSpan>{detail.totalAmount}DELFI</SubSpan>
             </MainSpan>
             <Typography variant="caption" className={classes.textColor}>
               <SpotSpan>{detail.claimed}%</SpotSpan> has claimed
@@ -207,7 +207,7 @@ const MyReward: React.FC<MyRewardProps> = (props) => {
               {detail.history.map((row, index) => (
                 <TableRow key={index}>
                   <TableCell>{row.date}</TableCell>
-                  <TableCell>{row.rewards} DLT</TableCell>
+                  <TableCell>{row.rewards} DELFI</TableCell>
                   <TableCell>
                     <Box className={classes.lockupBox}>
                       <LinearProgress

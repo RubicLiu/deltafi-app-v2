@@ -130,30 +130,30 @@ const Home: React.FC = (props): ReactElement => {
             DeltaFi Liquidity Mining
           </Typography>
           <Typography className={classes.description}>
-            Deposit your Liquidity Provider tokens to receive DLT, the DeltaFi governance token.
+            Deposit your Liquidity Provider tokens to receive DELFI, the DeltaFi governance token.
           </Typography>
           <Box display="flex" alignItems="center" mt={2}>
             <Typography className={classes.description}>Read more about</Typography>
             <Link
-              href="/DLT"
+              href="/DELFI"
               target="_blank"
               rel="noreferrer noopener"
               underline="always"
               className={classes.link}
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
-              data-amp-analytics-attrs="page: Farms, target: DLT"
+              data-amp-analytics-attrs="page: Farms, target: DELFI"
             >
-              DLT
+              DELFI
               <LinkIcon className={classes.linkIcon} isDark={isDark} />
             </Link>
           </Box>
         </Box>
         <Box display="flex" justifyContent="space-between" mt={2}>
-          <Typography className={classes.title}>Last DLT Price: US$ 0.08581</Typography>
+          <Typography className={classes.title}>Last DELFI Price: US$ 0.08581</Typography>
           <Typography color="secondary">
             <Link
-              href="/DLT"
+              href="/DELFI"
               target="_blank"
               rel="noreferrer noopener"
               underline="none"

@@ -115,7 +115,7 @@ const UnstakeTransaction = ({ ...props }) => {
             </IconWrapper>
             <Wrapper className="unit">
               <Text color={isDark ? "#FFFFFF" : "#000000"} fontFamily="'Inter', sans-serif" className="stake-symbol">
-                DLT
+                DELFI
               </Text>
               <Text color={isDark ? "#999999" : "#999999"} fontFamily="'Inter', sans-serif" className="stake-unit">
                 {farm?.stakingToken?.symbol || ""} - {farm?.earningToken?.symbol || ""} Del...

@@ -385,7 +385,7 @@ const Stake = (): ReactElement => {
           </Box>
           <Box>
             <Typography>Pool Rate</Typography>
-            <Typography>{poolRate} DLT / day</Typography>
+            <Typography>{poolRate} DELFI / day</Typography>
           </Box>
         </Box>
 
@@ -400,14 +400,14 @@ const Stake = (): ReactElement => {
             </Typography>
             <Box display="flex" alignItems="center" mt={3}>
               <Link
-                href="/DLT"
+                href="/DELFI"
                 target="_blank"
                 rel="noreferrer noopener"
                 underline="always"
                 className={classes.link}
                 data-amp-analytics-on="click"
                 data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Farms, target: DLT"
+                data-amp-analytics-attrs="page: Farms, target: DELFI"
               >
                 Deposit into the {farmPool.name} Pool
                 <LinkIcon className={classes.linkIcon} isDark width="15px" />
@@ -420,7 +420,7 @@ const Stake = (): ReactElement => {
           <Typography className={classes.title}>Your Liquidity Staked</Typography>
           <Box className={classes.cardBottom}>
             <Typography className={classes.amount}>{depositAmount.toString()}</Typography>
-            <Typography className={classes.amount}>{farmPool.name} DLT</Typography>
+            <Typography className={classes.amount}>{farmPool.name} DELFI</Typography>
           </Box>
         </Box>
         <Box className={classes.unclaimedToken}>
