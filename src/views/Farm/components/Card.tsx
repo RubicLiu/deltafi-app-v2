@@ -92,7 +92,10 @@ const FarmCard: React.FC<CardProps> = (props) => {
 
   const tvl = useMemo(() => {
     if (swapPool && farmPool && basePrice && quotePrice && lpMint && pmm) {
-      return pmm.tvl(basePrice, quotePrice, swapPool.baseTokenInfo.decimals, swapPool.quoteTokenInfo.decimals).multipliedBy(farmPool.reservedAmount.toString()).dividedBy(lpMint.supply);
+      return pmm
+        .tvl(basePrice, quotePrice, swapPool.baseTokenInfo.decimals, swapPool.quoteTokenInfo.decimals)
+        .multipliedBy(farmPool.reservedAmount.toString())
+        .dividedBy(lpMint.supply);
     }
     return 0;
   }, [swapPool, farmPool, basePrice, quotePrice, pmm, lpMint]);
@@ -102,8 +105,9 @@ const FarmCard: React.FC<CardProps> = (props) => {
       const apr = exponentiatedBy(
         exponentiate(
           new BigNumber(farmPool.aprNumerator.toString()).div(new BigNumber(farmPool.aprDenominator.toString())),
-          swapPool.baseTokenInfo.decimals),
-        deltafiTokenDecimals
+          swapPool.baseTokenInfo.decimals,
+        ),
+        deltafiTokenDecimals,
       );
       return new BigNumber(1).plus(apr.dividedBy(365)).pow(365).minus(1).multipliedBy(100).toFixed(2);
     }

@@ -12,19 +12,19 @@ import { SwapCard } from "views/Swap/components/types";
 import { getTokenInfo } from "providers/tokens";
 
 export interface SettingsProps {
-  priceImpact: string
-  isIncludeDecimal: boolean
-  isSmall?: boolean
-  handleChangeImpact: any
-  handleChangeInclude: any
-  handleClose: any
+  priceImpact: string;
+  isIncludeDecimal: boolean;
+  isSmall?: boolean;
+  handleChangeImpact: any;
+  handleChangeInclude: any;
+  handleClose: any;
 }
 
 export interface CardProps {
-  card: SwapCard
-  handleChangeCard: any
-  disableDrop?: boolean
-  withdrawal?: string
+  card: SwapCard;
+  handleChangeCard: any;
+  disableDrop?: boolean;
+  withdrawal?: string;
 }
 
 const WithdrawCard: React.FC<CardProps> = (props) => {
@@ -33,7 +33,7 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
 
   const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.replace(/[^\d.-]/g, "");
-   
+
     handleChangeCard({ ...card, amount: isNaN(parseFloat(value)) ? "" : value });
   };
 

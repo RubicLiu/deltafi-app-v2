@@ -18,14 +18,14 @@ export async function swap({
   rewardTokenRef,
   swapData,
 }: {
-  connection: Connection
-  walletPubkey: PublicKey
-  config: MarketConfig
-  pool: PoolInfo
-  source: ExTokenAccount
-  destinationRef?: PublicKey
-  rewardTokenRef?: PublicKey
-  swapData: SwapData
+  connection: Connection;
+  walletPubkey: PublicKey;
+  config: MarketConfig;
+  pool: PoolInfo;
+  source: ExTokenAccount;
+  destinationRef?: PublicKey;
+  rewardTokenRef?: PublicKey;
+  swapData: SwapData;
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
     console.error("swap failed with null parameter");
@@ -39,19 +39,24 @@ export async function swap({
   let initializeWrappedTokenAccountTransaction: Transaction | undefined;
   let closeWrappedTokenAccountTransaction: Transaction | undefined;
 
+  let buySol =
+    (pool.quoteTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellBase) ||
+    (pool.baseTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellQuote);
 
-  let buySol = (pool.quoteTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellBase) || 
-  (pool.baseTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellQuote);
-
-  let sellSol = (pool.quoteTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellQuote) || 
-  (pool.baseTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellBase);
+  let sellSol =
+    (pool.quoteTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellQuote) ||
+    (pool.baseTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellBase);
 
   let sourceRef: PublicKey = source.pubkey;
 
   if (buySol || sellSol) {
-    let tmpAccountLamport = buySol ? (lamports * 2) : (Number(swapData.amountIn) + lamports * 2);
+    let tmpAccountLamport = buySol ? lamports * 2 : Number(swapData.amountIn) + lamports * 2;
 
-    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(tempAccountRefKeyPair.publicKey, tmpAccountLamport, walletPubkey);
+    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(
+      tempAccountRefKeyPair.publicKey,
+      tmpAccountLamport,
+      walletPubkey,
+    );
     createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
     initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
     closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
@@ -119,10 +124,14 @@ export async function swap({
         userTransferAuthority.publicKey,
         sourceRef,
         swapSource,
-        source.account.mint, 
+        source.account.mint,
         swapDestination,
         destinationRef,
-        new PublicKey(pool.baseTokenInfo.address === source.account.mint.toBase58() ? pool.quoteTokenInfo.address : pool.baseTokenInfo.address),
+        new PublicKey(
+          pool.baseTokenInfo.address === source.account.mint.toBase58()
+            ? pool.quoteTokenInfo.address
+            : pool.baseTokenInfo.address,
+        ),
         rewardTokenRef,
         config.deltafiToken,
         adminFeeDestination,
@@ -133,10 +142,22 @@ export async function swap({
       ),
     );
 
-  transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createDestinationAccountTransaction, createRewardAccountTransaction, transaction, closeWrappedTokenAccountTransaction]);
-  if ( buySol || sellSol ) {
-      return signTransaction({ transaction, feePayer: walletPubkey, signers: [userTransferAuthority, tempAccountRefKeyPair], connection });
+  transaction = mergeTransactions([
+    createWrappedTokenAccountTransaction,
+    initializeWrappedTokenAccountTransaction,
+    createDestinationAccountTransaction,
+    createRewardAccountTransaction,
+    transaction,
+    closeWrappedTokenAccountTransaction,
+  ]);
+  if (buySol || sellSol) {
+    return signTransaction({
+      transaction,
+      feePayer: walletPubkey,
+      signers: [userTransferAuthority, tempAccountRefKeyPair],
+      connection,
+    });
   } else {
-      return signTransaction({ transaction, feePayer: walletPubkey, signers: [userTransferAuthority], connection });
+    return signTransaction({ transaction, feePayer: walletPubkey, signers: [userTransferAuthority], connection });
   }
 }

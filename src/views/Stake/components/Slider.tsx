@@ -47,8 +47,8 @@ const CustomSlider = withStyles((theme: Theme) => ({
 }))(Slider);
 
 interface SliderProps {
-  value: number
-  onChange: (value: number) => void
+  value: number;
+  onChange: (value: number) => void;
 }
 
 const PercentageSlider: React.FC<SliderProps> = (props) => {

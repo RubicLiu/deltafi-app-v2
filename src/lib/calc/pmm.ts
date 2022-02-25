@@ -5,25 +5,25 @@ import { PoolState, Multiplier } from "../state";
 let BN = BigNumber.clone({ DECIMAL_PLACES: 2 });
 
 export class PMM implements PoolState {
-  marketPrice = new BN(0)
+  marketPrice = new BN(0);
 
-  slope = new BN(0)
+  slope = new BN(0);
 
-  baseReserve = new BN(0)
+  baseReserve = new BN(0);
 
-  quoteReserve = new BN(0)
+  quoteReserve = new BN(0);
 
-  baseTarget = new BN(0)
+  baseTarget = new BN(0);
 
-  quoteTarget = new BN(0)
+  quoteTarget = new BN(0);
 
-  totalSupply = new BN(0)
+  totalSupply = new BN(0);
 
-  multiplier = Multiplier.One
+  multiplier = Multiplier.One;
 
-  lastPythPrice = new BN(0)
+  lastPythPrice = new BN(0);
 
-  lastValidPythPriceSlot = new BN(0)
+  lastValidPythPriceSlot = new BN(0);
 
   constructor(state: PoolState) {
     this.marketPrice = new BN(state.marketPrice);
@@ -261,7 +261,7 @@ export class PMM implements PoolState {
     if (targetReserve.isLessThanOrEqualTo(0)) return new BigNumber(0);
     if (quoteAmount.isZero()) return new BigNumber(0);
     if (slope.isGreaterThan(1)) return;
- 
+
     const fairAmount = quoteAmount.multipliedBy(marketPrice);
     if (slope.isZero()) return BigNumber.min(fairAmount, currentReserve);
     if (slope.isEqualTo(1)) {

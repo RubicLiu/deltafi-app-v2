@@ -99,7 +99,7 @@ const StakeCard: React.FC<CardProps> = (props) => {
       const realAmount = tokenBalance.multipliedBy(new BigNumber(percentage)).dividedBy(new BigNumber(100));
       handleChangeCard({
         ...card,
-        amount: realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString()
+        amount: realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString(),
       });
     }
   }, [card, handleChangeCard, percentage, tokenBalance]);
@@ -151,7 +151,9 @@ const StakeCard: React.FC<CardProps> = (props) => {
         />
       </Box>
       <Box display="flex" justifyContent="space-between">
-        <Typography className={classes.tokenBalance}>{`Available LP tokens: ${tokenBalance?.toString() ?? "--"}`}</Typography>
+        <Typography className={classes.tokenBalance}>{`Available LP tokens: ${
+          tokenBalance?.toString() ?? "--"
+        }`}</Typography>
         <Typography className={classes.tokenBalance}>{amountPercentage}</Typography>
       </Box>
     </Paper>

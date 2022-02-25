@@ -36,7 +36,7 @@ const InputBlock = styled.div`
     background: transparent;
     outline: none;
     font-size: 24px;
-    font-family: 'PT Mono';
+    font-family: "PT Mono";
     color: #515369;
     width: 100%;
     margin-right: 5px;

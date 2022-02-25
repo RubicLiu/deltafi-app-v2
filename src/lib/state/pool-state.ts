@@ -14,16 +14,16 @@ export enum Multiplier {
 }
 
 export interface PoolState {
-  marketPrice: BigNumber
-  slope: BigNumber
-  baseReserve: BigNumber
-  quoteReserve: BigNumber
-  baseTarget: BigNumber
-  quoteTarget: BigNumber
-  totalSupply: BigNumber
-  multiplier: Multiplier
-  lastPythPrice: BigNumber
-  lastValidPythPriceSlot: BigNumber
+  marketPrice: BigNumber;
+  slope: BigNumber;
+  baseReserve: BigNumber;
+  quoteReserve: BigNumber;
+  baseTarget: BigNumber;
+  quoteTarget: BigNumber;
+  totalSupply: BigNumber;
+  multiplier: Multiplier;
+  lastPythPrice: BigNumber;
+  lastValidPythPriceSlot: BigNumber;
 }
 
 /** @internal */

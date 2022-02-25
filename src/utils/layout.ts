@@ -4,19 +4,19 @@ import { blob, Layout, u8 } from "buffer-layout";
 import { toBigIntLE, toBufferLE } from "bigint-buffer";
 import { WAD } from "constants/index";
 
-export type Parser<T> = (data: Buffer) => T | undefined
+export type Parser<T> = (data: Buffer) => T | undefined;
 
 export type AccountParser<T> = (info: AccountInfo<Buffer>) =>
   | {
-      info: AccountInfo<Buffer>
-      data: T
+      info: AccountInfo<Buffer>;
+      data: T;
     }
-  | undefined
+  | undefined;
 
 /** @internal */
 export interface EncodeDecode<T> {
-  decode: (buffer: Buffer, offset?: number) => T
-  encode: (src: T, buffer: Buffer, offset?: number) => number
+  decode: (buffer: Buffer, offset?: number) => T;
+  encode: (src: T, buffer: Buffer, offset?: number) => number;
 }
 
 /** @internal */

@@ -2,15 +2,15 @@ import { struct, u8 } from "buffer-layout";
 import { u64 } from "utils/layout";
 
 export interface DepositData {
-  amountTokenA: bigint
-  amountTokenB: bigint
-  amountMintMin: bigint
+  amountTokenA: bigint;
+  amountTokenB: bigint;
+  amountMintMin: bigint;
 }
 
 export interface SwapData {
-  amountIn: bigint
-  minimumAmountOut: bigint
-  swapDirection: SWAP_DIRECTION
+  amountIn: bigint;
+  minimumAmountOut: bigint;
+  swapDirection: SWAP_DIRECTION;
 }
 
 export enum SWAP_DIRECTION {
@@ -23,12 +23,11 @@ export const SwapDataLayout = struct<SwapData>(
   [u64("amountIn"), u64("minimumAmountOut"), u8("swapDirection")],
   "swapData",
 );
-  
 
 export interface DepositData {
-  amountTokenA: bigint
-  amountTokenB: bigint
-  amountMintMin: bigint
+  amountTokenA: bigint;
+  amountTokenB: bigint;
+  amountMintMin: bigint;
 }
 
 /** @internal */
@@ -38,9 +37,9 @@ export const DepositDataLayout = struct<DepositData>(
 );
 
 export interface WithdrawData {
-  amountPoolToken: bigint
-  minAmountTokenA: bigint
-  minAmountTokenB: bigint
+  amountPoolToken: bigint;
+  minAmountTokenA: bigint;
+  minAmountTokenB: bigint;
 }
 
 /** @internal */

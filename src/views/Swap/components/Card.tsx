@@ -107,7 +107,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
       const realAmount = tokenBalance.multipliedBy(new BigNumber(percentage)).dividedBy(new BigNumber(100));
       handleChangeCard({
         ...card,
-        amount: realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString()
+        amount: realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString(),
       });
     }
   }, [card, handleChangeCard, percentage, tokenBalance]);

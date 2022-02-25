@@ -13,12 +13,12 @@ import { useDarkMode } from "providers/theme";
 import { usePoolFromAddress } from "providers/pool";
 
 interface TabPanelProps {
-  children?: React.ReactNode
-  index: any
-  value: any
+  children?: React.ReactNode;
+  index: any;
+  value: any;
 }
 interface DarkProps {
-  readonly isDark: boolean
+  readonly isDark: boolean;
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({

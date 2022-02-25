@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { BLOG_LINK, TWITTER_LINK, GITHUB_LINK, DISCORD_LINK } from "constants/index";
 
 interface Props {
-  isDark: boolean
+  isDark: boolean;
 }
 
 export const StyledLink = styled.a`

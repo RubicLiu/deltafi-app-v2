@@ -67,11 +67,13 @@ export const sendAndConfirmTransaction = async (
   return txSig;
 };
 
-
-const filteredProgramAccountsCache: Record<string, {
-  pubkey: PublicKey;
-  account: AccountInfo<Buffer>;
-}[]> = {};
+const filteredProgramAccountsCache: Record<
+  string,
+  {
+    pubkey: PublicKey;
+    account: AccountInfo<Buffer>;
+  }[]
+> = {};
 
 export async function getFilteredProgramAccounts(
   connection: Connection,
@@ -80,11 +82,10 @@ export async function getFilteredProgramAccounts(
 ): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
   let resp = null;
 
-  const keyHash = hash.keys({programId: programId, filters: filters});
+  const keyHash = hash.keys({ programId: programId, filters: filters });
   if (filteredProgramAccountsCache[keyHash]) {
     resp = filteredProgramAccountsCache[keyHash];
-  }
-  else {
+  } else {
     // @ts-ignore
     resp = await connection._rpcRequest("getProgramAccounts", [
       programId.toBase58(),
@@ -97,12 +98,11 @@ export async function getFilteredProgramAccounts(
 
     if (resp.error) {
       throw new Error(resp.error.message);
-    } 
-    else {
+    } else {
       filteredProgramAccountsCache[keyHash] = resp;
     }
   }
-  
+
   // @ts-ignore
   return resp.result.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
     publicKey: new PublicKey(pubkey),

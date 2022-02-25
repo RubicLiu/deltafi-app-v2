@@ -2,18 +2,16 @@
 import { poolInfo, network } from "./config.json";
 
 export interface TokenInfo {
-  chainId: number
-  address: string
-  symbol: string
-  name: string
-  decimals: number
-  logoURI: string
+  chainId: number;
+  address: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  logoURI: string;
 }
 
-export const tokens: TokenInfo[] =
-{
-  "mainnet-beta":
-  [
+export const tokens: TokenInfo[] = {
+  "mainnet-beta": [
     {
       chainId: 101,
       address: "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt",
@@ -39,7 +37,7 @@ export const tokens: TokenInfo[] =
       name: "USD Coin",
       decimals: 6,
       logoURI:
-      "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
+        "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
     },
     {
       chainId: 101,
@@ -48,12 +46,11 @@ export const tokens: TokenInfo[] =
       name: "USDT",
       decimals: 6,
       logoURI:
-      "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png",
+        "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png",
     },
   ],
 
-  "testnet":
-  [
+  testnet: [
     {
       chainId: 101,
       address: "HMCW6tEvAJirwTGbdhpcsv8eFBiNS4Ti6rwMbf5VyAUv",
@@ -79,7 +76,7 @@ export const tokens: TokenInfo[] =
       name: "USDC",
       decimals: 9,
       logoURI:
-      "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
+        "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
     },
     {
       chainId: 101,
@@ -88,17 +85,16 @@ export const tokens: TokenInfo[] =
       name: "USDT",
       decimals: 9,
       logoURI:
-      "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png",
+        "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png",
     },
-  ]
+  ],
 }[network];
 
-
-export const lpTokens: TokenInfo[] = poolInfo.map(({name, mint, decimals}) => ({
+export const lpTokens: TokenInfo[] = poolInfo.map(({ name, mint, decimals }) => ({
   chainId: 101,
   address: mint,
   symbol: name,
   name: "LP " + name,
   decimals: decimals,
-  logoURI: " "
+  logoURI: " ",
 }));

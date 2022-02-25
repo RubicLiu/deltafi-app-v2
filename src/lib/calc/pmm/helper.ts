@@ -133,7 +133,6 @@ export const solveQuadraticFunctionForTrade = (
   i: BigNumber,
   k: BigNumber,
 ): BigNumber => {
-
   if (V0.lte(0)) throw new Error("TARGET_IS_ZERO");
   if (delta.eq(0)) return delta;
 

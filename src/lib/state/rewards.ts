@@ -2,11 +2,11 @@ import { struct } from "buffer-layout";
 import { bool, u64 } from "utils/layout";
 
 export interface Rewards {
-  isInitialized: boolean
-  threshold: bigint
-  tradeRewardNumerator: bigint
-  tradeRewardDenominator: bigint
-  tradeRewardCap: bigint
+  isInitialized: boolean;
+  threshold: bigint;
+  tradeRewardNumerator: bigint;
+  tradeRewardDenominator: bigint;
+  tradeRewardCap: bigint;
 }
 
 /** @internal */

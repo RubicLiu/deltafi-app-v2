@@ -6,19 +6,18 @@ const pageLoadTime = new Date();
 
 const globalCache: Map<any, any> = new Map();
 
-
 class FetchLoopListener<T = any> {
-  cacheKey: any
+  cacheKey: any;
 
-  fn: () => Promise<T>
+  fn: () => Promise<T>;
 
-  refreshInterval: number
+  refreshInterval: number;
 
-  refreshIntervalOnError: number | null
+  refreshIntervalOnError: number | null;
 
-  callback: () => void
+  callback: () => void;
 
-  cacheNullValues: Boolean = true
+  cacheNullValues: Boolean = true;
 
   constructor(
     cacheKey: any,
@@ -38,20 +37,19 @@ class FetchLoopListener<T = any> {
 }
 
 class FetchLoopInternal<T = any> {
-  cacheKey: any
+  cacheKey: any;
 
-  fn: () => Promise<T>
+  fn: () => Promise<T>;
 
-  timeoutId: null | any
+  timeoutId: null | any;
 
-  listeners: Set<FetchLoopListener<T>>
+  listeners: Set<FetchLoopListener<T>>;
 
-  errors: number
+  errors: number;
 
-  cacheNullValues: Boolean = true
+  cacheNullValues: Boolean = true;
 
   constructor(cacheKey: any, fn: () => Promise<T>, cacheNullValues: Boolean) {
-
     this.cacheKey = cacheKey;
     this.fn = fn;
     this.timeoutId = null;
@@ -133,9 +131,8 @@ class FetchLoopInternal<T = any> {
       ++this.errors;
       console.warn(error);
       errored = true;
-      lastStatus = error instanceof Error ? error.stack?.includes("429 Too Many Requests") ? 429 : 404 : 404;
+      lastStatus = error instanceof Error ? (error.stack?.includes("429 Too Many Requests") ? 429 : 404) : 404;
     } finally {
-
       if (!this.timeoutId && !this.stopped) {
         let waitTime = this.refreshInterval;
 
@@ -159,18 +156,18 @@ class FetchLoopInternal<T = any> {
           waitTime = 60000;
         } else if (!document.hasFocus()) {
           waitTime *= 1.5;
-        } 
+        }
 
         // Add jitter so we don't send all requests at the same time.
         waitTime *= 0.8 + 0.4 * Math.random();
         this.timeoutId = setTimeout(this.refresh, waitTime);
       }
     }
-  }
+  };
 }
 
 class FetchLoops {
-  loops = new Map()
+  loops = new Map();
 
   addListener<T>(listener: FetchLoopListener<T>) {
     if (!this.loops.has(listener.cacheKey)) {

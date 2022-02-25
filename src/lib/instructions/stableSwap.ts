@@ -1,7 +1,14 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { struct, u8 } from "buffer-layout";
-import { SwapData, SwapDataLayout, DepositData, DepositDataLayout, WithdrawData, WithdrawDataLayout} from "./dataLayout";
+import {
+  SwapData,
+  SwapDataLayout,
+  DepositData,
+  DepositDataLayout,
+  WithdrawData,
+  WithdrawDataLayout,
+} from "./dataLayout";
 
 export enum StableSwapInstruction {
   Initialize = 10,

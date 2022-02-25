@@ -16,23 +16,23 @@ export enum SwapType {
 }
 
 export interface SwapInfo {
-  isInitialized: boolean
-  isPaused: boolean
-  nonce: number
-  swapType: SwapType
-  configKey: PublicKey
-  tokenA: PublicKey
-  tokenB: PublicKey
-  pythA: PublicKey
-  pythB: PublicKey
-  poolMint: PublicKey
-  tokenMintA: PublicKey
-  tokenMintB: PublicKey
-  adminFeeKeyA: PublicKey
-  adminFeeKeyB: PublicKey
-  fees: Fees
-  rewards: Rewards
-  poolState: PoolState
+  isInitialized: boolean;
+  isPaused: boolean;
+  nonce: number;
+  swapType: SwapType;
+  configKey: PublicKey;
+  tokenA: PublicKey;
+  tokenB: PublicKey;
+  pythA: PublicKey;
+  pythB: PublicKey;
+  poolMint: PublicKey;
+  tokenMintA: PublicKey;
+  tokenMintB: PublicKey;
+  adminFeeKeyA: PublicKey;
+  adminFeeKeyB: PublicKey;
+  fees: Fees;
+  rewards: Rewards;
+  poolState: PoolState;
 }
 
 /** @internal */

@@ -5,69 +5,69 @@ import React from "react";
 declare module "@material-ui/core/styles/createTheme" {
   export interface Theme {
     status?: {
-      danger: React.CSSProperties["color"]
-    }
+      danger: React.CSSProperties["color"];
+    };
   }
   export interface ThemeOptions {
     status?: {
-      danger: React.CSSProperties["color"]
-    }
+      danger: React.CSSProperties["color"];
+    };
   }
 }
 
 declare module "@material-ui/core/styles/createPalette" {
   export interface Palette {
     gradient?: {
-      cta: React.CSSProperties["color"]
-      btnCta?: React.CSSProperties["color"]
-      ctaContained?: React.CSSProperties["color"]
-      logo?: React.CSSProperties["color"]
-    }
+      cta: React.CSSProperties["color"];
+      btnCta?: React.CSSProperties["color"];
+      ctaContained?: React.CSSProperties["color"];
+      logo?: React.CSSProperties["color"];
+    };
     tertiary?: {
-      main: React.CSSProperties["color"]
-    }
+      main: React.CSSProperties["color"];
+    };
   }
   export interface PaletteOptions {
     gradient?: {
-      cta: React.CSSProperties["color"]
-      btnCta?: React.CSSProperties["color"]
-      ctaContained?: React.CSSProperties["color"]
-      logo?: React.CSSProperties["color"]
-    }
+      cta: React.CSSProperties["color"];
+      btnCta?: React.CSSProperties["color"];
+      ctaContained?: React.CSSProperties["color"];
+      logo?: React.CSSProperties["color"];
+    };
     tertiary?: {
-      main: React.CSSProperties["color"]
-    }
+      main: React.CSSProperties["color"];
+    };
   }
   export interface TypeBackground {
-    bgImage?: React.CSSProperties["background"]
-    investorBg?: string
-    primary?: React.CSSProperties["color"]
-    secondary?: React.CSSProperties["color"]
-    tertiary?: React.CSSProperties["color"]
-    black?: React.CSSProperties["color"]
-    lightBlack?: React.CSSProperties["color"]
+    bgImage?: React.CSSProperties["background"];
+    investorBg?: string;
+    primary?: React.CSSProperties["color"];
+    secondary?: React.CSSProperties["color"];
+    tertiary?: React.CSSProperties["color"];
+    black?: React.CSSProperties["color"];
+    lightBlack?: React.CSSProperties["color"];
   }
   export interface TypeBackgroundOptions {
-    bgImage?: React.CSSProperties["background"]
-    investorBg?: string
-    primary?: React.CSSProperties["color"]
-    secondary?: React.CSSProperties["color"]
-    tertiary?: React.CSSProperties["color"]
-    black?: React.CSSProperties["color"]
-    lightBlack?: React.CSSProperties["color"]
+    bgImage?: React.CSSProperties["background"];
+    investorBg?: string;
+    primary?: React.CSSProperties["color"];
+    secondary?: React.CSSProperties["color"];
+    tertiary?: React.CSSProperties["color"];
+    black?: React.CSSProperties["color"];
+    lightBlack?: React.CSSProperties["color"];
   }
   export interface TypeText {
-    crypto?: React.CSSProperties["color"]
-    dark?: React.CSSProperties["color"]
-    link?: React.CSSProperties["color"]
-    success?: React.CSSProperties["color"]
-    blue?: React.CSSProperties["color"]
+    crypto?: React.CSSProperties["color"];
+    dark?: React.CSSProperties["color"];
+    link?: React.CSSProperties["color"];
+    success?: React.CSSProperties["color"];
+    blue?: React.CSSProperties["color"];
   }
   export interface TypeTextOptions {
-    crypto?: React.CSSProperties["color"]
-    link?: React.CSSProperties["color"]
-    success?: React.CSSProperties["color"]
-    blue?: React.CSSProperties["color"]
+    crypto?: React.CSSProperties["color"];
+    link?: React.CSSProperties["color"];
+    success?: React.CSSProperties["color"];
+    blue?: React.CSSProperties["color"];
   }
 }
 
@@ -117,7 +117,7 @@ const darkTheme: Theme = createTheme({
       main: "#C3C5CA",
     },
     background: {
-      bgImage: "url(\"/images/bg.png\") center center / 100% 100% no-repeat",
+      bgImage: 'url("/images/bg.png") center center / 100% 100% no-repeat', // eslint-disable-line
       investorBg: "url(/images/investors-bg-dark.png)",
       primary: "#1D1A27",
       secondary: "#2F2C3E",
@@ -164,7 +164,7 @@ const lightTheme: Theme = createTheme({
       main: "#C3C5CA",
     },
     background: {
-      bgImage: "url(\"/images/light-bg.png\") center center / 100% 100% no-repeat",
+      bgImage: 'url("/images/light-bg.png") center center / 100% 100% no-repeat', // eslint-disable-line
       investorBg: "url(/images/investors-bg-light.png)",
       primary: "#FFFFFF",
       secondary: "rgb(235, 236, 241)",

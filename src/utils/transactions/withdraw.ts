@@ -24,18 +24,18 @@ export async function withdraw({
   farmPool,
   farmUser,
 }: {
-  connection: Connection
-  walletPubkey: PublicKey
-  poolTokenAccount: ExTokenAccount
-  pool: PoolInfo
-  baseTokenRef?: PublicKey
-  quteTokenRef?: PublicKey
-  basePricePythKey: PublicKey
-  quotePricePythKey: PublicKey
-  withdrawData: WithdrawData
-  config: MarketConfig
-  farmPool?: PublicKey
-  farmUser?: PublicKey
+  connection: Connection;
+  walletPubkey: PublicKey;
+  poolTokenAccount: ExTokenAccount;
+  pool: PoolInfo;
+  baseTokenRef?: PublicKey;
+  quteTokenRef?: PublicKey;
+  basePricePythKey: PublicKey;
+  quotePricePythKey: PublicKey;
+  withdrawData: WithdrawData;
+  config: MarketConfig;
+  farmPool?: PublicKey;
+  farmUser?: PublicKey;
 }) {
   if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
     console.error("withdraw failed with null parameter");
@@ -54,15 +54,18 @@ export async function withdraw({
   if (baseSOL || quoteSOL) {
     const tmpAccountLamport = lamports * 2;
 
-    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(tempAccountRefKeyPair.publicKey, tmpAccountLamport, walletPubkey);
+    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(
+      tempAccountRefKeyPair.publicKey,
+      tmpAccountLamport,
+      walletPubkey,
+    );
     createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
     initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
     closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
 
     if (baseSOL) {
       baseTokenRef = tempAccountRefKeyPair.publicKey;
-    }
-    else {
+    } else {
       quteTokenRef = tempAccountRefKeyPair.publicKey;
     }
   }
@@ -132,19 +135,20 @@ export async function withdraw({
       config,
     });
     transaction = mergeTransactions([createFarmUserTransaction, transaction]);
-    transaction.add(
-      createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [
-        newFarmUser.publicKey,
-      ]),
-    );
+    transaction.add(createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [newFarmUser.publicKey]));
     signers.push(newFarmUser);
   } else {
-    transaction.add(
-      createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [farmUser]),
-    );
+    transaction.add(createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [farmUser]));
   }
 
-  transaction = mergeTransactions([createWrappedTokenAccountTransaction, initializeWrappedTokenAccountTransaction, createBaseTokenTransaction, createQuoteTokenTransaction, transaction, closeWrappedTokenAccountTransaction]);
+  transaction = mergeTransactions([
+    createWrappedTokenAccountTransaction,
+    initializeWrappedTokenAccountTransaction,
+    createBaseTokenTransaction,
+    createQuoteTokenTransaction,
+    transaction,
+    closeWrappedTokenAccountTransaction,
+  ]);
   if (baseSOL || quoteSOL) {
     signers.push(tempAccountRefKeyPair);
   }

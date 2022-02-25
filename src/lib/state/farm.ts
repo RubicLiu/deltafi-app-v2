@@ -5,16 +5,16 @@ import { AccountParser, bool, publicKey, u64 } from "utils/layout";
 import { loadAccount } from "utils/account";
 
 export interface FarmInfo {
-  isInitialized: boolean
-  bumpSeed: number
-  configKey: PublicKey
-  poolMint: PublicKey
-  poolToken: PublicKey
-  reservedAmount: bigint
-  feeNumerator: bigint
-  feeDenominator: bigint
-  aprNumerator: bigint
-  aprDenominator: bigint
+  isInitialized: boolean;
+  bumpSeed: number;
+  configKey: PublicKey;
+  poolMint: PublicKey;
+  poolToken: PublicKey;
+  reservedAmount: bigint;
+  feeNumerator: bigint;
+  feeDenominator: bigint;
+  aprNumerator: bigint;
+  aprDenominator: bigint;
 }
 
 /** @internal */
@@ -73,13 +73,13 @@ export const loadFarmInfo = async (
 };
 
 export interface FarmPosition {
-  pool: PublicKey
-  depositedAmount: bigint
-  rewardsOwed: bigint
-  rewardsEstimated: bigint
-  cumulativeInterest: bigint
-  lastUpdateTs: bigint
-  nextClaimTs: bigint
+  pool: PublicKey;
+  depositedAmount: bigint;
+  rewardsOwed: bigint;
+  rewardsEstimated: bigint;
+  cumulativeInterest: bigint;
+  lastUpdateTs: bigint;
+  nextClaimTs: bigint;
 }
 
 /** @internal */
@@ -91,24 +91,24 @@ export const FarmPositionLayout = struct<FarmPosition>([
   u64("cumulativeInterest"),
   u64("lastUpdateTs"),
   u64("nextClaimTs"),
-  u64("latestDepositSlot")
+  u64("latestDepositSlot"),
 ]);
 
 export const FARM_POSITION_SIZE = FarmPositionLayout.span;
 
 export interface FarmUser {
-  isInitialized: boolean
-  configKey: PublicKey
-  owner: PublicKey
-  positions: Array<FarmPosition>
+  isInitialized: boolean;
+  configKey: PublicKey;
+  owner: PublicKey;
+  positions: Array<FarmPosition>;
 }
 
 export interface FarmUserDataFlat {
-  isInitialized: boolean
-  configKey: PublicKey
-  owner: PublicKey
-  positionLen: number
-  dataFlat: Buffer
+  isInitialized: boolean;
+  configKey: PublicKey;
+  owner: PublicKey;
+  positionLen: number;
+  dataFlat: Buffer;
 }
 
 /** @internal */

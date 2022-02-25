@@ -3,7 +3,7 @@ import Svg from "../Svg";
 import { SvgProps } from "../types";
 
 interface GithubProps extends SvgProps {
-  isDark: boolean
+  isDark: boolean;
 }
 
 const Icon: React.FC<GithubProps> = ({ isDark, ...props }) => {

@@ -63,8 +63,8 @@ const useStyles = makeStyles(({ breakpoints }: Theme) => ({
           padding: "16px 16px 10px",
           [breakpoints.down("sm")]: {
             padding: "21px 0px 6px",
-          }
-        }
+          },
+        },
       },
     },
     [breakpoints.down("sm")]: {

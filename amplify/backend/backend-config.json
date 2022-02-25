@@ -5,9 +5,7 @@
       "serviceType": "managed",
       "providerPlugin": "awscloudformation",
       "frontendAuthConfig": {
-        "loginMechanisms": [
-          "PREFERRED_USERNAME"
-        ],
+        "loginMechanisms": ["PREFERRED_USERNAME"],
         "signupAttributes": [],
         "passwordProtectionSettings": {
           "passwordPolicyCharacters": []

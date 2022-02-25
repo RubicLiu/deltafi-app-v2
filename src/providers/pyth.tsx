@@ -6,11 +6,11 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { getMultipleAccounts } from "utils/account";
 import { PythContextValue } from "./types";
 
-import { network } from "../constants/config.json"; 
+import { network } from "../constants/config.json";
 // TODO: update pyth pubkey
 const oraclePublicKey = {
-  "mainnet-beta": "AHtgzX45WTKfkPG53L6WYhGEXwQkN1BVknET3sVsLL8J", 
-  "testnet": "AFmdnt9ng1uVxqCmqwQJDAYC5cKTkw8gJKSM5PnzuF6z"
+  "mainnet-beta": "AHtgzX45WTKfkPG53L6WYhGEXwQkN1BVknET3sVsLL8J",
+  testnet: "AFmdnt9ng1uVxqCmqwQJDAYC5cKTkw8gJKSM5PnzuF6z",
 }[network];
 
 const BAD_SYMBOLS = ["BCH/USD", "LTC/USD"];
@@ -52,8 +52,8 @@ export function PythProvider({ children }) {
 
   useEffect(() => {
     let cancelled = false;
-    const subscription_ids: number[] = []
-    ;(async () => {
+    const subscription_ids: number[] = [];
+    (async () => {
       // read mapping account
       const publicKey = new PublicKey(oraclePublicKey);
       try {
@@ -133,7 +133,7 @@ export function PythProvider({ children }) {
 }
 
 interface ISymbolMap {
-  [index: string]: object
+  [index: string]: object;
 }
 
 export const usePyth = () => {
@@ -145,9 +145,9 @@ export const usePyth = () => {
 };
 
 export function usePriceBySymbol(tokenSymbol: string | null | undefined): {
-  priceData: PriceData | null
-  priceAccountKey: PublicKey | null
-  price: number | null
+  priceData: PriceData | null;
+  priceAccountKey: PublicKey | null;
+  price: number | null;
 } {
   const { symbolMap } = usePyth();
   return useMemo(() => {
@@ -176,8 +176,8 @@ export function usePriceByAddress(address: string | null | undefined) {
   const { connection } = useConnection();
   const [price, setPrice] = useState<null | number>(null);
   useEffect(() => {
-    let subscription_id = null
-    ;(async () => {
+    let subscription_id = null;
+    (async () => {
       if (!address) return;
       const priceInfoKey = new PublicKey(address);
       try {

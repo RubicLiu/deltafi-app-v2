@@ -30,7 +30,7 @@ export function EntirePoolsProvider({ children }) {
   useEffect(() => {
     const subscription_ids: number[] = [];
     if (schemas.length > 0 && connection) {
-      ;(async () => {
+      (async () => {
         try {
           const poolInfos = await getMultipleAccounts(
             connection,
@@ -38,8 +38,6 @@ export function EntirePoolsProvider({ children }) {
             "confirmed",
           );
           const tempPools = [];
-          
-          
 
           for (let i = 0; i < poolInfos.keys.length; i++) {
             let key = poolInfos.keys[i];

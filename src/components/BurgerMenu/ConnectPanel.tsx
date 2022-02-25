@@ -49,7 +49,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }));
 
 interface ConnectProps {
-  readonly isAccept: boolean
+  readonly isAccept: boolean;
 }
 const ExternalLink = styled.a`
   color: ${({ theme }) => theme.palette.text.link};

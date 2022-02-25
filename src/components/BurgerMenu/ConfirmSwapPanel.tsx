@@ -10,7 +10,7 @@ import { getSwapOutAmount } from "utils/swap";
 import { fixedNumber } from "utils/utils";
 
 interface IConfirmSwapPanelProps {
-  children?: ReactNode
+  children?: ReactNode;
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({

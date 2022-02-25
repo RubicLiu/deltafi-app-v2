@@ -42,10 +42,10 @@ import { SwapType } from "lib/state";
 import { stableSwap } from "utils/transactions/stableSwap";
 
 interface TransactionResult {
-  status: boolean | null
-  hash?: string
-  base?: ISwapCard
-  quote?: ISwapCard
+  status: boolean | null;
+  hash?: string;
+  base?: ISwapCard;
+  quote?: ISwapCard;
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
@@ -110,7 +110,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }));
 
 const Home: React.FC = (props) => {
-
   const classes = useStyles(props);
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
@@ -138,7 +137,7 @@ const Home: React.FC = (props) => {
     }
     return null;
   }, [destinationAccount, tokenTo]);
-  
+
   const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
 
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
@@ -161,9 +160,9 @@ const Home: React.FC = (props) => {
     return "-";
   }, [basePrice, quotePrice, tokenFrom.token.symbol, pool]);
   const [state, setState] = useState<{
-    open: boolean
-    vertical: "bottom" | "top"
-    horizontal: "left" | "center" | "right"
+    open: boolean;
+    vertical: "bottom" | "top";
+    horizontal: "left" | "center" | "right";
   }>({
     open: false,
     vertical: "bottom",
@@ -405,16 +404,17 @@ const Home: React.FC = (props) => {
 
   const actionButton = useMemo(() => {
     if (isConnectedWallet) {
-
       const unavailable = !pool;
       const sourceAccountNonExist = !sourceBalance;
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount);
-      const isInsufficientLiquidity = pool && exponentiatedBy(
-        tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? pool?.poolState.quoteReserve : pool?.poolState.baseReserve, 
-        tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? tokenTo.token.decimals : tokenFrom.token.decimals,
-      ).isLessThan(
-        tokenTo.amount,
-      );
+      const isInsufficientLiquidity =
+        pool &&
+        exponentiatedBy(
+          tokenFrom.token.symbol === pool.baseTokenInfo.symbol
+            ? pool?.poolState.quoteReserve
+            : pool?.poolState.baseReserve,
+          tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? tokenTo.token.decimals : tokenFrom.token.decimals,
+        ).isLessThan(tokenTo.amount);
 
       return (
         <ConnectButton
@@ -427,12 +427,15 @@ const Home: React.FC = (props) => {
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Swap, target: EnterAmount"
         >
-          {
-            unavailable ? "unavailable" : 
-            sourceAccountNonExist ? "No " + tokenFrom.token.symbol + " Account in Wallet" : 
-            isInsufficientBalance ? "Insufficient Balance" : 
-            isInsufficientLiquidity ? "Insufficient Liquidity" : "Swap"
-          }
+          {unavailable
+            ? "unavailable"
+            : sourceAccountNonExist
+            ? "No " + tokenFrom.token.symbol + " Account in Wallet"
+            : isInsufficientBalance
+            ? "Insufficient Balance"
+            : isInsufficientLiquidity
+            ? "Insufficient Liquidity"
+            : "Swap"}
         </ConnectButton>
       );
     }

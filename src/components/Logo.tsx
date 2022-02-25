@@ -2,8 +2,8 @@ import React from "react";
 import { Box, Link } from "@material-ui/core";
 
 interface Props {
-  isDark: boolean
-  href: string
+  isDark: boolean;
+  href: string;
 }
 
 const Logo: React.FC<Props> = ({ isDark, href }) => {

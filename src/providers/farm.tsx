@@ -34,7 +34,7 @@ export function FarmPoolsProvider({ children }) {
   useEffect(() => {
     const subscription_ids: number[] = [];
     if (schemas.length > 0 && connection) {
-      ;(async () => {
+      (async () => {
         try {
           const farmInfos = await getMultipleAccounts(
             connection,
@@ -124,13 +124,13 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
   const filtered = farmUserAccountInfos
     .map(({ publicKey, accountInfo }) => ({ publicKey, farmUserInfo: parseFarmUser(accountInfo) }))
     .filter(({ farmUserInfo }) => !!farmUserInfo);
-  
+
   if (filtered.length === 0) return null;
 
   const farmUserAddress = filtered[0].publicKey;
   const farmUserInfo = filtered[0].farmUserInfo.data;
   const positions: {
-    [key: string]: StakeAccount
+    [key: string]: StakeAccount;
   } = {};
 
   farmUserInfo.positions.forEach((position) => {
@@ -140,8 +140,8 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
       depositBalance,
       rewardDebt: new BigNumber(position.rewardsOwed.toString()),
       rewardEstimated: new BigNumber(position.rewardsEstimated.toString()),
-      lastUpdateTs: new BigNumber(position.lastUpdateTs.toString()), 
-      nextClaimTs: new BigNumber(position.nextClaimTs.toString())
+      lastUpdateTs: new BigNumber(position.lastUpdateTs.toString()),
+      nextClaimTs: new BigNumber(position.nextClaimTs.toString()),
     };
   });
 
@@ -184,7 +184,8 @@ export function useFarmUserAccount() {
     getFarmUser,
     tuple("getFarmUser", connection, config?.publicKey.toBase58(), publicKey?.toBase58()),
     {
-      refreshInterval: 1000, refreshIntervalOnError: 5000
+      refreshInterval: 1000,
+      refreshIntervalOnError: 5000,
     },
   );
 }

@@ -34,29 +34,28 @@ import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 
 interface TransactionResult {
-  status: boolean | null
-  action?: "stake" | "unstake" | "claim"
-  hash?: string
-  stake?: IStakeCard
+  status: boolean | null;
+  action?: "stake" | "unstake" | "claim";
+  hash?: string;
+  stake?: IStakeCard;
 }
 
 const SECONDS_OF_YEAR = 31556926;
 
 const getUnclaimedReward = (
-  apr : BigNumber,
+  apr: BigNumber,
   lastUpdateTs: BigNumber,
   nextClaimTs: BigNumber,
   rewardDebt: BigNumber,
   rewardEstimated: BigNumber,
   depositBalance: BigNumber,
-  deltafiTokenDecimals: number
+  deltafiTokenDecimals: number,
 ) => {
-  const currentTs: BigNumber = (new BigNumber(Date.now())).div(new BigNumber(1000));
+  const currentTs: BigNumber = new BigNumber(Date.now()).div(new BigNumber(1000));
   if (currentTs <= nextClaimTs) {
     return exponentiatedBy(rewardDebt, deltafiTokenDecimals);
   }
-  const unTrackedReward: BigNumber =
-    currentTs
+  const unTrackedReward: BigNumber = currentTs
     .minus(lastUpdateTs)
     .div(new BigNumber(SECONDS_OF_YEAR))
     .multipliedBy(depositBalance)
@@ -89,7 +88,7 @@ const Stake = (): ReactElement => {
     if (tokenAccount) {
       const value = exponentiatedBy(tokenAccount.account.amount, staking.token.decimals);
       if (staking.isStake) {
-        setStaking({...staking, balance: value});
+        setStaking({ ...staking, balance: value });
       }
       return value;
     }
@@ -100,9 +99,9 @@ const Stake = (): ReactElement => {
   const [percentage, setPercentage] = useState(0);
   const { setMenu } = useModal();
   const [state, setState] = useState<{
-    open: boolean
-    vertical: "bottom" | "top"
-    horizontal: "left" | "center" | "right"
+    open: boolean;
+    vertical: "bottom" | "top";
+    horizontal: "left" | "center" | "right";
   }>({
     open: false,
     vertical: "bottom",
@@ -127,14 +126,14 @@ const Stake = (): ReactElement => {
   }, [farmPool, lpMint]);
 
   const position = useMemo(() => farmUser?.positions[farmPoolId], [farmUser, farmPoolId]);
-  const apr = (new BigNumber(farmPool.aprNumerator.toString())).div(new BigNumber(farmPool.aprDenominator.toString()));
+  const apr = new BigNumber(farmPool.aprNumerator.toString()).div(new BigNumber(farmPool.aprDenominator.toString()));
 
   /*eslint-disable */
   const depositAmount = useMemo(() => {
     if (position && lpMint) {
       const value = exponentiatedBy(position.depositBalance, lpMint.decimals);
       if (!staking.isStake) {
-        setStaking({...staking, balance: value});
+        setStaking({ ...staking, balance: value });
       }
       return exponentiatedBy(position.depositBalance, lpMint.decimals);
     }
@@ -151,7 +150,7 @@ const Stake = (): ReactElement => {
         position.rewardDebt,
         position.rewardEstimated,
         position.depositBalance,
-        deltafiTokenMint.decimals
+        deltafiTokenMint.decimals,
       );
     }
     return new BigNumber(0);
@@ -168,7 +167,12 @@ const Stake = (): ReactElement => {
 
   const handleSwitchMethod = (method: "stake" | "unstake") => {
     setPercentage(0);
-    setStaking((staking) => ({ ...staking, isStake: method === "stake" ? true : false, balance: method === "stake" ? tokenBalance : depositAmount, amount: "" }));
+    setStaking((staking) => ({
+      ...staking,
+      isStake: method === "stake" ? true : false,
+      balance: method === "stake" ? tokenBalance : depositAmount,
+      amount: "",
+    }));
   };
 
   const handleStake = useCallback(async () => {
@@ -434,7 +438,9 @@ const Stake = (): ReactElement => {
             </ConnectButton>
           </Box>
           <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>{deltafiTokenMint ? unclaimedReward.toFixed(deltafiTokenMint.decimals) : "--"}</Typography>
+            <Typography className={classes.amount}>
+              {deltafiTokenMint ? unclaimedReward.toFixed(deltafiTokenMint.decimals) : "--"}
+            </Typography>
             <Typography className={classes.amount}>0 / Day</Typography>
           </Box>
         </Box>

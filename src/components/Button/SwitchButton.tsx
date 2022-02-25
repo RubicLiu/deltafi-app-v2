@@ -1,11 +1,11 @@
 import { createStyles, Switch, SwitchClassKey, SwitchProps, Theme, withStyles } from "@material-ui/core";
 
 interface Styles extends Partial<Record<SwitchClassKey, string>> {
-  focusVisible?: string
+  focusVisible?: string;
 }
 
 interface Props extends SwitchProps {
-  classes: Styles
+  classes: Styles;
 }
 
 const IOSSwitch = withStyles((theme: Theme) =>

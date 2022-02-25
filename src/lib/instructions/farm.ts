@@ -14,11 +14,11 @@ export enum FarmInstruction {
 }
 
 export interface FarmInitializeData {
-  feeNumerator: bigint
-  feeDenominator: bigint
-  rewardsNumerator: bigint
-  rewardsDenominator: bigint
-  bumpSeed: number
+  feeNumerator: bigint;
+  feeDenominator: bigint;
+  rewardsNumerator: bigint;
+  rewardsDenominator: bigint;
+  bumpSeed: number;
 }
 
 /** @internal */
@@ -59,7 +59,7 @@ export const createInitFarmInstruction = (
 };
 
 export interface FarmDepositData {
-  amount: bigint
+  amount: bigint;
 }
 
 /** @internal */
@@ -105,7 +105,7 @@ export const createFarmDepositInstruction = (
 };
 
 export interface FarmWithdrawData {
-  amount: bigint
+  amount: bigint;
 }
 
 /** @internal */
@@ -222,7 +222,7 @@ export const createClaimFarmInstruction = (
 export const createRefreshFarmInstruction = (
   farmPool: PublicKey,
   programId: PublicKey,
-  farmUsers: Array<PublicKey>
+  farmUsers: Array<PublicKey>,
 ) => {
   const keys = [
     { pubkey: farmPool, isSigner: false, isWritable: false },

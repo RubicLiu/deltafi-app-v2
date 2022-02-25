@@ -2,19 +2,19 @@ import { PublicKey } from "@solana/web3.js";
 import { poolInfo } from "./config.json";
 
 export interface PoolSchema {
-  name: string
-  address: PublicKey
-  mintAddress: PublicKey
-  base: string
-  quote: string
+  name: string;
+  address: PublicKey;
+  mintAddress: PublicKey;
+  base: string;
+  quote: string;
 }
 
-export const pools: PoolSchema[] = poolInfo.map(({name, swap, mint, base, quote}) => ({
-  name, 
-  address: new PublicKey(swap), 
-  mintAddress: new PublicKey(mint), 
+export const pools: PoolSchema[] = poolInfo.map(({ name, swap, mint, base, quote }) => ({
+  name,
+  address: new PublicKey(swap),
+  mintAddress: new PublicKey(mint),
   base,
-  quote
+  quote,
 }));
 
 export const listSymbols = (pools: PoolSchema[]) => {

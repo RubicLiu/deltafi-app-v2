@@ -1,7 +1,7 @@
 import React, { Suspense, SuspenseProps } from "react";
 
 interface State {
-  hasError: boolean
+  hasError: boolean;
 }
 
 class SuspenseWithChunkError extends React.Component<SuspenseProps, State> {

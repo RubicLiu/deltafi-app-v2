@@ -15,11 +15,11 @@ export async function createTokenAccountTransaction({
   walletPubkey,
   mintPublicKey,
 }: {
-  walletPubkey: PublicKey
-  mintPublicKey: PublicKey
+  walletPubkey: PublicKey;
+  mintPublicKey: PublicKey;
 }): Promise<{
-  transaction: Transaction
-  newAccountPubkey: PublicKey
+  transaction: Transaction;
+  newAccountPubkey: PublicKey;
 }> {
   const ata = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -58,10 +58,10 @@ export async function signTransaction({
   signers = [],
   connection,
 }: {
-  transaction: Transaction
-  feePayer: PublicKey
-  signers?: Array<Keypair>
-  connection: Connection
+  transaction: Transaction;
+  feePayer: PublicKey;
+  signers?: Array<Keypair>;
+  connection: Connection;
 }) {
   transaction.recentBlockhash = (await connection.getRecentBlockhash("max")).blockhash;
   transaction.feePayer = feePayer;
@@ -85,12 +85,12 @@ export async function sendSignedTransaction({
   successMessage = "Transaction confirmed",
   timeout = DEFAULT_TIMEOUT,
 }: {
-  signedTransaction: Transaction
-  connection: Connection
-  sendingMessage?: string
-  sentMessage?: string
-  successMessage?: string
-  timeout?: number
+  signedTransaction: Transaction;
+  connection: Connection;
+  sendingMessage?: string;
+  sentMessage?: string;
+  successMessage?: string;
+  timeout?: number;
 }) {
   const rawTransaction = signedTransaction.serialize();
   const startTime = getUnixTs();
@@ -140,7 +140,7 @@ async function awaitTransactionSignatureConfirmation(
 ) {
   let done = false;
   const result = await new Promise((resolve, reject) => {
-    ;(async () => {
+    (async () => {
       setTimeout(() => {
         if (done) {
           return;
@@ -170,7 +170,7 @@ async function awaitTransactionSignatureConfirmation(
         console.log("WS error in setup", txid, e);
       }
       while (!done) {
-        ;(async () => {
+        (async () => {
           try {
             const signatureStatuses = await connection.getSignatureStatuses([txid]);
             const result = signatureStatuses && signatureStatuses.value[0];

@@ -154,9 +154,9 @@ export function flatten(obj, { prefix = "", restrictTo }) {
   if (restrict) {
     restrict = restrict.filter((k) => obj.hasOwnProperty(k));
   }
-  const result = {}
-  ;(function recurse(obj, current, keys) {
-    ;(keys || Object.keys(obj)).forEach((key) => {
+  const result = {};
+  (function recurse(obj, current, keys) {
+    (keys || Object.keys(obj)).forEach((key) => {
       const value = obj[key];
       const newKey = current ? current + "." + key : key; // joined key with dot
       if (value && typeof value === "object") {

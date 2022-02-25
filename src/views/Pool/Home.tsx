@@ -92,10 +92,12 @@ const Home: React.FC = () => {
             <Typography>Your Pools</Typography>
             <Box mt={3.5}>
               {schemas
-              .filter(schema => tokens?.find(token => token.effectiveMint.toBase58() === schema.mintAddress.toBase58()))
-              .map(schema => (
-                <PoolCard isUserPool key={schema.address.toString()} poolKey={schema.address} />
-              ))}
+                .filter((schema) =>
+                  tokens?.find((token) => token.effectiveMint.toBase58() === schema.mintAddress.toBase58()),
+                )
+                .map((schema) => (
+                  <PoolCard isUserPool key={schema.address.toString()} poolKey={schema.address} />
+                ))}
             </Box>
           </Box>
         )}
@@ -108,12 +110,15 @@ const Home: React.FC = () => {
           {schemas.length > 0 && (
             <Box className={classes.poolCardContainer}>
               {schemas
-              .filter(schema => !tokens?.find(token => token.effectiveMint.toBase58() === schema.mintAddress.toBase58()))
-              .map((schema: PoolSchema) => (
-                <Box key={schema.address.toString()}>
-                  <PoolCard poolKey={schema.address} />
-                </Box>
-              ))}
+                .filter(
+                  (schema) =>
+                    !tokens?.find((token) => token.effectiveMint.toBase58() === schema.mintAddress.toBase58()),
+                )
+                .map((schema: PoolSchema) => (
+                  <Box key={schema.address.toString()}>
+                    <PoolCard poolKey={schema.address} />
+                  </Box>
+                ))}
             </Box>
           )}
         </Box>

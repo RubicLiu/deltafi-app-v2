@@ -67,9 +67,9 @@ export function getSwapOutAmount(
     const priceImpact = beforePrice.minus(afterPrice).abs().dividedBy(beforePrice).multipliedBy(100).toNumber();
     return {
       amountIn: parseFloat(amount),
-      amountOut: baseAmount.toNumber(), 
-      amountOutWithSlippage: baseAmountWithSlippage.toNumber(), 
-      lpFee: lpFee.toNumber(), 
+      amountOut: baseAmount.toNumber(),
+      amountOutWithSlippage: baseAmountWithSlippage.toNumber(),
+      lpFee: lpFee.toNumber(),
       priceImpact,
     };
   }

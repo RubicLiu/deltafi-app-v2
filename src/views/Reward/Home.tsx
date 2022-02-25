@@ -157,9 +157,9 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
 }));
 
 /**
- * a function that links to 2 closure variables, 
+ * a function that links to 2 closure variables,
  * referralLink and pubKey
- * this function is called when wallet connection status changes, 
+ * this function is called when wallet connection status changes,
  * and get the correct referral link from backend
  */
 const getReferralLink = (() => {
@@ -178,24 +178,23 @@ const getReferralLink = (() => {
         referralLink = process.env.REACT_APP_LOCAL_HOST + "?referral_code=" + jsonData.referral_code;
       }
 
-      setLink(referralLink);  
+      setLink(referralLink);
     }
     return referralLink;
   };
 })();
 
-const Home: React.FC = props => {
+const Home: React.FC = (props) => {
   const classes = useStyles(props);
   const { setMenu } = useModal();
-  const { connected: isConnectedWallet, publicKey} = useWallet();
-  
+  const { connected: isConnectedWallet, publicKey } = useWallet();
+
   const [buttonText, setButtonText] = useState("Copy Link");
   const [referralLink, setReferralLink] = useState("");
-  
-  useEffect(() => {
 
+  useEffect(() => {
     (async () => {
-      await getReferralLink(publicKey, link => setReferralLink(link));
+      await getReferralLink(publicKey, (link) => setReferralLink(link));
     })();
   }, [isConnectedWallet, publicKey]);
 

@@ -172,9 +172,9 @@ const Home: React.FC = (props): ReactElement => {
           <Typography variant="h6" color="primary" paragraph>
             Active Farms
           </Typography>
-            {schemas.map((farm: FarmPoolSchema) => (
-              <FarmCard key={farm.address.toBase58()} farm={farm} />
-            ))}
+          {schemas.map((farm: FarmPoolSchema) => (
+            <FarmCard key={farm.address.toBase58()} farm={farm} />
+          ))}
         </Box>
         {/* <Box className={classes.list}>
           <Typography variant="h6" color="primary" paragraph>

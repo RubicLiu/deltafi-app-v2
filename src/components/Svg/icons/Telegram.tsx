@@ -3,7 +3,7 @@ import Svg from "../Svg";
 import { SvgProps } from "../types";
 
 interface TelegramProps extends SvgProps {
-  isDark: boolean
+  isDark: boolean;
 }
 
 const Icon: React.FC<TelegramProps> = ({ isDark, ...props }) => {

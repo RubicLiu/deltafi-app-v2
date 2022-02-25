@@ -21,7 +21,7 @@ export function ConfigProvider({ children }) {
         bumpSeed: data.bumpSeed,
         deltafiMint: data.deltafiMint,
         oracleProgramId: data.oracleProgramId,
-        deltafiToken: data.deltafiToken
+        deltafiToken: data.deltafiToken,
       };
       return ret;
     }

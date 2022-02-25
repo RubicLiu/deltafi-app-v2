@@ -2,15 +2,15 @@ import { struct } from "buffer-layout";
 import { bool, u64 } from "utils/layout";
 
 export interface Fees {
-  isInitialized: boolean
-  adminTradeFeeNumerator: bigint
-  adminTradeFeeDenominator: bigint
-  adminWithdrawFeeNumerator: bigint
-  adminWithdrawFeeDenominator: bigint
-  tradeFeeNumerator: bigint
-  tradeFeeDenominator: bigint
-  withdrawFeeNumerator: bigint
-  withdrawFeeDenominator: bigint
+  isInitialized: boolean;
+  adminTradeFeeNumerator: bigint;
+  adminTradeFeeDenominator: bigint;
+  adminWithdrawFeeNumerator: bigint;
+  adminWithdrawFeeDenominator: bigint;
+  tradeFeeNumerator: bigint;
+  tradeFeeDenominator: bigint;
+  withdrawFeeNumerator: bigint;
+  withdrawFeeDenominator: bigint;
 }
 
 /** @internal */

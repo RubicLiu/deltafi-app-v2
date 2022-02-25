@@ -2,7 +2,7 @@ import React from "react";
 import { Button as MuiButton, ButtonProps, makeStyles, Theme } from "@material-ui/core";
 
 interface IButtonProps extends ButtonProps {
-  isRound?: boolean
+  isRound?: boolean;
 }
 
 const useStyles = makeStyles<Theme, IButtonProps>(({ palette, spacing }: Theme) => ({

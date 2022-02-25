@@ -8,8 +8,8 @@ import { useModal } from "providers/modal";
 import { HOMEPAGE_LINK } from "constants/index";
 
 interface ContainerProps extends AppBarProps {
-  theme: any
-  shrunk: number
+  theme: any;
+  shrunk: number;
 }
 
 const useStyles = makeStyles(({ breakpoints, palette }: Theme) => ({
@@ -116,7 +116,7 @@ const Header: React.FC = (props) => {
             data-amp-analytics-name="click"
             data-amp-analytics-attrs="page: Header, target: Logo"
           >
-            <img src="/horizontal 60.svg" alt="logo" className={classes.logo}/>
+            <img src="/horizontal 60.svg" alt="logo" className={classes.logo} />
           </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>

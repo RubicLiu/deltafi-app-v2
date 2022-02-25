@@ -7,14 +7,14 @@ import { Fees, FeesLayout } from "./fees";
 import { Rewards, RewardsLayout } from "./rewards";
 
 export interface ConfigInfo {
-  version: number
-  bumpSeed: number
-  adminKey: PublicKey
-  deltafiMint: PublicKey
-  oracleProgramId: PublicKey
-  fees: Fees
-  rewards: Rewards
-  deltafiToken: PublicKey
+  version: number;
+  bumpSeed: number;
+  adminKey: PublicKey;
+  deltafiMint: PublicKey;
+  oracleProgramId: PublicKey;
+  fees: Fees;
+  rewards: Rewards;
+  deltafiToken: PublicKey;
 }
 
 /** @internal */
@@ -27,7 +27,7 @@ export const ConfigInfoLayout = struct<ConfigInfo>(
     publicKey("oracleProgramId"),
     FeesLayout("fees"),
     RewardsLayout("rewards"),
-    publicKey("deltafiToken")
+    publicKey("deltafiToken"),
   ],
   "configInfo",
 );

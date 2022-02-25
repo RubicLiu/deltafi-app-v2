@@ -3,7 +3,8 @@ import { Button, ButtonProps, makeStyles, Theme } from "@material-ui/core";
 
 const useStyles = makeStyles(({ breakpoints, palette }: Theme) => ({
   button: {
-    backgroundImage: "linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), linear-gradient(314.49deg, #4048FF 0%, #B372CE 50.52%, #FF4B81 100%)",
+    backgroundImage:
+      "linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), linear-gradient(314.49deg, #4048FF 0%, #B372CE 50.52%, #FF4B81 100%)",
     color: palette.text.primary,
     borderRadius: "12px",
     backgroundOrigin: "border-box",
@@ -16,7 +17,7 @@ const useStyles = makeStyles(({ breakpoints, palette }: Theme) => ({
       opacity: ".8",
     },
     [breakpoints.down("sm")]: {
-      width: 92
+      width: 92,
     },
   },
 }));

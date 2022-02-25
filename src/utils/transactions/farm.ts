@@ -21,9 +21,9 @@ export async function createFarmUser({
   walletPubkey,
   config,
 }: {
-  connection: Connection
-  walletPubkey: PublicKey
-  config: MarketConfig
+  connection: Connection;
+  walletPubkey: PublicKey;
+  config: MarketConfig;
 }) {
   if (!connection || !walletPubkey) {
     console.error("create farm user failed with null parameter");
@@ -60,13 +60,13 @@ export async function stake({
   poolTokenAccount,
   stakeData,
 }: {
-  connection: Connection
-  walletPubkey: PublicKey
-  config: MarketConfig
-  farmPool: FarmPoolInfo
-  farmUser: PublicKey | undefined
-  poolTokenAccount: ExTokenAccount
-  stakeData: FarmDepositData
+  connection: Connection;
+  walletPubkey: PublicKey;
+  config: MarketConfig;
+  farmPool: FarmPoolInfo;
+  farmUser: PublicKey | undefined;
+  poolTokenAccount: ExTokenAccount;
+  stakeData: FarmDepositData;
 }) {
   if (!connection || !walletPubkey || !farmPool || !poolTokenAccount || !config || !stakeData) {
     console.error("farm stake failed with null parameter");
@@ -115,11 +115,7 @@ export async function stake({
         SWAP_PROGRAM_ID,
       ),
     )
-    .add(
-      createRefreshFarmInstruction(farmPool.publicKey, SWAP_PROGRAM_ID, [
-        farmUser,
-      ]),
-    );
+    .add(createRefreshFarmInstruction(farmPool.publicKey, SWAP_PROGRAM_ID, [farmUser]));
   signers.push(userTransferAuthority);
 
   transaction = mergeTransactions([createFarmUserAccountTransaction, transaction]);
@@ -135,12 +131,12 @@ export async function unstake({
   poolTokenAccount,
   unstakeData,
 }: {
-  connection: Connection
-  walletPubkey: PublicKey
-  farmPool: FarmPoolInfo
-  farmUser: PublicKey
-  poolTokenAccount: ExTokenAccount
-  unstakeData: FarmWithdrawData
+  connection: Connection;
+  walletPubkey: PublicKey;
+  farmPool: FarmPoolInfo;
+  farmUser: PublicKey;
+  poolTokenAccount: ExTokenAccount;
+  unstakeData: FarmWithdrawData;
 }) {
   if (!connection || !walletPubkey || !farmPool || !farmUser || !poolTokenAccount || !unstakeData) {
     console.error("farm unstake failed with null parameter");
@@ -167,11 +163,7 @@ export async function unstake({
         SWAP_PROGRAM_ID,
       ),
     )
-    .add(
-      createRefreshFarmInstruction(farmPool.publicKey, SWAP_PROGRAM_ID, [
-        farmUser,
-      ]),
-    );
+    .add(createRefreshFarmInstruction(farmPool.publicKey, SWAP_PROGRAM_ID, [farmUser]));
 
   return signTransaction({ transaction, feePayer: walletPubkey, connection });
 }
@@ -184,12 +176,12 @@ export async function claim({
   farmUser,
   claimDestination,
 }: {
-  connection: Connection
-  config: MarketConfig
-  walletPubkey: PublicKey
-  farmPool: FarmPoolInfo
-  farmUser: PublicKey
-  claimDestination: PublicKey
+  connection: Connection;
+  config: MarketConfig;
+  walletPubkey: PublicKey;
+  farmPool: FarmPoolInfo;
+  farmUser: PublicKey;
+  claimDestination: PublicKey;
 }) {
   if (!connection || !walletPubkey || !farmPool || !farmUser || !claimDestination) {
     console.error("farm claim failed with null parameter");
@@ -227,12 +219,12 @@ export async function refresh({
   walletPubkey,
   farmUser,
 }: {
-  connection: Connection
-  swap: PublicKey
-  farmPool: PublicKey
-  poolMint: PublicKey
-  walletPubkey: PublicKey
-  farmUser: PublicKey
+  connection: Connection;
+  swap: PublicKey;
+  farmPool: PublicKey;
+  poolMint: PublicKey;
+  walletPubkey: PublicKey;
+  farmUser: PublicKey;
 }) {
   if (!connection || !farmPool || !poolMint || !walletPubkey || !farmUser) {
     console.error("farm refresh failed with null parameter");

@@ -79,7 +79,7 @@ const ConnectItem = styled.div`
     height: 87px;
   }
   .connect-type {
-    font-family: 'Inter';
+    font-family: "Inter";
     font-size: 14px;
     font-weight: 500;
     padding: 10px;

@@ -1,0 +1,10 @@
+*.json
+*.yaml
+*.yml  
+*.lock
+
+build/
+node_modules/
+.vscode/
+.github/
+amplify/
