@@ -151,20 +151,6 @@ const Home: React.FC = (props): ReactElement => {
         </Box>
         <Box display="flex" justifyContent="space-between" mt={2}>
           <Typography className={classes.title}>Last DELFI Price: Coming Soon</Typography>
-          <Typography color="secondary">
-            <Link
-              href="/DELFI"
-              target="_blank"
-              rel="noreferrer noopener"
-              underline="none"
-              className={classes.link}
-              data-amp-analytics-on="click"
-              data-amp-analytics-name="click"
-            >
-              View on Serum
-              <LinkIcon className={classes.linkIcon} isDark={isDark} />
-            </Link>
-          </Typography>
         </Box>
 
         <Box className={classes.list}>
