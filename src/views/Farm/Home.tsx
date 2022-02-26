@@ -150,7 +150,7 @@ const Home: React.FC = (props): ReactElement => {
           </Box>
         </Box>
         <Box display="flex" justifyContent="space-between" mt={2}>
-          <Typography className={classes.title}>Last DELFI Price: US$ 0.08581</Typography>
+          <Typography className={classes.title}>Last DELFI Price: Coming Soon</Typography>
           <Typography color="secondary">
             <Link
               href="/DELFI"
@@ -160,7 +160,6 @@ const Home: React.FC = (props): ReactElement => {
               className={classes.link}
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
-              data-amp-analytics-attrs="page: Farms, target: ViewSerum"
             >
               View on Serum
               <LinkIcon className={classes.linkIcon} isDark={isDark} />
