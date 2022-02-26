@@ -1,6 +1,7 @@
 import { ReactElement, useState, useMemo, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { Context, SignatureResult, AccountInfo } from "@solana/web3.js";
 import clx from "classnames";
 import {
   Snackbar,
@@ -22,8 +23,9 @@ import Page from "components/layout/Page";
 import { ConnectButton, LinkIcon } from "components";
 
 import useStyles from "./styles";
-import { getFarmTokenInfo, useTokenFromMint, useTokenMintAccount } from "providers/tokens";
-import { useFarmPoolByAddress, useFarmUserAccount } from "providers/farm";
+import { getFarmTokenInfo, updateTokenAccountCache, useTokenFromMint, useTokenMintAccount } from "providers/tokens";
+import { useFarmPoolByAddress, useFarmUserAccount, updateStakeAccountCache } from "providers/farm";
+import { parseFarmUser } from "lib/state";
 import { lpTokens } from "constants/tokens";
 import { useModal } from "providers/modal";
 import { useConfig } from "providers/config";
@@ -46,14 +48,14 @@ const getUnclaimedReward = (
   apr: BigNumber,
   lastUpdateTs: BigNumber,
   nextClaimTs: BigNumber,
-  rewardDebt: BigNumber,
+  rewardsOwed: BigNumber,
   rewardEstimated: BigNumber,
   depositBalance: BigNumber,
   deltafiTokenDecimals: number,
 ) => {
   const currentTs: BigNumber = new BigNumber(Date.now()).div(new BigNumber(1000));
   if (currentTs <= nextClaimTs) {
-    return exponentiatedBy(rewardDebt, deltafiTokenDecimals);
+    return exponentiatedBy(rewardsOwed, deltafiTokenDecimals);
   }
   const unTrackedReward: BigNumber = currentTs
     .minus(lastUpdateTs)
@@ -61,7 +63,7 @@ const getUnclaimedReward = (
     .multipliedBy(depositBalance)
     .multipliedBy(apr);
 
-  return exponentiatedBy(unTrackedReward.plus(rewardDebt).plus(rewardEstimated), deltafiTokenDecimals);
+  return exponentiatedBy(unTrackedReward.plus(rewardsOwed).plus(rewardEstimated), deltafiTokenDecimals);
 };
 
 const Stake = (): ReactElement => {
@@ -74,7 +76,8 @@ const Stake = (): ReactElement => {
   const { connection } = useConnection();
   const { network } = useCustomConnection();
   const token = getFarmTokenInfo(farmPool?.name);
-  const tokenAccount = useTokenFromMint(token?.address);
+  const [lastUpdate, setLastUpdate] = useState(0);
+  const tokenAccount = useTokenFromMint(token?.address, lastUpdate);
 
   const [staking, setStaking] = useState({
     isStake: true,
@@ -109,11 +112,11 @@ const Stake = (): ReactElement => {
   });
 
   const { config } = useConfig();
-  const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58());
+  const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58(), 0);
   const lpMint = useTokenMintAccount(farmPool?.poolMintKey);
   const deltafiTokenMint = useTokenMintAccount(DELTAFI_TOKEN_MINT);
   const [farmUser] = useFarmUserAccount();
-  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
+  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58(), 0);
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
   });
@@ -125,7 +128,7 @@ const Stake = (): ReactElement => {
     return new BigNumber(0);
   }, [farmPool, lpMint]);
 
-  const position = useMemo(() => farmUser?.positions[farmPoolId], [farmUser, farmPoolId]);
+  let position = useMemo(() => farmUser?.positions[farmPoolId], [farmUser, farmPoolId, lastUpdate]); // eslint-disable-line
   const apr = new BigNumber(farmPool.aprNumerator.toString()).div(new BigNumber(farmPool.aprDenominator.toString()));
 
   /*eslint-disable */
@@ -141,20 +144,20 @@ const Stake = (): ReactElement => {
   }, [position, lpMint]);
   /*eslint-enable */
 
-  const unclaimedReward = useMemo(() => {
+  const unclaimedReward = (() => {
     if (position && deltafiTokenMint) {
       return getUnclaimedReward(
         apr,
         position.lastUpdateTs,
         position.nextClaimTs,
-        position.rewardDebt,
+        position.rewardsOwed,
         position.rewardEstimated,
         position.depositBalance,
         deltafiTokenMint.decimals,
       );
     }
     return new BigNumber(0);
-  }, [position, deltafiTokenMint, apr]);
+  })();
 
   const poolRate = useMemo(() => {
     if (farmPool && totalStaked) {
@@ -171,7 +174,7 @@ const Stake = (): ReactElement => {
       ...staking,
       isStake: method === "stake" ? true : false,
       balance: method === "stake" ? tokenBalance : depositAmount,
-      amount: "",
+      amount: "0",
     }));
   };
 
@@ -199,21 +202,45 @@ const Stake = (): ReactElement => {
 
         const signedTransaction = await signTransaction(transaction);
 
+        connection.onAccountChange(farmUser.publicKey, (farmUserAccoutInfo: AccountInfo<Buffer>, _: Context) => {
+          const farmUserInfo = parseFarmUser(farmUserAccoutInfo);
+          const filteredPosition = farmUserInfo.data.positions.filter((p) => p.pool.toBase58() === farmPoolId);
+          if (filteredPosition.length === 0) {
+            console.error("cannot found farm position");
+            return;
+          }
+          updateStakeAccountCache(walletPubkey, config.publicKey, farmPoolId, filteredPosition[0]);
+        });
+
+        connection.onAccountChange(lpToken.pubkey, (lpTokenAccountInfo: AccountInfo<Buffer>, _: Context) => {
+          const tokenAccountData = updateTokenAccountCache(lpToken.pubkey, walletPubkey, lpTokenAccountInfo);
+          setLastUpdate(Date.now());
+          setPercentage(0);
+          setStaking({
+            ...staking,
+            isStake: true,
+            amount: "0",
+            balance: exponentiatedBy(tokenAccountData.amount, staking.token.decimals),
+          });
+        });
+
         const hash = await sendSignedTransaction({
           signedTransaction,
           connection,
         });
 
-        setTransactionResult({
-          status: true,
-          action: "stake",
-          hash,
-          stake: staking,
+        connection.onSignature(hash, async (signatureResult: SignatureResult, _: Context) => {
+          setTransactionResult({
+            status: true,
+            action: "stake",
+            hash,
+            stake: staking,
+          });
+          setState((state) => ({ ...state, open: true }));
         });
-
-        setStaking({ ...staking, amount: "" });
       } catch (e) {
         setTransactionResult({ status: false });
+        setState((state) => ({ ...state, open: true }));
       }
     } else {
       if (staking.amount === "" || !position || depositAmount.lt(staking.amount)) {
@@ -235,25 +262,52 @@ const Stake = (): ReactElement => {
 
         const signedTransaction = await signTransaction(transaction);
 
+        connection.onAccountChange(farmUser.publicKey, (farmUserAccoutInfo: AccountInfo<Buffer>, _: Context) => {
+          const farmUserInfo = parseFarmUser(farmUserAccoutInfo);
+          const filteredPosition = farmUserInfo.data.positions.filter((p) => p.pool.toBase58() === farmPoolId);
+          if (filteredPosition.length === 0) {
+            console.error("cannot found farm position");
+            return;
+          }
+          const currentPositon = updateStakeAccountCache(
+            walletPubkey,
+            config.publicKey,
+            farmPoolId,
+            filteredPosition[0],
+          );
+          setPercentage(0);
+          setStaking({
+            ...staking,
+            isStake: false,
+            amount: "0",
+            balance: exponentiatedBy(currentPositon.depositBalance, lpMint.decimals),
+          });
+          setLastUpdate(Date.now());
+        });
+
+        connection.onAccountChange(lpToken.pubkey, (lpTokenAccountInfo: AccountInfo<Buffer>, _: Context) => {
+          updateTokenAccountCache(lpToken.pubkey, walletPubkey, lpTokenAccountInfo);
+        });
+
         const hash = await sendSignedTransaction({
           signedTransaction,
           connection,
         });
 
-        setTransactionResult({
-          status: true,
-          action: "unstake",
-          hash,
-          stake: staking,
+        connection.onSignature(hash, async (signatureResult: SignatureResult, _: Context) => {
+          setTransactionResult({
+            status: true,
+            action: "unstake",
+            hash,
+            stake: staking,
+          });
+          setState((state) => ({ ...state, open: true }));
         });
-
-        setStaking({ ...staking, amount: "" });
       } catch (e) {
         setTransactionResult({ status: false });
+        setState((state) => ({ ...state, open: true }));
       }
-    }
-
-    setState((state) => ({ ...state, open: true }));
+    } /*eslint-disable */
   }, [
     connection,
     walletPubkey,
@@ -267,7 +321,7 @@ const Stake = (): ReactElement => {
     position,
     depositAmount,
   ]);
-
+  /*eslint-enable */
   const handleClaim = useCallback(async () => {
     if (!connection || !farmPool || !walletPubkey || !lpMint || !lpToken) {
       return null;
@@ -283,21 +337,53 @@ const Stake = (): ReactElement => {
         claimDestination: rewardsAccount?.pubkey,
       });
       const signedTransaction = await signTransaction(transaction);
+
+      connection.onAccountChange(farmUser.publicKey, (farmUserAccoutInfo: AccountInfo<Buffer>, _: Context) => {
+        const farmUserInfo = parseFarmUser(farmUserAccoutInfo);
+        const filteredPosition = farmUserInfo.data.positions.filter((p) => p.pool.toBase58() === farmPoolId);
+        if (filteredPosition.length === 0) {
+          console.error("cannot found farm position");
+          return;
+        }
+        updateStakeAccountCache(walletPubkey, config.publicKey, farmPoolId, filteredPosition[0]);
+        setLastUpdate(Date.now());
+      });
+
+      connection.onAccountChange(lpToken.pubkey, (lpTokenAccountInfo: AccountInfo<Buffer>, _: Context) => {
+        updateTokenAccountCache(lpToken.pubkey, walletPubkey, lpTokenAccountInfo);
+        setLastUpdate(Date.now());
+      });
+
       const hash = await sendSignedTransaction({
         signedTransaction,
         connection,
       });
 
-      setTransactionResult({
-        status: true,
-        action: "claim",
-        hash,
+      connection.onSignature(hash, async (signatureResult: SignatureResult, _: Context) => {
+        setTransactionResult({
+          status: true,
+          action: "claim",
+          hash,
+        });
+        setState((state) => ({ ...state, open: true }));
       });
     } catch (e) {
       console.log(e);
       setTransactionResult({ status: false });
+      setState((state) => ({ ...state, open: true }));
     }
-  }, [config, connection, farmPool, farmUser, lpMint, lpToken, signTransaction, walletPubkey, rewardsAccount]);
+  }, [
+    config,
+    connection,
+    farmPool,
+    farmUser,
+    lpMint,
+    lpToken,
+    signTransaction,
+    walletPubkey,
+    rewardsAccount,
+    farmPoolId,
+  ]);
 
   const handleSnackBarClose = useCallback(() => {
     setState((state) => ({ ...state, open: false }));
@@ -478,7 +564,7 @@ const Stake = (): ReactElement => {
               handleChangeCard={setStaking}
               tokens={lpTokens}
               disableDrop
-              percentage={percentage}
+              percentage={percentage < 0.02 ? 0 : percentage}
             />
           </Box>
           <Box marginTop={2} width="100%">

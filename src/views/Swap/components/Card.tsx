@@ -84,7 +84,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 const SwapCard: React.FC<CardProps> = (props) => {
   const { card, handleChangeCard, disabled, tokens, disableDrop, percentage } = props;
   const classes = useStyles(props);
-  const tokenAccount = useTokenFromMint(card.token?.address);
+  const tokenAccount = useTokenFromMint(card.token?.address, card.lastUpdate);
 
   const tokenBalance = useMemo(() => {
     if (tokenAccount && card) {

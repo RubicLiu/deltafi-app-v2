@@ -9,7 +9,6 @@ import {
   Commitment,
 } from "@solana/web3.js";
 
-import hash from "object-hash";
 import { chunks } from "./utils";
 
 export const loadAccount = async (
@@ -67,41 +66,20 @@ export const sendAndConfirmTransaction = async (
   return txSig;
 };
 
-const filteredProgramAccountsCache: Record<
-  string,
-  {
-    pubkey: PublicKey;
-    account: AccountInfo<Buffer>;
-  }[]
-> = {};
-
 export async function getFilteredProgramAccounts(
   connection: Connection,
   programId: PublicKey,
   filters: any,
 ): Promise<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }[]> {
-  let resp = null;
-
-  const keyHash = hash.keys({ programId: programId, filters: filters });
-  if (filteredProgramAccountsCache[keyHash]) {
-    resp = filteredProgramAccountsCache[keyHash];
-  } else {
-    // @ts-ignore
-    resp = await connection._rpcRequest("getProgramAccounts", [
-      programId.toBase58(),
-      {
-        commitment: connection.commitment,
-        filters,
-        encoding: "base64",
-      },
-    ]);
-
-    if (resp.error) {
-      throw new Error(resp.error.message);
-    } else {
-      filteredProgramAccountsCache[keyHash] = resp;
-    }
-  }
+  // @ts-ignore
+  const resp = await connection._rpcRequest("getProgramAccounts", [
+    programId.toBase58(),
+    {
+      commitment: connection.commitment,
+      filters,
+      encoding: "base64",
+    },
+  ]);
 
   // @ts-ignore
   return resp.result.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({

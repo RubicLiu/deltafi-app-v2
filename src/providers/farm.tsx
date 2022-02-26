@@ -7,11 +7,12 @@ import tuple from "immutable-tuple";
 import { FarmPoolSchema } from "constants/farm";
 import { FarmPoolInfo, FarmPoolsContextValues, StakeAccount } from "./types";
 import { getMultipleAccounts, getFilteredProgramAccounts } from "utils/account";
-import { parseFarmInfo, FARM_USER_SIZE, parseFarmUser } from "lib/state/farm";
+import { parseFarmInfo, FARM_USER_SIZE, parseFarmUser, FarmPosition } from "lib/state/farm";
 import { getTokenInfo } from "./tokens";
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { useAsyncData } from "utils/fetch-loop";
 import { useConfig } from "./config";
+import hash from "object-hash";
 
 const FarmPoolsContext = createContext<null | FarmPoolsContextValues>(null);
 
@@ -119,7 +120,57 @@ export function useFarmByPoolAddress(poolAddress: string | null | undefined) {
   if (schema && pools) return pools.find((pool) => pool.publicKey.equals(schema.address));
 }
 
+const stakeAccountsCache: Record<
+  string,
+  {
+    data: {
+      publicKey: PublicKey;
+      positions: {
+        [key: string]: StakeAccount;
+      };
+    };
+    expiredTime: number;
+  }
+> = {};
+
+const defaultStakeAccountsCachLife: number = 60000; // 60,000
+
+export function updateStakeAccountCache(
+  walletPubkey: PublicKey,
+  configPubkey: PublicKey,
+  // this key is string because we only use it as a search key
+  // in the pool positions, and the key in position field in StakeAccout is string
+  farmPoolId: string,
+  farmPoolPositionData: FarmPosition,
+): StakeAccount | null {
+  const stakeFilters = getStakeFilters(configPubkey, walletPubkey);
+  const keyHash = hash.keys(JSON.stringify(stakeFilters));
+
+  if (!stakeAccountsCache[keyHash] || !stakeAccountsCache[keyHash].data.positions[farmPoolId]) {
+    console.log(keyHash);
+    console.error("farm pool position not found");
+    return null;
+  }
+
+  const position: StakeAccount = {
+    depositBalance: new BigNumber(farmPoolPositionData.depositedAmount.toString()),
+    rewardsOwed: new BigNumber(farmPoolPositionData.rewardsOwed.toString()),
+    rewardEstimated: new BigNumber(farmPoolPositionData.rewardsEstimated.toString()),
+    lastUpdateTs: new BigNumber(farmPoolPositionData.lastUpdateTs.toString()),
+    nextClaimTs: new BigNumber(farmPoolPositionData.nextClaimTs.toString()),
+  };
+
+  stakeAccountsCache[keyHash].data.positions[farmPoolId] = position;
+
+  return position;
+}
+
 async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) {
+  const keyHash = hash.keys(JSON.stringify(stakeFilters));
+  if (stakeAccountsCache[keyHash] && stakeAccountsCache[keyHash].expiredTime > Date.now()) {
+    return stakeAccountsCache[keyHash].data;
+  }
+
   const farmUserAccountInfos = await getFilteredProgramAccounts(connection, SWAP_PROGRAM_ID, stakeFilters);
   const filtered = farmUserAccountInfos
     .map(({ publicKey, accountInfo }) => ({ publicKey, farmUserInfo: parseFarmUser(accountInfo) }))
@@ -138,18 +189,22 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
     const depositBalance = new BigNumber(position.depositedAmount.toString());
     positions[poolId] = {
       depositBalance,
-      rewardDebt: new BigNumber(position.rewardsOwed.toString()),
+      rewardsOwed: new BigNumber(position.rewardsOwed.toString()),
       rewardEstimated: new BigNumber(position.rewardsEstimated.toString()),
       lastUpdateTs: new BigNumber(position.lastUpdateTs.toString()),
       nextClaimTs: new BigNumber(position.nextClaimTs.toString()),
     };
   });
 
+  stakeAccountsCache[keyHash] = {
+    data: { publicKey: farmUserAddress, positions },
+    expiredTime: Date.now() + defaultStakeAccountsCachLife,
+  };
   return { publicKey: farmUserAddress, positions };
 }
 
-async function getFarmUserAccount(connection: Connection, config: PublicKey, walletAddress: PublicKey) {
-  const stakeFilters = [
+function getStakeFilters(config: PublicKey, walletAddress: PublicKey) {
+  return [
     {
       memcmp: {
         offset: 1,
@@ -166,7 +221,10 @@ async function getFarmUserAccount(connection: Connection, config: PublicKey, wal
       dataSize: FARM_USER_SIZE,
     },
   ];
+}
 
+async function getFarmUserAccount(connection: Connection, config: PublicKey, walletAddress: PublicKey) {
+  const stakeFilters = getStakeFilters(config, walletAddress);
   return stakeProgramIdAccount(connection, stakeFilters);
 }
 

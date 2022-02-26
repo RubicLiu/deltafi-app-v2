@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import BigNumber from "bignumber.js";
 import { AccountInfo, PublicKey, Connection } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID, NATIVE_MINT } from "@solana/spl-token";
@@ -75,30 +75,13 @@ export function getOwnedAccountsFilters(publicKey: PublicKey) {
   ];
 }
 
-const tokenAccountCache: Record<
-  string,
-  {
-    pubkey: PublicKey;
-    account: AccountInfo<Buffer>;
-  }[]
-> = {};
-
 export async function getOwnedTokenAccounts(
   connection: Connection,
   publicKey: PublicKey,
 ): Promise<Array<{ publicKey: PublicKey; accountInfo: AccountInfo<Buffer> }>> {
   let filters = getOwnedAccountsFilters(publicKey);
-  const keyHash = hash.keys({ filters: filters, publicKey: publicKey });
 
-  let resp = null;
-  if (tokenAccountCache[keyHash]) {
-    resp = tokenAccountCache[keyHash];
-  } else {
-    resp = await connection.getProgramAccounts(TOKEN_PROGRAM_ID, { filters });
-    tokenAccountCache[keyHash] = resp;
-  }
-
-  tokenAccountCache[keyHash] = resp;
+  const resp = await connection.getProgramAccounts(TOKEN_PROGRAM_ID, { filters });
 
   return resp.map(({ pubkey, account: { data, executable, owner, lamports } }) => ({
     publicKey: new PublicKey(pubkey),
@@ -111,7 +94,72 @@ export async function getOwnedTokenAccounts(
   }));
 }
 
+const defalutTokenAccountCacheLife: number = 60000; // 60,000ms
+const tokenAccountCache: Record<
+  string,
+  {
+    data: TokenAccount[];
+    expiredTime: number;
+  }
+> = {};
+
+export function updateTokenAccountCache(
+  tokenAccountPubkey: PublicKey,
+  ownerAddress: PublicKey,
+  tokenAccountInfo: AccountInfo<Buffer>,
+): {
+  mint: PublicKey;
+  owner: PublicKey;
+  amount: BigNumber;
+} | null {
+  const keyHash = hash.keys(ownerAddress.toBase58());
+  if (!tokenAccountCache[keyHash]) {
+    console.error("wrong token account owner");
+    return null;
+  }
+
+  const tokenAccountIndex: number = tokenAccountCache[keyHash].data.findIndex(
+    (t) => t.pubkey.toBase58() === tokenAccountPubkey.toBase58(),
+  );
+  if (tokenAccountIndex === -1) {
+    console.error("cannot find token account", tokenAccountPubkey.toBase58());
+    return null;
+  }
+
+  if (tokenAccountPubkey === ownerAddress) {
+    tokenAccountInfo.data = Buffer.alloc(ACCOUNT_LAYOUT.span);
+    ACCOUNT_LAYOUT.encode(
+      {
+        mint: NATIVE_MINT,
+        owner: ownerAddress,
+        amount: new BigNumber(tokenAccountInfo.lamports),
+      },
+      tokenAccountInfo.data,
+    );
+
+    tokenAccountCache[keyHash].data[tokenAccountIndex] = {
+      pubkey: tokenAccountPubkey,
+      account: tokenAccountInfo,
+      effectiveMint: NATIVE_MINT,
+    };
+  } else {
+    tokenAccountCache[keyHash].data[tokenAccountIndex] = {
+      pubkey: tokenAccountPubkey,
+      account: tokenAccountInfo,
+      effectiveMint: parseTokenAccountData(tokenAccountInfo.data).mint,
+    };
+
+    return parseTokenAccountData(tokenAccountInfo.data);
+  }
+}
+
 export async function getTokenAccountInfo(connection: Connection, ownerAddress: PublicKey) {
+  const keyHash = hash.keys(ownerAddress.toBase58());
+
+  if (tokenAccountCache[keyHash] && tokenAccountCache[keyHash].expiredTime > Date.now()) {
+    return tokenAccountCache[keyHash].data;
+  }
+
   let [splAccounts, account] = await Promise.all([
     getOwnedTokenAccounts(connection, ownerAddress),
     connection.getAccountInfo(ownerAddress),
@@ -135,11 +183,18 @@ export async function getTokenAccountInfo(connection: Connection, ownerAddress: 
     account.data,
   );
 
-  return parsedSplAccounts.concat({
+  const result = parsedSplAccounts.concat({
     pubkey: ownerAddress,
     account,
     effectiveMint: NATIVE_MINT,
   });
+
+  tokenAccountCache[keyHash] = {
+    data: result,
+    expiredTime: Date.now() + defalutTokenAccountCacheLife,
+  };
+
+  return result;
 }
 
 export function useTokenAccounts(): [TokenAccount[] | null | undefined, boolean] {
@@ -157,8 +212,10 @@ export function useTokenAccounts(): [TokenAccount[] | null | undefined, boolean]
   });
 }
 
-export function useTokenFromMint(mintAddress: string | null | undefined) {
+export function useTokenFromMint(mintAddress: string | null | undefined, updateFlag: number | undefined) {
   const [tokens] = useTokenAccounts();
+  const { publicKey } = useWallet();
+
   return useMemo(() => {
     if (mintAddress && tokens) {
       const targetTokens = tokens.filter((token) => token.effectiveMint.toBase58() === mintAddress && token.account);
@@ -166,14 +223,20 @@ export function useTokenFromMint(mintAddress: string | null | undefined) {
       if (!targetTokens || targetTokens.length === 0) {
         return null;
       }
-      const targetToken = targetTokens.reduce((a, b) => {
-        const accountA = parseTokenAccountData(a.account.data);
-        const accountB = parseTokenAccountData(b.account.data);
-        if (accountA.amount > accountB.amount) {
-          return a;
-        }
-        return b;
-      });
+
+      let targetToken: TokenAccount;
+      if (mintAddress === NATIVE_MINT.toBase58()) {
+        targetToken = targetTokens.filter((token) => token.pubkey === publicKey)[0] ?? null;
+      } else {
+        targetToken = targetTokens.reduce((a, b) => {
+          const accountA = parseTokenAccountData(a.account.data);
+          const accountB = parseTokenAccountData(b.account.data);
+          if (accountA.amount > accountB.amount) {
+            return a;
+          }
+          return b;
+        });
+      }
 
       return {
         ...targetToken,
@@ -181,5 +244,7 @@ export function useTokenFromMint(mintAddress: string | null | undefined) {
       };
     }
     return null;
-  }, [mintAddress, tokens]);
+    /*eslint-disable */
+  }, [mintAddress, tokens, publicKey, updateFlag]);
+  /*eslint-enable */
 }

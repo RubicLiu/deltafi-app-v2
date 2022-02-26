@@ -146,7 +146,7 @@ export interface FarmPoolInfo {
 
 export interface StakeAccount {
   depositBalance: BigNumber;
-  rewardDebt: BigNumber;
+  rewardsOwed: BigNumber;
   rewardEstimated: BigNumber;
   lastUpdateTs: BigNumber;
   nextClaimTs: BigNumber;

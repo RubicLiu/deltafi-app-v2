@@ -78,7 +78,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const pool = usePoolFromAddress(poolKey);
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
-  const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
+  const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58(), 0);
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
 
   const pmm = useMemo(() => {

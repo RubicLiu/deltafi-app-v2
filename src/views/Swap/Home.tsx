@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Context, SignatureResult } from "@solana/web3.js";
+import { AccountInfo, Context, SignatureResult } from "@solana/web3.js";
 import ReactCardFlip from "react-card-flip";
 import {
   Typography,
@@ -24,7 +24,13 @@ import { ConnectButton } from "components";
 import SettingsPanel from "components/SettingsPanel/SettingsPanel";
 import SwapCard from "./components/Card";
 import { useModal } from "providers/modal";
-import { getTokenAccountInfo, getTokenInfo, parseTokenAccountData, useTokenFromMint } from "providers/tokens";
+import {
+  getTokenAccountInfo,
+  getTokenInfo,
+  parseTokenAccountData,
+  updateTokenAccountCache,
+  useTokenFromMint,
+} from "providers/tokens";
 import { usePoolFromSymbols } from "providers/pool";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { swap } from "utils/transactions/swap";
@@ -116,15 +122,17 @@ const Home: React.FC = (props) => {
   const [tokenFrom, setTokenFrom] = useState<ISwapCard>({
     token: getTokenInfo("SOL"),
     amount: "",
+    lastUpdate: Date.now(),
   });
   const [tokenTo, setTokenTo] = useState<ISwapCard>({
     token: getTokenInfo("USDC"),
     amount: "",
+    lastUpdate: Date.now(),
   });
   const { config } = useConfig();
   const pool = usePoolFromSymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
-  const sourceAccount = useTokenFromMint(tokenFrom.token.address);
-  const destinationAccount = useTokenFromMint(tokenTo.token.address);
+  const sourceAccount = useTokenFromMint(tokenFrom.token.address, 0);
+  const destinationAccount = useTokenFromMint(tokenTo.token.address, 0);
   const sourceBalance = useMemo(() => {
     if (sourceAccount && tokenFrom) {
       return exponentiatedBy(sourceAccount.account.amount, tokenFrom.token.decimals);
@@ -138,7 +146,7 @@ const Home: React.FC = (props) => {
     return null;
   }, [destinationAccount, tokenTo]);
 
-  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
+  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58(), 0);
 
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
@@ -213,8 +221,8 @@ const Home: React.FC = (props) => {
 
       amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
     }
-    setTokenFrom({ token: newTokenFrom, amount: card.amount });
-    setTokenTo({ token: newTokenTo, amount: amountOut });
+    setTokenFrom({ token: newTokenFrom, amount: card.amount, lastUpdate: Date.now() });
+    setTokenTo({ token: newTokenTo, amount: amountOut, lastUpdate: Date.now() });
   };
 
   const handleTokenToInput = (card: ISwapCard) => {
@@ -235,8 +243,8 @@ const Home: React.FC = (props) => {
 
       amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
     }
-    setTokenFrom({ ...tokenFrom, token: newTokenFrom });
-    setTokenTo({ token: newTokenTo, amount: amountOut });
+    setTokenFrom({ ...tokenFrom, token: newTokenFrom, lastUpdate: Date.now() });
+    setTokenTo({ token: newTokenTo, amount: amountOut, lastUpdate: Date.now() });
   };
 
   const swapCallback = useCallback(async () => {
@@ -249,13 +257,6 @@ const Home: React.FC = (props) => {
     }
 
     try {
-      // const { amountOutWithSlippage } = http://localhost:3000(
-      //   pool,
-      //   tokenFrom.token.address,
-      //   tokenTo.token.address,
-      //   tokenFrom.amount ?? '0',
-      //   parseFloat(priceImpact),
-      // )
       const swapMethod = pool.swapType === SwapType.Normal ? swap : stableSwap;
       let transaction = await swapMethod({
         connection,
@@ -276,6 +277,18 @@ const Home: React.FC = (props) => {
         },
       });
       transaction = await signTransaction(transaction);
+
+      connection.onAccountChange(sourceAccount.pubkey, (sourceAccountInfo: AccountInfo<Buffer>, _: Context) => {
+        updateTokenAccountCache(sourceAccount.pubkey, walletPubkey, sourceAccountInfo);
+        setTokenFrom({ ...tokenFrom, amount: "", lastUpdate: Date.now() });
+      });
+      connection.onAccountChange(
+        destinationAccount.pubkey,
+        (destinationAccountInfo: AccountInfo<Buffer>, _: Context) => {
+          updateTokenAccountCache(destinationAccount.pubkey, walletPubkey, destinationAccountInfo);
+          setTokenTo({ ...tokenTo, amount: "", lastUpdate: Date.now() });
+        },
+      );
 
       const hash = await sendSignedTransaction({ signedTransaction: transaction, connection });
 
@@ -312,9 +325,6 @@ const Home: React.FC = (props) => {
           setState((_state) => ({ ..._state, open: true }));
         }
       });
-
-      setTokenFrom({ ...tokenFrom, amount: "" });
-      setTokenTo({ ...tokenTo, amount: "" });
     } catch (e) {
       console.log(e);
       setTransactionResult({ status: false });
