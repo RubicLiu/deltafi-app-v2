@@ -61,11 +61,11 @@ const Home: React.FC = () => {
           const basePrice = ((symbolMap[baseSymbol] as any).price as PriceData).price
             ? ((symbolMap[baseSymbol] as any).price as PriceData).price
             : ((symbolMap[baseSymbol] as any).price as PriceData).previousPrice;
-          const baseDecimals = ((symbolMap[baseSymbol] as any).price as PriceData).exponent;
+          const baseDecimals = -((symbolMap[baseSymbol] as any).price as PriceData).exponent;
           const quotePrice = ((symbolMap[quoteSymbol] as any).price as PriceData).price
             ? ((symbolMap[quoteSymbol] as any).price as PriceData).price
             : ((symbolMap[quoteSymbol] as any).price as PriceData).previousPrice;
-          const quoteDecimals = ((symbolMap[quoteSymbol] as any).price as PriceData).exponent;
+          const quoteDecimals = -((symbolMap[quoteSymbol] as any).price as PriceData).exponent;
 
           volumn = pmm.tvl(basePrice, quotePrice, baseDecimals, quoteDecimals);
         }
@@ -83,7 +83,7 @@ const Home: React.FC = () => {
             Pools
           </Typography>
           <Typography align="center" color="textPrimary">
-            TVL {convertDollar(tvl.toString())}
+            Total Value Locked: {convertDollar(tvl.toFixed(2))}
           </Typography>
         </Box>
         <br />
