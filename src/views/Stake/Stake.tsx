@@ -459,7 +459,7 @@ const Stake = (): ReactElement => {
     <Page>
       <Container className={classes.root}>
         <Box display="flex" justifyContent="space-between" pb={2}>
-          <Typography variant="h6">{farmPool.name} Liquidity Mining</Typography>
+          <Typography variant="h6">{farmPool.name} LP Token Staking</Typography>
           <Box className={classes.iconGroup}>
             <img
               src={farmPool.baseTokenInfo.logoURI}
@@ -483,12 +483,12 @@ const Stake = (): ReactElement => {
         {isConnectedWallet && (
           <Box className={classes.desc}>
             <Typography variant="h6" paragraph>
-              About DeltaFi LT Tokens
+              About {farmPool.name} LP Tokens
             </Typography>
             <Typography variant="subtitle2">
-              DELFI tokens are tokens which represent a share of the liquidity provided to a DeltaFi staking pool. You
-              may obtain DELFI tokens by depositing {farmPool.name.split("-")[0]} or {farmPool.name.split("-")[1]} into
-              the {farmPool.name} pool.
+              LP tokens represents a share of the liquidity provided to a swap pool. You may obtain {farmPool.name} LP
+              tokens by depositing {farmPool.name.split("-")[0]} and {farmPool.name.split("-")[1]} into the{" "}
+              {farmPool.name} pool.
             </Typography>
             <Box display="flex" alignItems="center" mt={3}>
               <Link
