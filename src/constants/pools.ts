@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import { poolInfo } from "./config.json";
+import { deployConfig } from "./deployConfig";
 
 export interface PoolSchema {
   name: string;
@@ -9,7 +9,7 @@ export interface PoolSchema {
   quote: string;
 }
 
-export const pools: PoolSchema[] = poolInfo.map(({ name, swap, mint, base, quote }) => ({
+export const pools: PoolSchema[] = deployConfig.poolInfo.map(({ name, swap, mint, base, quote }) => ({
   name,
   address: new PublicKey(swap),
   mintAddress: new PublicKey(mint),

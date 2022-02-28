@@ -19,7 +19,7 @@ import { farmPools } from "constants/farm";
 import { useCustomConnection } from "providers/connection";
 import usePyth from "providers/pyth";
 import { PublicKey } from "@solana/web3.js";
-import { network } from "constants/config.json";
+import { deployConfig } from "constants/deployConfig";
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
 //   enable: true,
@@ -124,7 +124,7 @@ const App: React.FC<{ params: string }> = ({ params }) => {
     setConfigAddress(MARKET_CONFIG_ADDRESS);
     setSchemas(pools);
     setFarmSchema(farmPools);
-    setNetwork(network);
+    setNetwork(deployConfig.network);
     setFilters(listSymbols(pools));
   }, [setConfigAddress, setSchemas, setFarmSchema, setNetwork, setFilters]);
 

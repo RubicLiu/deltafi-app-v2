@@ -6,12 +6,12 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { getMultipleAccounts } from "utils/account";
 import { PythContextValue } from "./types";
 
-import { network } from "../constants/config.json";
+import { deployConfig } from "../constants/deployConfig";
 // TODO: update pyth pubkey
 const oraclePublicKey = {
   "mainnet-beta": "AHtgzX45WTKfkPG53L6WYhGEXwQkN1BVknET3sVsLL8J",
   testnet: "AFmdnt9ng1uVxqCmqwQJDAYC5cKTkw8gJKSM5PnzuF6z",
-}[network];
+}[deployConfig.network];
 
 const BAD_SYMBOLS = ["BCH/USD", "LTC/USD"];
 
