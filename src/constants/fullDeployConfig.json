@@ -47,48 +47,48 @@
   "mainnet-test": {
     "network": "mainnet-beta",
     "swapProgramId": "8Y7g9EN4MQv5epFEU3aKpXrNcu1t2nkyM2jZpWkw6q1u",
-    "marketConfigAddress": "HsxTa945PpbwmjjdhNB659EExm8r7gw1khezsLV6FpFk",
+    "marketConfigAddress": "5fb9KKiX4unmeq2F2ZjvNahc38AALL7dDQuPanDNKRt1",
     "deltafiTokenMint": "tstpB7nAg8n7ynm5C5mfRkQ73Q8dSTcyxkjNvR2Bspt",
-    "deltafiToken": "4xzNADUekWUYKen7Z3hsMYKaYhr7TyAoHr96xULS573C",
+    "deltafiToken": "Cajir4DbVH8Gyj8E9EjuvxmrZj9ihZYVYZJ7RNH5uBQs",
     "poolInfo": [
       {
         "name": "SOL-SRM",
         "base": "SOL",
         "quote": "SRM",
-        "swap": "EBHwQaSZ8hEgrpvEMfBYre93FY4cABZswg7xZLRiy4GQ",
-        "mint": "9jVSLsHvPweSsdwZjLL4yXaRBZw2DHLWpUrdkUK8F7g5",
-        "farm": "E69f6F2y6ktwDQr3cK7gU2zthrCE2PNbVzACi7Di726h",
-        "token": "3MRZKY9jazQvbhpeDsNd5zoGgjAUH7WGajvkVbdCkjYh",
+        "swap": "CMWjTEZV86ZjxjZQjzFTyhRTEL3PkoAjayhoqbG65YPq",
+        "mint": "8KtQESJRaBvchvLhssKdVFZenxRrErtXvc6xaNadMLrM",
+        "farm": "DXeo3UmkGwoZYu4JtSmMLwhBuEmrwQARiCJojEoAJYe6",
+        "token": "9ga2VELHdqk8ykhjhgXrbmTKRfMrHrvZ3f8dyNr2Ee4t",
         "decimals": 9
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swap": "B3q28w9RTXArw5rYfwVyZP3zif32iGe7Gj21LD4gYPUD",
-        "mint": "6Vt1Rw2mtXFWnEgpUegeL6QdPBNutt4wevdnC7ro4RLe",
-        "farm": "6TdPUMsTdnDFkRvDj1R6RcYSHSHkE6omgqyJUuiyVvSB",
-        "token": "Hg1vEY5d2EYovmUUAkKSTnuMynnJi2xwc6y1EuiyLZR1",
+        "swap": "HH1URcy7GDq8c5cP8qksUocAkag52gzgWhPzxv2muQxR",
+        "mint": "HVvUCoW6exyJK2iagVtkSMSmf7yP1fngD8k5u2kJZPWd",
+        "farm": "HX1BuR3hE8g4LiY8rMhukrq83dqryUpn1fD4Awzb4fkR",
+        "token": "Dy4ta9z6eUohYwjyZZWpBhCua6kQwFt2PKQ9pqRcdSD7",
         "decimals": 9
       },
       {
         "name": "SRM-USDC",
         "base": "SRM",
         "quote": "USDC",
-        "swap": "4hSXwvBkN7nabDy4MQqzsSAKJrKvRHKcBwcYn5WiU4V8",
-        "mint": "5WpJ7LuWW532NQKyZA4NnZmUe31rezwajB5CDJBAshPi",
-        "farm": "38GoR9Yv7LzaBc7rcQcNGojxoNZ7wPpqgxG5nci2WNBi",
-        "token": "HkFEXH5ktMsUPkEmxp7BvrFqxB21wqgxENh5pycFkUPF",
+        "swap": "GxPJ6pcf1jXKfA2qHbwJG8rDsfQ3xGidrsebqiL6diBg",
+        "mint": "DGepQvYSGKP49mEk2P9dtTLKkqnjZ9Qg6fb4f9r9SSZ2",
+        "farm": "64gEGuaACTLkzGFxYnhknj5ZLAURDvf8ut2jbjgJbQun",
+        "token": "AmBamE89XLtF2ta12bYZajKhKjE4YXzg5rPAiF5J1SWL",
         "decimals": 6
       },
       {
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swap": "HafCL4THW946fQ2sjfSQuLxecfwrrBt95ckG6wS8JbsG",
-        "mint": "8VNE67V3g4AU9GtTPz8mwugtJW4HYSEuYnfXdmxMUFbQ",
-        "farm": "8qCYjeW9Tw5B45QpcFp5MNutDXHmgLtTockjZzhYSeHr",
-        "token": "HEPRsp9a6jBGB8q1ncnmUGBLVtAqSA4U8jpoKYFztTaH",
+        "swap": "47trsEY9xSeKrqFDFjpqsaeKwqdGPgt4TD1zzDubr46c",
+        "mint": "8JSg5CLxjKcA3fUHbvCG4dMrqR8RMnzYdjeDWHzQjnJJ",
+        "farm": "5QYn31EzSuBRZrmS2ZQD2DKhAAPgGS6pLEwkL2E1pwag",
+        "token": "2aD8XdumqTxSYpo9snywGMikskPEvk7X12HyQTjegZHq",
         "decimals": 6
       }
     ]

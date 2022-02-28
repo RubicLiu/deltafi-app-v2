@@ -30,6 +30,7 @@ export const FarmInfoLayout = struct<FarmInfo>(
     u64("feeDenominator"),
     u64("aprNumerator"),
     u64("aprDenominator"),
+    blob(64, "reserved"),
   ],
   "farmInfo",
 );

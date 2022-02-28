@@ -1,5 +1,5 @@
 import { AccountInfo, PublicKey, Connection } from "@solana/web3.js";
-import { struct, u8 } from "buffer-layout";
+import { struct, u8, blob } from "buffer-layout";
 import { loadAccount } from "utils/account";
 import { AccountParser, publicKey } from "utils/layout";
 
@@ -28,6 +28,7 @@ export const ConfigInfoLayout = struct<ConfigInfo>(
     FeesLayout("fees"),
     RewardsLayout("rewards"),
     publicKey("deltafiToken"),
+    blob(128, "reserved"),
   ],
   "configInfo",
 );

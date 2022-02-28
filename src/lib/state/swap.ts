@@ -1,5 +1,5 @@
 import { AccountInfo, PublicKey, Connection } from "@solana/web3.js";
-import { struct, u8 } from "buffer-layout";
+import { struct, u8, blob } from "buffer-layout";
 
 import { AccountParser, bool, publicKey } from "utils/layout";
 import { loadAccount } from "utils/account";
@@ -55,6 +55,7 @@ export const SwapInfoLayout = struct<SwapInfo>(
     FeesLayout("fees"),
     RewardsLayout("rewards"),
     PoolStateLayout("poolState"),
+    blob(64, "reserved"),
   ],
   "swapInfo",
 );
