@@ -506,7 +506,11 @@ const Stake = (): ReactElement => {
           <Typography className={classes.title}>Your Liquidity Staked</Typography>
           <Box className={classes.cardBottom}>
             <Typography className={classes.amount}>{depositAmount.toString()}</Typography>
-            <Typography className={classes.amount}>{farmPool.name} DELFI</Typography>
+            <Typography className={classes.amount}>{farmPool.name}</Typography>
+          </Box>
+          <Box className={classes.cardBottom}>
+            <Typography className={classes.amount}>0 / Day</Typography>
+            <Typography className={classes.amount}>DELFI</Typography>
           </Box>
         </Box>
         <Box className={classes.unclaimedToken}>
@@ -527,7 +531,6 @@ const Stake = (): ReactElement => {
             <Typography className={classes.amount}>
               {deltafiTokenMint ? unclaimedReward.toFixed(deltafiTokenMint.decimals) : "--"}
             </Typography>
-            <Typography className={classes.amount}>0 / Day</Typography>
           </Box>
         </Box>
         <Paper className={classes.minting}>

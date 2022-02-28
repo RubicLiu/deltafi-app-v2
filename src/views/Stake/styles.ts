@@ -60,6 +60,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
   unclaimedToken: {
+    marginTop: spacing(3),
     borderRadius: spacing(1.5),
     padding: `${spacing(2.5)}px ${spacing(2)}px`,
     background: palette.background.primary,
