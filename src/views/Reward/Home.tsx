@@ -5,10 +5,12 @@ import Page from "components/layout/Page";
 import { ConnectButton } from "components";
 import { useModal } from "providers/modal";
 import ReferralCard from "./components/ReferralCard";
-import MyReward from "./components/MyReward";
 import CopyLinkButton from "./components/CopyLinkButton";
 import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from "components";
 import copy from "copy-to-clipboard";
+
+import { useTokenFromMint } from "providers/tokens";
+import { deployConfig } from "constants/deployConfig";
 
 /*
  * mockup test data for reward page
@@ -28,43 +30,6 @@ const referralIntroCard = [
     caption: "Earn crypto",
     detail: "Get referral rewards from your friends’ earnings & swaps.",
     image: "/images/earn_crypto.png",
-  },
-];
-
-const myRewards = [
-  {
-    name: "REFERRAL",
-    totalAmount: 1000,
-    claimedAmount: 200,
-    claimed: 10,
-    history: [
-      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
-      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
-      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
-      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
-
-      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
-      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
-      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
-      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
-    ],
-  },
-  {
-    name: "AIRDROPS",
-    totalAmount: 1000,
-    claimedAmount: 500,
-    claimed: 50,
-    history: [
-      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
-      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
-      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
-      { date: "18.Sep.2021", rewards: 10, lockup: 60 },
-
-      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
-      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
-      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
-      { date: "18.Feb.2021", rewards: 10, lockup: 100 },
-    ],
   },
 ];
 
@@ -164,18 +129,16 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
  */
 const getReferralLink = (() => {
   let referralLink = null;
-  let pubKey = null;
+  let referrer = null;
 
-  return async (publicKey, setLink: (link: string) => void) => {
-    if (publicKey === null) {
+  return async (deltafiTokenAccount, setLink: (link: string) => void) => {
+    if (deltafiTokenAccount === null) {
       return null;
     }
-    if (!referralLink || publicKey !== pubKey) {
-      pubKey = publicKey.toString();
+    if (!referralLink || referrer !== deltafiTokenAccount.pubKey.toBase58()) {
+      referrer = deltafiTokenAccount.pubkey.toBase58();
       try {
-        const res = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/get_code/" + publicKey);
-        const jsonData = await res.json();
-        referralLink = process.env.REACT_APP_LOCAL_HOST + "?referral_code=" + jsonData.referral_code;
+        referralLink = process.env.REACT_APP_LOCAL_HOST + "?referrer=" + referrer;
         setLink(referralLink);
       } catch (err) {
         console.warn("err :>> ", err);
@@ -188,16 +151,17 @@ const getReferralLink = (() => {
 const Home: React.FC = (props) => {
   const classes = useStyles(props);
   const { setMenu } = useModal();
-  const { connected: isConnectedWallet, publicKey } = useWallet();
+  const { connected: isConnectedWallet } = useWallet();
 
   const [buttonText, setButtonText] = useState("Copy Link");
   const [referralLink, setReferralLink] = useState("");
+  const deltafiTokenAccount = useTokenFromMint(deployConfig.deltafiTokenMint);
 
   useEffect(() => {
     (async () => {
-      await getReferralLink(publicKey, (link) => setReferralLink(link));
+      await getReferralLink(deltafiTokenAccount, (link) => setReferralLink(link));
     })();
-  }, [isConnectedWallet, publicKey]);
+  }, [isConnectedWallet, deltafiTokenAccount]);
 
   return (
     <Page>
@@ -301,16 +265,6 @@ const Home: React.FC = (props) => {
                   </Box>
                 </Box>
               </Paper>
-            </Box>
-
-            {/* My Rewards */}
-            <Box className={classes.mainComponentMargin}>
-              <Typography variant="h5" color="primary" align="center" paragraph>
-                My Rewards (Mock data only now. Real data coming soon...)
-              </Typography>
-              {myRewards.map((item, index) => (
-                <MyReward detail={item} key={index} />
-              ))}
             </Box>
           </>
         )}
