@@ -92,15 +92,6 @@ const SwapCard: React.FC<CardProps> = (props) => {
     }
     return null;
   }, [tokenAccount, card]);
-  const amountPercentage = useMemo(() => {
-    if (card && tokenBalance && !disabled) {
-      const _percentage = (parseFloat(card.amount ?? "0") / tokenBalance.toNumber()) * 100;
-      if (!isNaN(_percentage) && _percentage <= 100) {
-        return Number(_percentage).toFixed(2) + "%";
-      }
-    }
-    return "%--";
-  }, [card, tokenBalance, disabled]);
 
   useEffect(() => {
     if (percentage && tokenBalance) {
@@ -160,7 +151,6 @@ const SwapCard: React.FC<CardProps> = (props) => {
       </Box>
       <Box display="flex" justifyContent="space-between">
         <Typography className={classes.tokenBalance}>{`Balance: ${tokenBalance?.toString() ?? "--"}`}</Typography>
-        <Typography className={classes.tokenBalance}>{amountPercentage}</Typography>
       </Box>
     </Paper>
   );

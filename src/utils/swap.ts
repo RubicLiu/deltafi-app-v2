@@ -33,7 +33,6 @@ export function getSwapOutAmount(
     const baseAmount = new BigNumber(amount);
     const quoteAmount = pmmHelper.querySellBase(baseAmount, pmmState);
     const fee = quoteAmount.multipliedBy(pmmState.mtFeeRate);
-    const lpFee = fee.multipliedBy(pmmState.lpFeeRate);
     const quoteAmountWithSlippage = quoteAmount.multipliedBy(100 - slippage).dividedBy(100);
     /**
      * calc price impact
@@ -49,7 +48,7 @@ export function getSwapOutAmount(
       amountIn: parseFloat(amount),
       amountOut: quoteAmount.toNumber(),
       amountOutWithSlippage: quoteAmountWithSlippage.toNumber(),
-      lpFee: lpFee.toNumber(),
+      fee: fee.toNumber(),
       priceImpact,
     };
   } else {

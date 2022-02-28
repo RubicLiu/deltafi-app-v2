@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 
-export const convertDoller = (value) => {
-  return "US$ " + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+export const convertDollar = (value) => {
+  return "USD " + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
 export function isValidPublicKey(key) {

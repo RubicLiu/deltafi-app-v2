@@ -7,7 +7,7 @@ import BigNumber from "bignumber.js";
 import Page from "components/layout/Page";
 import PoolCard from "./components/Card";
 import { PoolSchema } from "constants/pools";
-import { convertDoller } from "utils/utils";
+import { convertDollar } from "utils/utils";
 import { usePools } from "providers/pool";
 import { PMM } from "lib/calc";
 import usePyth from "providers/pyth";
@@ -83,7 +83,7 @@ const Home: React.FC = () => {
             Pools
           </Typography>
           <Typography align="center" color="textPrimary">
-            TVL {convertDoller(tvl.toString())}
+            TVL {convertDollar(tvl.toString())}
           </Typography>
         </Box>
         <br />

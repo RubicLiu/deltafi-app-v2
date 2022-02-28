@@ -34,7 +34,7 @@ import { PMM } from "lib/calc";
 import { rate, exponentiate, exponentiatedBy } from "utils/decimal";
 import { getOutAmount } from "utils/liquidity";
 import { deposit, withdraw, sendSignedTransaction } from "utils/transactions";
-import { convertDoller } from "utils/utils";
+import { convertDollar } from "utils/utils";
 import { SOLSCAN_LINK } from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import { useFarmByPoolAddress, useFarmUserAccount } from "providers/farm";
@@ -706,7 +706,7 @@ const Deposit: React.FC = () => {
             Total Share
           </Typography>
           <Typography variant="body1" color="primary">
-            {convertDoller(sharePrice.toFixed(2).toString())}
+            {convertDollar(sharePrice.toFixed(2).toString())}
           </Typography>
         </Box>
         <Paper className={classes.root}>
@@ -796,7 +796,7 @@ const Deposit: React.FC = () => {
               </Box>
               <Box display="flex" justifyContent="space-between" marginBottom={2}>
                 <Typography className={classes.label}>Total Reserves</Typography>
-                <Typography className={classes.label}>{convertDoller(tvl.toFixed(2).toString())}</Typography>
+                <Typography className={classes.label}>{convertDollar(tvl.toFixed(2).toString())}</Typography>
               </Box>
             </Box>
           </Box>

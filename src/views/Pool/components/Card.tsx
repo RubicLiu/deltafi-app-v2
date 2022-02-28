@@ -10,7 +10,7 @@ import { usePoolFromAddress } from "providers/pool";
 import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
 import { usePriceBySymbol } from "providers/pyth";
 import { PMM } from "lib/calc";
-import { convertDoller } from "utils/utils";
+import { convertDollar } from "utils/utils";
 import { rate } from "utils/decimal";
 import { CardProps } from "./types";
 
@@ -138,12 +138,12 @@ const PoolCard: React.FC<CardProps> = (props) => {
       </Box>
       <Box display="flex" justifyContent="space-between">
         <Typography className={classes.label}>Total Deposits</Typography>
-        <Typography className={classes.label}>{convertDoller(tvl.toFixed(2).toString())}</Typography>
+        <Typography className={classes.label}>{convertDollar(tvl.toFixed(2).toString())}</Typography>
       </Box>
       {connected && props.isUserPool && (
         <Box display="flex" justifyContent="space-between">
           <Typography className={classes.label}>Your deposits</Typography>
-          <Typography className={classes.label}>{convertDoller(sharePrice?.toFixed(2).toString())}</Typography>
+          <Typography className={classes.label}>{convertDollar(sharePrice?.toFixed(2).toString())}</Typography>
         </Box>
       )}
     </Box>

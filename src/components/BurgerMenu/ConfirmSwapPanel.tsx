@@ -115,34 +115,15 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
               <Typography>{`${data?.tokenFrom.amount ?? 0} ${data?.tokenFrom.token.symbol}`}</Typography>
             </Box>
           </Box>
-          {/* <Box display="flex" justifyContent="space-between" className={classes.row}>
-            <Typography color="textSecondary">Minimum Received</Typography>
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <img src={tokenFrom.token.link} alt={`${tokenFrom.symbol} coin`} className={classes.img} />
-              <Typography>{tokenFrom.amount || 0} USDC</Typography>
-            </Box>
-          </Box> */}
-          {/* <Box display="flex" justifyContent="space-between" className={classes.row}>
-            <Typography color="textSecondary">Exchange Rate</Typography>
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <Typography>{tokenFrom.amount || 0} USDC</Typography>
-            </Box>
-          </Box> */}
           <Box display="flex" justifyContent="space-between" className={classes.row}>
-            <Typography color="textSecondary">Price Impact</Typography>
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <Typography className={classes.success}>{Number(swapOut?.priceImpact ?? 0).toFixed(2)} %</Typography>
-            </Box>
-          </Box>
-          <Box display="flex" justifyContent="space-between" className={classes.row}>
-            <Typography color="textSecondary">Liquidity Provider Fee</Typography>
+            <Typography color="textSecondary">Transaction Fee</Typography>
             <Box display="flex" justifyContent="center" alignItems="center">
               <img
                 src={data?.tokenTo.token.logoURI}
                 alt={`${data?.tokenFrom.token.symbol} coin`}
                 className={classes.img}
               />
-              <Typography>{`${fixedNumber(swapOut?.lpFee) ?? 0} ${data?.tokenTo.token.symbol}`}</Typography>
+              <Typography>{`${fixedNumber(swapOut?.fee) ?? 0} ${data?.tokenTo.token.symbol}`}</Typography>
             </Box>
           </Box>
         </Box>

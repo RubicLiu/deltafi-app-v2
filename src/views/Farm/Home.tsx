@@ -135,7 +135,7 @@ const Home: React.FC = (props): ReactElement => {
           <Box display="flex" alignItems="center" mt={2}>
             <Typography className={classes.description}>Read more about</Typography>
             <Link
-              href="/DELFI"
+              href="https://solscan.io/token/de1QJkP1qDCk5JYCCXCeq27bQQUdCaiv7xVKFrhPSzF"
               target="_blank"
               rel="noreferrer noopener"
               underline="always"
@@ -161,14 +161,6 @@ const Home: React.FC = (props): ReactElement => {
             <FarmCard key={farm.address.toBase58()} farm={farm} />
           ))}
         </Box>
-        {/* <Box className={classes.list}>
-          <Typography variant="h6" color="primary" paragraph>
-            Inactive Farms
-          </Typography>
-          {farms.map((farm: FarmConfig, index) => (
-            <FarmCard key={index} farm={farm} info={null} />
-          ))}
-        </Box> */}
       </Box>
     </Page>
   );

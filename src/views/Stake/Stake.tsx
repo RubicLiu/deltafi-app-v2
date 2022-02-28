@@ -159,14 +159,19 @@ const Stake = (): ReactElement => {
     return new BigNumber(0);
   })();
 
-  const poolRate = useMemo(() => {
+  const poolRateByDay = useMemo(() => {
     if (farmPool && totalStaked) {
-      const apr = new BigNumber(farmPool.aprNumerator.toString())
-        .dividedBy(farmPool.aprDenominator.toString())
-        .toFixed(3);
-      return totalStaked.multipliedBy(apr).toFixed(3);
+      return totalStaked.multipliedBy(apr).dividedBy(365).toFixed(3);
     }
-  }, [farmPool, totalStaked]);
+    return "--";
+  }, [farmPool, totalStaked, apr]);
+
+  const rewardRateByDay = useMemo(() => {
+    if (depositAmount) {
+      return depositAmount.multipliedBy(apr).dividedBy(365).toFixed(3);
+    }
+    return "--";
+  }, [depositAmount, apr]);
 
   const handleSwitchMethod = (method: "stake" | "unstake") => {
     setPercentage(0);
@@ -471,7 +476,7 @@ const Stake = (): ReactElement => {
           </Box>
           <Box>
             <Typography>Pool Rate</Typography>
-            <Typography>{poolRate} DELFI / day</Typography>
+            <Typography>{poolRateByDay} DELFI / day</Typography>
           </Box>
         </Box>
 
@@ -481,12 +486,13 @@ const Stake = (): ReactElement => {
               About DeltaFi LT Tokens
             </Typography>
             <Typography variant="subtitle2">
-              DL tokens are tokens which represent a share of the liquidity provided to a DeltaFi staking pool. You may
-              obtain DL tokens by depositing USD Coin (USDC) or USDT (USDT) into the USDT-USDC pool.
+              DELFI tokens are tokens which represent a share of the liquidity provided to a DeltaFi staking pool. You
+              may obtain DELFI tokens by depositing {farmPool.name.split("-")[0]} or {farmPool.name.split("-")[1]} into
+              the {farmPool.name} pool.
             </Typography>
             <Box display="flex" alignItems="center" mt={3}>
               <Link
-                href="/DELFI"
+                href={"/deposit/" + farmPool?.poolAddress.toBase58()}
                 target="_blank"
                 rel="noreferrer noopener"
                 underline="always"
@@ -509,7 +515,7 @@ const Stake = (): ReactElement => {
             <Typography className={classes.amount}>{farmPool.name}</Typography>
           </Box>
           <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>0 / Day</Typography>
+            <Typography className={classes.amount}>{rewardRateByDay} / Day</Typography>
             <Typography className={classes.amount}>DELFI</Typography>
           </Box>
         </Box>

@@ -84,16 +84,6 @@ const StakeCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const tokenBalance = card.balance;
 
-  const amountPercentage = useMemo(() => {
-    if (card && tokenBalance && !disabled) {
-      const percentage = (parseFloat(card.amount ?? "0") / tokenBalance.toNumber()) * 100;
-      if (!isNaN(percentage) && percentage <= 100) {
-        return Number(percentage).toFixed(2) + "%";
-      }
-    }
-    return "%--";
-  }, [card, tokenBalance, disabled]);
-
   useEffect(() => {
     if (percentage && tokenBalance) {
       const realAmount = tokenBalance.multipliedBy(new BigNumber(percentage)).dividedBy(new BigNumber(100));
@@ -154,7 +144,6 @@ const StakeCard: React.FC<CardProps> = (props) => {
         <Typography className={classes.tokenBalance}>{`Available LP tokens: ${
           tokenBalance?.toString() ?? "--"
         }`}</Typography>
-        <Typography className={classes.tokenBalance}>{amountPercentage}</Typography>
       </Box>
     </Paper>
   );

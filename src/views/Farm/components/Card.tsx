@@ -8,7 +8,7 @@ import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { ConnectButton, Text } from "components";
 import { CardProps } from "./types";
 import { PMM } from "lib/calc";
-import { convertDoller } from "utils/utils";
+import { convertDollar } from "utils/utils";
 import { usePoolFromAddress } from "providers/pool";
 import { usePriceBySymbol } from "providers/pyth";
 import { useTokenMintAccount } from "providers/tokens";
@@ -141,7 +141,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
       </Box>
       <Box display="flex" justifyContent="space-between">
         <Typography className={classes.label}>Total Staked:</Typography>
-        <Typography className={classes.label}>{convertDoller(tvl.toFixed(2))}</Typography>
+        <Typography className={classes.label}>{convertDollar(tvl.toFixed(2))}</Typography>
       </Box>
       <Box display="flex" justifyContent="space-between" mt={1.5}>
         <Typography className={classes.label}>APY</Typography>

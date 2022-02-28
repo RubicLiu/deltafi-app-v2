@@ -246,11 +246,11 @@ const StakePanel: React.FC = (props) => {
           {isConnectedWallet && (
             <LiquidDescriptonDiv isDark={isDark}>
               <Text small color={"rgba(255, 255, 255, 0.8)"}>
-                DL tokens are tokens which represent a share of the liquidity provided to a DeltaFi staking pool.
+                DELFI tokens are tokens which represent a share of the liquidity provided to a DeltaFi staking pool.
               </Text>
               <br />
               <Text small color={"rgba(255, 255, 255, 0.8)"}>
-                You may obtain DL tokens by depositing USD Coin (USDC) or USDT (USDT) into the USDT-USDC pool.
+                You may obtain DELFI tokens by depositing USD Coin (USDC) or USDT (USDT) into the USDT-USDC pool.
               </Text>
               <br />
               <FlexWrapper>

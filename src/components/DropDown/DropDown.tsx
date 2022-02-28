@@ -1,9 +1,9 @@
 import { ReactNode, useState, useMemo } from "react";
 import { Avatar, Button, ClickAwayListener, makeStyles, Box, Theme, Typography, InputBase } from "@material-ui/core";
 import { SearchOutlined } from "@material-ui/icons";
-
+import styled from "styled-components";
 import { DropDownProps } from "./types";
-import { TokenInfo } from "constants/tokens";
+import { TokenInfo, tokens } from "constants/tokens";
 import { ArrowDown } from "components";
 import { useDarkMode } from "providers/theme";
 
@@ -116,6 +116,22 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+const Img = styled.img`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  &.coin-earning {
+    margin-left: -1.2px;
+  }
+  ${({ theme }) => theme.muibreakpoints.up("sm")} {
+    width: 32px;
+    height: 32px;
+    &.coin-earning {
+      margin-left: -5px;
+    }
+  }
+`;
+
 const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: ReactNode }) => {
   const classes = useStyles();
   const { value, options, onChange, inputProps, disableDrop } = props;
@@ -147,7 +163,32 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
           onClick={handleOpen}
           disabled={disableDrop}
           startIcon={
-            value?.logoURI ? <Avatar src={value?.logoURI} alt={value?.symbol} className={classes.icon} /> : null
+            value?.logoURI ? (
+              <Avatar src={value?.logoURI} alt={value?.symbol} className={classes.icon} />
+            ) : (
+              (() => {
+                if (!value?.symbol) {
+                  return null;
+                }
+                const [baseTokenSymbol, quoteTokenSymbol] = value.symbol.split("-");
+                if (!baseTokenSymbol || !quoteTokenSymbol) {
+                  return null;
+                }
+
+                const baseTokenLogoURL = tokens.find((tokenInfo) => tokenInfo.symbol === baseTokenSymbol)?.logoURI;
+                const quoteTokenLogoURL = tokens.find((tokenInfo) => tokenInfo.symbol === quoteTokenSymbol)?.logoURI;
+                if (!baseTokenLogoURL || !quoteTokenLogoURL) {
+                  return null;
+                }
+
+                return (
+                  <Box display="flex" alignItems="center">
+                    <Img src={baseTokenLogoURL} alt={baseTokenSymbol} />
+                    <Img src={quoteTokenLogoURL} alt={quoteTokenSymbol} className="coin-earning" />
+                  </Box>
+                );
+              })()
+            )
           }
           endIcon={disableDrop ? undefined : <ArrowDown isDark={isDark} width="10" height="6" />}
           className={classes.button}

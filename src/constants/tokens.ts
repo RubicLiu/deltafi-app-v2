@@ -96,5 +96,5 @@ export const lpTokens: TokenInfo[] = deployConfig.poolInfo.map(({ name, mint, de
   symbol: name,
   name: "LP " + name,
   decimals: decimals,
-  logoURI: " ",
+  logoURI: null,
 }));
