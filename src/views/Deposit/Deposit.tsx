@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from "react";
-import { PublicKey, Transaction, Context, SignatureResult, AccountInfo } from "@solana/web3.js";
+import { PublicKey, Transaction, Context, SignatureResult } from "@solana/web3.js";
 import {
   Typography,
   IconButton,
@@ -27,7 +27,7 @@ import { WithdrawSelectCard } from "components/molecules";
 import WithdrawCard from "components/molecules/WithdrawCard";
 
 import { useModal } from "providers/modal";
-import { useTokenFromMint, useTokenMintAccount, updateTokenAccountCache } from "providers/tokens";
+import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
 import { usePoolFromAddress } from "providers/pool";
 import { usePriceBySymbol } from "providers/pyth";
 import { PMM } from "lib/calc";
@@ -208,9 +208,9 @@ const Deposit: React.FC = () => {
   const pool = usePoolFromAddress(new PublicKey(poolAddress));
   const [base, setBase] = useState<ISwapCard>({ token: null, amount: "", lastUpdate: Date.now() });
   const [quote, setQuote] = useState<ISwapCard>({ token: null, amount: "", lastUpdate: Date.now() });
-  const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58(), 0);
-  const baseTokenAccount = useTokenFromMint(pool?.baseTokenInfo.address, 0);
-  const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address, 0);
+  const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
+  const baseTokenAccount = useTokenFromMint(pool?.baseTokenInfo.address);
+  const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address);
   const [farmUser] = useFarmUserAccount();
   const { config } = useConfig();
   const farmPool = useFarmByPoolAddress(poolAddress);
@@ -335,15 +335,6 @@ const Deposit: React.FC = () => {
 
       transaction = await signTransaction(transaction);
 
-      connection.onAccountChange(baseTokenAccount.pubkey, (baseTokenAccountInfo: AccountInfo<Buffer>, _: Context) => {
-        updateTokenAccountCache(baseTokenAccount.pubkey, walletPubkey, baseTokenAccountInfo);
-        setBase({ ...base, amount: "", lastUpdate: Date.now() });
-      });
-      connection.onAccountChange(quoteTokenAccount.pubkey, (quoteTokenAccountInfo: AccountInfo<Buffer>, _: Context) => {
-        updateTokenAccountCache(quoteTokenAccount.pubkey, walletPubkey, quoteTokenAccountInfo);
-        setQuote({ ...quote, amount: "", lastUpdate: Date.now() });
-      });
-
       const hash = await sendSignedTransaction({
         signedTransaction: transaction,
         connection,
@@ -359,6 +350,10 @@ const Deposit: React.FC = () => {
         });
         setState((state) => ({ ...state, open: true }));
       });
+
+      await connection.confirmTransaction(hash, "confirmed");
+      setBase((prevBase) => ({ ...prevBase, amount: "", lastUpdate: Date.now() }));
+      setQuote((prevQuote) => ({ ...prevQuote, amount: "", lastUpdate: Date.now() }));
     } catch (e) {
       console.error("error", e);
       setTransactionResult({ status: false });
@@ -418,16 +413,6 @@ const Deposit: React.FC = () => {
       }
 
       transaction = await signTransaction(transaction);
-
-      connection.onAccountChange(baseTokenAccount.pubkey, (baseTokenAccountInfo: AccountInfo<Buffer>, _: Context) => {
-        updateTokenAccountCache(baseTokenAccount.pubkey, walletPubkey, baseTokenAccountInfo);
-        setBase({ ...base, amount: "", lastUpdate: Date.now() });
-      });
-      connection.onAccountChange(quoteTokenAccount.pubkey, (quoteTokenAccountInfo: AccountInfo<Buffer>, _: Context) => {
-        updateTokenAccountCache(quoteTokenAccount.pubkey, walletPubkey, quoteTokenAccountInfo);
-        setQuote({ ...quote, amount: "", lastUpdate: Date.now() });
-      });
-
       const hash = await sendSignedTransaction({
         signedTransaction: transaction,
         connection,
@@ -444,6 +429,10 @@ const Deposit: React.FC = () => {
 
         setState({ ...state, open: true });
       });
+
+      await connection.confirmTransaction(hash, "confirmed");
+      setBase((prevBase) => ({ ...prevBase, amount: "", lastUpdate: Date.now() }));
+      setQuote((prevQuote) => ({ ...prevQuote, amount: "", lastUpdate: Date.now() }));
     } catch (e) {
       console.error("error", e);
       setTransactionResult({ status: false });

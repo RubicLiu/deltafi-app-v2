@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import BigNumber from "bignumber.js";
-import { AccountInfo, PublicKey, Connection } from "@solana/web3.js";
+import { AccountInfo, PublicKey, Connection, Context } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID, NATIVE_MINT } from "@solana/spl-token";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import tuple from "immutable-tuple";
@@ -100,6 +100,7 @@ const tokenAccountCache: Record<
   {
     data: TokenAccount[];
     expiredTime: number;
+    lastUpdate: number;
   }
 > = {};
 
@@ -149,6 +150,7 @@ export function updateTokenAccountCache(
       effectiveMint: parseTokenAccountData(tokenAccountInfo.data).mint,
     };
 
+    tokenAccountCache[keyHash].lastUpdate = Date.now();
     return parseTokenAccountData(tokenAccountInfo.data);
   }
 }
@@ -189,9 +191,19 @@ export async function getTokenAccountInfo(connection: Connection, ownerAddress: 
     effectiveMint: NATIVE_MINT,
   });
 
+  for (const tokenAccount of result) {
+    connection.onAccountChange(
+      tokenAccount.pubkey,
+      (tokenAccountInfo: AccountInfo<Buffer>, _: Context) =>
+        updateTokenAccountCache(tokenAccount.pubkey, ownerAddress, tokenAccountInfo),
+      "confirmed",
+    );
+  }
+
   tokenAccountCache[keyHash] = {
     data: result,
     expiredTime: Date.now() + defalutTokenAccountCacheLife,
+    lastUpdate: Date.now(),
   };
 
   return result;
@@ -212,9 +224,12 @@ export function useTokenAccounts(): [TokenAccount[] | null | undefined, boolean]
   });
 }
 
-export function useTokenFromMint(mintAddress: string | null | undefined, updateFlag: number | undefined) {
+export function useTokenFromMint(mintAddress: string | null | undefined) {
   const [tokens] = useTokenAccounts();
   const { publicKey } = useWallet();
+
+  const keyHash = publicKey ? hash.keys(publicKey.toBase58()) : null;
+  const tokenAccountCacheLastUpdate = keyHash ? tokenAccountCache[keyHash]?.lastUpdate : null;
 
   return useMemo(() => {
     if (mintAddress && tokens) {
@@ -245,6 +260,6 @@ export function useTokenFromMint(mintAddress: string | null | undefined, updateF
     }
     return null;
     /*eslint-disable */
-  }, [mintAddress, tokens, publicKey, updateFlag]);
+  }, [mintAddress, tokens, publicKey, tokenAccountCacheLastUpdate]);
   /*eslint-enable */
 }

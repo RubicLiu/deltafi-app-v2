@@ -77,7 +77,7 @@ const Stake = (): ReactElement => {
   const { network } = useCustomConnection();
   const token = getFarmTokenInfo(farmPool?.name);
   const [lastUpdate, setLastUpdate] = useState(0);
-  const tokenAccount = useTokenFromMint(token?.address, lastUpdate);
+  const tokenAccount = useTokenFromMint(token?.address);
 
   const [staking, setStaking] = useState({
     isStake: true,
@@ -112,11 +112,11 @@ const Stake = (): ReactElement => {
   });
 
   const { config } = useConfig();
-  const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58(), 0);
+  const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58());
   const lpMint = useTokenMintAccount(farmPool?.poolMintKey);
   const deltafiTokenMint = useTokenMintAccount(DELTAFI_TOKEN_MINT);
   const [farmUser] = useFarmUserAccount();
-  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58(), 0);
+  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
   });

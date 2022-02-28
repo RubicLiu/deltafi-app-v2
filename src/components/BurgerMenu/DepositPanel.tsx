@@ -60,7 +60,7 @@ const DepositPanel = (props: IDepositPanelProps): ReactElement => {
   const classes = useStyles(props);
   const { address, setMenu } = useModal();
   const pool = usePoolFromAddress(address);
-  const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58(), 0);
+  const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
