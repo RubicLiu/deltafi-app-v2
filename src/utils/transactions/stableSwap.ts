@@ -1,8 +1,9 @@
-import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
 import BN from "bn.js";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
-import { createApproveInstruction, SwapData, SWAP_DIRECTION } from "lib/instructions";
+import { USER_REFERRER_DATA_SIZE } from "lib/state";
+import { createSetReferrerInstruction, createApproveInstruction, SwapData, SWAP_DIRECTION } from "lib/instructions";
 import { ExTokenAccount, MarketConfig, PoolInfo } from "providers/types";
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from ".";
@@ -18,6 +19,7 @@ export async function stableSwap({
   destinationRef,
   rewardTokenRef,
   swapData,
+  referrer,
 }: {
   connection: Connection;
   walletPubkey: PublicKey;
@@ -27,6 +29,7 @@ export async function stableSwap({
   destinationRef?: PublicKey;
   rewardTokenRef?: PublicKey;
   swapData: SwapData;
+  referrer?: PublicKey;
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
     console.error("stable swap failed with null parameter");
@@ -38,6 +41,7 @@ export async function stableSwap({
   let createWrappedTokenAccountTransaction: Transaction | undefined;
   let initializeWrappedTokenAccountTransaction: Transaction | undefined;
   let closeWrappedTokenAccountTransaction: Transaction | undefined;
+  let createUserReferrerAccountTransaction: Transaction | undefined;
 
   let buySol =
     (pool.quoteTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellBase) ||
@@ -90,6 +94,27 @@ export async function stableSwap({
     });
     rewardTokenRef = result?.newAccountPubkey;
     createRewardAccountTransaction = result?.transaction;
+  }
+
+  if (referrer) {
+    const seed = "referrer";
+    const userReferrerDataPubkey = await PublicKey.createWithSeed(walletPubkey, seed, SWAP_PROGRAM_ID);
+    const balanceForUserReferrerData = await connection.getMinimumBalanceForRentExemption(USER_REFERRER_DATA_SIZE);
+    createUserReferrerAccountTransaction = new Transaction()
+      .add(
+        SystemProgram.createAccountWithSeed({
+          basePubkey: walletPubkey,
+          fromPubkey: walletPubkey,
+          newAccountPubkey: userReferrerDataPubkey,
+          lamports: balanceForUserReferrerData,
+          space: USER_REFERRER_DATA_SIZE,
+          programId: SWAP_PROGRAM_ID,
+          seed,
+        }),
+      )
+      .add(
+        createSetReferrerInstruction(config.publicKey, walletPubkey, userReferrerDataPubkey, referrer, SWAP_PROGRAM_ID),
+      );
   }
 
   const userTransferAuthority = Keypair.generate();
@@ -145,6 +170,7 @@ export async function stableSwap({
     initializeWrappedTokenAccountTransaction,
     createDestinationAccountTransaction,
     createRewardAccountTransaction,
+    createUserReferrerAccountTransaction,
     transaction,
     closeWrappedTokenAccountTransaction,
   ]);

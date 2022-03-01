@@ -2,7 +2,6 @@ import React, { lazy, useEffect } from "react";
 import { Route, Switch, BrowserRouter, Redirect } from "react-router-dom";
 // import Amplify, { Analytics } from 'aws-amplify'
 
-import { useWallet } from "@solana/wallet-adapter-react";
 import SuspenseWithChunkError from "./components/SuspenseWithChunkError";
 import PageLoader from "components/PageLoader";
 import Header from "components/Header";
@@ -18,7 +17,6 @@ import { useFarmPools } from "providers/farm";
 import { farmPools } from "constants/farm";
 import { useCustomConnection } from "providers/connection";
 import usePyth from "providers/pyth";
-import { PublicKey } from "@solana/web3.js";
 import { deployConfig } from "constants/deployConfig";
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -41,76 +39,7 @@ const Stake = lazy(() => import("./views/Stake"));
 const Unavailable = lazy(() => import("./views/Unavailable"));
 const Terms = lazy(() => import("./views/Terms"));
 
-/**
- * Parse the query parameters from url
- * currently used for parsing referral link
- * @param the parameter string
- * @returns a json data of params' keys and values
- */
-const parseQueryParams = (params: string) => {
-  if (params.length === 0 || params[0] !== "?") {
-    return { referral_code: null };
-  }
-
-  const paramsArray = params.slice(1, params.length).split("&");
-  let res = { referral_code: null };
-  paramsArray.forEach((paramStr: string) => {
-    const param = paramStr.split("=");
-    if (param.length === 2) {
-      res[param[0]] = param[1];
-    }
-  });
-
-  return res;
-};
-
-/**
- * a function that links to a closure variable walletAddress
- * this function is called whenever the wallet connection state is changed
- * and it will update to wallet to the backend
- * if the wallet is connected for the first time,
- * the backend will record the address and its referrer (if any)
- */
-const updateWallet = (() => {
-  let walletAddress = null;
-
-  return async (address: PublicKey, referralCode: string) => {
-    if (address !== null && !walletAddress) {
-      try {
-        const res = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/check_record/" + address.toString());
-        if (!res.ok) {
-          return;
-        }
-
-        const resJson = await res.json();
-        if (resJson.exist) {
-          return;
-        }
-
-        const updateRes = await fetch(process.env.REACT_APP_BACKEND_HOST + "/referral/new_wallet", {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            wallet_address: address.toString(),
-            referral_code: referralCode,
-          }),
-          method: "POST",
-          credentials: "include",
-        });
-
-        if (updateRes.ok) {
-          walletAddress = address.toString();
-        }
-      } catch (err) {
-        console.warn("err : >> ", err);
-      }
-    }
-  };
-})();
-
-const App: React.FC<{ params: string }> = ({ params }) => {
+const App: React.FC = () => {
   const { setConfigAddress } = useConfig();
   const { setSchemas } = usePools();
   const { setSchemas: setFarmSchema } = useFarmPools();
@@ -118,7 +47,16 @@ const App: React.FC<{ params: string }> = ({ params }) => {
   const { setFilters } = usePyth();
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
 
-  const { connected: isConnectedWallet, publicKey } = useWallet();
+  useEffect(() => {
+    // TODO: Get the referrer from user referrer data account.
+    const _referrer = new URLSearchParams(window.location.search).get("referrer");
+    // This flag is added to toggle the flag for local development.
+    const _enableReferral = new URLSearchParams(window.location.search).get("enableReferral");
+    if (_referrer) {
+      window.localStorage.setItem("deltafi._referrer", _referrer);
+      window.localStorage.setItem("deltafi._enableReferral", _enableReferral);
+    }
+  }, []);
 
   useEffect(() => {
     setConfigAddress(MARKET_CONFIG_ADDRESS);
@@ -127,10 +65,6 @@ const App: React.FC<{ params: string }> = ({ params }) => {
     setNetwork(deployConfig.network);
     setFilters(listSymbols(pools));
   }, [setConfigAddress, setSchemas, setFarmSchema, setNetwork, setFilters]);
-
-  useEffect(() => {
-    updateWallet(publicKey, parseQueryParams(params).referral_code);
-  }, [isConnectedWallet, publicKey, params]);
 
   return (
     <BrowserRouter>

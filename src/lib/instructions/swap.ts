@@ -1,5 +1,5 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { PublicKey, SYSVAR_CLOCK_PUBKEY, TransactionInstruction } from "@solana/web3.js";
+import { PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruction } from "@solana/web3.js";
 import { struct, u8 } from "buffer-layout";
 import {
   SwapData,
@@ -15,6 +15,7 @@ export enum SwapInstruction {
   Swap,
   Deposit,
   Withdraw,
+  SetReferrer,
 }
 
 export const createSwapInstruction = (
@@ -172,5 +173,36 @@ export const createWithdrawInstruction = (
     keys,
     programId,
     data,
+  });
+};
+
+export const createSetReferrerInstruction = (
+  config: PublicKey,
+  owner: PublicKey,
+  userReferrerData: PublicKey,
+  referrer: PublicKey,
+  programId: PublicKey,
+) => {
+  const keys = [
+    { pubkey: config, isSigner: false, isWritable: true },
+    { pubkey: owner, isSigner: true, isWritable: false },
+    { pubkey: userReferrerData, isSigner: false, isWritable: true },
+    { pubkey: referrer, isSigner: false, isWritable: false },
+    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+  ];
+  const dataLayout = struct([u8("instruction")]);
+  const data = Buffer.alloc(dataLayout.span);
+  dataLayout.encode(
+    {
+      instruction: SwapInstruction.SetReferrer,
+    },
+    data,
+  );
+
+  return new TransactionInstruction({
+    keys,
+    data,
+    programId,
   });
 };

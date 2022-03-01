@@ -94,3 +94,18 @@ export const loadSwapInfo = async (
 
   return { data: parsed.data, key };
 };
+
+export interface UserReferrerData {
+  isInitialized: boolean;
+  configKey: PublicKey;
+  owner: PublicKey;
+  referrer: PublicKey;
+}
+
+/** @internal */
+export const UserReferrerDataLayout = struct<UserReferrerData>(
+  [bool("isInitialized"), publicKey("configKey"), publicKey("owner"), publicKey("referrer")],
+  "userReferrerData",
+);
+
+export const USER_REFERRER_DATA_SIZE = UserReferrerDataLayout.span;

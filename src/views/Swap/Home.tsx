@@ -48,6 +48,7 @@ import { SwapType } from "lib/state";
 import { stableSwap } from "utils/transactions/stableSwap";
 import { sleep } from "utils/utils";
 import loadingIcon from "components/gif/loading_white.gif";
+import { PublicKey } from "@solana/web3.js";
 
 interface TransactionResult {
   status: boolean | null;
@@ -124,6 +125,8 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }));
 
 const Home: React.FC = (props) => {
+  const referrer = window.localStorage.getItem("deltafi._referrer");
+  const enableReferral = window.localStorage.getItem("deltafi._enableReferral");
   const classes = useStyles(props);
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
@@ -266,6 +269,7 @@ const Home: React.FC = (props) => {
     setIsProcessing(true);
     try {
       const swapMethod = pool.swapType === SwapType.Normal ? swap : stableSwap;
+      const referrerPubkey = referrer != null && enableReferral === "true" ? new PublicKey(referrer) : null;
       let transaction = await swapMethod({
         connection,
         walletPubkey,
@@ -283,6 +287,7 @@ const Home: React.FC = (props) => {
           swapDirection:
             tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? SWAP_DIRECTION.SellBase : SWAP_DIRECTION.SellQuote,
         },
+        referrer: referrerPubkey,
       });
       transaction = await signTransaction(transaction);
       const hash = await sendSignedTransaction({ signedTransaction: transaction, connection });
@@ -340,6 +345,8 @@ const Home: React.FC = (props) => {
     rewardsAccount?.pubkey,
     signTransaction,
     destinationBalance,
+    referrer,
+    enableReferral,
   ]);
 
   const handleSwap = useCallback(async () => {
