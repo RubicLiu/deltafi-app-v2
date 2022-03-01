@@ -29,12 +29,7 @@ export function fixedNumber(number: number | string | null | undefined, maxDecim
   if (number === null || number === undefined) {
     return "";
   }
-  const str = Number(number).toString();
-  const pointIdx = str.indexOf(".");
-  if (pointIdx) {
-    return str.slice(0, pointIdx) + str.slice(pointIdx, pointIdx + maxDecimalPlace + 1);
-  }
-  return str;
+  return Number(number).toFixed(maxDecimalPlace);
 }
 
 export async function sleep(ms) {

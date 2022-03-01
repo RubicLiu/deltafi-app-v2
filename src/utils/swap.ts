@@ -55,7 +55,6 @@ export function getSwapOutAmount(
     const quoteAmount = new BigNumber(amount);
     const baseAmount = pmmHelper.querySellQuote(quoteAmount, pmmState);
     const fee = baseAmount.multipliedBy(tradeFeeNumerator1).dividedBy(tradeFeeDenominator1);
-    const lpFee = fee.multipliedBy(adminFeeDenominator1.minus(adminFeeNumerator1)).dividedBy(adminFeeDenominator1);
     const baseAmountWithSlippage = baseAmount.multipliedBy(100 - slippage).dividedBy(100);
     const baseBalance = poolState.baseReserve.minus(baseAmount);
     const quoteBalance = poolState.quoteReserve.plus(quoteAmount);
@@ -68,7 +67,7 @@ export function getSwapOutAmount(
       amountIn: parseFloat(amount),
       amountOut: baseAmount.toNumber(),
       amountOutWithSlippage: baseAmountWithSlippage.toNumber(),
-      lpFee: lpFee.toNumber(),
+      fee: fee.toNumber(),
       priceImpact,
     };
   }
