@@ -583,9 +583,9 @@ const Deposit: React.FC = () => {
         <img src={"/images/snack-success.svg"} alt="snack-status-icon" className={classes.snackBarIcon} />
         <Box>
           <Typography variant="body1" color="primary">
-            {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(base.amount).toFixed(2)} ${
+            {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(base.amount).toFixed(6)} ${
               base.token.symbol
-            } and ${Number(quote.amount).toFixed(2)} ${quote.token.symbol} for ${base.token.symbol}-${
+            } and ${Number(quote.amount).toFixed(6)} ${quote.token.symbol} for ${base.token.symbol}-${
               quote.token.symbol
             } LP`}
           </Typography>

@@ -379,7 +379,7 @@ const Home: React.FC = (props) => {
         <img src={"/images/snack-success.svg"} alt="snack-status-icon" className={classes.snackBarIcon} />
         <Box>
           <Typography variant="body1" color="primary">
-            {`Swap ${Number(base.amount).toFixed(2)} ${base.token.symbol} to ${Number(quote.amount).toFixed(2)} ${
+            {`Swap ${Number(base.amount).toFixed(6)} ${base.token.symbol} to ${Number(quote.amount).toFixed(6)} ${
               quote.token.symbol
             } for ${base.token.symbol}-${quote.token.symbol} Pool`}
           </Typography>

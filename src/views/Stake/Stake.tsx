@@ -162,14 +162,14 @@ const Stake = (): ReactElement => {
 
   const poolRateByDay = useMemo(() => {
     if (farmPool && totalStaked) {
-      return totalStaked.multipliedBy(apr).dividedBy(365).toFixed(3);
+      return totalStaked.multipliedBy(apr).dividedBy(365).toFixed(6);
     }
     return "--";
   }, [farmPool, totalStaked, apr]);
 
   const rewardRateByDay = useMemo(() => {
     if (depositAmount) {
-      return depositAmount.multipliedBy(apr).dividedBy(365).toFixed(3);
+      return depositAmount.multipliedBy(apr).dividedBy(365).toFixed(6);
     }
     return "--";
   }, [depositAmount, apr]);
@@ -378,7 +378,7 @@ const Stake = (): ReactElement => {
         <Box>
           {stake && (
             <Typography variant="body1" color="primary">
-              {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(stake?.amount).toFixed(2)} ${
+              {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(stake?.amount).toFixed(6)} ${
                 stake.token.symbol
               } LP`}
             </Typography>
