@@ -53,7 +53,7 @@ export function useMarketAuthorityKey() {
         );
         setMarketAuthorityKey(authorityKey);
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     };
     fn();

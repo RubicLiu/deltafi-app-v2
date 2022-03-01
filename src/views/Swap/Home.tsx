@@ -312,7 +312,7 @@ const Home: React.FC = (props) => {
       setTokenFrom((prevTokenFrom) => ({ ...prevTokenFrom, amount: "", lastUpdate: Date.now() }));
       setTokenTo((prevTokenTo) => ({ ...prevTokenTo, amount: "", lastUpdate: Date.now() }));
     } catch (e) {
-      console.log(e);
+      console.error(e);
       setTransactionResult({ status: false });
       setState((_state) => ({ ..._state, open: true }));
     }

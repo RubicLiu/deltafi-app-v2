@@ -91,7 +91,7 @@ export function EntirePoolsProvider({ children }) {
           }
           setPools(tempPools);
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
       })();
     }

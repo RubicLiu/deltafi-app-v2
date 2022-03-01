@@ -83,7 +83,7 @@ export function FarmPoolsProvider({ children }) {
           }
           setPools(tempFarms);
         } catch (e) {
-          console.log("Hey", e);
+          console.error("Hey", e);
         }
       })();
     }
@@ -147,7 +147,6 @@ export function updateStakeAccountCache(
   const keyHash = hash.keys(JSON.stringify(stakeFilters));
 
   if (!stakeAccountsCache[keyHash] || !stakeAccountsCache[keyHash].data.positions[farmPoolId]) {
-    console.log(keyHash);
     console.error("farm pool position not found");
     return null;
   }

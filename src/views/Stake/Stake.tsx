@@ -249,7 +249,6 @@ const Stake = (): ReactElement => {
       }
     } else {
       if (staking.amount === "" || !position || depositAmount.lt(staking.amount)) {
-        console.log("null unstake", staking.amount, position, depositAmount);
         return null;
       }
 
@@ -373,7 +372,6 @@ const Stake = (): ReactElement => {
         setState((state) => ({ ...state, open: true }));
       });
     } catch (e) {
-      console.log(e);
       setTransactionResult({ status: false });
       setState((state) => ({ ...state, open: true }));
     }

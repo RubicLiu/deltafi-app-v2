@@ -32,7 +32,6 @@ export async function swap({
     return null;
   }
 
-  console.log("pool info", pool.swapType);
   const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
   const tempAccountRefKeyPair = Keypair.generate();
   let createWrappedTokenAccountTransaction: Transaction | undefined;

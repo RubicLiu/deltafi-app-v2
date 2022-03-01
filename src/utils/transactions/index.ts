@@ -162,14 +162,14 @@ async function awaitTransactionSignatureConfirmation(
         }
 
         done = true;
-        console.log("Timed out for txid", txid);
+        console.info("Timed out for txid", txid);
         reject({ timeout: true });
       }, timeout);
       try {
         connection.onSignature(
           txid,
           (result) => {
-            console.log("WS confirmed", txid, result);
+            console.info("WS confirmed", txid, result);
             done = true;
             if (result.err) {
               reject(result.err);
@@ -179,10 +179,10 @@ async function awaitTransactionSignatureConfirmation(
           },
           "recent",
         );
-        console.log("Set up WS connection", txid);
+        console.info("Set up WS connection", txid);
       } catch (e) {
         done = true;
-        console.log("WS error in setup", txid, e);
+        console.info("WS error in setup", txid, e);
       }
       while (!done) {
         (async () => {
@@ -191,22 +191,22 @@ async function awaitTransactionSignatureConfirmation(
             const result = signatureStatuses && signatureStatuses.value[0];
             if (!done) {
               if (!result) {
-                console.log("REST null result for", txid, result);
+                console.info("REST null result for", txid, result);
               } else if (result.err) {
-                console.log("REST error for", txid, result);
+                console.info("REST error for", txid, result);
                 done = true;
                 reject(result.err);
               } else if (!result.confirmations) {
-                console.log("REST no confirmations for", txid, result);
+                console.info("REST no confirmations for", txid, result);
               } else {
-                console.log("REST confirmation for", txid, result);
+                console.info("REST confirmation for", txid, result);
                 done = true;
                 resolve(result);
               }
             }
           } catch (e) {
             if (!done) {
-              console.log("REST connection error: txid", txid, e);
+              console.info("REST connection error: txid", txid, e);
             }
           }
         })();
