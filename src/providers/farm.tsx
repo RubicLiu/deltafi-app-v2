@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { AccountInfo, PublicKey, Connection } from "@solana/web3.js";
+import { AccountInfo, PublicKey, Connection, Context } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
 import tuple from "immutable-tuple";
@@ -195,6 +195,35 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
     };
   });
 
+  connection.onAccountChange(
+    farmUserAddress,
+    (farmUserAccountInfo: AccountInfo<Buffer>, _: Context) => {
+      console.log("farm user changed");
+      const { data: farmUserData } = parseFarmUser(farmUserAccountInfo);
+      const updatedPositions: {
+        [key: string]: StakeAccount;
+      } = {};
+
+      farmUserData.positions.forEach((position) => {
+        const poolId = position.pool.toBase58();
+        const depositBalance = new BigNumber(position.depositedAmount.toString());
+        updatedPositions[poolId] = {
+          depositBalance,
+          rewardsOwed: new BigNumber(position.rewardsOwed.toString()),
+          rewardEstimated: new BigNumber(position.rewardsEstimated.toString()),
+          lastUpdateTs: new BigNumber(position.lastUpdateTs.toString()),
+          nextClaimTs: new BigNumber(position.nextClaimTs.toString()),
+        };
+      });
+
+      stakeAccountsCache[keyHash] = {
+        data: { publicKey: farmUserAddress, positions: updatedPositions },
+        expiredTime: stakeAccountsCache[keyHash].expiredTime,
+      };
+    },
+    "confirmed",
+  );
+
   stakeAccountsCache[keyHash] = {
     data: { publicKey: farmUserAddress, positions },
     expiredTime: Date.now() + defaultStakeAccountsCachLife,
@@ -241,7 +270,7 @@ export function useFarmUserAccount() {
     getFarmUser,
     tuple("getFarmUser", connection, config?.publicKey.toBase58(), publicKey?.toBase58()),
     {
-      refreshInterval: 1000,
+      refreshInterval: 800,
       refreshIntervalOnError: 5000,
     },
   );
