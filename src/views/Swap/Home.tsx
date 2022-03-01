@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Context, SignatureResult } from "@solana/web3.js";
 import ReactCardFlip from "react-card-flip";
 import {
   Typography,
@@ -13,6 +12,7 @@ import {
   Snackbar,
   SnackbarContent,
   Link,
+  Avatar,
 } from "@material-ui/core";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import SettingsIcon from "@material-ui/icons/Settings";
@@ -24,7 +24,13 @@ import { ConnectButton } from "components";
 import SettingsPanel from "components/SettingsPanel/SettingsPanel";
 import SwapCard from "./components/Card";
 import { useModal } from "providers/modal";
-import { getTokenAccountInfo, getTokenInfo, parseTokenAccountData, useTokenFromMint } from "providers/tokens";
+import {
+  getTokenAccountInfo,
+  getTokenInfo,
+  parseTokenAccountData,
+  useTokenFromMint,
+  findTokenAccountByMint,
+} from "providers/tokens";
 import { usePoolFromSymbols } from "providers/pool";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { swap } from "utils/transactions/swap";
@@ -40,6 +46,8 @@ import { useCustomConnection } from "providers/connection";
 import BigNumber from "bignumber.js";
 import { SwapType } from "lib/state";
 import { stableSwap } from "utils/transactions/stableSwap";
+import { sleep } from "utils/utils";
+import loadingIcon from "components/gif/loading_white.gif";
 
 interface TransactionResult {
   status: boolean | null;
@@ -107,6 +115,12 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   snackBarIcon: {
     marginRight: spacing(2),
   },
+  actionLoadingButton: {
+    width: 50,
+    height: 50,
+    marginTop: 4,
+    marginBottom: 4,
+  },
 }));
 
 const Home: React.FC = (props) => {
@@ -116,12 +130,10 @@ const Home: React.FC = (props) => {
   const [tokenFrom, setTokenFrom] = useState<ISwapCard>({
     token: getTokenInfo("SOL"),
     amount: "",
-    lastUpdate: Date.now(),
   });
   const [tokenTo, setTokenTo] = useState<ISwapCard>({
     token: getTokenInfo("USDC"),
     amount: "",
-    lastUpdate: Date.now(),
   });
   const { config } = useConfig();
   const pool = usePoolFromSymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
@@ -145,6 +157,7 @@ const Home: React.FC = (props) => {
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
 
+  const [isProcessing, setIsProcessing] = useState(false);
   const [priceImpact, setPriceImpact] = useState("2.0");
   const [isIncludeDecimal, setIsIncludeDecimal] = useState(true);
   const [openSettings, setOpenSettings] = useState(false);
@@ -215,8 +228,8 @@ const Home: React.FC = (props) => {
 
       amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
     }
-    setTokenFrom({ token: newTokenFrom, amount: card.amount, lastUpdate: Date.now() });
-    setTokenTo({ token: newTokenTo, amount: amountOut, lastUpdate: Date.now() });
+    setTokenFrom({ token: newTokenFrom, amount: card.amount });
+    setTokenTo({ token: newTokenTo, amount: amountOut });
   };
 
   const handleTokenToInput = (card: ISwapCard) => {
@@ -237,8 +250,8 @@ const Home: React.FC = (props) => {
 
       amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
     }
-    setTokenFrom({ ...tokenFrom, token: newTokenFrom, lastUpdate: Date.now() });
-    setTokenTo({ token: newTokenTo, amount: amountOut, lastUpdate: Date.now() });
+    setTokenFrom({ ...tokenFrom, token: newTokenFrom });
+    setTokenTo({ token: newTokenTo, amount: amountOut });
   };
 
   const swapCallback = useCallback(async () => {
@@ -250,6 +263,7 @@ const Home: React.FC = (props) => {
       return null;
     }
 
+    setIsProcessing(true);
     try {
       const swapMethod = pool.swapType === SwapType.Normal ? swap : stableSwap;
       let transaction = await swapMethod({
@@ -273,48 +287,44 @@ const Home: React.FC = (props) => {
       transaction = await signTransaction(transaction);
       const hash = await sendSignedTransaction({ signedTransaction: transaction, connection });
 
-      connection.onSignature(hash, async (signatureResult: SignatureResult, _: Context) => {
-        if (!signatureResult.err) {
-          const prevBalanceFrom = sourceBalance ?? 0;
-          const prevBalanceTo = destinationBalance ?? 0;
-          const tokenAccounts = await getTokenAccountInfo(connection, walletPubkey);
-          const from = tokenAccounts.find((acc) => acc.effectiveMint.toBase58() === tokenFrom.token.address);
-          const to = tokenAccounts.find((acc) => acc.effectiveMint.toBase58() === tokenTo.token.address);
-          if (!from || !to) {
-            return;
-          }
-
-          const nextBalanceFrom = exponentiatedBy(
-            parseTokenAccountData(from.account.data).amount,
-            tokenFrom.token.decimals,
-          );
-          const nextBalanceTo = exponentiatedBy(parseTokenAccountData(to.account.data).amount, tokenTo.token.decimals);
-          setTransactionResult({
-            status: true,
-            hash,
-            base: {
-              ...tokenFrom,
-              amount: nextBalanceFrom.minus(prevBalanceFrom).abs().toString(),
-            },
-            quote: {
-              ...tokenTo,
-              amount: nextBalanceTo.minus(prevBalanceTo).abs().toString(),
-            },
-          });
-          setState((_state) => ({ ..._state, open: true }));
-        } else {
-          setTransactionResult({ status: false });
-          setState((_state) => ({ ..._state, open: true }));
-        }
-      });
-
       await connection.confirmTransaction(hash, "confirmed");
+      await sleep(0.3); // sleep here to make sure the balance up-to-date
       setTokenFrom((prevTokenFrom) => ({ ...prevTokenFrom, amount: "", lastUpdate: Date.now() }));
       setTokenTo((prevTokenTo) => ({ ...prevTokenTo, amount: "", lastUpdate: Date.now() }));
+      const prevBalanceFrom = sourceBalance ?? 0;
+      const prevBalanceTo = destinationBalance ?? 0;
+      const tokenAccounts = await getTokenAccountInfo(connection, walletPubkey);
+      const from = findTokenAccountByMint(tokenAccounts, walletPubkey, tokenFrom.token.address);
+      const to = findTokenAccountByMint(tokenAccounts, walletPubkey, tokenTo.token.address);
+      if (from && to) {
+        const nextBalanceFrom = exponentiatedBy(
+          parseTokenAccountData(from.account.data).amount,
+          tokenFrom.token.decimals,
+        );
+        const nextBalanceTo = exponentiatedBy(parseTokenAccountData(to.account.data).amount, tokenTo.token.decimals);
+        setTransactionResult({
+          status: true,
+          hash,
+          base: {
+            ...tokenFrom,
+            amount: nextBalanceFrom.minus(prevBalanceFrom).abs().toString(),
+          },
+          quote: {
+            ...tokenTo,
+            amount: nextBalanceTo.minus(prevBalanceTo).abs().toString(),
+          },
+        });
+        setState((_state) => ({ ..._state, open: true }));
+      } else {
+        throw Error("Cannot find associated token account to confirm transaction");
+      }
+
+      setIsProcessing(false);
     } catch (e) {
       console.error(e);
       setTransactionResult({ status: false });
       setState((_state) => ({ ..._state, open: true }));
+      setIsProcessing(false);
     }
   }, [
     pool,
@@ -417,21 +427,27 @@ const Home: React.FC = (props) => {
           fullWidth
           size="large"
           variant="outlined"
-          disabled={unavailable || sourceAccountNonExist || isInsufficientBalance || isInsufficientLiquidity}
+          disabled={
+            unavailable || sourceAccountNonExist || isInsufficientBalance || isInsufficientLiquidity || isProcessing
+          }
           onClick={handleSwap}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Swap, target: EnterAmount"
         >
-          {unavailable
-            ? "unavailable"
-            : sourceAccountNonExist
-            ? "No " + tokenFrom.token.symbol + " Account in Wallet"
-            : isInsufficientBalance
-            ? "Insufficient Balance"
-            : isInsufficientLiquidity
-            ? "Insufficient Liquidity"
-            : "Swap"}
+          {unavailable ? (
+            "unavailable"
+          ) : sourceAccountNonExist ? (
+            "No " + tokenFrom.token.symbol + " Account in Wallet"
+          ) : isInsufficientBalance ? (
+            "Insufficient Balance"
+          ) : isInsufficientLiquidity ? (
+            "Insufficient Liquidity"
+          ) : isProcessing ? (
+            <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
+          ) : (
+            "Swap"
+          )}
         </ConnectButton>
       );
     }
@@ -441,7 +457,18 @@ const Home: React.FC = (props) => {
         Connect Wallet
       </ConnectButton>
     );
-  }, [isConnectedWallet, handleSwap, setMenu, sourceBalance, pool, tokenFrom, tokenTo.amount, tokenTo.token.decimals]);
+  }, [
+    isConnectedWallet,
+    handleSwap,
+    setMenu,
+    sourceBalance,
+    pool,
+    tokenFrom,
+    tokenTo.amount,
+    tokenTo.token.decimals,
+    isProcessing,
+    classes.actionLoadingButton,
+  ]);
 
   // if (!pool) return null
 

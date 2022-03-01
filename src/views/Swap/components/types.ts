@@ -12,7 +12,6 @@ export interface SettingsProps {
 export interface SwapCard {
   token: TokenInfo | null | undefined;
   amount: string;
-  lastUpdate: number;
 }
 
 export interface CardProps {

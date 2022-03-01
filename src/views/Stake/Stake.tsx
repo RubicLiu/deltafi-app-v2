@@ -1,7 +1,6 @@
 import { ReactElement, useState, useMemo, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Context, SignatureResult } from "@solana/web3.js";
 import clx from "classnames";
 import {
   Snackbar,
@@ -13,6 +12,7 @@ import {
   IconButton,
   Link,
   Container,
+  Avatar,
 } from "@material-ui/core";
 import { Close as CloseIcon } from "@material-ui/icons";
 import BigNumber from "bignumber.js";
@@ -33,6 +33,7 @@ import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK } from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
+import loadingIcon from "components/gif/loading_white.gif";
 
 interface TransactionResult {
   status: boolean | null;
@@ -77,6 +78,8 @@ const Stake = (): ReactElement => {
   const token = getFarmTokenInfo(farmPool?.name);
   const tokenAccount = useTokenFromMint(token?.address);
 
+  const [isProcessingStake, setIsProcessingStake] = useState(false);
+  const [isProcessingClaim, setIsProcessingClaim] = useState(false);
   const [staking, setStaking] = useState({
     isStake: true,
     token: token,
@@ -190,6 +193,7 @@ const Stake = (): ReactElement => {
         return null;
       }
 
+      setIsProcessingStake(true);
       try {
         const transaction = await stake({
           connection,
@@ -209,31 +213,36 @@ const Stake = (): ReactElement => {
           connection,
         });
 
-        connection.onSignature(hash, async (signatureResult: SignatureResult, _: Context) => {
-          setTransactionResult({
-            status: true,
-            action: "stake",
-            hash,
-            stake: staking,
-          });
-          setState((state) => ({ ...state, open: true }));
-        });
-
         await connection.confirmTransaction(hash, "confirmed");
         setPercentage(0);
         setStaking((prevStaking) => ({
           ...prevStaking,
           amount: "0",
         }));
+        setTransactionResult({
+          status: true,
+          action: "stake",
+          hash,
+          stake: staking,
+        });
+        setState((state) => ({ ...state, open: true }));
+        setIsProcessingStake(false);
       } catch (e) {
+        setPercentage(0);
+        setStaking((prevStaking) => ({
+          ...prevStaking,
+          amount: "0",
+        }));
         setTransactionResult({ status: false });
         setState((state) => ({ ...state, open: true }));
+        setIsProcessingStake(false);
       }
     } else {
       if (staking.amount === "" || !position || depositAmount.lt(staking.amount)) {
         return null;
       }
 
+      setIsProcessingStake(true);
       try {
         const transaction = await unstake({
           connection,
@@ -253,25 +262,29 @@ const Stake = (): ReactElement => {
           connection,
         });
 
-        connection.onSignature(hash, async (signatureResult: SignatureResult, _: Context) => {
-          setTransactionResult({
-            status: true,
-            action: "unstake",
-            hash,
-            stake: staking,
-          });
-          setState((state) => ({ ...state, open: true }));
-        });
-
         await connection.confirmTransaction(hash, "confirmed");
         setPercentage(0);
         setStaking((prevStaking) => ({
           ...prevStaking,
           amount: "0",
         }));
+        setTransactionResult({
+          status: true,
+          action: "unstake",
+          hash,
+          stake: staking,
+        });
+        setState((state) => ({ ...state, open: true }));
+        setIsProcessingStake(false);
       } catch (e) {
+        setPercentage(0);
+        setStaking((prevStaking) => ({
+          ...prevStaking,
+          amount: "0",
+        }));
         setTransactionResult({ status: false });
         setState((state) => ({ ...state, open: true }));
+        setIsProcessingStake(false);
       }
     } /*eslint-disable */
   }, [
@@ -287,12 +300,14 @@ const Stake = (): ReactElement => {
     position,
     depositAmount,
   ]);
+
   /*eslint-enable */
   const handleClaim = useCallback(async () => {
     if (!connection || !farmPool || !walletPubkey || !lpMint || !lpToken) {
       return null;
     }
 
+    setIsProcessingClaim(true);
     try {
       const transaction = await claim({
         connection,
@@ -309,17 +324,18 @@ const Stake = (): ReactElement => {
         connection,
       });
 
-      connection.onSignature(hash, async (signatureResult: SignatureResult, _: Context) => {
-        setTransactionResult({
-          status: true,
-          action: "claim",
-          hash,
-        });
-        setState((state) => ({ ...state, open: true }));
+      await connection.confirmTransaction(hash, "confirmed");
+      setTransactionResult({
+        status: true,
+        action: "claim",
+        hash,
       });
+      setState((state) => ({ ...state, open: true }));
+      setIsProcessingClaim(false);
     } catch (e) {
       setTransactionResult({ status: false });
       setState((state) => ({ ...state, open: true }));
+      setIsProcessingClaim(false);
     }
   }, [config, connection, farmPool, farmUser, lpMint, lpToken, signTransaction, walletPubkey, rewardsAccount]);
 
@@ -455,16 +471,22 @@ const Stake = (): ReactElement => {
         <Box className={classes.unclaimedToken}>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography className={classes.title}>Your Unclaimed Token</Typography>
-            <ConnectButton
-              variant="contained"
-              onClick={handleClaim}
-              disabled={!unclaimedReward.gt(0)}
-              data-amp-analytics-on="click"
-              data-amp-analytics-name="click"
-              data-amp-analytics-attrs="page: Farms, target: Claim"
-            >
-              CLAIM
-            </ConnectButton>
+            {isProcessingClaim ? (
+              <ConnectButton variant="contained" disabled={true}>
+                <Avatar className={classes.claimLoadingButton} src={loadingIcon} />
+              </ConnectButton>
+            ) : (
+              <ConnectButton
+                variant="contained"
+                onClick={handleClaim}
+                disabled={!unclaimedReward.gt(0)}
+                data-amp-analytics-on="click"
+                data-amp-analytics-name="click"
+                data-amp-analytics-attrs="page: Farms, target: Claim"
+              >
+                CLAIM
+              </ConnectButton>
+            )}
           </Box>
           <Box className={classes.cardBottom}>
             <Typography className={classes.amount}>
@@ -510,7 +532,11 @@ const Stake = (): ReactElement => {
             />
           </Box>
           <Box marginTop={2} width="100%">
-            {isConnectedWallet ? (
+            {isProcessingStake ? (
+              <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
+                <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
+              </ConnectButton>
+            ) : isConnectedWallet ? (
               <ConnectButton
                 fullWidth
                 size="large"

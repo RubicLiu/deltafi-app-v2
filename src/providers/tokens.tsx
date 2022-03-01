@@ -224,6 +224,34 @@ export function useTokenAccounts(): [TokenAccount[] | null | undefined, boolean]
   });
 }
 
+export function findTokenAccountByMint(
+  tokens: TokenAccount[],
+  walletPubkey: PublicKey,
+  mintAddress: string,
+): TokenAccount | null {
+  const targetTokens = tokens.filter((token) => token.effectiveMint.toBase58() === mintAddress && token.account);
+
+  if (!targetTokens || targetTokens.length === 0) {
+    return null;
+  }
+
+  let targetToken: TokenAccount | null;
+  if (mintAddress === NATIVE_MINT.toBase58()) {
+    targetToken = targetTokens.filter((token) => token.pubkey === walletPubkey)[0] ?? null;
+  } else {
+    targetToken = targetTokens.reduce((a, b) => {
+      const accountA = parseTokenAccountData(a.account.data);
+      const accountB = parseTokenAccountData(b.account.data);
+      if (accountA.amount > accountB.amount) {
+        return a;
+      }
+      return b;
+    });
+  }
+
+  return targetToken ?? null;
+}
+
 export function useTokenFromMint(mintAddress: string | null | undefined) {
   const [tokens] = useTokenAccounts();
   const { publicKey } = useWallet();
@@ -233,24 +261,10 @@ export function useTokenFromMint(mintAddress: string | null | undefined) {
 
   return useMemo(() => {
     if (mintAddress && tokens) {
-      const targetTokens = tokens.filter((token) => token.effectiveMint.toBase58() === mintAddress && token.account);
+      const targetToken = findTokenAccountByMint(tokens, publicKey, mintAddress);
 
-      if (!targetTokens || targetTokens.length === 0) {
+      if (!targetToken) {
         return null;
-      }
-
-      let targetToken: TokenAccount;
-      if (mintAddress === NATIVE_MINT.toBase58()) {
-        targetToken = targetTokens.filter((token) => token.pubkey === publicKey)[0] ?? null;
-      } else {
-        targetToken = targetTokens.reduce((a, b) => {
-          const accountA = parseTokenAccountData(a.account.data);
-          const accountB = parseTokenAccountData(b.account.data);
-          if (accountA.amount > accountB.amount) {
-            return a;
-          }
-          return b;
-        });
       }
 
       return {

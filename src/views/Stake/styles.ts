@@ -160,6 +160,20 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   snackBarClose: {
     marginTop: 5,
   },
+  claimLoadingButton: {
+    marginTop: 0,
+    marginBottom: 1,
+    marginLeft: 11,
+    marginRight: 12,
+    width: 31,
+    height: 31,
+  },
+  actionLoadingButton: {
+    width: 50,
+    height: 50,
+    marginTop: 4,
+    marginBottom: 5,
+  },
 }));
 
 export default useStyles;

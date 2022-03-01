@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from "react";
-import { PublicKey, Transaction, Context, SignatureResult } from "@solana/web3.js";
+import { PublicKey, Transaction } from "@solana/web3.js";
 import {
   Typography,
   IconButton,
@@ -12,6 +12,7 @@ import {
   Snackbar,
   SnackbarContent,
   Link,
+  Avatar,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -43,6 +44,7 @@ import { SwapType } from "lib/state";
 import { stableDeposit } from "utils/transactions/stableDeposit";
 import { stableWithdraw } from "utils/transactions/stableWithdraw";
 import { PoolInformation } from "./PoolInformation";
+import loadingIcon from "components/gif/loading_white.gif";
 
 interface TransactionResult {
   status: boolean | null;
@@ -186,6 +188,12 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
       lineHeight: 1,
     },
   },
+  actionLoadingButton: {
+    width: 50,
+    height: 50,
+    marginTop: 4,
+    marginBottom: 4,
+  },
 }));
 
 const Deposit: React.FC = () => {
@@ -206,8 +214,8 @@ const Deposit: React.FC = () => {
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const [method, switchMethod] = useState<string>("deposit");
   const pool = usePoolFromAddress(new PublicKey(poolAddress));
-  const [base, setBase] = useState<ISwapCard>({ token: null, amount: "", lastUpdate: Date.now() });
-  const [quote, setQuote] = useState<ISwapCard>({ token: null, amount: "", lastUpdate: Date.now() });
+  const [base, setBase] = useState<ISwapCard>({ token: null, amount: "" });
+  const [quote, setQuote] = useState<ISwapCard>({ token: null, amount: "" });
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const baseTokenAccount = useTokenFromMint(pool?.baseTokenInfo.address);
   const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address);
@@ -220,12 +228,13 @@ const Deposit: React.FC = () => {
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
   });
+  const [isProcessing, setIsProcessing] = useState(false);
   const { network } = useCustomConnection();
 
   useEffect(() => {
     if (pool) {
-      setBase((base) => ({ ...base, token: pool.baseTokenInfo, lastUpdate: Date.now() }));
-      setQuote((quote) => ({ ...quote, token: pool.quoteTokenInfo, lastUpdate: Date.now() }));
+      setBase((base) => ({ ...base, token: pool.baseTokenInfo }));
+      setQuote((quote) => ({ ...quote, token: pool.quoteTokenInfo }));
     }
   }, [pool]);
 
@@ -308,6 +317,7 @@ const Deposit: React.FC = () => {
       return null;
     }
 
+    setIsProcessing(true);
     try {
       if (base.amount !== "" && quote.amount !== "") {
         const depositMethod = pool.swapType === SwapType.Normal ? deposit : stableDeposit;
@@ -330,6 +340,7 @@ const Deposit: React.FC = () => {
           farmUser: farmUser?.publicKey,
         });
       } else {
+        setIsProcessing(false);
         return null;
       }
 
@@ -340,24 +351,25 @@ const Deposit: React.FC = () => {
         connection,
       });
 
-      connection.onSignature(hash, async (signatureResult: SignatureResult, _: Context) => {
-        setTransactionResult({
-          status: true,
-          action: "deposit",
-          hash,
-          base,
-          quote,
-        });
-        setState((state) => ({ ...state, open: true }));
-      });
-
       await connection.confirmTransaction(hash, "confirmed");
-      setBase((prevBase) => ({ ...prevBase, amount: "", lastUpdate: Date.now() }));
-      setQuote((prevQuote) => ({ ...prevQuote, amount: "", lastUpdate: Date.now() }));
+      setBase((prevBase) => ({ ...prevBase, amount: "" }));
+      setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
+      setTransactionResult({
+        status: true,
+        action: "deposit",
+        hash,
+        base,
+        quote,
+      });
+      setState((state) => ({ ...state, open: true }));
+      setIsProcessing(false);
     } catch (e) {
       console.error("error", e);
+      setBase((prevBase) => ({ ...prevBase, amount: "" }));
+      setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
       setTransactionResult({ status: false });
       setState((state) => ({ ...state, open: true }));
+      setIsProcessing(false);
     }
   }, [
     connection,
@@ -381,6 +393,7 @@ const Deposit: React.FC = () => {
       return null;
     }
 
+    setIsProcessing(true);
     try {
       if (base.amount !== "" && quote.amount !== "") {
         const withdrawMethod = pool.swapType === SwapType.Normal ? withdraw : stableWithdraw;
@@ -409,6 +422,7 @@ const Deposit: React.FC = () => {
           farmUser: farmUser?.publicKey,
         });
       } else {
+        setIsProcessing(false);
         return null;
       }
 
@@ -418,25 +432,27 @@ const Deposit: React.FC = () => {
         connection,
       });
 
-      connection.onSignature(hash, async (signatureResult: SignatureResult, _: Context) => {
-        setTransactionResult({
-          status: true,
-          action: "withdraw",
-          hash,
-          base,
-          quote,
-        });
-
-        setState({ ...state, open: true });
-      });
-
       await connection.confirmTransaction(hash, "confirmed");
-      setBase((prevBase) => ({ ...prevBase, amount: "", lastUpdate: Date.now() }));
-      setQuote((prevQuote) => ({ ...prevQuote, amount: "", lastUpdate: Date.now() }));
+      setBase((prevBase) => ({ ...prevBase, amount: "" }));
+      setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
+      setWithdrawPercentage(0);
+      setTransactionResult({
+        status: true,
+        action: "withdraw",
+        hash,
+        base,
+        quote,
+      });
+      setState({ ...state, open: true });
+      setIsProcessing(false);
     } catch (e) {
       console.error("error", e);
+      setBase((prevBase) => ({ ...prevBase, amount: "", lastUpdate: Date.now() }));
+      setQuote((prevQuote) => ({ ...prevQuote, amount: "", lastUpdate: Date.now() }));
+      setWithdrawPercentage(0);
       setTransactionResult({ status: false });
       setState({ ...state, open: true });
+      setIsProcessing(false);
     }
   }, [
     connection,
@@ -479,11 +495,10 @@ const Deposit: React.FC = () => {
             setQuote({
               ...quote,
               amount: pmm.quoteFromBase(parseFloat(card.amount)).toString(),
-              lastUpdate: Date.now(),
             });
           } else if (card.amount === "") {
             setWithdrawPercentage(0);
-            setQuote({ ...quote, amount: "", lastUpdate: Date.now() });
+            setQuote({ ...quote, amount: "" });
           }
         }
       }
@@ -502,17 +517,16 @@ const Deposit: React.FC = () => {
           setBase({
             ...base,
             amount: isNaN(outAmount) ? "" : Number(outAmount).toString(),
-            lastUpdate: Date.now(),
           });
         } else {
           if (share && card.amount) {
             setWithdrawPercentage(
               pmm.quoteShareRate(exponentiate(card.amount, card.token.decimals).toNumber(), share).toNumber() * 100,
             );
-            setBase({ ...base, amount: pmm.baseFromQuote(parseFloat(card.amount)).toString(), lastUpdate: Date.now() });
+            setBase({ ...base, amount: pmm.baseFromQuote(parseFloat(card.amount)).toString() });
           } else if (card.amount === "") {
             setWithdrawPercentage(0);
-            setBase({ ...base, amount: "", lastUpdate: Date.now() });
+            setBase({ ...base, amount: "" });
           }
         }
       }
@@ -528,8 +542,8 @@ const Deposit: React.FC = () => {
           pool.baseTokenInfo.decimals,
           pool.quoteTokenInfo.decimals,
         );
-        setBase({ ...base, amount: baseAmount.toString(), lastUpdate: Date.now() });
-        setQuote({ ...quote, amount: quoteAmount.toString(), lastUpdate: Date.now() });
+        setBase({ ...base, amount: baseAmount.toString() });
+        setQuote({ ...quote, amount: quoteAmount.toString() });
       }
       setWithdrawPercentage(value);
     },
@@ -538,8 +552,8 @@ const Deposit: React.FC = () => {
 
   const handleSwitchMethod = (method: string) => {
     switchMethod(method);
-    setBase({ ...base, amount: "", lastUpdate: Date.now() });
-    setQuote({ ...quote, amount: "", lastUpdate: Date.now() });
+    setBase({ ...base, amount: "" });
+    setQuote({ ...quote, amount: "" });
     setWithdrawPercentage(0);
   };
 
@@ -609,6 +623,13 @@ const Deposit: React.FC = () => {
       );
     }
 
+    if (isProcessing) {
+      return (
+        <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
+          <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
+        </ConnectButton>
+      );
+    }
     if (method === "deposit") {
       if (base.token && quote.token && baseTokenAccount && quoteTokenAccount) {
         const isInsufficient =
@@ -664,6 +685,7 @@ const Deposit: React.FC = () => {
       );
     }
   }, [
+    isProcessing,
     isConnectedWallet,
     baseTokenAccount,
     base,
@@ -675,6 +697,7 @@ const Deposit: React.FC = () => {
     handleDeposit,
     handleWithdraw,
     method,
+    classes.actionLoadingButton,
   ]);
 
   if (!pool) return null;
