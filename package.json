@@ -73,7 +73,7 @@
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",
     "lint:ci": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "eslint": "eslint",
-    "format": "prettier --write ."
+    "format": "prettier --write ./src"
   },
   "browserslist": {
     "production": [

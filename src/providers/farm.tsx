@@ -198,6 +198,7 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
   connection.onAccountChange(
     farmUserAddress,
     (farmUserAccountInfo: AccountInfo<Buffer>, _: Context) => {
+      console.info("farm user changed");
       const { data: farmUserData } = parseFarmUser(farmUserAccountInfo);
       const updatedPositions: {
         [key: string]: StakeAccount;

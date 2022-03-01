@@ -238,6 +238,7 @@ const Stake = (): ReactElement => {
         const transaction = await unstake({
           connection,
           walletPubkey,
+          config,
           farmPool,
           farmUser: farmUser?.publicKey,
           poolTokenAccount: lpToken,

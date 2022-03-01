@@ -67,6 +67,7 @@ export const FarmDepositDataLayout = struct<FarmDepositData>([u64("amount")], "d
 
 // Instruction for deposit farm
 export const createFarmDepositInstruction = (
+  config: PublicKey,
   farmPool: PublicKey,
   userTransferAuthority: PublicKey,
   source: PublicKey,
@@ -77,6 +78,7 @@ export const createFarmDepositInstruction = (
   programId: PublicKey,
 ): TransactionInstruction => {
   const keys = [
+    { pubkey: config, isSigner: false, isWritable: false },
     { pubkey: farmPool, isSigner: false, isWritable: true },
     { pubkey: userTransferAuthority, isSigner: true, isWritable: false },
     { pubkey: source, isSigner: false, isWritable: true },
@@ -113,6 +115,7 @@ export const FarmWithdrawDataLayout = struct<FarmWithdrawData>([u64("amount")], 
 
 // Instruction for withdraw farm
 export const createFarmWithdrawInstruction = (
+  config: PublicKey,
   farmPool: PublicKey,
   farmUser: PublicKey,
   farmOwner: PublicKey,
@@ -123,6 +126,7 @@ export const createFarmWithdrawInstruction = (
   programId: PublicKey,
 ): TransactionInstruction => {
   const keys = [
+    { pubkey: config, isSigner: false, isWritable: false },
     { pubkey: farmPool, isSigner: false, isWritable: true },
     { pubkey: farmUser, isSigner: false, isWritable: true },
     { pubkey: authority, isSigner: false, isWritable: false },

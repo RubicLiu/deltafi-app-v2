@@ -105,6 +105,7 @@ export async function stake({
     )
     .add(
       createFarmDepositInstruction(
+        config.publicKey,
         farmPool.publicKey,
         userTransferAuthority.publicKey,
         poolTokenAccount.pubkey,
@@ -125,6 +126,7 @@ export async function stake({
 export async function unstake({
   connection,
   walletPubkey,
+  config,
   farmPool,
   farmUser,
   poolTokenAccount,
@@ -132,6 +134,7 @@ export async function unstake({
 }: {
   connection: Connection;
   walletPubkey: PublicKey;
+  config: MarketConfig;
   farmPool: FarmPoolInfo;
   farmUser: PublicKey;
   poolTokenAccount: ExTokenAccount;
@@ -151,6 +154,7 @@ export async function unstake({
   let transaction = new Transaction();
   transaction.add(
     createFarmWithdrawInstruction(
+      config.publicKey,
       farmPool.publicKey,
       farmUser,
       walletPubkey,
