@@ -6,7 +6,6 @@ import { PoolInfo, ExTokenAccount, MarketConfig } from "providers/types";
 import { createApproveInstruction, createStableDepositInstruction, DepositData } from "lib/instructions";
 import { createTokenAccountTransaction, signTransaction, mergeTransactions } from ".";
 import { SWAP_PROGRAM_ID } from "constants/index";
-import { createRefreshFarmInstruction } from "lib/instructions/farm";
 import { createFarmUser } from "./farm";
 import { AccountLayout } from "@solana/spl-token";
 
@@ -119,7 +118,6 @@ export async function stableDeposit({
       config,
     });
     transaction = mergeTransactions([createFarmUserTransaction, transaction]);
-    transaction.add(createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [newFarmUser.publicKey]));
     signers.push(newFarmUser);
   }
   // removed farm refresh after deposit

@@ -6,7 +6,6 @@ import { PoolInfo, ExTokenAccount, MarketConfig } from "providers/types";
 import { createApproveInstruction, createWithdrawInstruction, WithdrawData } from "lib/instructions";
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from ".";
 import { SWAP_PROGRAM_ID } from "constants/index";
-import { createRefreshFarmInstruction } from "lib/instructions/farm";
 import { createFarmUser } from "./farm";
 import { AccountLayout } from "@solana/spl-token";
 
@@ -135,10 +134,7 @@ export async function withdraw({
       config,
     });
     transaction = mergeTransactions([createFarmUserTransaction, transaction]);
-    transaction.add(createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [newFarmUser.publicKey]));
     signers.push(newFarmUser);
-  } else {
-    transaction.add(createRefreshFarmInstruction(farmPool, SWAP_PROGRAM_ID, [farmUser]));
   }
 
   transaction = mergeTransactions([

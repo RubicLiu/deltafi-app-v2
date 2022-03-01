@@ -114,8 +114,7 @@ export async function stake({
         stakeData,
         SWAP_PROGRAM_ID,
       ),
-    )
-    .add(createRefreshFarmInstruction(farmPool.publicKey, SWAP_PROGRAM_ID, [farmUser]));
+    );
   signers.push(userTransferAuthority);
 
   transaction = mergeTransactions([createFarmUserAccountTransaction, transaction]);
@@ -150,20 +149,18 @@ export async function unstake({
   );
 
   let transaction = new Transaction();
-  transaction
-    .add(
-      createFarmWithdrawInstruction(
-        farmPool.publicKey,
-        farmUser,
-        walletPubkey,
-        farmPoolAuthority,
-        farmPool.poolToken,
-        poolTokenAccount.pubkey,
-        unstakeData,
-        SWAP_PROGRAM_ID,
-      ),
-    )
-    .add(createRefreshFarmInstruction(farmPool.publicKey, SWAP_PROGRAM_ID, [farmUser]));
+  transaction.add(
+    createFarmWithdrawInstruction(
+      farmPool.publicKey,
+      farmUser,
+      walletPubkey,
+      farmPoolAuthority,
+      farmPool.poolToken,
+      poolTokenAccount.pubkey,
+      unstakeData,
+      SWAP_PROGRAM_ID,
+    ),
+  );
 
   return signTransaction({ transaction, feePayer: walletPubkey, connection });
 }
