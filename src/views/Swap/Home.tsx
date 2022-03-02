@@ -157,14 +157,14 @@ const Home: React.FC = (props) => {
 
   const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
 
-  const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
-  const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
-
   const [isProcessing, setIsProcessing] = useState(false);
   const [priceImpact, setPriceImpact] = useState("2.0");
   const [isIncludeDecimal, setIsIncludeDecimal] = useState(true);
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
+
+  const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
+  const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
 
   if (pool?.poolState) {
     if (basePrice && quotePrice) {

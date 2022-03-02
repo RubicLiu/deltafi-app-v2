@@ -4,10 +4,12 @@ import CloseIcon from "@material-ui/icons/Close";
 
 import { ConnectButton } from "components";
 
+import { usePriceBySymbol } from "providers/pyth";
 import { useModal } from "providers/modal";
 import { usePoolFromSymbols } from "providers/pool";
 import { getSwapOutAmount } from "utils/swap";
 import { fixedNumber } from "utils/utils";
+import BigNumber from "bignumber.js";
 
 interface IConfirmSwapPanelProps {
   children?: ReactNode;
@@ -60,6 +62,17 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
   const classes = useStyles(props);
   const { setMenu, data } = useModal();
   const pool = usePoolFromSymbols(data?.tokenFrom.token.symbol, data?.tokenTo.token.symbol);
+
+  const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
+  const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
+
+  if (pool?.poolState) {
+    if (basePrice && quotePrice) {
+      pool.poolState.marketPrice = new BigNumber(basePrice / quotePrice); // market price from the chain is not up-to-date
+    } else {
+      pool.poolState.marketPrice = new BigNumber(NaN);
+    }
+  }
 
   const swapOut = useMemo(() => {
     if (pool && data) {
