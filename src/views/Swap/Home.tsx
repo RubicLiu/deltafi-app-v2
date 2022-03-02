@@ -165,10 +165,22 @@ const Home: React.FC = (props) => {
   const [isIncludeDecimal, setIsIncludeDecimal] = useState(true);
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
+
+  if (pool?.poolState) {
+    if (basePrice && quotePrice) {
+      pool.poolState.marketPrice = new BigNumber(basePrice / quotePrice); // market price from the chain is not up-to-date
+    } else {
+      pool.poolState.marketPrice =
+        pool.baseTokenInfo.decimals < pool.quoteTokenInfo.decimals
+          ? exponentiatedBy(pool.poolState.marketPrice, pool.quoteTokenInfo.decimals - pool.baseTokenInfo.decimals)
+          : exponentiate(pool.poolState.marketPrice, pool.baseTokenInfo.decimals - pool.quoteTokenInfo.decimals);
+
+      console.info(pool.poolState.marketPrice.toNumber());
+    }
+  }
+
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && pool) {
-      pool.poolState.marketPrice = new BigNumber(basePrice / quotePrice); // market price from the chain is not up-to-date
-
       if (tokenFrom.token.symbol === pool?.baseTokenInfo.symbol) {
         return Number(basePrice / quotePrice).toFixed(pool.quoteTokenInfo.decimals);
       } else if (tokenFrom.token.symbol === pool?.quoteTokenInfo.symbol) {
