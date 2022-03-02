@@ -170,12 +170,7 @@ const Home: React.FC = (props) => {
     if (basePrice && quotePrice) {
       pool.poolState.marketPrice = new BigNumber(basePrice / quotePrice); // market price from the chain is not up-to-date
     } else {
-      pool.poolState.marketPrice =
-        pool.baseTokenInfo.decimals < pool.quoteTokenInfo.decimals
-          ? exponentiatedBy(pool.poolState.marketPrice, pool.quoteTokenInfo.decimals - pool.baseTokenInfo.decimals)
-          : exponentiate(pool.poolState.marketPrice, pool.baseTokenInfo.decimals - pool.quoteTokenInfo.decimals);
-
-      console.info(pool.poolState.marketPrice.toNumber());
+      pool.poolState.marketPrice = new BigNumber(NaN);
     }
   }
 
