@@ -128,13 +128,12 @@ export async function withdraw({
 
   let signers = [userTransferAuthority];
   if (!farmUser) {
-    const { transaction: createFarmUserTransaction, address: newFarmUser } = await createFarmUser({
+    const { transaction: createFarmUserTransaction } = await createFarmUser({
       connection,
       walletPubkey,
       config,
     });
     transaction = mergeTransactions([createFarmUserTransaction, transaction]);
-    signers.push(newFarmUser);
   }
 
   transaction = mergeTransactions([

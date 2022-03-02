@@ -112,13 +112,12 @@ export async function stableDeposit({
     );
   let signers = [userTransferAuthority];
   if (!farmUser && farmPool) {
-    const { transaction: createFarmUserTransaction, address: newFarmUser } = await createFarmUser({
+    const { transaction: createFarmUserTransaction } = await createFarmUser({
       connection,
       walletPubkey,
       config,
     });
     transaction = mergeTransactions([createFarmUserTransaction, transaction]);
-    signers.push(newFarmUser);
   }
   // removed farm refresh after deposit
 

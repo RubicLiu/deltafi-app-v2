@@ -30,24 +30,30 @@ export async function createFarmUser({
     return null;
   }
 
-  const stakeAccount = Keypair.generate();
+  const seed = "farmUser";
+  const stakeAccountPubkey = await PublicKey.createWithSeed(
+    walletPubkey,
+    seed + config.publicKey.toBase58(),
+    SWAP_PROGRAM_ID,
+  );
 
   const balanceForStakeAccount = await connection.getMinimumBalanceForRentExemption(FARM_USER_SIZE);
   let transaction = new Transaction()
     .add(
-      SystemProgram.createAccount({
+      SystemProgram.createAccountWithSeed({
+        basePubkey: walletPubkey,
         fromPubkey: walletPubkey,
-        newAccountPubkey: stakeAccount.publicKey,
+        newAccountPubkey: stakeAccountPubkey,
         lamports: balanceForStakeAccount,
         space: FARM_USER_SIZE,
         programId: SWAP_PROGRAM_ID,
+        seed: seed + config.publicKey.toBase58(),
       }),
     )
-    .add(createInitFarmUserInstruction(config.publicKey, stakeAccount.publicKey, walletPubkey, SWAP_PROGRAM_ID));
+    .add(createInitFarmUserInstruction(config.publicKey, stakeAccountPubkey, walletPubkey, SWAP_PROGRAM_ID));
 
   return {
     transaction,
-    address: stakeAccount,
   };
 }
 

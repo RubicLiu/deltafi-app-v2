@@ -128,12 +128,12 @@ const stakeAccountsCache: Record<
       positions: {
         [key: string]: StakeAccount;
       };
-    };
+    } | null;
     expiredTime: number;
   }
 > = {};
 
-const defaultStakeAccountsCachLife: number = 60000; // 60,000
+const defaultStakeAccountsCacheLife: number = 60000; // 60,000ms, 1min
 
 export function updateStakeAccountCache(
   walletPubkey: PublicKey,
@@ -175,7 +175,14 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
     .map(({ publicKey, accountInfo }) => ({ publicKey, farmUserInfo: parseFarmUser(accountInfo) }))
     .filter(({ farmUserInfo }) => !!farmUserInfo);
 
-  if (filtered.length === 0) return null;
+  if (filtered.length === 0) {
+    // we still need to update the cache is the user doesn't have a farm user account
+    stakeAccountsCache[keyHash] = {
+      data: null,
+      expiredTime: Date.now() + defaultStakeAccountsCacheLife,
+    };
+    return null;
+  }
 
   const farmUserAddress = filtered[0].publicKey;
   const farmUserInfo = filtered[0].farmUserInfo.data;
@@ -198,7 +205,6 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
   connection.onAccountChange(
     farmUserAddress,
     (farmUserAccountInfo: AccountInfo<Buffer>, _: Context) => {
-      console.info("farm user changed");
       const { data: farmUserData } = parseFarmUser(farmUserAccountInfo);
       const updatedPositions: {
         [key: string]: StakeAccount;
@@ -226,7 +232,7 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
 
   stakeAccountsCache[keyHash] = {
     data: { publicKey: farmUserAddress, positions },
-    expiredTime: Date.now() + defaultStakeAccountsCachLife,
+    expiredTime: Date.now() + defaultStakeAccountsCacheLife,
   };
   return { publicKey: farmUserAddress, positions };
 }
