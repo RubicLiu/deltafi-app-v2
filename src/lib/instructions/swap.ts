@@ -37,7 +37,17 @@ export const createSwapInstruction = (
   pythB: PublicKey,
   swapData: SwapData,
   programId: PublicKey,
+  userReferrerData?: PublicKey,
+  referrer?: PublicKey,
 ) => {
+  let extraReferrerAccounts = [];
+  if (userReferrerData && referrer) {
+    extraReferrerAccounts = [
+      { pubkey: userReferrerData, isSigner: false, isWritable: false },
+      { pubkey: referrer, isSigner: false, isWritable: true },
+    ];
+  }
+
   const keys = [
     { pubkey: config, isSigner: false, isWritable: false },
     { pubkey: tokenSwap, isSigner: false, isWritable: true },
@@ -57,7 +67,7 @@ export const createSwapInstruction = (
     { pubkey: pythB, isSigner: false, isWritable: false },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ];
+  ].concat(extraReferrerAccounts);
 
   const dataLayout = struct([u8("instruction"), SwapDataLayout]);
   const data = Buffer.alloc(dataLayout.span);

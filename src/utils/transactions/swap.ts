@@ -48,6 +48,7 @@ export async function swap({
   let initializeWrappedTokenAccountTransaction: Transaction | undefined;
   let closeWrappedTokenAccountTransaction: Transaction | undefined;
   let createUserReferrerAccountTransaction: Transaction | undefined;
+  let userReferrerDataPubkey: PublicKey | undefined;
 
   let buySol =
     (pool.quoteTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellBase) ||
@@ -106,23 +107,32 @@ export async function swap({
   // will fail as the transaction payload is too big.
   if (referrer && !(buySol || sellSol)) {
     const seed = "referrer";
-    const userReferrerDataPubkey = await PublicKey.createWithSeed(walletPubkey, seed, SWAP_PROGRAM_ID);
-    const balanceForUserReferrerData = await connection.getMinimumBalanceForRentExemption(USER_REFERRER_DATA_SIZE);
-    createUserReferrerAccountTransaction = new Transaction()
-      .add(
-        SystemProgram.createAccountWithSeed({
-          basePubkey: walletPubkey,
-          fromPubkey: walletPubkey,
-          newAccountPubkey: userReferrerDataPubkey,
-          lamports: balanceForUserReferrerData,
-          space: USER_REFERRER_DATA_SIZE,
-          programId: SWAP_PROGRAM_ID,
-          seed,
-        }),
-      )
-      .add(
-        createSetReferrerInstruction(config.publicKey, walletPubkey, userReferrerDataPubkey, referrer, SWAP_PROGRAM_ID),
-      );
+    userReferrerDataPubkey = await PublicKey.createWithSeed(walletPubkey, seed, SWAP_PROGRAM_ID);
+    // TODO: Check if the user referrer data is created already.
+    if (userReferrerDataPubkey == null) {
+      const balanceForUserReferrerData = await connection.getMinimumBalanceForRentExemption(USER_REFERRER_DATA_SIZE);
+      createUserReferrerAccountTransaction = new Transaction()
+        .add(
+          SystemProgram.createAccountWithSeed({
+            basePubkey: walletPubkey,
+            fromPubkey: walletPubkey,
+            newAccountPubkey: userReferrerDataPubkey,
+            lamports: balanceForUserReferrerData,
+            space: USER_REFERRER_DATA_SIZE,
+            programId: SWAP_PROGRAM_ID,
+            seed,
+          }),
+        )
+        .add(
+          createSetReferrerInstruction(
+            config.publicKey,
+            walletPubkey,
+            userReferrerDataPubkey,
+            referrer,
+            SWAP_PROGRAM_ID,
+          ),
+        );
+    }
   }
 
   const userTransferAuthority = Keypair.generate();
@@ -173,6 +183,8 @@ export async function swap({
         pool.pythQuote,
         swapData,
         SWAP_PROGRAM_ID,
+        userReferrerDataPubkey,
+        referrer,
       ),
     );
 
