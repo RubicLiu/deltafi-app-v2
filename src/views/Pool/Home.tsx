@@ -12,7 +12,6 @@ import { usePools } from "providers/pool";
 import { PMM } from "lib/calc";
 import usePyth from "providers/pyth";
 import { useTokenAccounts } from "providers/tokens";
-import { useCustomConnection } from "providers/connection";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
@@ -48,14 +47,12 @@ const Home: React.FC = () => {
 
   const { symbolMap } = usePyth();
   const { connected: isConnectedWallet } = useWallet();
-  const { network } = useCustomConnection();
-  const isMainnet = network === "mainnet-beta";
   const tvl = useMemo(() => {
     if (pools.length > 0) {
       return (pools as any).reduce((p, c) => {
         const pmm = new PMM(c.poolState);
-        const baseSymbol = `${!isMainnet ? "Crypto." : ""}${c.baseTokenInfo.symbol.toUpperCase()}/USD`;
-        const quoteSymbol = `${!isMainnet ? "Crypto." : ""}${c.quoteTokenInfo.symbol.toUpperCase()}/USD`;
+        const baseSymbol = `Crypto.${c.baseTokenInfo.symbol.toUpperCase()}/USD`;
+        const quoteSymbol = `Crypto.${c.quoteTokenInfo.symbol.toUpperCase()}/USD`;
         let volumn = new BigNumber(0);
         if (symbolMap[baseSymbol] && symbolMap[quoteSymbol]) {
           const basePrice = ((symbolMap[baseSymbol] as any).price as PriceData).price
@@ -73,7 +70,7 @@ const Home: React.FC = () => {
       }, new BigNumber(0)) as BigNumber;
     }
     return new BigNumber(0);
-  }, [pools, isMainnet, symbolMap]);
+  }, [pools, symbolMap]);
 
   return (
     <Page>
