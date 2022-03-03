@@ -6,7 +6,7 @@ import { PoolInfo, ExTokenAccount, MarketConfig } from "providers/types";
 import { createApproveInstruction, createWithdrawInstruction, WithdrawData } from "lib/instructions";
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from ".";
 import { SWAP_PROGRAM_ID } from "constants/index";
-import { createFarmUser } from "./farm";
+// import { createFarmUser } from "./farm";
 import { AccountLayout } from "@solana/spl-token";
 
 export async function withdraw({
@@ -127,14 +127,14 @@ export async function withdraw({
     );
 
   let signers = [userTransferAuthority];
-  if (!farmUser) {
-    const { transaction: createFarmUserTransaction } = await createFarmUser({
-      connection,
-      walletPubkey,
-      config,
-    });
-    transaction = mergeTransactions([createFarmUserTransaction, transaction]);
-  }
+  // if (!farmUser) {
+  //   const { transaction: createFarmUserTransaction } = await createFarmUser({
+  //     connection,
+  //     walletPubkey,
+  //     config,
+  //   });
+  //   transaction = mergeTransactions([createFarmUserTransaction, transaction]);
+  // }
 
   transaction = mergeTransactions([
     createWrappedTokenAccountTransaction,

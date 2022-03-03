@@ -6,7 +6,7 @@ import { PoolInfo, ExTokenAccount, MarketConfig } from "providers/types";
 import { createApproveInstruction, createStableDepositInstruction, DepositData } from "lib/instructions";
 import { createTokenAccountTransaction, signTransaction, mergeTransactions } from ".";
 import { SWAP_PROGRAM_ID } from "constants/index";
-import { createFarmUser } from "./farm";
+// import { createFarmUser } from "./farm";
 import { AccountLayout } from "@solana/spl-token";
 
 export async function stableDeposit({
@@ -111,14 +111,15 @@ export async function stableDeposit({
       ),
     );
   let signers = [userTransferAuthority];
-  if (!farmUser && farmPool) {
-    const { transaction: createFarmUserTransaction } = await createFarmUser({
-      connection,
-      walletPubkey,
-      config,
-    });
-    transaction = mergeTransactions([createFarmUserTransaction, transaction]);
-  }
+  // if (!farmUser && farmPool) {
+  //   const { transaction: createFarmUserTransaction, address: newFarmUser } = await createFarmUser({
+  //     connection,
+  //     walletPubkey,
+  //     config,
+  //   });
+  //   transaction = mergeTransactions([createFarmUserTransaction, transaction]);
+  //   signers.push(newFarmUser);
+  // }
   // removed farm refresh after deposit
 
   transaction = mergeTransactions([

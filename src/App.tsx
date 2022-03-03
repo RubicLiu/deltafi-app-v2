@@ -18,6 +18,7 @@ import { farmPools } from "constants/farm";
 import { useCustomConnection } from "providers/connection";
 import usePyth from "providers/pyth";
 import { deployConfig } from "constants/deployConfig";
+import { FarmUnavailable } from "./views/Unavailable";
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
 //   enable: true,
@@ -30,12 +31,12 @@ import { deployConfig } from "constants/deployConfig";
 // })
 // Analytics.record({ name: 'App' })
 
-const Farm = lazy(() => import("./views/Farm"));
+// const Farm = lazy(() => import("./views/Farm"));
 const Swap = lazy(() => import("./views/Swap"));
 const Pool = lazy(() => import("./views/Pool"));
 const Reward = lazy(() => import("./views/Reward"));
 const Deposit = lazy(() => import("./views/Deposit"));
-const Stake = lazy(() => import("./views/Stake"));
+// const Stake = lazy(() => import("./views/Stake"));
 const Unavailable = lazy(() => import("./views/Unavailable"));
 const Terms = lazy(() => import("./views/Terms"));
 
@@ -76,9 +77,9 @@ const App: React.FC = () => {
             <Route path="/swap" exact component={Swap} />
             <Route path="/pools" exact component={Pool} />
             <Route path="/deposit/:poolAddress" exact component={Deposit} />
-            <Route path="/farms" exact component={Farm} />
+            <Route path="/farms" exact component={FarmUnavailable} />
             <Route path="/rewards" exact component={Reward} />
-            <Route path="/stake/:id" exact component={Stake} />
+            <Route path="/stake/:id" exact component={FarmUnavailable} />
             <Route path="/terms" exact component={Terms} />
             <Redirect from="*" to="/swap" />
           </Switch>

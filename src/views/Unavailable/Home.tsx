@@ -97,4 +97,59 @@ const Home: React.FC = (props) => {
     </Page>
   );
 };
+
+export const FarmUnavailable: React.FC = (props) => {
+  const classes = useStyles(props);
+
+  return (
+    <Page>
+      <Typography variant="h1" align="center" paragraph className={classes.header}>
+        Farm is comming soon...
+      </Typography>
+      <Box display="flex" className={classes.socialLinks}>
+        <Link
+          href="https://twitter.com/deltafi_ai"
+          target="_blank"
+          rel="noreferrer noopener"
+          data-amp-analytics-on="click"
+          data-amp-analytics-name="click"
+          data-amp-analytics-attrs="page: Reward, target: Twitter"
+        >
+          <img src={"images/twitter.svg"} alt="" />
+        </Link>
+
+        <Link
+          href="https://discord.gg/deltafi"
+          target="_blank"
+          rel="noreferrer noopener"
+          data-amp-analytics-on="click"
+          data-amp-analytics-name="click"
+          data-amp-analytics-attrs="page: Reward, target: Discord"
+        >
+          <img src={"images/discord.svg"} alt="" />
+        </Link>
+        <Link
+          href="https://t.me/deltafi_ai"
+          target="_blank"
+          rel="noreferrer noopener"
+          data-amp-analytics-on="click"
+          data-amp-analytics-name="click"
+          data-amp-analytics-attrs="page: Reward, target: Telegram"
+        >
+          <img src={"images/telegram.svg"} alt="" />
+        </Link>
+        <Link
+          href="https://medium.com/deltafi"
+          target="_blank"
+          rel="noreferrer noopener"
+          data-amp-analytics-on="click"
+          data-amp-analytics-name="click"
+          data-amp-analytics-attrs="page: Reward, target: Medium"
+        >
+          <img src={"images/medium.svg"} alt="" />
+        </Link>
+      </Box>
+    </Page>
+  );
+};
 export default Home;
