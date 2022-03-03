@@ -44,6 +44,55 @@
       }
     ]
   },
+  "mainnet-prod": {
+    "network": "mainnet-beta",
+    "swapProgramId": "3gaAmJzWkXfkVWK1Q7BcWBE5KJtU4mtG9mQ7aGBSSp3X",
+    "marketConfigAddress": "5hwGxMpQkoAx21aoAvafT3NmAGk1iZTorjoQz3j2SKk6",
+    "deltafiTokenMint": "de1QJkP1qDCk5JYCCXCeq27bQQUdCaiv7xVKFrhPSzF",
+    "deltafiToken": "J6NXoLLUwywpeDhSVbD2bawigPEmBGczgNq3dTAkA4fu",
+    "poolInfo": [
+      {
+        "name": "SOL-SRM",
+        "base": "SOL",
+        "quote": "SRM",
+        "swap": "35AZDUGx1nDKJYHMTiCT5xA9zhzPAP4uXYw8aZm48WmD",
+        "mint": "9fHwPURxFVwGUuzM5NRpHc7aD5bjbeUryM2EPHkrWtnU",
+        "farm": "CDpftATsN8TqFNyG4Xrog2EHLvECJWgEEZ1BDUXpkMGU",
+        "token": "FVTL1TfdWDEmYATeoa6qqYHWDYWpqbenDY7ApdDQDeAF",
+        "decimals": 9
+      },
+      {
+        "name": "SOL-USDC",
+        "base": "SOL",
+        "quote": "USDC",
+        "swap": "BetnYScwkgk5wzRMMurjf5m1g9Fp2oFmm4QXzM3PwEte",
+        "mint": "6mUAz8crd161da7riGTQABU86LEV3ykNHDkZXy3MMX4S",
+        "farm": "H4x8neZ7wMVw5uhTn8944CkVfD31h1jbGw9BTrcQvXjL",
+        "token": "4yZKCNKF7Fys6ckUNdHad1AhgdnNraLTjbdyv4AEEQEj",
+        "decimals": 9
+      },
+      {
+        "name": "SRM-USDC",
+        "base": "SRM",
+        "quote": "USDC",
+        "swap": "BF634p5jjQ22fAV1Qnzs5HoxHS5JdwXsiivZxxGkYera",
+        "mint": "7pa4L3kCAhxGm7uwVESsBWXrpt6SVEbJCoDAwpQQ272w",
+        "farm": "4rZWRLHHeVz9a3qm1H62aD74RhTSRpuJULdMoYEE6Tjz",
+        "token": "7AAbRbDKZPf6mLiSjkiTLJqKpjgMjhUtXL3saktzJHaL",
+        "decimals": 6
+      },
+      {
+        "name": "USDC-USDT",
+        "base": "USDC",
+        "quote": "USDT",
+        "swap": "BU6gEuehCmDw2XrfNb2WK74PdLQnLwUgZUMqt9NzMmPN",
+        "mint": "8hVHAGeNHytsJWGu1RxtRDskPvBBu3KfCoZvV6eFSbDs",
+        "farm": "FsW2ViEiJMXGoRgFVagsF1D7tR3wV3QdPe5D9KuVveTS",
+        "token": "7bMmkfke5tL86rRTofxuuHdZqzpk2PXwNVsEv2HzZfEc",
+        "decimals": 6
+      }
+    ]
+  },
   "mainnet-test": {
     "network": "mainnet-beta",
     "swapProgramId": "8Y7g9EN4MQv5epFEU3aKpXrNcu1t2nkyM2jZpWkw6q1u",

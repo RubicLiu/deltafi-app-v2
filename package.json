@@ -64,8 +64,8 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "PORT=3001 ESLINT_NO_DEV_ERRORS=true react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "start": "PORT=3001 ESLINT_NO_DEV_ERRORS=true REACT_APP_DEPLOYMENT_MODE=mainnet-test react-scripts start",
+    "build": "GENERATE_SOURCEMAP=false REACT_APP_DEPLOYMENT_MODE=mainnet-prod react-scripts build",
     "build-dev": "REACT_APP_DEPLOYMENT_MODE=mainnet-test GENERATE_SOURCEMAP=false react-scripts build",
     "build-debug": "REACT_APP_DEPLOYMENT_MODE=mainnet-test react-scripts build",
     "test": "react-scripts test",
