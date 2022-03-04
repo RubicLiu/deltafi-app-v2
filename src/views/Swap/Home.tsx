@@ -31,7 +31,7 @@ import {
   useTokenFromMint,
   findTokenAccountByMint,
 } from "providers/tokens";
-import { usePoolFromSymbols } from "providers/pool";
+import { usePoolFromSymbols, usePools, updatePoolFromAddress } from "providers/pool";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { swap } from "utils/transactions/swap";
 import { useConfig } from "providers/config";
@@ -139,6 +139,7 @@ const Home: React.FC = (props) => {
     amount: "",
   });
   const { config } = useConfig();
+  const { pools } = usePools();
   const pool = usePoolFromSymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
   const sourceAccount = useTokenFromMint(tokenFrom.token.address);
   const destinationAccount = useTokenFromMint(tokenTo.token.address);
@@ -326,6 +327,8 @@ const Home: React.FC = (props) => {
             amount: nextBalanceTo.minus(prevBalanceTo).abs().toString(),
           },
         });
+        // Force update pool state to reflect the balance change.
+        await updatePoolFromAddress(connection, pools, pool.publicKey);
         setState((_state) => ({ ..._state, open: true }));
       } else {
         throw Error("Cannot find associated token account to confirm transaction");
@@ -354,6 +357,7 @@ const Home: React.FC = (props) => {
     destinationBalance,
     referrer,
     enableReferral,
+    pools,
   ]);
 
   const handleSwap = useCallback(async () => {

@@ -1,15 +1,41 @@
-import React, { createContext, useState, useContext, useEffect, useMemo } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import { AccountInfo, PublicKey } from "@solana/web3.js";
+import { useConnection } from "@solana/wallet-adapter-react";
 
+import { SWAP_PROGRAM_ID } from "constants/index";
 import { PoolInfo, EntirePoolsContextValues } from "./types";
 import { PoolSchema } from "constants/pools";
 import { parseSwapInfo } from "lib/state";
 import { getTokenInfo } from "./tokens";
 import { getMultipleAccounts } from "utils/account";
-import { useConnection } from "@solana/wallet-adapter-react";
+import { loadAccount } from "utils/account";
 
 const EntirePoolsContext: React.Context<null | EntirePoolsContextValues> =
   createContext<null | EntirePoolsContextValues>(null);
+
+const getPoolFromSwapInfoAccount = (schema, publicKey, poolInfo) => {
+  const { data } = parseSwapInfo(poolInfo as AccountInfo<Buffer>);
+  return {
+    name: schema.name,
+    swapType: data.swapType,
+    publicKey: publicKey,
+    nonce: data.nonce,
+    isPaused: data.isPaused,
+    baseTokenInfo: getTokenInfo(schema.base),
+    quoteTokenInfo: getTokenInfo(schema.quote),
+    base: data.tokenA,
+    quote: data.tokenB,
+    pythBase: data.pythA,
+    pythQuote: data.pythB,
+    poolMintKey: data.poolMint,
+    baseFee: data.adminFeeKeyA,
+    quoteFee: data.adminFeeKeyB,
+    fees: data.fees,
+    rewards: data.rewards,
+    poolState: data.poolState,
+    schema: schema,
+  };
+};
 
 export function EntirePoolsProvider({ children }) {
   const [pools, setPools] = useState<PoolInfo[]>([]);
@@ -40,52 +66,15 @@ export function EntirePoolsProvider({ children }) {
           const tempPools = [];
 
           for (let i = 0; i < poolInfos.keys.length; i++) {
-            let key = poolInfos.keys[i];
-            let poolInfo = poolInfos.array[i];
-            const schema = schemas.find((s) => s.address.equals(new PublicKey(key)));
-            const { data } = parseSwapInfo(poolInfo as AccountInfo<Buffer>);
-            tempPools.push({
-              name: schema.name,
-              swapType: data.swapType,
-              publicKey: new PublicKey(key),
-              nonce: data.nonce,
-              isPaused: data.isPaused,
-              baseTokenInfo: getTokenInfo(schema.base),
-              quoteTokenInfo: getTokenInfo(schema.quote),
-              base: data.tokenA,
-              quote: data.tokenB,
-              pythBase: data.pythA,
-              pythQuote: data.pythB,
-              poolMintKey: data.poolMint,
-              baseFee: data.adminFeeKeyA,
-              quoteFee: data.adminFeeKeyB,
-              fees: data.fees,
-              rewards: data.rewards,
-              poolState: data.poolState,
-            });
+            const key = poolInfos.keys[i];
+            const poolInfo = poolInfos.array[i];
+            const publicKey = new PublicKey(key);
+            const schema = schemas.find((s) => s.address.equals(publicKey));
+            tempPools.push(getPoolFromSwapInfoAccount(schema, publicKey, poolInfo));
 
             subscription_ids.push(
-              connection.onAccountChange(new PublicKey(key), (accountInfo) => {
-                const { data } = parseSwapInfo(accountInfo);
-                updatePool({
-                  name: schema.name,
-                  swapType: data.swapType,
-                  publicKey: new PublicKey(key),
-                  nonce: data.nonce,
-                  isPaused: data.isPaused,
-                  baseTokenInfo: getTokenInfo(schema.base),
-                  quoteTokenInfo: getTokenInfo(schema.quote),
-                  base: data.tokenA,
-                  quote: data.tokenB,
-                  pythBase: data.pythA,
-                  pythQuote: data.pythB,
-                  poolMintKey: data.poolMint,
-                  baseFee: data.adminFeeKeyA,
-                  quoteFee: data.adminFeeKeyB,
-                  fees: data.fees,
-                  rewards: data.rewards,
-                  poolState: data.poolState,
-                });
+              connection.onAccountChange(publicKey, (accountInfo) => {
+                updatePool(getPoolFromSwapInfoAccount(schema, publicKey, accountInfo));
               }),
             );
           }
@@ -123,18 +112,28 @@ export function usePoolFromAddress(address: PublicKey): PoolInfo {
   return null;
 }
 
+export async function updatePoolFromAddress(connection, pools, address: PublicKey) {
+  const poolIdx = pools.findIndex((p) => p.publicKey.toString() === address.toString());
+  if (poolIdx === -1) {
+    return null;
+  }
+
+  const oldPool = pools[poolIdx];
+  const accountInfo = await loadAccount(connection, address, SWAP_PROGRAM_ID);
+  pools[poolIdx] = getPoolFromSwapInfoAccount(oldPool.schema, address, accountInfo);
+  return pools[poolIdx];
+}
+
 export function usePoolFromSymbols(base?: string, quote?: string) {
   const { pools } = usePools();
-  return useMemo(() => {
-    if (pools.length > 0 && base && quote) {
-      return pools.find(
-        (s) =>
-          (s.baseTokenInfo.symbol.toLowerCase() === base.toLowerCase() &&
-            s.quoteTokenInfo.symbol.toLowerCase() === quote.toLowerCase()) ||
-          (s.baseTokenInfo.symbol.toLowerCase() === quote.toLowerCase() &&
-            s.quoteTokenInfo.symbol.toLowerCase() === base.toLowerCase()),
-      );
-    }
-    return null;
-  }, [pools, base, quote]);
+  if (pools.length > 0 && base && quote) {
+    return pools.find(
+      (s) =>
+        (s.baseTokenInfo.symbol.toLowerCase() === base.toLowerCase() &&
+          s.quoteTokenInfo.symbol.toLowerCase() === quote.toLowerCase()) ||
+        (s.baseTokenInfo.symbol.toLowerCase() === quote.toLowerCase() &&
+          s.quoteTokenInfo.symbol.toLowerCase() === base.toLowerCase()),
+    );
+  }
+  return null;
 }

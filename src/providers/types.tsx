@@ -106,6 +106,7 @@ export interface PoolInfo {
   fees: Fees;
   rewards: Rewards;
   poolState: PoolState;
+  schema: PoolSchema;
 }
 
 export interface PoolContextValues {
