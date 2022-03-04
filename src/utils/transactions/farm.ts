@@ -20,37 +20,38 @@ export async function createFarmUser({
   connection,
   walletPubkey,
   config,
+  farmPoolPubkey,
 }: {
   connection: Connection;
   walletPubkey: PublicKey;
   config: MarketConfig;
+  farmPoolPubkey: PublicKey;
 }) {
   if (!connection || !walletPubkey) {
     console.error("create farm user failed with null parameter");
     return null;
   }
 
-  const seed = "farmUser";
-  const stakeAccountPubkey = await PublicKey.createWithSeed(
-    walletPubkey,
-    seed + config.publicKey.toBase58(),
-    SWAP_PROGRAM_ID,
-  );
+  const seed = ("farmUser" + farmPoolPubkey.toBase58()).substring(0, 32);
 
+  const farmUserPubkey = await PublicKey.createWithSeed(walletPubkey, seed, SWAP_PROGRAM_ID);
   const balanceForStakeAccount = await connection.getMinimumBalanceForRentExemption(FARM_USER_SIZE);
+
   let transaction = new Transaction()
     .add(
       SystemProgram.createAccountWithSeed({
         basePubkey: walletPubkey,
         fromPubkey: walletPubkey,
-        newAccountPubkey: stakeAccountPubkey,
+        newAccountPubkey: farmUserPubkey,
         lamports: balanceForStakeAccount,
         space: FARM_USER_SIZE,
         programId: SWAP_PROGRAM_ID,
-        seed: seed + config.publicKey.toBase58(),
+        seed,
       }),
     )
-    .add(createInitFarmUserInstruction(config.publicKey, stakeAccountPubkey, walletPubkey, SWAP_PROGRAM_ID));
+    .add(
+      createInitFarmUserInstruction(config.publicKey, farmPoolPubkey, farmUserPubkey, walletPubkey, SWAP_PROGRAM_ID),
+    );
 
   return {
     transaction,
@@ -81,23 +82,6 @@ export async function stake({
 
   let createFarmUserAccountTransaction: Transaction;
   let signers = [];
-  if (!farmUser) {
-    const farmUserAccount = Keypair.generate();
-    const balance = await connection.getMinimumBalanceForRentExemption(FARM_USER_SIZE);
-    createFarmUserAccountTransaction = new Transaction()
-      .add(
-        SystemProgram.createAccount({
-          fromPubkey: walletPubkey,
-          newAccountPubkey: farmUserAccount.publicKey,
-          lamports: balance,
-          space: FARM_USER_SIZE,
-          programId: SWAP_PROGRAM_ID,
-        }),
-      )
-      .add(createInitFarmUserInstruction(config.publicKey, farmUserAccount.publicKey, walletPubkey, SWAP_PROGRAM_ID));
-    farmUser = farmUserAccount.publicKey;
-    signers.push(farmUserAccount);
-  }
 
   const userTransferAuthority = Keypair.generate();
   let transaction = new Transaction()

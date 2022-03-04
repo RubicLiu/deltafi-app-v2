@@ -100,6 +100,7 @@ export const FARM_POSITION_SIZE = FarmPositionLayout.span;
 export interface FarmUser {
   isInitialized: boolean;
   configKey: PublicKey;
+  farmPoolKey: PublicKey;
   owner: PublicKey;
   positions: Array<FarmPosition>;
 }
@@ -107,6 +108,7 @@ export interface FarmUser {
 export interface FarmUserDataFlat {
   isInitialized: boolean;
   configKey: PublicKey;
+  farmPoolKey: PublicKey;
   owner: PublicKey;
   positionLen: number;
   dataFlat: Buffer;
@@ -117,9 +119,10 @@ export const FarmUserLayout = struct<FarmUserDataFlat>(
   [
     bool("isInitialized"),
     publicKey("configKey"),
+    publicKey("farmPoolKey"),
     publicKey("owner"),
     u8("positionLen"),
-    blob(FarmPositionLayout.span * 10, "dataFlat"),
+    blob(FarmPositionLayout.span * 1, "dataFlat"),
   ],
   "farmUser",
 );
@@ -132,7 +135,7 @@ export const parseFarmUser: AccountParser<FarmUser> = (info: AccountInfo<Buffer>
   if (!isFarmUser(info)) return;
 
   const buffer = Buffer.from(info.data);
-  const { isInitialized, configKey, owner, positionLen, dataFlat } = FarmUserLayout.decode(buffer);
+  const { isInitialized, configKey, owner, farmPoolKey, positionLen, dataFlat } = FarmUserLayout.decode(buffer);
 
   if (!isInitialized) return;
 
@@ -145,6 +148,7 @@ export const parseFarmUser: AccountParser<FarmUser> = (info: AccountInfo<Buffer>
     data: {
       isInitialized,
       configKey,
+      farmPoolKey,
       owner,
       positions,
     },

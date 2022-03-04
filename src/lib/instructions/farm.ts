@@ -156,12 +156,14 @@ export const createFarmWithdrawInstruction = (
 // Instruction for initialize farm user
 export const createInitFarmUserInstruction = (
   config: PublicKey,
+  farmPool: PublicKey,
   farmUser: PublicKey,
   farmOwner: PublicKey,
   programId: PublicKey,
 ) => {
   const keys = [
     { pubkey: config, isSigner: false, isWritable: false },
+    { pubkey: farmPool, isSigner: false, isWritable: false },
     { pubkey: farmUser, isSigner: false, isWritable: true },
     { pubkey: farmOwner, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },

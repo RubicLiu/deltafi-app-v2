@@ -118,6 +118,7 @@ export async function deposit({
   //     connection,
   //     walletPubkey,
   //     config,
+  //     farmPoolPubkey: farmPool,
   //   });
   //   transaction = mergeTransactions([createFarmUserTransaction, transaction]);
   // }
