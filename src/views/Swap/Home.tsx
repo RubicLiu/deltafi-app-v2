@@ -133,10 +133,12 @@ const Home: React.FC = (props) => {
   const [tokenFrom, setTokenFrom] = useState<ISwapCard>({
     token: getTokenInfo("SOL"),
     amount: "",
+    amountWithSlippage: "",
   });
   const [tokenTo, setTokenTo] = useState<ISwapCard>({
     token: getTokenInfo("USDC"),
     amount: "",
+    amountWithSlippage: "",
   });
   const { config } = useConfig();
   const { pools } = usePools();
@@ -225,11 +227,12 @@ const Home: React.FC = (props) => {
     let newTokenFrom = card.token;
     let newTokenTo = tokenTo.token;
     let amountOut = "";
+    let amountOutWithSlippage = "";
     if (tokenTo.token.address === newTokenFrom.address) {
       newTokenTo = Object.assign({}, tokenFrom.token);
     }
     if (pool && priceImpact) {
-      const { amountOut: quoteAmount } = getSwapOutAmount(
+      const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } = getSwapOutAmount(
         pool,
         newTokenFrom.address,
         newTokenTo.address,
@@ -238,20 +241,22 @@ const Home: React.FC = (props) => {
       );
 
       amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
+      amountOutWithSlippage = isNaN(quoteAmountWithSlippage) ? "" : Number(quoteAmountWithSlippage).toString();
     }
-    setTokenFrom({ token: newTokenFrom, amount: card.amount });
-    setTokenTo({ token: newTokenTo, amount: amountOut });
+    setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: card.amount });
+    setTokenTo({ token: newTokenTo, amount: amountOut, amountWithSlippage: amountOutWithSlippage });
   };
 
   const handleTokenToInput = (card: ISwapCard) => {
     let newTokenFrom = tokenFrom.token;
     let newTokenTo = card.token;
     let amountOut = "";
+    let amountOutWithSlippage = "";
     if (tokenFrom.token.address === newTokenTo.address) {
       newTokenFrom = Object.assign({}, tokenTo.token);
     }
     if (pool && priceImpact) {
-      const { amountOut: quoteAmount } = getSwapOutAmount(
+      const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } = getSwapOutAmount(
         pool,
         newTokenFrom.address,
         newTokenTo.address,
@@ -260,9 +265,10 @@ const Home: React.FC = (props) => {
       );
 
       amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
+      amountOutWithSlippage = isNaN(quoteAmountWithSlippage) ? "" : Number(quoteAmountWithSlippage).toString();
     }
     setTokenFrom({ ...tokenFrom, token: newTokenFrom });
-    setTokenTo({ token: newTokenTo, amount: amountOut });
+    setTokenTo({ token: newTokenTo, amount: amountOut, amountWithSlippage: amountOutWithSlippage });
   };
 
   const swapCallback = useCallback(async () => {
@@ -278,6 +284,12 @@ const Home: React.FC = (props) => {
     try {
       const swapMethod = pool.swapType === SwapType.Normal ? swap : stableSwap;
       const referrerPubkey = referrer != null && enableReferral === "true" ? new PublicKey(referrer) : null;
+      const amountIn = BigInt(exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString());
+      const minimumAmountOut = BigInt(
+        exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
+      );
+      const swapDirection =
+        tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? SWAP_DIRECTION.SellBase : SWAP_DIRECTION.SellQuote;
       let transaction = await swapMethod({
         connection,
         walletPubkey,
@@ -287,13 +299,9 @@ const Home: React.FC = (props) => {
         destinationRef: destinationAccount?.pubkey,
         rewardTokenRef: rewardsAccount?.pubkey,
         swapData: {
-          amountIn: BigInt(exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString()),
-          minimumAmountOut: BigInt(
-            0,
-            // exponentiate(amountOutWithSlippage.toString(), tokenFrom.token.decimals).integerValue().toString(),
-          ),
-          swapDirection:
-            tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? SWAP_DIRECTION.SellBase : SWAP_DIRECTION.SellQuote,
+          amountIn,
+          minimumAmountOut,
+          swapDirection,
         },
         referrer: referrerPubkey,
       });

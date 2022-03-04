@@ -214,8 +214,8 @@ const Deposit: React.FC = () => {
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const [method, switchMethod] = useState<string>("deposit");
   const pool = usePoolFromAddress(new PublicKey(poolAddress));
-  const [base, setBase] = useState<ISwapCard>({ token: null, amount: "" });
-  const [quote, setQuote] = useState<ISwapCard>({ token: null, amount: "" });
+  const [base, setBase] = useState<ISwapCard>({ token: null, amount: "", amountWithSlippage: "" });
+  const [quote, setQuote] = useState<ISwapCard>({ token: null, amount: "", amountWithSlippage: "" });
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const baseTokenAccount = useTokenFromMint(pool?.baseTokenInfo.address);
   const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address);
