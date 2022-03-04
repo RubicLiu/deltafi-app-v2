@@ -49,6 +49,8 @@ import { stableSwap } from "utils/transactions/stableSwap";
 import { sleep } from "utils/utils";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
+import { useSelector } from "react-redux";
+import { appSelector } from "states/selectors";
 
 interface TransactionResult {
   status: boolean | null;
@@ -125,8 +127,8 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }));
 
 const Home: React.FC = (props) => {
-  const referrer = window.localStorage.getItem("deltafi._referrer");
-  const enableReferral = window.localStorage.getItem("deltafi._enableReferral");
+  const appState = useSelector(appSelector);
+
   const classes = useStyles(props);
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
@@ -283,7 +285,8 @@ const Home: React.FC = (props) => {
     setIsProcessing(true);
     try {
       const swapMethod = pool.swapType === SwapType.Normal ? swap : stableSwap;
-      const referrerPubkey = referrer != null && enableReferral === "true" ? new PublicKey(referrer) : null;
+      const referrerPubkey =
+        appState.referrer != null && appState.enableReferral ? new PublicKey(appState.referrer) : null;
       const amountIn = BigInt(exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString());
       const minimumAmountOut = BigInt(
         exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
@@ -363,8 +366,7 @@ const Home: React.FC = (props) => {
     rewardsAccount?.pubkey,
     signTransaction,
     destinationBalance,
-    referrer,
-    enableReferral,
+    appState,
     pools,
   ]);
 

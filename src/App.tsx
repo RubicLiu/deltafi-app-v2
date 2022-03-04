@@ -20,7 +20,7 @@ import usePyth from "providers/pyth";
 import { deployConfig } from "constants/deployConfig";
 
 import { useDispatch } from "react-redux";
-import * as appActions from "states/app/actions";
+import { setReferrerAction } from "states/appState";
 
 import { FarmUnavailable } from "./views/Unavailable";
 // Amplify.configure(awsconfig)
@@ -54,18 +54,13 @@ const App: React.FC = () => {
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
 
   useEffect(() => {
-    // TODO: Get the referrer from user referrer data account.
-    const referrer = new URLSearchParams(window.location.search).get("referrer");
+    const params = new URLSearchParams(window.location.search);
     // This flag is added to toggle the flag for local development.
-    const enableReferral = new URLSearchParams(window.location.search).get("enableReferral");
+    const enableReferral = params.get("enableReferral") === "true";
+    // TODO: Get the referrer from user referrer data account.
+    const referrer = params.get("referrer");
 
-    // for test purpose, it requires enableReferral is set to be true explicitly
-    if (enableReferral !== "true") {
-      return;
-    }
-    if (!!referrer) {
-      dispatch(appActions.setReferrer({ referrer }));
-    }
+    dispatch(setReferrerAction({ referrer, enableReferral }));
   }, [dispatch]);
 
   useEffect(() => {
