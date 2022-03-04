@@ -18,6 +18,10 @@ import { farmPools } from "constants/farm";
 import { useCustomConnection } from "providers/connection";
 import usePyth from "providers/pyth";
 import { deployConfig } from "constants/deployConfig";
+
+import { useDispatch } from "react-redux";
+import * as appActions from "states/app/actions";
+
 import { FarmUnavailable } from "./views/Unavailable";
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -41,6 +45,7 @@ const Unavailable = lazy(() => import("./views/Unavailable"));
 const Terms = lazy(() => import("./views/Terms"));
 
 const App: React.FC = () => {
+  const dispatch = useDispatch();
   const { setConfigAddress } = useConfig();
   const { setSchemas } = usePools();
   const { setSchemas: setFarmSchema } = useFarmPools();
@@ -50,14 +55,18 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // TODO: Get the referrer from user referrer data account.
-    const _referrer = new URLSearchParams(window.location.search).get("referrer");
+    const referrer = new URLSearchParams(window.location.search).get("referrer");
     // This flag is added to toggle the flag for local development.
-    const _enableReferral = new URLSearchParams(window.location.search).get("enableReferral");
-    if (_referrer) {
-      window.localStorage.setItem("deltafi._referrer", _referrer);
-      window.localStorage.setItem("deltafi._enableReferral", _enableReferral);
+    const enableReferral = new URLSearchParams(window.location.search).get("enableReferral");
+
+    // for test purpose, it requires enableReferral is set to be true explicitly
+    if (enableReferral !== "true") {
+      return;
     }
-  }, []);
+    if (!!referrer) {
+      dispatch(appActions.setReferrer({ referrer }));
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     setConfigAddress(MARKET_CONFIG_ADDRESS);
