@@ -285,8 +285,8 @@ const Home: React.FC = (props) => {
     setIsProcessing(true);
     try {
       const swapMethod = pool.swapType === SwapType.Normal ? swap : stableSwap;
-      const referrerPubkey =
-        appState.referrer != null && appState.enableReferral ? new PublicKey(appState.referrer) : null;
+      // TODO: get isNewUser information
+      const referrerPubkey: PublicKey | null = appState.referrerPublicKey;
       const amountIn = BigInt(exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString());
       const minimumAmountOut = BigInt(
         exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
