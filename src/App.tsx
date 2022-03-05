@@ -2,6 +2,7 @@ import React, { lazy, useEffect } from "react";
 import { Route, Switch, BrowserRouter, Redirect } from "react-router-dom";
 // import Amplify, { Analytics } from 'aws-amplify'
 
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import SuspenseWithChunkError from "./components/SuspenseWithChunkError";
 import PageLoader from "components/PageLoader";
 import Header from "components/Header";
@@ -18,12 +19,13 @@ import { farmPools } from "constants/farm";
 import { useCustomConnection } from "providers/connection";
 import usePyth from "providers/pyth";
 import { deployConfig } from "constants/deployConfig";
+import { FarmUserFlat } from "lib/state/farm";
 
 import { useDispatch } from "react-redux";
+import { getFarmUsers, fetchFarmUsersAction } from "states/farmState";
 import { setReferrerAction, updateReferrerAction } from "states/appState";
 
 import { FarmUnavailable } from "./views/Unavailable";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { UserReferrerDataLayout } from "lib/state";
 // Amplify.configure(awsconfig)
@@ -59,6 +61,24 @@ const App: React.FC = () => {
   const { connection } = useConnection();
 
   useEffect(() => {
+    if (walletAddress) {
+      const enableFarm: boolean = new URLSearchParams(window.location.search).get("enableFarm") === "true";
+      if (!enableFarm) {
+        return;
+      }
+
+      getFarmUsers(connection, MARKET_CONFIG_ADDRESS, walletAddress).then((farmUsers) => {
+        const farmPoolKeyToFarmUser: { [key: string]: FarmUserFlat } = {};
+        console.info("found farm users " + farmUsers.length);
+        for (const farmUser of farmUsers) {
+          farmPoolKeyToFarmUser[farmUser.farmPoolKey.toBase58()] = farmUser;
+        }
+        dispatch(fetchFarmUsersAction({ farmPoolKeyToFarmUser }));
+      });
+    }
+  }, [connection, walletAddress, dispatch]);
+
+  useEffect(() => {
     const referrer: string = new URLSearchParams(window.location.search).get("referrer");
 
     // test is the referrer string is a valid public key
@@ -80,6 +100,10 @@ const App: React.FC = () => {
     // for test purpose, it requires enableReferral is set to be true explicitly
     if (!!referrer) {
       dispatch(setReferrerAction({ referrerPublicKey, enableReferral, timestamp }));
+    }
+
+    if (!enableReferral) {
+      return;
     }
 
     // this async function immediately process the referral input

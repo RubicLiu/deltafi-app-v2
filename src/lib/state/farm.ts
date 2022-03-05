@@ -1,5 +1,5 @@
 import { AccountInfo, PublicKey, Connection } from "@solana/web3.js";
-import { blob, seq, struct, u8 } from "buffer-layout";
+import { blob, struct, u8 } from "buffer-layout";
 
 import { AccountParser, bool, publicKey, u64 } from "utils/layout";
 import { loadAccount } from "utils/account";
@@ -114,6 +114,11 @@ export interface FarmUserDataFlat {
   dataFlat: Buffer;
 }
 
+export interface FarmUserFlat {
+  configKey: PublicKey;
+  farmPoolKey: PublicKey;
+}
+
 /** @internal */
 export const FarmUserLayout = struct<FarmUserDataFlat>(
   [
@@ -122,7 +127,15 @@ export const FarmUserLayout = struct<FarmUserDataFlat>(
     publicKey("farmPoolKey"),
     publicKey("owner"),
     u8("positionLen"),
-    blob(FarmPositionLayout.span * 1, "dataFlat"),
+    publicKey("dummy"),
+    u64("depositedAmount"),
+    u64("rewardsOwed"),
+    u64("rewardsEstimated"),
+    u64("cumulativeInterest"),
+    u64("lastUpdateTs"),
+    u64("nextClaimTs"),
+    u64("latestDepositSlot"),
+    blob(64, "reserved"),
   ],
   "farmUser",
 );
@@ -135,22 +148,16 @@ export const parseFarmUser: AccountParser<FarmUser> = (info: AccountInfo<Buffer>
   if (!isFarmUser(info)) return;
 
   const buffer = Buffer.from(info.data);
-  const { isInitialized, configKey, owner, farmPoolKey, positionLen, dataFlat } = FarmUserLayout.decode(buffer);
+  const farmUser = FarmUserLayout.decode(buffer);
+  const { isInitialized } = farmUser;
 
   if (!isInitialized) return;
-
-  const positionSpan = FarmPositionLayout.span * positionLen;
-  const positionsBuffer = dataFlat.slice(0, positionSpan);
-  const positions = seq(FarmPositionLayout, positionLen).decode(positionsBuffer);
 
   return {
     info,
     data: {
-      isInitialized,
-      configKey,
-      farmPoolKey,
-      owner,
-      positions,
+      positions: [],
+      ...farmUser,
     },
   };
 };

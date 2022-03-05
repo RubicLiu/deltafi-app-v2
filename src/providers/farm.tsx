@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { AccountInfo, PublicKey, Connection, Context } from "@solana/web3.js";
+import { AccountInfo, PublicKey, Connection } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
 import tuple from "immutable-tuple";
@@ -202,34 +202,6 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
     };
   });
 
-  connection.onAccountChange(
-    farmUserAddress,
-    (farmUserAccountInfo: AccountInfo<Buffer>, _: Context) => {
-      const { data: farmUserData } = parseFarmUser(farmUserAccountInfo);
-      const updatedPositions: {
-        [key: string]: StakeAccount;
-      } = {};
-
-      farmUserData.positions.forEach((position) => {
-        const poolId = position.pool.toBase58();
-        const depositBalance = new BigNumber(position.depositedAmount.toString());
-        updatedPositions[poolId] = {
-          depositBalance,
-          rewardsOwed: new BigNumber(position.rewardsOwed.toString()),
-          rewardEstimated: new BigNumber(position.rewardsEstimated.toString()),
-          lastUpdateTs: new BigNumber(position.lastUpdateTs.toString()),
-          nextClaimTs: new BigNumber(position.nextClaimTs.toString()),
-        };
-      });
-
-      stakeAccountsCache[keyHash] = {
-        data: { publicKey: farmUserAddress, positions: updatedPositions },
-        expiredTime: stakeAccountsCache[keyHash].expiredTime,
-      };
-    },
-    "confirmed",
-  );
-
   stakeAccountsCache[keyHash] = {
     data: { publicKey: farmUserAddress, positions },
     expiredTime: Date.now() + defaultStakeAccountsCacheLife,
@@ -237,7 +209,7 @@ async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) 
   return { publicKey: farmUserAddress, positions };
 }
 
-function getStakeFilters(config: PublicKey, walletAddress: PublicKey) {
+export function getStakeFilters(config: PublicKey, walletAddress: PublicKey) {
   return [
     {
       memcmp: {
@@ -247,7 +219,8 @@ function getStakeFilters(config: PublicKey, walletAddress: PublicKey) {
     },
     {
       memcmp: {
-        offset: 33,
+        // isInitialized + config key + farm pool key
+        offset: 33 + 32,
         bytes: walletAddress.toBase58(),
       },
     },
