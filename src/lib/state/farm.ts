@@ -112,11 +112,24 @@ export interface FarmUserDataFlat {
   owner: PublicKey;
   positionLen: number;
   dataFlat: Buffer;
+  depositedAmount: bigint;
+  rewardsOwed: bigint;
+  rewardsEstimated: bigint;
+  cumulativeInterest: bigint;
+  lastUpdateTs: bigint;
+  nextClaimTs: bigint;
 }
 
 export interface FarmUserFlat {
   configKey: PublicKey;
   farmPoolKey: PublicKey;
+  owner: PublicKey;
+  depositedAmount: bigint;
+  rewardsOwed: bigint;
+  rewardsEstimated: bigint;
+  cumulativeInterest: bigint;
+  lastUpdateTs: bigint;
+  nextClaimTs: bigint;
 }
 
 /** @internal */

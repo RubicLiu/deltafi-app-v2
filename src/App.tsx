@@ -19,10 +19,9 @@ import { farmPools } from "constants/farm";
 import { useCustomConnection } from "providers/connection";
 import usePyth from "providers/pyth";
 import { deployConfig } from "constants/deployConfig";
-import { FarmUserFlat } from "lib/state/farm";
 
 import { useDispatch } from "react-redux";
-import { getFarmUsers, fetchFarmUsersAction } from "states/farmState";
+import { fetchFarmUsersThunk } from "states/farmState";
 import { setReferrerAction, updateReferrerAction } from "states/appState";
 
 import { FarmUnavailable } from "./views/Unavailable";
@@ -49,6 +48,12 @@ const Deposit = lazy(() => import("./views/Deposit"));
 const Unavailable = lazy(() => import("./views/Unavailable"));
 const Terms = lazy(() => import("./views/Terms"));
 
+// This is hack is needed to resolve the bigint json serialization in redux.
+// eslint-disable-next-line
+BigInt.prototype["toJSON"] = function () {
+  return this.toString();
+};
+
 const App: React.FC = () => {
   const dispatch = useDispatch();
   const { setConfigAddress } = useConfig();
@@ -67,14 +72,7 @@ const App: React.FC = () => {
         return;
       }
 
-      getFarmUsers(connection, MARKET_CONFIG_ADDRESS, walletAddress).then((farmUsers) => {
-        const farmPoolKeyToFarmUser: { [key: string]: FarmUserFlat } = {};
-        console.info("found farm users " + farmUsers.length);
-        for (const farmUser of farmUsers) {
-          farmPoolKeyToFarmUser[farmUser.farmPoolKey.toBase58()] = farmUser;
-        }
-        dispatch(fetchFarmUsersAction({ farmPoolKeyToFarmUser }));
-      });
+      dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress }));
     }
   }, [connection, walletAddress, dispatch]);
 
