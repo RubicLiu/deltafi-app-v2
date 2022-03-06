@@ -104,20 +104,20 @@
         "name": "SOL-SRM",
         "base": "SOL",
         "quote": "SRM",
-        "swap": "CMWjTEZV86ZjxjZQjzFTyhRTEL3PkoAjayhoqbG65YPq",
-        "mint": "8KtQESJRaBvchvLhssKdVFZenxRrErtXvc6xaNadMLrM",
-        "farm": "DXeo3UmkGwoZYu4JtSmMLwhBuEmrwQARiCJojEoAJYe6",
-        "token": "9ga2VELHdqk8ykhjhgXrbmTKRfMrHrvZ3f8dyNr2Ee4t",
+        "swap": "5hXCKkLB1HYW5v5K7ctGVp7mYzjtACYkqoRhGWDUd8jJ",
+        "mint": "AYeBNmoFWFHMLtu8oJs9BkDt7Z2gqUCZEbFB3izryAHg",
+        "farm": "DsEzfpo5YrPW5jCZVMddjMuze2sK7AgLyWSZrrGEgzPK",
+        "token": "FSmiCZA6NTsMvqWSt2vV6XqcDX9ou3TtmS34KwLombKy",
         "decimals": 9
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swap": "HH1URcy7GDq8c5cP8qksUocAkag52gzgWhPzxv2muQxR",
-        "mint": "HVvUCoW6exyJK2iagVtkSMSmf7yP1fngD8k5u2kJZPWd",
-        "farm": "HX1BuR3hE8g4LiY8rMhukrq83dqryUpn1fD4Awzb4fkR",
-        "token": "Dy4ta9z6eUohYwjyZZWpBhCua6kQwFt2PKQ9pqRcdSD7",
+        "swap": "5tqeQMtAjgreGYz7ApN2A8JxMjQqbp4g9Z2S6MF3XFJ7",
+        "mint": "DnRuYKY5d2Rw8PY5DfB6Q2DcKuUCMXcsd41yzcJGzzH8",
+        "farm": "9J44Ex8PBvzeeTEPcwqeuZ4HJYswX8PFcdGBQpH6M3fD",
+        "token": "AGvDuH6aYrbeetgttaMdtY9Jp5UidWpcGVVWXWSGf9GC",
         "decimals": 9
       },
       {
