@@ -13,7 +13,7 @@ import { listSymbols, pools } from "constants/pools";
 import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
-import { MARKET_CONFIG_ADDRESS, SWAP_PROGRAM_ID } from "./constants";
+import { MARKET_CONFIG_ADDRESS } from "./constants";
 import { useFarmPools } from "providers/farm";
 import { farmPools } from "constants/farm";
 import { useCustomConnection } from "providers/connection";
@@ -22,11 +22,10 @@ import { deployConfig } from "constants/deployConfig";
 
 import { useDispatch } from "react-redux";
 import { fetchFarmUsersThunk } from "states/farmState";
-import { setReferrerAction, updateReferrerAction } from "states/appState";
+import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { FarmUnavailable } from "./views/Unavailable";
 import { PublicKey } from "@solana/web3.js";
-import { UserReferrerDataLayout } from "lib/state";
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
 //   enable: true,
@@ -90,42 +89,16 @@ const App: React.FC = () => {
     }
 
     // This flag is added to toggle the flag for local development.
-    const enableReferral: boolean = new URLSearchParams(window.location.search).get("enableReferral") === "true";
-
-    // this timestamp if used for both set/update referral action in this scope
-    // the reducer will validate if the post process is the most recent one based on this flag
-    const timestamp = Date.now();
     // for test purpose, it requires enableReferral is set to be true explicitly
-    if (!!referrer) {
-      dispatch(setReferrerAction({ referrerPublicKey, enableReferral, timestamp }));
-    }
+    const enableReferral: boolean = new URLSearchParams(window.location.search).get("enableReferral") === "true";
+    // TODO(ypeng): Check wallet key and reset state if wallet changes.
+    dispatch(setReferrerAction({ referrerPublicKey, enableReferral }));
 
     if (!enableReferral) {
       return;
     }
 
-    // this async function immediately process the referral input
-    (async () => {
-      console.info("processing");
-      const referralAccountPublickey = await PublicKey.createWithSeed(walletAddress, "referrer", SWAP_PROGRAM_ID);
-      const referralAccountInfo = await connection.getAccountInfo(referralAccountPublickey);
-
-      if (!referralAccountInfo) {
-        if (referrerPublicKey !== walletAddress) {
-          // in the case that the user enter his own referral link
-          // we block this action from getting into our smart contract and set the user's referrer to null
-          dispatch(updateReferrerAction({ referrerPublicKey, isNewUser: true, timestamp }));
-        } else {
-          dispatch(updateReferrerAction({ referrerPublicKey: null, isNewUser: true, timestamp }));
-        }
-        return;
-      }
-
-      const referralInfo = UserReferrerDataLayout.decode(referralAccountInfo.data);
-      // TODO: check if the referrer is a dummy key, set it to null
-      referrerPublicKey = referralInfo.referrer;
-      dispatch(updateReferrerAction({ referrerPublicKey, isNewUser: false, timestamp }));
-    })();
+    dispatch(fetchReferrerThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress }));
   }, [dispatch, walletAddress, connection]);
 
   useEffect(() => {

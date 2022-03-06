@@ -1,6 +1,8 @@
-import { createReducer, PayloadAction } from "@reduxjs/toolkit";
+import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { createAction } from "@reduxjs/toolkit";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
+import { SWAP_PROGRAM_ID } from "constants/index";
+import { UserReferrerDataLayout } from "lib/state";
 
 export interface AppState {
   referrerPublicKey?: PublicKey | null;
@@ -18,43 +20,51 @@ const initialState: AppState = {
   isNewUser: undefined,
 };
 
-export const SET_REFERRER = "APP.SET_REFERRER";
 export const setReferrerAction =
-  createAction<{ referrerPublicKey: PublicKey | null; enableReferral: boolean; timestamp: number }>(SET_REFERRER);
+  createAction<{ referrerPublicKey: PublicKey | null; enableReferral: boolean }>("app/setReferrer");
 
-export const UPDATE_REFERRER = "APP.UPDATE_REFERRER";
-export const updateReferrerAction =
-  createAction<{ referrerPublicKey: PublicKey | null; isNewUser: boolean; timestamp: number }>(UPDATE_REFERRER);
+type FetchReferrerThunkArg = {
+  connection: Connection;
+  config: PublicKey;
+  walletAddress: PublicKey;
+};
+
+export const fetchReferrerThunk = createAsyncThunk("app/fetchReferrer", async (arg: FetchReferrerThunkArg) => {
+  const timestamp = Date.now();
+  const referralAccountPublickey = await PublicKey.createWithSeed(arg.walletAddress, "referrer", SWAP_PROGRAM_ID);
+  const referralAccountInfo = await arg.connection.getAccountInfo(referralAccountPublickey);
+
+  let referrerPublicKey: PublicKey = null;
+  let isNewUser: boolean = null;
+  if (referralAccountInfo) {
+    const referralInfo = UserReferrerDataLayout.decode(referralAccountInfo.data);
+    if (arg.walletAddress !== referralInfo.referrer) {
+      referrerPublicKey = referralInfo.referrer;
+    }
+    // TODO: check if the referrer is a dummy key, set it to null
+    isNewUser = false;
+  }
+
+  return {
+    referrerPublicKey,
+    isNewUser,
+    timestamp,
+  };
+});
 
 export const appReducer = createReducer(initialState, (builder) => {
   builder
-    .addCase(
-      setReferrerAction,
-      (
-        state,
-        action: PayloadAction<{
-          referrerPublicKey: PublicKey | null;
-          enableReferral: boolean;
-          timestamp: number;
-        }>,
-      ) => {
-        state = {
-          lastSetTime: action.payload.timestamp,
-          ...action.payload,
-        };
-      },
-    )
-    .addCase(
-      updateReferrerAction,
-      (
-        state,
-        action: PayloadAction<{ referrerPublicKey: PublicKey | null; isNewUser: boolean; timestamp: number }>,
-      ) => {
-        if (action.payload.timestamp < state.lastSetTime || state.isNewUser !== undefined) {
-          return;
-        }
-        state.referrerPublicKey = action.payload.referrerPublicKey;
-        state.isNewUser = action.payload.isNewUser;
-      },
-    );
+    .addCase(setReferrerAction, (state, action) => {
+      state.enableReferral = action.payload.enableReferral;
+      state.referrerPublicKey = action.payload.referrerPublicKey;
+      state.lastSetTime = undefined;
+      state.isNewUser = undefined;
+    })
+    .addCase(fetchReferrerThunk.fulfilled, (state, action) => {
+      if (action.payload.timestamp < state.lastSetTime || state.isNewUser !== undefined) {
+        return;
+      }
+      state.referrerPublicKey = action.payload.referrerPublicKey;
+      state.isNewUser = action.payload.isNewUser;
+    });
 });
