@@ -1,18 +1,12 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { AccountInfo, PublicKey, Connection } from "@solana/web3.js";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import BigNumber from "bignumber.js";
-import tuple from "immutable-tuple";
+import { AccountInfo, PublicKey } from "@solana/web3.js";
+import { useConnection } from "@solana/wallet-adapter-react";
 
 import { FarmPoolSchema } from "constants/farm";
-import { FarmPoolInfo, FarmPoolsContextValues, StakeAccount } from "./types";
-import { getMultipleAccounts, getFilteredProgramAccounts } from "utils/account";
-import { parseFarmInfo, FARM_USER_SIZE, parseFarmUser, FarmPosition } from "lib/state/farm";
+import { FarmPoolInfo, FarmPoolsContextValues } from "./types";
+import { getMultipleAccounts } from "utils/account";
+import { parseFarmInfo, FARM_USER_SIZE } from "lib/state/farm";
 import { getTokenInfo } from "./tokens";
-import { SWAP_PROGRAM_ID } from "constants/index";
-import { useAsyncData } from "utils/fetch-loop";
-import { useConfig } from "./config";
-import hash from "object-hash";
 
 const FarmPoolsContext = createContext<null | FarmPoolsContextValues>(null);
 
@@ -120,95 +114,6 @@ export function useFarmByPoolAddress(poolAddress: string | null | undefined) {
   if (schema && pools) return pools.find((pool) => pool.publicKey.equals(schema.address));
 }
 
-const stakeAccountsCache: Record<
-  string,
-  {
-    data: {
-      publicKey: PublicKey;
-      positions: {
-        [key: string]: StakeAccount;
-      };
-    } | null;
-    expiredTime: number;
-  }
-> = {};
-
-const defaultStakeAccountsCacheLife: number = 60000; // 60,000ms, 1min
-
-export function updateStakeAccountCache(
-  walletPubkey: PublicKey,
-  configPubkey: PublicKey,
-  // this key is string because we only use it as a search key
-  // in the pool positions, and the key in position field in StakeAccout is string
-  farmPoolId: string,
-  farmPoolPositionData: FarmPosition,
-): StakeAccount | null {
-  const stakeFilters = getStakeFilters(configPubkey, walletPubkey);
-  const keyHash = hash.keys(JSON.stringify(stakeFilters));
-
-  if (!stakeAccountsCache[keyHash] || !stakeAccountsCache[keyHash].data.positions[farmPoolId]) {
-    console.error("farm pool position not found");
-    return null;
-  }
-
-  const position: StakeAccount = {
-    depositBalance: new BigNumber(farmPoolPositionData.depositedAmount.toString()),
-    rewardsOwed: new BigNumber(farmPoolPositionData.rewardsOwed.toString()),
-    rewardEstimated: new BigNumber(farmPoolPositionData.rewardsEstimated.toString()),
-    lastUpdateTs: new BigNumber(farmPoolPositionData.lastUpdateTs.toString()),
-    nextClaimTs: new BigNumber(farmPoolPositionData.nextClaimTs.toString()),
-  };
-
-  stakeAccountsCache[keyHash].data.positions[farmPoolId] = position;
-
-  return position;
-}
-
-async function stakeProgramIdAccount(connection: Connection, stakeFilters: any) {
-  const keyHash = hash.keys(JSON.stringify(stakeFilters));
-  if (stakeAccountsCache[keyHash] && stakeAccountsCache[keyHash].expiredTime > Date.now()) {
-    return stakeAccountsCache[keyHash].data;
-  }
-
-  const farmUserAccountInfos = await getFilteredProgramAccounts(connection, SWAP_PROGRAM_ID, stakeFilters);
-  const filtered = farmUserAccountInfos
-    .map(({ publicKey, accountInfo }) => ({ publicKey, farmUserInfo: parseFarmUser(accountInfo) }))
-    .filter(({ farmUserInfo }) => !!farmUserInfo);
-
-  if (filtered.length === 0) {
-    // we still need to update the cache is the user doesn't have a farm user account
-    stakeAccountsCache[keyHash] = {
-      data: null,
-      expiredTime: Date.now() + defaultStakeAccountsCacheLife,
-    };
-    return null;
-  }
-
-  const farmUserAddress = filtered[0].publicKey;
-  const farmUserInfo = filtered[0].farmUserInfo.data;
-  const positions: {
-    [key: string]: StakeAccount;
-  } = {};
-
-  farmUserInfo.positions.forEach((position) => {
-    const poolId = position.pool.toBase58();
-    const depositBalance = new BigNumber(position.depositedAmount.toString());
-    positions[poolId] = {
-      depositBalance,
-      rewardsOwed: new BigNumber(position.rewardsOwed.toString()),
-      rewardEstimated: new BigNumber(position.rewardsEstimated.toString()),
-      lastUpdateTs: new BigNumber(position.lastUpdateTs.toString()),
-      nextClaimTs: new BigNumber(position.nextClaimTs.toString()),
-    };
-  });
-
-  stakeAccountsCache[keyHash] = {
-    data: { publicKey: farmUserAddress, positions },
-    expiredTime: Date.now() + defaultStakeAccountsCacheLife,
-  };
-  return { publicKey: farmUserAddress, positions };
-}
-
 export function getStakeFilters(config: PublicKey, walletAddress: PublicKey) {
   return [
     {
@@ -228,29 +133,4 @@ export function getStakeFilters(config: PublicKey, walletAddress: PublicKey) {
       dataSize: FARM_USER_SIZE,
     },
   ];
-}
-
-async function getFarmUserAccount(connection: Connection, config: PublicKey, walletAddress: PublicKey) {
-  const stakeFilters = getStakeFilters(config, walletAddress);
-  return stakeProgramIdAccount(connection, stakeFilters);
-}
-
-export function useFarmUserAccount() {
-  const { connected, publicKey } = useWallet();
-  const { config } = useConfig();
-  const { connection } = useConnection();
-  async function getFarmUser() {
-    if (!connected || !publicKey || !config) {
-      return null;
-    }
-    return getFarmUserAccount(connection, config.publicKey, publicKey);
-  }
-  return useAsyncData(
-    getFarmUser,
-    tuple("getFarmUser", connection, config?.publicKey.toBase58(), publicKey?.toBase58()),
-    {
-      refreshInterval: 800,
-      refreshIntervalOnError: 5000,
-    },
-  );
 }

@@ -33,7 +33,6 @@ export async function createFarmUser({
   }
 
   const seed = ("farmUser" + farmPoolPubkey.toBase58()).substring(0, 32);
-
   const farmUserPubkey = await PublicKey.createWithSeed(walletPubkey, seed, SWAP_PROGRAM_ID);
   const balanceForStakeAccount = await connection.getMinimumBalanceForRentExemption(FARM_USER_SIZE);
 

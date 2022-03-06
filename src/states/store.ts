@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { appReducer } from "./appState";
-import { farmReducer } from "./farmState";
+import { farmUserReducer } from "./farmUserState";
 
 export const store = configureStore({
   reducer: {
     app: appReducer,
-    farm: farmReducer,
+    farmUser: farmUserReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

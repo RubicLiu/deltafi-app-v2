@@ -10,11 +10,11 @@ import { StakeAccount } from "providers/types";
 
 type FarmPoolKeyToFarmUser = Record<string, FarmUserFlat>;
 
-export interface FarmState {
+export interface FarmUserState {
   farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser;
 }
 
-const initialState: FarmState = {
+const initialState: FarmUserState = {
   farmPoolKeyToFarmUser: {},
 };
 
@@ -37,7 +37,7 @@ export const fetchFarmUsersThunk = createAsyncThunk("farm/fetchFarmUsers", async
   };
 });
 
-export const farmReducer = createReducer(initialState, (builder) => {
+export const farmUserReducer = createReducer(initialState, (builder) => {
   builder.addCase(fetchFarmUsersThunk.fulfilled, (state, action) => {
     state.farmPoolKeyToFarmUser = action.payload.farmPoolKeyToFarmUser;
   });

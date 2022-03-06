@@ -1,4 +1,4 @@
 import { RootState } from "./store";
 
 export const appSelector = (state: RootState) => state.app;
-export const farmSelector = (state: RootState) => state.farm;
+export const farmUserSelector = (state: RootState) => state.farmUser;

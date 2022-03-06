@@ -21,7 +21,7 @@ import usePyth from "providers/pyth";
 import { deployConfig } from "constants/deployConfig";
 
 import { useDispatch } from "react-redux";
-import { fetchFarmUsersThunk } from "states/farmState";
+import { fetchFarmUsersThunk } from "states/farmUserState";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { FarmUnavailable } from "./views/Unavailable";
@@ -63,7 +63,7 @@ const App: React.FC = () => {
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
-  const enableFarm = new URLSearchParams(window.location.search).get("enableFarm") === "true";
+  const enableFarm = true;
 
   useEffect(() => {
     if (enableFarm && walletAddress) {

@@ -35,8 +35,8 @@ import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector } from "react-redux";
-import { farmSelector } from "states/selectors";
-import { toFarmUserPosition } from "states/farmState";
+import { farmUserSelector } from "states/selectors";
+import { toFarmUserPosition } from "states/farmUserState";
 
 interface TransactionResult {
   status: boolean | null;
@@ -74,7 +74,7 @@ const Stake = (): ReactElement => {
   const location = useLocation();
   const farmPoolId = location.pathname.split("/").pop();
   const farmPool = useFarmPoolByAddress(farmPoolId);
-  const farmState = useSelector(farmSelector);
+  const farmState = useSelector(farmUserSelector);
   const farmUserFlat = farmState.farmPoolKeyToFarmUser[farmPoolId];
   const farmUser = toFarmUserPosition(farmUserFlat);
 

@@ -168,6 +168,7 @@ export const createInitFarmUserInstruction = (
     { pubkey: farmUser, isSigner: false, isWritable: true },
     { pubkey: farmOwner, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
   ];
 
   const dataLayout = struct([u8("instruction")]);

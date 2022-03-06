@@ -38,13 +38,17 @@ import { deposit, withdraw, sendSignedTransaction } from "utils/transactions";
 import { convertDollar } from "utils/utils";
 import { SOLSCAN_LINK } from "constants/index";
 import { useCustomConnection } from "providers/connection";
-import { useFarmByPoolAddress, useFarmUserAccount } from "providers/farm";
+import { useFarmByPoolAddress } from "providers/farm";
 import { useConfig } from "providers/config";
 import { SwapType } from "lib/state";
 import { stableDeposit } from "utils/transactions/stableDeposit";
 import { stableWithdraw } from "utils/transactions/stableWithdraw";
 import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
+import { useSelector, useDispatch } from "react-redux";
+import { farmUserSelector } from "states/selectors";
+import { fetchFarmUsersThunk, toFarmUserPosition } from "states/farmUserState";
+import { MARKET_CONFIG_ADDRESS } from "constants/index";
 
 interface TransactionResult {
   status: boolean | null;
@@ -219,9 +223,15 @@ const Deposit: React.FC = () => {
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const baseTokenAccount = useTokenFromMint(pool?.baseTokenInfo.address);
   const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address);
-  const [farmUser] = useFarmUserAccount();
+
   const { config } = useConfig();
   const farmPool = useFarmByPoolAddress(poolAddress);
+
+  const dispatch = useDispatch();
+  const farmState = useSelector(farmUserSelector);
+  const farmUserFlat = farmState.farmPoolKeyToFarmUser[farmPool?.publicKey.toBase58()];
+  const farmUser = toFarmUserPosition(farmUserFlat);
+
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
@@ -339,6 +349,8 @@ const Deposit: React.FC = () => {
           farmPool: farmPool?.publicKey,
           farmUser: farmUser?.publicKey,
         });
+
+        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
       } else {
         setIsProcessing(false);
         return null;
@@ -384,6 +396,7 @@ const Deposit: React.FC = () => {
     config,
     farmPool,
     farmUser,
+    dispatch,
   ]);
 
   const handleWithdraw = useCallback(async () => {
@@ -421,6 +434,8 @@ const Deposit: React.FC = () => {
           farmPool: farmPool?.publicKey,
           farmUser: farmUser?.publicKey,
         });
+
+        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
       } else {
         setIsProcessing(false);
         return null;
@@ -469,6 +484,7 @@ const Deposit: React.FC = () => {
     config,
     farmPool,
     farmUser,
+    dispatch,
   ]);
 
   const handleSnackBarClose = useCallback(() => {
