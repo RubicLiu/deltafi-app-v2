@@ -24,7 +24,7 @@ import { ConnectButton, LinkIcon } from "components";
 
 import useStyles from "./styles";
 import { getFarmTokenInfo, useTokenFromMint, useTokenMintAccount } from "providers/tokens";
-import { useFarmPoolByAddress, useFarmUserAccount } from "providers/farm";
+import { useFarmPoolByAddress } from "providers/farm";
 import { lpTokens } from "constants/tokens";
 import { useModal } from "providers/modal";
 import { useConfig } from "providers/config";
@@ -34,6 +34,9 @@ import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK } from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
+import { useSelector } from "react-redux";
+import { farmSelector } from "states/selectors";
+import { toFarmUserPosition } from "states/farmState";
 
 interface TransactionResult {
   status: boolean | null;
@@ -71,6 +74,9 @@ const Stake = (): ReactElement => {
   const location = useLocation();
   const farmPoolId = location.pathname.split("/").pop();
   const farmPool = useFarmPoolByAddress(farmPoolId);
+  const farmState = useSelector(farmSelector);
+  const farmUserFlat = farmState.farmPoolKeyToFarmUser[farmPoolId];
+  const farmUser = toFarmUserPosition(farmUserFlat);
 
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
@@ -91,9 +97,10 @@ const Stake = (): ReactElement => {
   const tokenBalance = useMemo(() => {
     if (tokenAccount?.account) {
       const value = exponentiatedBy(tokenAccount.account.amount, staking.token.decimals);
-      if (staking.isStake) {
-        setStaking({ ...staking, balance: value });
-      }
+      // TODO(ypeng): Set balance explicitly.
+      //      if (staking.isStake) {
+      //        setStaking({ ...staking, balance: value });
+      //      }
       return value;
     }
     return null;
@@ -116,7 +123,6 @@ const Stake = (): ReactElement => {
   const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58());
   const lpMint = useTokenMintAccount(farmPool?.poolMintKey);
   const deltafiTokenMint = useTokenMintAccount(DELTAFI_TOKEN_MINT);
-  const [farmUser] = useFarmUserAccount();
   const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
@@ -136,10 +142,11 @@ const Stake = (): ReactElement => {
   const depositAmount = useMemo(() => {
     if (position && lpMint) {
       const value = exponentiatedBy(position.depositBalance, lpMint.decimals);
-      if (!staking.isStake) {
-        setStaking({ ...staking, balance: value });
-      }
-      return exponentiatedBy(position.depositBalance, lpMint.decimals);
+      // TODO(ypeng): Set balance explicitly.
+      //      if (!staking.isStake) {
+      //        setStaking({ ...staking, balance: value });
+      //      }
+      return value;
     }
     return new BigNumber(0);
   }, [position?.depositBalance, lpMint]);

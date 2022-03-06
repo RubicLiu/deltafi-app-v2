@@ -121,6 +121,7 @@ export interface FarmUserDataFlat {
 }
 
 export interface FarmUserFlat {
+  publicKey: PublicKey;
   configKey: PublicKey;
   farmPoolKey: PublicKey;
   owner: PublicKey;

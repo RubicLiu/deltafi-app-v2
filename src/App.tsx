@@ -38,12 +38,12 @@ import { PublicKey } from "@solana/web3.js";
 // })
 // Analytics.record({ name: 'App' })
 
-// const Farm = lazy(() => import("./views/Farm"));
+const Farm = lazy(() => import("./views/Farm"));
 const Swap = lazy(() => import("./views/Swap"));
 const Pool = lazy(() => import("./views/Pool"));
 const Reward = lazy(() => import("./views/Reward"));
 const Deposit = lazy(() => import("./views/Deposit"));
-// const Stake = lazy(() => import("./views/Stake"));
+const Stake = lazy(() => import("./views/Stake"));
 const Unavailable = lazy(() => import("./views/Unavailable"));
 const Terms = lazy(() => import("./views/Terms"));
 
@@ -63,17 +63,13 @@ const App: React.FC = () => {
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
+  const enableFarm = new URLSearchParams(window.location.search).get("enableFarm") === "true";
 
   useEffect(() => {
-    if (walletAddress) {
-      const enableFarm: boolean = new URLSearchParams(window.location.search).get("enableFarm") === "true";
-      if (!enableFarm) {
-        return;
-      }
-
+    if (enableFarm && walletAddress) {
       dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress }));
     }
-  }, [connection, walletAddress, dispatch]);
+  }, [connection, walletAddress, dispatch, enableFarm]);
 
   useEffect(() => {
     const referrer: string = new URLSearchParams(window.location.search).get("referrer");
@@ -119,9 +115,9 @@ const App: React.FC = () => {
             <Route path="/swap" exact component={Swap} />
             <Route path="/pools" exact component={Pool} />
             <Route path="/deposit/:poolAddress" exact component={Deposit} />
-            <Route path="/farms" exact component={FarmUnavailable} />
+            <Route path="/farms" exact component={enableFarm ? Farm : FarmUnavailable} />
             <Route path="/rewards" exact component={Reward} />
-            <Route path="/stake/:id" exact component={FarmUnavailable} />
+            <Route path="/stake/:id" exact component={enableFarm ? Stake : FarmUnavailable} />
             <Route path="/terms" exact component={Terms} />
             <Redirect from="*" to="/swap" />
           </Switch>
