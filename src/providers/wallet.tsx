@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import {
   getCoin98Wallet,
   getLedgerWallet,
   getPhantomWallet,
   // getSafePalWallet,
+  getSlopeWallet,
   getSolflareWallet,
   getSolflareWebWallet,
   getSolletExtensionWallet,
@@ -25,12 +26,13 @@ export function CustomWalletProvider({ children }) {
       getSolletExtensionWallet({ network }),
       getCoin98Wallet(),
       // getSafePalWallet(),
+      getSlopeWallet(),
     ],
     [network],
   );
-  const onErrorWallet = (error: WalletError) => {
+  const onErrorWallet = useCallback((error: WalletError) => {
     console.error(error);
-  };
+  }, []);
 
   return (
     <WalletProvider wallets={wallets} onError={onErrorWallet} autoConnect>

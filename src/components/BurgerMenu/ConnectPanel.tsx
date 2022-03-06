@@ -125,6 +125,9 @@ const ConnectPanel: React.FC = (props) => {
       case WalletName.SolletExtension:
         notFound = !(window as any)?.sollet;
         break;
+      case WalletName.Slope:
+        notFound = !(window as any)?.slope;
+        break;
       case WalletName.Ledger:
       case WalletName.Sollet:
       case WalletName.SafePal:
