@@ -5,7 +5,7 @@ import BigNumber from "bignumber.js";
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { getFilteredProgramAccounts } from "utils/account";
 import { FarmUserFlat, FarmUserLayout } from "lib/state/farm";
-import { getStakeFilters } from "providers/farm";
+import { FARM_USER_SIZE } from "lib/state/farm";
 import { StakeAccount } from "providers/types";
 
 type FarmPoolKeyToFarmUser = Record<string, FarmUserFlat>;
@@ -53,7 +53,28 @@ const parseFarmUser = (publicKey: PublicKey, info: AccountInfo<Buffer>) => {
   };
 };
 
-export async function getFarmUsers(connection: Connection, config: PublicKey, walletAddress: PublicKey) {
+function getStakeFilters(config: PublicKey, walletAddress: PublicKey) {
+  return [
+    {
+      memcmp: {
+        offset: 1,
+        bytes: config.toBase58(),
+      },
+    },
+    {
+      memcmp: {
+        // isInitialized + config key + farm pool key
+        offset: 33 + 32,
+        bytes: walletAddress.toBase58(),
+      },
+    },
+    {
+      dataSize: FARM_USER_SIZE,
+    },
+  ];
+}
+
+async function getFarmUsers(connection: Connection, config: PublicKey, walletAddress: PublicKey) {
   const stakeFilters = getStakeFilters(config, walletAddress);
   const farmUserAccountInfos = await getFilteredProgramAccounts(connection, SWAP_PROGRAM_ID, stakeFilters);
   return farmUserAccountInfos

@@ -14,8 +14,6 @@ import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
 import { MARKET_CONFIG_ADDRESS } from "./constants";
-import { useFarmPools } from "providers/farm";
-import { farmPools } from "constants/farm";
 import { useCustomConnection } from "providers/connection";
 import usePyth from "providers/pyth";
 import { deployConfig } from "constants/deployConfig";
@@ -57,14 +55,11 @@ const App: React.FC = () => {
   const dispatch = useDispatch();
   const { setConfigAddress } = useConfig();
   const { setSchemas } = usePools();
-  const { setSchemas: setFarmSchema } = useFarmPools();
   const { setNetwork } = useCustomConnection();
   const { setFilters } = usePyth();
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
-  // TODO(ypeng): Use redux farm pool in farm and stake pages.
-  const enableFarmPool = false;
 
   useEffect(() => {
     if (walletAddress) {
@@ -73,17 +68,13 @@ const App: React.FC = () => {
   }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
-    if (!enableFarmPool) {
-      return;
-    }
-
     dispatch(fetchFarmPoolsThunk({ connection }));
     // Refresh the farm pool every 1 minute.
     const interval = setInterval(() => {
       dispatch(fetchFarmPoolsThunk({ connection }));
     }, 60 * 1000);
     return () => clearInterval(interval);
-  }, [connection, dispatch, enableFarmPool]);
+  }, [connection, dispatch]);
 
   useEffect(() => {
     const referrer: string = new URLSearchParams(window.location.search).get("referrer");
@@ -114,10 +105,9 @@ const App: React.FC = () => {
   useEffect(() => {
     setConfigAddress(MARKET_CONFIG_ADDRESS);
     setSchemas(pools);
-    setFarmSchema(farmPools);
     setNetwork(deployConfig.network);
     setFilters(listSymbols(pools));
-  }, [setConfigAddress, setSchemas, setFarmSchema, setNetwork, setFilters]);
+  }, [setConfigAddress, setSchemas, setNetwork, setFilters]);
 
   return (
     <BrowserRouter>

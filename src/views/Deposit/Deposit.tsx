@@ -38,7 +38,6 @@ import { deposit, withdraw, sendSignedTransaction } from "utils/transactions";
 import { convertDollar } from "utils/utils";
 import { SOLSCAN_LINK } from "constants/index";
 import { useCustomConnection } from "providers/connection";
-import { useFarmByPoolAddress } from "providers/farm";
 import { useConfig } from "providers/config";
 import { SwapType } from "lib/state";
 import { stableDeposit } from "utils/transactions/stableDeposit";
@@ -49,6 +48,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { farmUserSelector } from "states/selectors";
 import { fetchFarmUsersThunk, toFarmUserPosition } from "states/farmUserState";
 import { MARKET_CONFIG_ADDRESS } from "constants/index";
+import { getPoolConfigByPoolKey } from "constants/deployConfig";
 
 interface TransactionResult {
   status: boolean | null;
@@ -225,11 +225,14 @@ const Deposit: React.FC = () => {
   const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address);
 
   const { config } = useConfig();
-  const farmPool = useFarmByPoolAddress(poolAddress);
+  const farmPoolKey = useMemo(() => {
+    const poolConfig = getPoolConfigByPoolKey(poolAddress);
+    return new PublicKey(poolConfig.farm);
+  }, [poolAddress]);
 
   const dispatch = useDispatch();
   const farmState = useSelector(farmUserSelector);
-  const farmUserFlat = farmState.farmPoolKeyToFarmUser[farmPool?.publicKey.toBase58()];
+  const farmUserFlat = farmState.farmPoolKeyToFarmUser[farmPoolKey.toBase58()];
   const farmUser = toFarmUserPosition(farmUserFlat);
 
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
@@ -346,7 +349,7 @@ const Deposit: React.FC = () => {
             amountMintMin: BigInt(0),
           },
           config,
-          farmPool: farmPool?.publicKey,
+          farmPool: farmPoolKey,
           farmUser: farmUser?.publicKey,
         });
 
@@ -394,7 +397,7 @@ const Deposit: React.FC = () => {
     signTransaction,
     poolTokenAccount?.pubkey,
     config,
-    farmPool,
+    farmPoolKey,
     farmUser,
     dispatch,
   ]);
@@ -431,7 +434,7 @@ const Deposit: React.FC = () => {
             minAmountTokenB: BigInt(exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString()),
           },
           config,
-          farmPool: farmPool?.publicKey,
+          farmPool: farmPoolKey,
           farmUser: farmUser?.publicKey,
         });
 
@@ -482,7 +485,7 @@ const Deposit: React.FC = () => {
     quoteTokenAccount?.pubkey,
     withdrawPercentage,
     config,
-    farmPool,
+    farmPoolKey,
     farmUser,
     dispatch,
   ]);

@@ -12,7 +12,9 @@ import { convertDollar } from "utils/utils";
 import { usePoolFromAddress } from "providers/pool";
 import { usePriceBySymbol } from "providers/pyth";
 import { useTokenMintAccount } from "providers/tokens";
-import { useFarmPoolByAddress } from "providers/farm";
+
+import { useSelector } from "react-redux";
+import { farmPoolSelector } from "states/selectors";
 
 const deltafiTokenDecimals = 6;
 
@@ -78,7 +80,10 @@ const FarmCard: React.FC<CardProps> = (props) => {
   const history = useHistory();
   const { farm } = props;
   const swapPool = usePoolFromAddress(farm?.poolAddress);
-  const farmPool = useFarmPoolByAddress(farm?.address.toBase58());
+
+  const farmPoolState = useSelector(farmPoolSelector);
+  const farmPool = farmPoolState.farmPoolKeyToFarmPoolInfo[farm?.address.toBase58()];
+
   const lpMint = useTokenMintAccount(swapPool?.poolMintKey);
   const { price: basePrice } = usePriceBySymbol(swapPool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(swapPool?.quoteTokenInfo.symbol);

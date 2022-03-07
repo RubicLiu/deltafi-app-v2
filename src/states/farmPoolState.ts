@@ -23,9 +23,7 @@ type FetchFarmPoolsThunkArg = {
 export const fetchFarmPoolsThunk = createAsyncThunk("farmPool/fetchFarmPools", async (arg: FetchFarmPoolsThunkArg) => {
   const farmPoolKeyToFarmPoolInfo: FarmPoolKeyToFarmPoolInfo = {};
   const farmPools = await getFarmPools(arg.connection);
-  console.info("found farm pools " + farmPools.length);
   for (const farmPool of farmPools) {
-    console.info(farmPool);
     farmPoolKeyToFarmPoolInfo[farmPool.publicKey.toBase58()] = farmPool;
   }
   return {

@@ -24,7 +24,6 @@ import { ConnectButton, LinkIcon } from "components";
 
 import useStyles from "./styles";
 import { getFarmTokenInfo, useTokenFromMint, useTokenMintAccount } from "providers/tokens";
-import { useFarmPoolByAddress } from "providers/farm";
 import { lpTokens } from "constants/tokens";
 import { useModal } from "providers/modal";
 import { useConfig } from "providers/config";
@@ -35,8 +34,10 @@ import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector, useDispatch } from "react-redux";
-import { farmUserSelector } from "states/selectors";
+import { farmUserSelector, farmPoolSelector } from "states/selectors";
 import { toFarmUserPosition, fetchFarmUsersThunk } from "states/farmUserState";
+import { getPoolConfigByFarmPoolKey } from "constants/deployConfig";
+import { getTokenInfo } from "providers/tokens";
 
 interface TransactionResult {
   status: boolean | null;
@@ -73,10 +74,23 @@ const Stake = (): ReactElement => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const location = useLocation();
+
   const farmPoolId = location.pathname.split("/").pop();
-  const farmPool = useFarmPoolByAddress(farmPoolId);
-  const farmState = useSelector(farmUserSelector);
-  const farmUserFlat = farmState.farmPoolKeyToFarmUser[farmPoolId];
+  const farmPoolState = useSelector(farmPoolSelector);
+  const farmPool = farmPoolState.farmPoolKeyToFarmPoolInfo[farmPoolId];
+
+  const { baseTokenInfo, quoteTokenInfo } = useMemo(() => {
+    const poolConfig = getPoolConfigByFarmPoolKey(farmPoolId);
+    const baseTokenInfo = getTokenInfo(poolConfig.base);
+    const quoteTokenInfo = getTokenInfo(poolConfig.quote);
+    return {
+      baseTokenInfo,
+      quoteTokenInfo,
+    };
+  }, [farmPoolId]);
+
+  const farmUserState = useSelector(farmUserSelector);
+  const farmUserFlat = farmUserState.farmPoolKeyToFarmUser[farmPoolId];
   const farmUser = toFarmUserPosition(farmUserFlat);
 
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
@@ -418,12 +432,8 @@ const Stake = (): ReactElement => {
         <Box display="flex" justifyContent="space-between" pb={2}>
           <Typography variant="h6">{farmPool.name} LP Token Staking</Typography>
           <Box className={classes.iconGroup}>
-            <img
-              src={farmPool.baseTokenInfo.logoURI}
-              alt="staking-coin"
-              className={clx(classes.coinIcon, classes.firstCoin)}
-            />
-            <img src={farmPool.quoteTokenInfo.logoURI} alt="earning-coin" className={classes.coinIcon} />
+            <img src={baseTokenInfo.logoURI} alt="staking-coin" className={clx(classes.coinIcon, classes.firstCoin)} />
+            <img src={quoteTokenInfo.logoURI} alt="earning-coin" className={classes.coinIcon} />
           </Box>
         </Box>
         <Box display="flex" justifyContent="space-between" pb={4}>
