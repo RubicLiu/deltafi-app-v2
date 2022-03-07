@@ -1,4 +1,4 @@
-import { ReactElement, useState, useMemo, useCallback } from "react";
+import { ReactElement, useState, useMemo, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import clx from "classnames";
@@ -30,13 +30,13 @@ import { useModal } from "providers/modal";
 import { useConfig } from "providers/config";
 import { sendSignedTransaction, claim, stake, unstake } from "utils/transactions";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
-import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK } from "constants/index";
+import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK, MARKET_CONFIG_ADDRESS } from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { farmUserSelector } from "states/selectors";
-import { toFarmUserPosition } from "states/farmUserState";
+import { toFarmUserPosition, fetchFarmUsersThunk } from "states/farmUserState";
 
 interface TransactionResult {
   status: boolean | null;
@@ -70,6 +70,7 @@ const getUnclaimedReward = (
 };
 
 const Stake = (): ReactElement => {
+  const dispatch = useDispatch();
   const classes = useStyles();
   const location = useLocation();
   const farmPoolId = location.pathname.split("/").pop();
@@ -86,26 +87,6 @@ const Stake = (): ReactElement => {
 
   const [isProcessingStake, setIsProcessingStake] = useState(false);
   const [isProcessingClaim, setIsProcessingClaim] = useState(false);
-  const [staking, setStaking] = useState({
-    isStake: true,
-    token: token,
-    balance: null,
-    amount: "",
-  });
-
-  /*eslint-disable */
-  const tokenBalance = useMemo(() => {
-    if (tokenAccount?.account) {
-      const value = exponentiatedBy(tokenAccount.account.amount, staking.token.decimals);
-      // TODO(ypeng): Set balance explicitly.
-      //      if (staking.isStake) {
-      //        setStaking({ ...staking, balance: value });
-      //      }
-      return value;
-    }
-    return null;
-  }, [tokenAccount?.account?.amount]);
-  /*eslint-enable */
 
   const [percentage, setPercentage] = useState(0);
   const { setMenu } = useModal();
@@ -128,29 +109,39 @@ const Stake = (): ReactElement => {
     status: null,
   });
 
+  const tokenBalance = useMemo(() => {
+    return tokenAccount?.account ? exponentiatedBy(tokenAccount.account.amount, token.decimals) : new BigNumber(0);
+  }, [tokenAccount?.account, token]);
+
   const totalStaked = useMemo(() => {
-    if (farmPool && lpMint) {
-      return exponentiatedBy(farmPool.reservedAmount.toString(), lpMint.decimals);
-    }
-    return new BigNumber(0);
+    return farmPool && lpMint ? exponentiatedBy(farmPool.reservedAmount.toString(), lpMint.decimals) : new BigNumber(0);
   }, [farmPool, lpMint]);
 
   let position = farmUser?.positions[farmPoolId];
   const apr = new BigNumber(farmPool.aprNumerator.toString()).div(new BigNumber(farmPool.aprDenominator.toString()));
-
-  /*eslint-disable */
   const depositAmount = useMemo(() => {
-    if (position && lpMint) {
-      const value = exponentiatedBy(position.depositBalance, lpMint.decimals);
-      // TODO(ypeng): Set balance explicitly.
-      //      if (!staking.isStake) {
-      //        setStaking({ ...staking, balance: value });
-      //      }
-      return value;
+    return position && lpMint ? exponentiatedBy(position.depositBalance, lpMint.decimals) : new BigNumber(0);
+  }, [position, lpMint]);
+
+  const [staking, setStaking] = useState({
+    isStake: true,
+    token: token,
+    balance: tokenBalance,
+    amount: "",
+  });
+
+  useEffect(() => {
+    const balance = staking.balance;
+    if (staking.isStake) {
+      if (balance === null || balance.toString() !== tokenBalance.toString()) {
+        setStaking({ ...staking, balance: tokenBalance });
+      }
+    } else {
+      if (balance == null || balance.toString() !== depositAmount.toString()) {
+        setStaking({ ...staking, balance: depositAmount });
+      }
     }
-    return new BigNumber(0);
-  }, [position?.depositBalance, lpMint]);
-  /*eslint-enable */
+  }, [staking, tokenBalance, depositAmount]);
 
   const unclaimedReward = (() => {
     if (position && deltafiTokenMint) {
@@ -234,6 +225,7 @@ const Stake = (): ReactElement => {
         });
         setState((state) => ({ ...state, open: true }));
         setIsProcessingStake(false);
+        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
       } catch (e) {
         setPercentage(0);
         setStaking((prevStaking) => ({
@@ -283,6 +275,7 @@ const Stake = (): ReactElement => {
         });
         setState((state) => ({ ...state, open: true }));
         setIsProcessingStake(false);
+        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
       } catch (e) {
         setPercentage(0);
         setStaking((prevStaking) => ({
@@ -306,6 +299,7 @@ const Stake = (): ReactElement => {
     signTransaction,
     position,
     depositAmount,
+    dispatch,
   ]);
 
   /*eslint-enable */
