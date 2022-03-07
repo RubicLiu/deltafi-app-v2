@@ -21,10 +21,10 @@ import usePyth from "providers/pyth";
 import { deployConfig } from "constants/deployConfig";
 
 import { useDispatch } from "react-redux";
+import { fetchFarmPoolsThunk } from "states/farmPoolState";
 import { fetchFarmUsersThunk } from "states/farmUserState";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
-import { FarmUnavailable } from "./views/Unavailable";
 import { PublicKey } from "@solana/web3.js";
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -63,13 +63,27 @@ const App: React.FC = () => {
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
-  const enableFarm = true;
+  // TODO(ypeng): Use redux farm pool in farm and stake pages.
+  const enableFarmPool = false;
 
   useEffect(() => {
-    if (enableFarm && walletAddress) {
+    if (walletAddress) {
       dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress }));
     }
-  }, [connection, walletAddress, dispatch, enableFarm]);
+  }, [connection, walletAddress, dispatch]);
+
+  useEffect(() => {
+    if (!enableFarmPool) {
+      return;
+    }
+
+    dispatch(fetchFarmPoolsThunk({ connection }));
+    // Refresh the farm pool every 1 minute.
+    const interval = setInterval(() => {
+      dispatch(fetchFarmPoolsThunk({ connection }));
+    }, 60 * 1000);
+    return () => clearInterval(interval);
+  }, [connection, dispatch, enableFarmPool]);
 
   useEffect(() => {
     const referrer: string = new URLSearchParams(window.location.search).get("referrer");
@@ -115,9 +129,9 @@ const App: React.FC = () => {
             <Route path="/swap" exact component={Swap} />
             <Route path="/pools" exact component={Pool} />
             <Route path="/deposit/:poolAddress" exact component={Deposit} />
-            <Route path="/farms" exact component={enableFarm ? Farm : FarmUnavailable} />
+            <Route path="/farms" exact component={Farm} />
             <Route path="/rewards" exact component={Reward} />
-            <Route path="/stake/:id" exact component={enableFarm ? Stake : FarmUnavailable} />
+            <Route path="/stake/:id" exact component={Stake} />
             <Route path="/terms" exact component={Terms} />
             <Redirect from="*" to="/swap" />
           </Switch>
