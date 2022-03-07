@@ -223,18 +223,16 @@ const Stake = (): ReactElement => {
           hash,
           stake: staking,
         });
-        setState((state) => ({ ...state, open: true }));
-        setIsProcessingStake(false);
-        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
       } catch (e) {
         setPercentage(0);
         setStaking((prevStaking) => ({
           ...prevStaking,
           amount: "0",
         }));
-        setTransactionResult({ status: false });
+      } finally {
         setState((state) => ({ ...state, open: true }));
         setIsProcessingStake(false);
+        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
       }
     } else {
       if (staking.amount === "" || !position || depositAmount.lt(staking.amount)) {
@@ -273,9 +271,6 @@ const Stake = (): ReactElement => {
           hash,
           stake: staking,
         });
-        setState((state) => ({ ...state, open: true }));
-        setIsProcessingStake(false);
-        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
       } catch (e) {
         setPercentage(0);
         setStaking((prevStaking) => ({
@@ -283,10 +278,12 @@ const Stake = (): ReactElement => {
           amount: "0",
         }));
         setTransactionResult({ status: false });
+      } finally {
         setState((state) => ({ ...state, open: true }));
         setIsProcessingStake(false);
+        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
       }
-    } /*eslint-disable */
+    }
   }, [
     connection,
     walletPubkey,
@@ -302,7 +299,6 @@ const Stake = (): ReactElement => {
     dispatch,
   ]);
 
-  /*eslint-enable */
   const handleClaim = useCallback(async () => {
     if (!connection || !farmPool || !walletPubkey || !lpMint || !lpToken) {
       return null;
@@ -331,14 +327,25 @@ const Stake = (): ReactElement => {
         action: "claim",
         hash,
       });
-      setState((state) => ({ ...state, open: true }));
-      setIsProcessingClaim(false);
     } catch (e) {
       setTransactionResult({ status: false });
+    } finally {
       setState((state) => ({ ...state, open: true }));
       setIsProcessingClaim(false);
+      dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
     }
-  }, [config, connection, farmPool, farmUser, lpMint, lpToken, signTransaction, walletPubkey, rewardsAccount]);
+  }, [
+    config,
+    connection,
+    farmPool,
+    farmUser,
+    lpMint,
+    lpToken,
+    signTransaction,
+    walletPubkey,
+    rewardsAccount,
+    dispatch,
+  ]);
 
   const handleSnackBarClose = useCallback(() => {
     setState((state) => ({ ...state, open: false }));
