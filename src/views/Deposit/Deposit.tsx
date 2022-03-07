@@ -424,14 +424,27 @@ const Deposit: React.FC = () => {
           quotePricePythKey: pool.pythQuote,
           withdrawData: {
             amountPoolToken: BigInt(
-              new BigNumber(poolTokenAccount.account.amount)
-                .multipliedBy(withdrawPercentage)
-                .div(100)
-                .integerValue()
+              pmm
+                .poolTokenFromAmount(
+                  exponentiate(base.amount, pool.baseTokenInfo.decimals),
+                  exponentiate(quote.amount, pool.quoteTokenInfo.decimals),
+                  poolTokenAccount.account.amount,
+                  share,
+                )
+                // round ceil makes sure the amount of token the lp token
+                // worth is more than the min amount using round floor below
+                // the poolTokenFromAmount guarantees the lp token amout after round ceil
+                // won't be more than the amount the user actually has
+                .integerValue(BigNumber.ROUND_CEIL)
+                .toNumber()
                 .toString(),
             ),
-            minAmountTokenA: BigInt(exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString()),
-            minAmountTokenB: BigInt(exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString()),
+            minAmountTokenA: BigInt(
+              exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue(BigNumber.ROUND_FLOOR).toString(),
+            ),
+            minAmountTokenB: BigInt(
+              exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue(BigNumber.ROUND_FLOOR).toString(),
+            ),
           },
           config,
           farmPool: farmPoolKey,
@@ -483,11 +496,12 @@ const Deposit: React.FC = () => {
     signTransaction,
     baseTokenAccount?.pubkey,
     quoteTokenAccount?.pubkey,
-    withdrawPercentage,
     config,
     farmPoolKey,
     farmUser,
     dispatch,
+    pmm,
+    share,
   ]);
 
   const handleSnackBarClose = useCallback(() => {

@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { max } from "lodash";
 import { exponentiatedBy } from "utils/decimal";
 import { PoolState, Multiplier } from "../state";
 
@@ -65,11 +66,11 @@ export class PMM implements PoolState {
   }
 
   baseShareRate(base: number, share: BigNumber): BigNumber {
-    return new BigNumber(base).div(this.baseReserve.multipliedBy(share.div(100)));
+    return new BigNumber(base).multipliedBy(100).div(this.baseReserve.multipliedBy(share));
   }
 
   quoteShareRate(quote: number, share: BigNumber): BigNumber {
-    return new BigNumber(quote).div(this.quoteReserve.multipliedBy(share.div(100)));
+    return new BigNumber(quote).multipliedBy(100).div(this.quoteReserve.multipliedBy(share));
   }
 
   quoteFromBase(base: number): BigNumber {
@@ -80,9 +81,23 @@ export class PMM implements PoolState {
     return this.baseReserve.multipliedBy(new BigNumber(quote).div(this.quoteReserve));
   }
 
+  poolTokenFromAmount(
+    baseAmount: BigNumber,
+    quoteAmount: BigNumber,
+    poolTokenAmount: BigNumber,
+    share: 0 | BigNumber,
+  ): BigNumber {
+    console.info("poolTokenAmount", poolTokenAmount);
+    const basePercent = baseAmount.multipliedBy(100).div(share).multipliedBy(100).div(this.baseReserve);
+    const quotePercent = quoteAmount.multipliedBy(100).div(share).multipliedBy(100).div(this.quoteReserve);
+    const poolTokenPercentage = max([basePercent.toNumber(), quotePercent.toNumber()]);
+
+    return new BigNumber(poolTokenAmount).multipliedBy(poolTokenPercentage).div(100);
+  }
+
   amountFromShare(share: number, baseDecimals: number, quoteDecimals: number): [BigNumber, BigNumber] {
-    const base = exponentiatedBy(this.baseReserve.multipliedBy((share / 100) * 0.98), baseDecimals);
-    const quote = exponentiatedBy(this.quoteReserve.multipliedBy((share / 100) * 0.98), quoteDecimals);
+    const base = exponentiatedBy(this.baseReserve.multipliedBy(share / 100), baseDecimals);
+    const quote = exponentiatedBy(this.quoteReserve.multipliedBy(share / 100), quoteDecimals);
     return [base, quote];
   }
 
