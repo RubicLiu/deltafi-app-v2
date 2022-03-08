@@ -35,7 +35,7 @@ import { usePoolFromSymbols, usePools, updatePoolFromAddress } from "providers/p
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { swap } from "utils/transactions/swap";
 import { useConfig } from "providers/config";
-import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK } from "constants/index";
+import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS, SOLSCAN_LINK } from "constants/index";
 import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
@@ -44,12 +44,12 @@ import { SwapCard as ISwapCard } from "./components/types";
 import { tokens } from "constants/tokens";
 import { useCustomConnection } from "providers/connection";
 import { SwapType } from "lib/state";
-import { stableSwap } from "utils/transactions/stableSwap";
 import { sleep } from "utils/utils";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { appSelector } from "states/selectors";
+import { fetchReferrerThunk } from "states/appState";
 
 interface TransactionResult {
   status: boolean | null;
@@ -131,6 +131,7 @@ const Home: React.FC = (props) => {
   const classes = useStyles(props);
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
+  const dispatch = useDispatch();
   const [tokenFrom, setTokenFrom] = useState<ISwapCard>({
     token: getTokenInfo("SOL"),
     amount: "",
@@ -279,16 +280,18 @@ const Home: React.FC = (props) => {
 
     setIsProcessing(true);
     try {
-      const swapMethod = pool.swapType === SwapType.Normal ? swap : stableSwap;
-      // TODO: get isNewUser information
+      const isStable = pool.swapType === SwapType.Stable;
       const referrerPubkey: PublicKey | null = appState.referrerPublicKey;
+      const isNewUser: Boolean = appState.isNewUser;
+
       const amountIn = BigInt(exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString());
       const minimumAmountOut = BigInt(
         exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
       );
       const swapDirection =
         tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? SWAP_DIRECTION.SellBase : SWAP_DIRECTION.SellQuote;
-      let transaction = await swapMethod({
+      let transaction = await swap({
+        isStable,
         connection,
         walletPubkey,
         config,
@@ -302,8 +305,13 @@ const Home: React.FC = (props) => {
           swapDirection,
         },
         referrer: referrerPubkey,
+        isNewUser,
       });
       transaction = await signTransaction(transaction);
+      if (isNewUser) {
+        dispatch(fetchReferrerThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
+      }
+
       const hash = await sendSignedTransaction({ signedTransaction: transaction, connection });
 
       await connection.confirmTransaction(hash, "confirmed");
@@ -363,6 +371,7 @@ const Home: React.FC = (props) => {
     destinationBalance,
     appState,
     pools,
+    dispatch,
   ]);
 
   const handleSwap = useCallback(async () => {

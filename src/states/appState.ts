@@ -3,6 +3,7 @@ import { createAction } from "@reduxjs/toolkit";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { UserReferrerDataLayout } from "lib/state";
+import { dummyReferrerAddress } from "utils/transactions/swap";
 
 export interface AppState {
   referrerPublicKey?: PublicKey | null;
@@ -35,10 +36,10 @@ export const fetchReferrerThunk = createAsyncThunk("app/fetchReferrer", async (a
   const referralAccountInfo = await arg.connection.getAccountInfo(referralAccountPublickey);
 
   let referrerPublicKey: PublicKey = null;
-  let isNewUser: boolean = null;
+  let isNewUser: boolean = true;
   if (referralAccountInfo) {
     const referralInfo = UserReferrerDataLayout.decode(referralAccountInfo.data);
-    if (arg.walletAddress !== referralInfo.referrer) {
+    if (arg.walletAddress !== referralInfo.referrer && referralInfo.referrer.toBase58() !== dummyReferrerAddress) {
       referrerPublicKey = referralInfo.referrer;
     }
     // TODO: check if the referrer is a dummy key, set it to null
@@ -64,7 +65,12 @@ export const appReducer = createReducer(initialState, (builder) => {
       if (action.payload.timestamp < state.lastSetTime || state.isNewUser !== undefined) {
         return;
       }
-      state.referrerPublicKey = action.payload.referrerPublicKey;
+
       state.isNewUser = action.payload.isNewUser;
+      if (!action.payload.isNewUser) {
+        // if the current user is not a new user, we set set referrerPublicKey
+        // the the payload's value which was fetched from the account data
+        state.referrerPublicKey = action.payload.referrerPublicKey;
+      }
     });
 });

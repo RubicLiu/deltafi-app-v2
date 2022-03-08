@@ -6,6 +6,12 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import { store } from "./states";
 
+// save referral information before first rendering
+const referrer: string = new URLSearchParams(window.location.search).get("referrer");
+if (!!referrer) window.localStorage.setItem("referrer", referrer);
+const enableReferralStr: string = new URLSearchParams(window.location.search).get("enableReferral");
+if (!!enableReferralStr) window.localStorage.setItem("enableReferralStr", enableReferralStr);
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>

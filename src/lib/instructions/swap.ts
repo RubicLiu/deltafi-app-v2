@@ -37,8 +37,8 @@ export const createSwapInstruction = (
   pythB: PublicKey,
   swapData: SwapData,
   programId: PublicKey,
-  userReferrerData?: PublicKey,
-  referrer?: PublicKey,
+  userReferrerData: PublicKey,
+  referrer: PublicKey | null,
 ) => {
   let extraReferrerAccounts = [];
   if (userReferrerData && referrer) {

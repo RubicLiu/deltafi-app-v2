@@ -1,4 +1,4 @@
-import { Connection, Keypair, PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, Transaction, SystemProgram, TransactionInstruction } from "@solana/web3.js";
 import BN from "bn.js";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
@@ -8,6 +8,7 @@ import {
   SwapData,
   SWAP_DIRECTION,
   createSetReferrerInstruction,
+  createStableSwapInstruction,
 } from "lib/instructions";
 import { ExTokenAccount, MarketConfig, PoolInfo } from "providers/types";
 import { USER_REFERRER_DATA_SIZE } from "lib/state";
@@ -16,7 +17,83 @@ import { SWAP_PROGRAM_ID } from "constants/index";
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from ".";
 import { AccountLayout } from "@solana/spl-token";
 
+export const dummyReferrerAddress = "66666666666666666666666666666666666666666666";
+
+/**
+ * alter normal swap and stable swap
+ */
+function createSwapInstructionMethod(
+  isStable: boolean,
+  config: PublicKey,
+  tokenSwap: PublicKey,
+  marketAuthority: PublicKey,
+  swapAuthority: PublicKey,
+  userTransferAuthority: PublicKey,
+  source: PublicKey,
+  swapSource: PublicKey,
+  sourceMint: PublicKey,
+  swapDestination: PublicKey,
+  destination: PublicKey,
+  destinationMint: PublicKey,
+  rewardToken: PublicKey,
+  sourceRewardToken: PublicKey,
+  adminFeeDestination: PublicKey,
+  pythA: PublicKey,
+  pythB: PublicKey,
+  swapData: SwapData,
+  programId: PublicKey,
+  userReferrerData: PublicKey,
+  referrer: PublicKey | null,
+): TransactionInstruction {
+  if (isStable) {
+    return createStableSwapInstruction(
+      config,
+      tokenSwap,
+      marketAuthority,
+      swapAuthority,
+      userTransferAuthority,
+      source,
+      swapSource,
+      sourceMint,
+      swapDestination,
+      destination,
+      destinationMint,
+      rewardToken,
+      sourceRewardToken,
+      adminFeeDestination,
+      swapData,
+      programId,
+      userReferrerData,
+      referrer,
+    );
+  } else {
+    return createSwapInstruction(
+      config,
+      tokenSwap,
+      marketAuthority,
+      swapAuthority,
+      userTransferAuthority,
+      source,
+      swapSource,
+      sourceMint,
+      swapDestination,
+      destination,
+      destinationMint,
+      rewardToken,
+      sourceRewardToken,
+      adminFeeDestination,
+      pythA,
+      pythB,
+      swapData,
+      programId,
+      userReferrerData,
+      referrer,
+    );
+  }
+}
+
 export async function swap({
+  isStable,
   connection,
   walletPubkey,
   config,
@@ -26,7 +103,9 @@ export async function swap({
   rewardTokenRef,
   swapData,
   referrer,
+  isNewUser,
 }: {
+  isStable: boolean;
   connection: Connection;
   walletPubkey: PublicKey;
   config: MarketConfig;
@@ -35,7 +114,8 @@ export async function swap({
   destinationRef?: PublicKey;
   rewardTokenRef?: PublicKey;
   swapData: SwapData;
-  referrer?: PublicKey;
+  referrer: PublicKey;
+  isNewUser: Boolean;
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
     console.error("swap failed with null parameter");
@@ -105,11 +185,12 @@ export async function swap({
 
   // Only create user referrer data account for non-sol operation, because otherwise the transaction
   // will fail as the transaction payload is too big.
-  if (referrer && !(buySol || sellSol)) {
+  if (isNewUser && !(buySol || sellSol)) {
     const seed = "referrer";
     userReferrerDataPubkey = await PublicKey.createWithSeed(walletPubkey, seed, SWAP_PROGRAM_ID);
-    // TODO: Check if the user referrer data is created already.
-    if (userReferrerDataPubkey == null) {
+    const userReferralAccountInfo = await connection.getAccountInfo(userReferrerDataPubkey);
+    // Check if the user referrer data is created already.
+    if (!userReferralAccountInfo) {
       const balanceForUserReferrerData = await connection.getMinimumBalanceForRentExemption(USER_REFERRER_DATA_SIZE);
       createUserReferrerAccountTransaction = new Transaction()
         .add(
@@ -160,7 +241,8 @@ export async function swap({
   transaction
     .add(createApproveInstruction(sourceRef, userTransferAuthority.publicKey, walletPubkey, swapData.amountIn))
     .add(
-      createSwapInstruction(
+      createSwapInstructionMethod(
+        isStable,
         config.publicKey,
         pool.publicKey,
         marketAuthority,
