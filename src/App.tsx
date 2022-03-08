@@ -21,6 +21,7 @@ import { deployConfig } from "constants/deployConfig";
 import { useDispatch } from "react-redux";
 import { fetchFarmPoolsThunk } from "states/farmPoolState";
 import { fetchFarmUsersThunk } from "states/farmUserState";
+import { fetchPythDataThunk } from "states/PythState";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { PublicKey } from "@solana/web3.js";
@@ -60,6 +61,21 @@ const App: React.FC = () => {
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
+  // TODO(ypeng): Use pyth state to replace provider.
+  const enablePythState = false;
+
+  useEffect(() => {
+    if (!enablePythState) {
+      return;
+    }
+
+    dispatch(fetchPythDataThunk(connection));
+    // Refresh the farm pool every 5 seconds.
+    const interval = setInterval(() => {
+      dispatch(fetchPythDataThunk(connection));
+    }, 1 * 1000);
+    return () => clearInterval(interval);
+  }, [connection, dispatch, enablePythState]);
 
   useEffect(() => {
     if (walletAddress) {
