@@ -1,22 +1,6 @@
 import BigNumber from "bignumber.js";
 
-import { Multiplier } from "lib/state";
 import { PoolInfo } from "providers/types";
-
-export function getPrice(pool: PoolInfo) {
-  const { poolState } = pool;
-  const { multiplier, baseReserve, baseTarget, quoteReserve, quoteTarget, marketPrice, slope } = poolState;
-
-  if (multiplier === Multiplier.BelowOne) {
-    let m = new BigNumber(quoteTarget).multipliedBy(quoteTarget).dividedBy(quoteReserve).dividedBy(quoteReserve);
-    m = m.multipliedBy(slope).plus(1).minus(slope);
-    return m.multipliedBy(marketPrice).toNumber();
-  } else {
-    let m = new BigNumber(baseTarget).multipliedBy(baseTarget).dividedBy(baseReserve).dividedBy(baseReserve);
-    m = m.multipliedBy(slope).plus(1).minus(slope);
-    return m.multipliedBy(marketPrice).toNumber();
-  }
-}
 
 export function getOutAmount(
   pool: PoolInfo,

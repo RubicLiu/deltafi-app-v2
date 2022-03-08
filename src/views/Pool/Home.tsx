@@ -10,7 +10,7 @@ import { PoolSchema } from "constants/pools";
 import { convertDollar } from "utils/utils";
 import { usePools } from "providers/pool";
 import { PMM } from "lib/calc";
-import usePyth from "providers/pyth";
+import usePyth, { getMarketPrice } from "providers/pyth";
 import { useTokenAccounts } from "providers/tokens";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
@@ -50,7 +50,7 @@ const Home: React.FC = () => {
   const tvl = useMemo(() => {
     if (pools.length > 0) {
       return (pools as any).reduce((p, c) => {
-        const pmm = new PMM(c.poolState);
+        const pmm = new PMM(c.poolState, getMarketPrice(symbolMap, c));
         const baseSymbol = `Crypto.${c.baseTokenInfo.symbol.toUpperCase()}/USD`;
         const quoteSymbol = `Crypto.${c.quoteTokenInfo.symbol.toUpperCase()}/USD`;
         let volumn = new BigNumber(0);

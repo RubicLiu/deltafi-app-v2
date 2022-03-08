@@ -36,14 +36,13 @@ import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { swap } from "utils/transactions/swap";
 import { useConfig } from "providers/config";
 import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK } from "constants/index";
-import { usePriceBySymbol } from "providers/pyth";
+import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
 import { getSwapOutAmount } from "utils/swap";
 import { SwapCard as ISwapCard } from "./components/types";
 import { tokens } from "constants/tokens";
 import { useCustomConnection } from "providers/connection";
-import BigNumber from "bignumber.js";
 import { SwapType } from "lib/state";
 import { stableSwap } from "utils/transactions/stableSwap";
 import { sleep } from "utils/utils";
@@ -168,16 +167,10 @@ const Home: React.FC = (props) => {
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
 
+  const { symbolMap } = usePyth();
+  const marketPrice = getMarketPrice(symbolMap, pool);
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
-
-  if (pool?.poolState) {
-    if (basePrice && quotePrice) {
-      pool.poolState.marketPrice = new BigNumber(basePrice / quotePrice); // market price from the chain is not up-to-date
-    } else {
-      pool.poolState.marketPrice = new BigNumber(NaN);
-    }
-  }
 
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && pool) {
@@ -240,6 +233,7 @@ const Home: React.FC = (props) => {
         newTokenTo.address,
         card.amount ?? "0",
         parseFloat(priceImpact),
+        marketPrice,
       );
 
       amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
@@ -264,6 +258,7 @@ const Home: React.FC = (props) => {
         newTokenTo.address,
         tokenFrom.amount ?? "0",
         parseFloat(priceImpact),
+        marketPrice,
       );
 
       amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();

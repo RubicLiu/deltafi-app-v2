@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState, createContext, useContext } from "react";
 import { AccountInfo, PublicKey } from "@solana/web3.js";
 import { parsePriceData, parseProductData, PriceData } from "@pythnetwork/client";
 import { useConnection } from "@solana/wallet-adapter-react";
+import BigNumber from "bignumber.js";
 
 import { getMultipleAccounts } from "utils/account";
-import { PythContextValue } from "./types";
+import { PoolInfo, PythContextValue } from "./types";
 
 import { deployConfig } from "../constants/deployConfig";
 
@@ -119,26 +120,28 @@ export const usePyth = () => {
   return context;
 };
 
+function getPriceBySymbol(symbolMap: ISymbolMap, tokenSymbol: string | null | undefined) {
+  let res = { priceData: null, priceAccountKey: null, price: null };
+  if (!tokenSymbol) return res;
+
+  const symbol = `Crypto.${tokenSymbol}/USD`;
+  if (!symbolMap[symbol]) return res;
+
+  const priceData = (symbolMap[symbol] as any).price as PriceData;
+  res.priceData = priceData;
+  res.priceAccountKey = (symbolMap[symbol] as any).priceAccountKey as PublicKey;
+  res.price = priceData.price ? priceData.price : priceData.previousPrice;
+
+  return res;
+}
+
 export function usePriceBySymbol(tokenSymbol: string | null | undefined): {
   priceData: PriceData | null;
   priceAccountKey: PublicKey | null;
   price: number | null;
 } {
   const { symbolMap } = usePyth();
-  return useMemo(() => {
-    let res = { priceData: null, priceAccountKey: null, price: null };
-    if (!tokenSymbol) return res;
-
-    const symbol = `Crypto.${tokenSymbol}/USD`;
-    if (!symbolMap[symbol]) return res;
-
-    const priceData = (symbolMap[symbol] as any).price as PriceData;
-    res.priceData = priceData;
-    res.priceAccountKey = (symbolMap[symbol] as any).priceAccountKey as PublicKey;
-    res.price = priceData.price ? priceData.price : priceData.previousPrice;
-
-    return res;
-  }, [symbolMap, tokenSymbol]);
+  return useMemo(() => getPriceBySymbol(symbolMap, tokenSymbol), [symbolMap, tokenSymbol]);
 }
 
 function getPrice(accountInfo: AccountInfo<Buffer>) {
@@ -174,6 +177,17 @@ export function usePriceByAddress(address: string | null | undefined) {
   }, [connection, address]);
 
   return price;
+}
+
+export function getMarketPrice(symbolMap: ISymbolMap, pool: PoolInfo) {
+  const { price: basePrice } = getPriceBySymbol(symbolMap, pool?.baseTokenInfo.symbol);
+  const { price: quotePrice } = getPriceBySymbol(symbolMap, pool?.quoteTokenInfo.symbol);
+
+  if (basePrice && quotePrice) {
+    return new BigNumber(basePrice / quotePrice); // market price from the chain is not up-to-date
+  } else {
+    return new BigNumber(NaN);
+  }
 }
 
 export default usePyth;

@@ -8,7 +8,7 @@ import styled from "styled-components";
 import { ConnectButton } from "components";
 import { usePoolFromAddress } from "providers/pool";
 import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
-import { usePriceBySymbol } from "providers/pyth";
+import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
 import { rate } from "utils/decimal";
@@ -78,15 +78,18 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const pool = usePoolFromAddress(poolKey);
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
+  const { symbolMap } = usePyth();
+  const marketPrice = getMarketPrice(symbolMap, pool);
+
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
 
   const pmm = useMemo(() => {
     if (pool) {
-      return new PMM(pool.poolState);
+      return new PMM(pool.poolState, marketPrice);
     }
     return null;
-  }, [pool]);
+  }, [pool, marketPrice]);
 
   const tvl = useMemo(() => {
     if (pmm && basePrice && quotePrice) {

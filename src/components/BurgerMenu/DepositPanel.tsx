@@ -5,7 +5,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { usePoolFromAddress } from "providers/pool";
 import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
 import { useModal } from "providers/modal";
-import { usePriceBySymbol } from "providers/pyth";
+import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { PMM } from "lib/calc";
 import { rate } from "utils/decimal";
 import { ConnectButton } from "components";
@@ -64,6 +64,8 @@ const DepositPanel = (props: IDepositPanelProps): ReactElement => {
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
+  const { symbolMap } = usePyth();
+  const marketPrice = getMarketPrice(symbolMap, pool);
 
   const share = useMemo(() => {
     if (pool && poolTokenAccount && poolMint) {
@@ -74,14 +76,14 @@ const DepositPanel = (props: IDepositPanelProps): ReactElement => {
 
   const sharePrice = useMemo(() => {
     if (pool && basePrice && quotePrice) {
-      const pmm = new PMM(pool.poolState);
+      const pmm = new PMM(pool.poolState, marketPrice);
       return pmm
         .tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals)
         .multipliedBy(share)
         .div(100);
     }
     return 0;
-  }, [pool, basePrice, quotePrice, share]);
+  }, [pool, basePrice, quotePrice, share, marketPrice]);
 
   if (!pool) return null;
 

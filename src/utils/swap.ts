@@ -9,6 +9,7 @@ export function getSwapOutAmount(
   toTokenMint: string,
   amount: string,
   slippage: number,
+  marketPrice: BigNumber,
 ) {
   const { poolState, fees, baseTokenInfo, quoteTokenInfo } = pool;
   const pmmHelper = new PMMHelper();
@@ -23,7 +24,7 @@ export function getSwapOutAmount(
     B0: exponentiatedBy(poolState.baseTarget, baseTokenInfo.decimals),
     Q0: exponentiatedBy(poolState.quoteTarget, quoteTokenInfo.decimals),
     R: poolState.multiplier as number,
-    i: poolState.marketPrice,
+    i: marketPrice,
     K: poolState.slope,
     mtFeeRate: tradeFeeNumerator1.dividedBy(tradeFeeDenominator1),
     lpFeeRate: adminFeeDenominator1.minus(adminFeeNumerator1).dividedBy(adminFeeDenominator1),

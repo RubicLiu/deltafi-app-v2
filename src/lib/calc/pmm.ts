@@ -26,8 +26,8 @@ export class PMM implements PoolState {
 
   lastValidPythPriceSlot = new BN(0);
 
-  constructor(state: PoolState) {
-    this.marketPrice = new BN(state.marketPrice);
+  constructor(state: PoolState, marketPrice: BigNumber) {
+    this.marketPrice = new BN(marketPrice);
     this.slope = new BN(state.slope);
     this.baseReserve = new BN(state.baseReserve);
     this.quoteReserve = new BN(state.quoteReserve);

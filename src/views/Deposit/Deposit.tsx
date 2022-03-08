@@ -30,7 +30,7 @@ import WithdrawCard from "components/molecules/WithdrawCard";
 import { useModal } from "providers/modal";
 import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
 import { usePoolFromAddress } from "providers/pool";
-import { usePriceBySymbol } from "providers/pyth";
+import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { PMM } from "lib/calc";
 import { rate, exponentiate, exponentiatedBy } from "utils/decimal";
 import { getOutAmount } from "utils/liquidity";
@@ -238,6 +238,10 @@ const Deposit: React.FC = () => {
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
   const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
+
+  const { symbolMap } = usePyth();
+  const marketPrice = getMarketPrice(symbolMap, pool);
+
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
   });
@@ -253,10 +257,10 @@ const Deposit: React.FC = () => {
 
   const pmm = useMemo(() => {
     if (pool) {
-      return new PMM(pool.poolState);
+      return new PMM(pool.poolState, marketPrice);
     }
     return null;
-  }, [pool]);
+  }, [pool, marketPrice]);
 
   const basePercent = useMemo(() => {
     if (pmm && basePrice && quotePrice) {

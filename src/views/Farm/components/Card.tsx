@@ -10,7 +10,7 @@ import { CardProps } from "./types";
 import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
 import { usePoolFromAddress } from "providers/pool";
-import { usePriceBySymbol } from "providers/pyth";
+import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { useTokenMintAccount } from "providers/tokens";
 
 import { useSelector } from "react-redux";
@@ -87,13 +87,15 @@ const FarmCard: React.FC<CardProps> = (props) => {
   const lpMint = useTokenMintAccount(swapPool?.poolMintKey);
   const { price: basePrice } = usePriceBySymbol(swapPool?.baseTokenInfo.symbol);
   const { price: quotePrice } = usePriceBySymbol(swapPool?.quoteTokenInfo.symbol);
+  const { symbolMap } = usePyth();
+  const marketPrice = getMarketPrice(symbolMap, swapPool);
 
   const pmm = useMemo(() => {
     if (swapPool) {
-      return new PMM(swapPool.poolState);
+      return new PMM(swapPool.poolState, marketPrice);
     }
     return null;
-  }, [swapPool]);
+  }, [swapPool, marketPrice]);
 
   const tvl = useMemo(() => {
     if (swapPool && farmPool && basePrice && quotePrice && lpMint && pmm) {

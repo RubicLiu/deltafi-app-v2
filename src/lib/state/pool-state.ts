@@ -14,7 +14,6 @@ export enum Multiplier {
 }
 
 export interface PoolState {
-  marketPrice: BigNumber;
   slope: BigNumber;
   baseReserve: BigNumber;
   quoteReserve: BigNumber;
