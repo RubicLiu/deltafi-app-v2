@@ -3,7 +3,13 @@ import { useState } from "react";
 import CurrencyInput from "react-currency-input-field";
 import { useWallet } from "@solana/wallet-adapter-react";
 
-import { Button, ViewTransactionIcon, ErrorIcon, StakeTransactionIcon, ConnectButton } from "components";
+import {
+  Button,
+  ViewTransactionIcon,
+  ErrorIcon,
+  StakeTransactionIcon,
+  ConnectButton,
+} from "components";
 import { Text } from "components/Text";
 
 import { useDarkMode } from "providers/theme";
@@ -114,10 +120,18 @@ const UnstakeTransaction = ({ ...props }) => {
               <StakeTransactionIcon />
             </IconWrapper>
             <Wrapper className="unit">
-              <Text color={isDark ? "#FFFFFF" : "#000000"} fontFamily="'Inter', sans-serif" className="stake-symbol">
+              <Text
+                color={isDark ? "#FFFFFF" : "#000000"}
+                fontFamily="'Inter', sans-serif"
+                className="stake-symbol"
+              >
                 DELFI
               </Text>
-              <Text color={isDark ? "#999999" : "#999999"} fontFamily="'Inter', sans-serif" className="stake-unit">
+              <Text
+                color={isDark ? "#999999" : "#999999"}
+                fontFamily="'Inter', sans-serif"
+                className="stake-unit"
+              >
                 {farm?.stakingToken?.symbol || ""} - {farm?.earningToken?.symbol || ""} Del...
               </Text>
             </Wrapper>
@@ -135,10 +149,18 @@ const UnstakeTransaction = ({ ...props }) => {
           />
         </FlexWrapper>
         <FlexWrapper className="info">
-          <Text color={isDark ? "#515369" : "#515369"} fontFamily="'Inter', sans-serif" className="stake-symbol">
+          <Text
+            color={isDark ? "#515369" : "#515369"}
+            fontFamily="'Inter', sans-serif"
+            className="stake-symbol"
+          >
             Balance: --
           </Text>
-          <Text color={isDark ? "#515369" : "#515369"} fontFamily="'Inter', sans-serif" className="stake-unit">
+          <Text
+            color={isDark ? "#515369" : "#515369"}
+            fontFamily="'Inter', sans-serif"
+            className="stake-unit"
+          >
             %--
           </Text>
         </FlexWrapper>
@@ -207,7 +229,11 @@ const UnstakeTransaction = ({ ...props }) => {
                 <ErrorIcon isDark={isDark} isSelected={true} className="icon" />
                 <Typography color="error">Sorry, Transaction Failed!</Typography>
               </FlexWrapper>
-              <Text color={isDark ? "#88809C" : "#6B7280"} className="view" fontFamily="'Inter', sans-serif">
+              <Text
+                color={isDark ? "#88809C" : "#6B7280"}
+                className="view"
+                fontFamily="'Inter', sans-serif"
+              >
                 <ExternalLink
                   href="/VIEWTRANSACTION"
                   target="_blank"

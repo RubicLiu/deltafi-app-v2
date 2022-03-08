@@ -11,7 +11,14 @@ const Icon: React.FC = ({ ...props }) => {
         fill="white"
       />
       <defs>
-        <linearGradient id="paint0_linear" x1="15" y1="0" x2="15" y2="30" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="paint0_linear"
+          x1="15"
+          y1="0"
+          x2="15"
+          y2="30"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#FF5E79" />
           <stop offset="1" stopColor="#DC0640" />
         </linearGradient>

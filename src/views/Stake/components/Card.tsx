@@ -86,7 +86,9 @@ const StakeCard: React.FC<CardProps> = (props) => {
 
   useEffect(() => {
     if (percentage && tokenBalance) {
-      const realAmount = tokenBalance.multipliedBy(new BigNumber(percentage)).dividedBy(new BigNumber(100));
+      const realAmount = tokenBalance
+        .multipliedBy(new BigNumber(percentage))
+        .dividedBy(new BigNumber(100));
       const expectedAmount = realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString();
       if (card.amount == null || card.amount.toString() !== expectedAmount) {
         handleChangeCard({

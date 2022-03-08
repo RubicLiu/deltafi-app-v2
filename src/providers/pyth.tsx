@@ -11,7 +11,9 @@ import { deployConfig } from "../constants/deployConfig";
 
 const BAD_SYMBOLS = ["BCH/USD", "LTC/USD"];
 
-const PythContext: React.Context<null | PythContextValue> = createContext<null | PythContextValue>(null);
+const PythContext: React.Context<null | PythContextValue> = createContext<null | PythContextValue>(
+  null,
+);
 
 const createSetSymbolMapUpdater =
   (symbol: string, product: any, price: any, priceAccountKey: PublicKey) => (prev: any) =>
@@ -55,7 +57,9 @@ export function PythProvider({ children }) {
 
         setIsLoading(false);
 
-        const pythProductKeys = deployConfig.tokenInfo.map(({ pyth }) => new PublicKey(pyth.product));
+        const pythProductKeys = deployConfig.tokenInfo.map(
+          ({ pyth }) => new PublicKey(pyth.product),
+        );
         setNumProducts(pythProductKeys.length);
         const productsInfos = await getMultipleAccounts(connection, pythProductKeys, "confirmed");
 
@@ -75,7 +79,13 @@ export function PythProvider({ children }) {
           const priceInfo = priceInfos.array[i];
 
           if ((!filters || filters.includes(symbol)) && !BAD_SYMBOLS.includes(symbol)) {
-            handlePriceInfo(symbol, product, priceInfo as AccountInfo<Buffer>, setSymbolMap, priceAccountKey);
+            handlePriceInfo(
+              symbol,
+              product,
+              priceInfo as AccountInfo<Buffer>,
+              setSymbolMap,
+              priceAccountKey,
+            );
 
             subscription_ids.push(
               connection.onAccountChange(priceAccountKey, (accountInfo) => {
@@ -95,7 +105,9 @@ export function PythProvider({ children }) {
       cancelled = true;
       for (const subscription_id of subscription_ids) {
         connection.removeAccountChangeListener(subscription_id).catch(() => {
-          console.warn(`Unsuccessfully attempted to remove listener for subscription id ${subscription_id}`);
+          console.warn(
+            `Unsuccessfully attempted to remove listener for subscription id ${subscription_id}`,
+          );
         });
       }
     };
@@ -161,7 +173,9 @@ export function usePriceByAddress(address: string | null | undefined) {
       try {
         const accountInfo = await connection.getAccountInfo(priceInfoKey);
         setPrice(getPrice(accountInfo));
-        subscription_id = connection.onAccountChange(priceInfoKey, (accountInfo) => setPrice(getPrice(accountInfo)));
+        subscription_id = connection.onAccountChange(priceInfoKey, (accountInfo) =>
+          setPrice(getPrice(accountInfo)),
+        );
       } catch (e) {
         console.warn("failed to fetch price information for ", address);
       }

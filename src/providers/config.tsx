@@ -6,7 +6,8 @@ import { useAccountInfo } from "./connection";
 import { parserConfigInfo } from "lib/state";
 import { SWAP_PROGRAM_ID } from "constants/index";
 
-const ConfigContext: React.Context<null | ConfigContextValues> = createContext<null | ConfigContextValues>(null);
+const ConfigContext: React.Context<null | ConfigContextValues> =
+  createContext<null | ConfigContextValues>(null);
 
 export function ConfigProvider({ children }) {
   const [configAddress, setConfigAddress] = useState<null | PublicKey>(null);
@@ -27,7 +28,9 @@ export function ConfigProvider({ children }) {
     }
   }, [configAddress, configInfo]);
 
-  return <ConfigContext.Provider value={{ config, setConfigAddress }}>{children}</ConfigContext.Provider>;
+  return (
+    <ConfigContext.Provider value={{ config, setConfigAddress }}>{children}</ConfigContext.Provider>
+  );
 }
 
 export function useConfig() {

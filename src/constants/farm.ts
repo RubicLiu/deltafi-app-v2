@@ -9,10 +9,12 @@ export interface FarmPoolSchema {
   quote: string;
 }
 
-export const farmPools: FarmPoolSchema[] = deployConfig.poolInfo.map(({ name, swap, farm, base, quote }) => ({
-  name,
-  address: new PublicKey(farm),
-  poolAddress: new PublicKey(swap),
-  base,
-  quote,
-}));
+export const farmPools: FarmPoolSchema[] = deployConfig.poolInfo.map(
+  ({ name, swap, farm, base, quote }) => ({
+    name,
+    address: new PublicKey(farm),
+    poolAddress: new PublicKey(swap),
+    base,
+    quote,
+  }),
+);

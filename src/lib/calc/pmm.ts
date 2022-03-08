@@ -49,17 +49,34 @@ export class PMM implements PoolState {
     return exponentiatedBy(this.quoteReserve.multipliedBy(quotePrice), decimals);
   }
 
-  tvl(basePrice: number, quotePrice: number, baseDecimals: number, quoteDecimals: number): BigNumber {
-    return this.baseTotalValue(basePrice, baseDecimals).plus(this.quoteTotalValue(quotePrice, quoteDecimals));
+  tvl(
+    basePrice: number,
+    quotePrice: number,
+    baseDecimals: number,
+    quoteDecimals: number,
+  ): BigNumber {
+    return this.baseTotalValue(basePrice, baseDecimals).plus(
+      this.quoteTotalValue(quotePrice, quoteDecimals),
+    );
   }
 
-  basePercent(basePrice: number, quotePrice: number, baseDecimals: number, quoteDecimals: number): BigNumber {
+  basePercent(
+    basePrice: number,
+    quotePrice: number,
+    baseDecimals: number,
+    quoteDecimals: number,
+  ): BigNumber {
     const tvl = this.tvl(basePrice, quotePrice, baseDecimals, quoteDecimals);
     const baseTotalValue = this.baseTotalValue(basePrice, baseDecimals);
     return baseTotalValue.dividedBy(tvl).multipliedBy(100);
   }
 
-  quotePercent(basePrice: number, quotePrice: number, quoteDecimals: number, baseDecimals): BigNumber {
+  quotePercent(
+    basePrice: number,
+    quotePrice: number,
+    quoteDecimals: number,
+    baseDecimals,
+  ): BigNumber {
     const tvl = this.tvl(basePrice, quotePrice, baseDecimals, quoteDecimals);
     const quoteTotalValue = this.quoteTotalValue(quotePrice, quoteDecimals);
     return quoteTotalValue.dividedBy(tvl).multipliedBy(100);
@@ -88,14 +105,26 @@ export class PMM implements PoolState {
     share: 0 | BigNumber,
   ): BigNumber {
     console.info("poolTokenAmount", poolTokenAmount);
-    const basePercent = baseAmount.multipliedBy(100).div(share).multipliedBy(100).div(this.baseReserve);
-    const quotePercent = quoteAmount.multipliedBy(100).div(share).multipliedBy(100).div(this.quoteReserve);
+    const basePercent = baseAmount
+      .multipliedBy(100)
+      .div(share)
+      .multipliedBy(100)
+      .div(this.baseReserve);
+    const quotePercent = quoteAmount
+      .multipliedBy(100)
+      .div(share)
+      .multipliedBy(100)
+      .div(this.quoteReserve);
     const poolTokenPercentage = max([basePercent.toNumber(), quotePercent.toNumber()]);
 
     return new BigNumber(poolTokenAmount).multipliedBy(poolTokenPercentage).div(100);
   }
 
-  amountFromShare(share: number, baseDecimals: number, quoteDecimals: number): [BigNumber, BigNumber] {
+  amountFromShare(
+    share: number,
+    baseDecimals: number,
+    quoteDecimals: number,
+  ): [BigNumber, BigNumber] {
     const base = exponentiatedBy(this.baseReserve.multipliedBy(share / 100), baseDecimals);
     const quote = exponentiatedBy(this.quoteReserve.multipliedBy(share / 100), quoteDecimals);
     return [base, quote];
@@ -134,7 +163,9 @@ export class PMM implements PoolState {
     let squareRoot: BigNumber;
     if (priceOffset.isZero()) {
       squareRoot = new BigNumber(1);
-    } else if (priceOffset.multipliedBy(quoteAmount).dividedBy(priceOffset).isEqualTo(quoteAmount)) {
+    } else if (
+      priceOffset.multipliedBy(quoteAmount).dividedBy(priceOffset).isEqualTo(quoteAmount)
+    ) {
       squareRoot = priceOffset.multipliedBy(quoteAmount).dividedBy(currentReserve).plus(1).sqrt();
     } else {
       squareRoot = priceOffset.dividedBy(currentReserve).multipliedBy(quoteAmount).plus(1).sqrt();
@@ -225,7 +256,10 @@ export class PMM implements PoolState {
             baseAmount = backToOneReceiveBase;
           } else if (backToOnePayQuote.isLessThan(quoteAmount)) {
             baseAmount = backToOneReceiveBase.plus(
-              this.sellQuoteTokenWithMultiplier(quoteAmount.minus(backToOnePayQuote), Multiplier.One),
+              this.sellQuoteTokenWithMultiplier(
+                quoteAmount.minus(backToOnePayQuote),
+                Multiplier.One,
+              ),
             );
           }
         }
@@ -282,8 +316,13 @@ export class PMM implements PoolState {
     if (slope.isEqualTo(1)) {
       let adjustedRatio: BigNumber;
       if (fairAmount.isZero()) adjustedRatio = new BigNumber(1);
-      else if (fairAmount.multipliedBy(currentReserve).dividedBy(fairAmount).isEqualTo(currentReserve)) {
-        adjustedRatio = fairAmount.multipliedBy(currentReserve).dividedBy(targetReserve).dividedBy(targetReserve);
+      else if (
+        fairAmount.multipliedBy(currentReserve).dividedBy(fairAmount).isEqualTo(currentReserve)
+      ) {
+        adjustedRatio = fairAmount
+          .multipliedBy(currentReserve)
+          .dividedBy(targetReserve)
+          .dividedBy(targetReserve);
       } else {
         adjustedRatio = quoteAmount
           .multipliedBy(currentReserve)
@@ -318,7 +357,9 @@ export class PMM implements PoolState {
       .multipliedBy(targetReserve.pow(2));
     squareRoot = adjustedReserve.multipliedBy(adjustedReserve).plus(squareRoot).sqrt();
     const denominator = new BigNumber(1).minus(slope).multipliedBy(2);
-    const numerator = isSmaller ? squareRoot.minus(adjustedReserve) : adjustedReserve.plus(squareRoot);
+    const numerator = isSmaller
+      ? squareRoot.minus(adjustedReserve)
+      : adjustedReserve.plus(squareRoot);
     const candidateReserve = numerator.dividedBy(denominator);
 
     if (candidateReserve.isGreaterThan(currentReserve)) return new BigNumber(0);

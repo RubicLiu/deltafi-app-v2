@@ -1,6 +1,7 @@
 import fullDeployConfig from "./fullDeployConfig.json";
 
-export const deployConfig = fullDeployConfig[process.env.REACT_APP_DEPLOYMENT_MODE || "mainnet-test"];
+export const deployConfig =
+  fullDeployConfig[process.env.REACT_APP_DEPLOYMENT_MODE || "mainnet-test"];
 
 export function getPoolConfigByFarmPoolKey(farmPoolKey: String) {
   const poolInfoList = deployConfig.poolInfo;

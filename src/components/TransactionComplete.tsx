@@ -57,13 +57,25 @@ const TransactionComplete = ({ ...props }) => {
   return (
     <>
       <TransactionDiv>
-        <Text color={isDark ? "#EBECF1" : "#88809C"} className="congrat" fontFamily="'Inter', sans-serif">
+        <Text
+          color={isDark ? "#EBECF1" : "#88809C"}
+          className="congrat"
+          fontFamily="'Inter', sans-serif"
+        >
           Congratulations!
         </Text>
-        <Text color={isDark ? "#EBECF1" : "#88809C"} className="complete" fontFamily="'Inter', sans-serif">
+        <Text
+          color={isDark ? "#EBECF1" : "#88809C"}
+          className="complete"
+          fontFamily="'Inter', sans-serif"
+        >
           Your transaction is complete
         </Text>
-        <Text color={isDark ? "#88809C" : "#6B7280"} className="view-transaction" fontFamily="'Inter', sans-serif">
+        <Text
+          color={isDark ? "#88809C" : "#6B7280"}
+          className="view-transaction"
+          fontFamily="'Inter', sans-serif"
+        >
           <ExternalLink
             href="/VIEWTRANSACTION"
             target="_blank"
@@ -77,7 +89,11 @@ const TransactionComplete = ({ ...props }) => {
           </ExternalLink>
         </Text>
         <Img src={"/images/transaction-complete.png"} alt="Transaction Working" />
-        <Text color={isDark ? "#EFCBD7" : "#1B0D3F"} className="view-transaction" fontFamily="'Inter', sans-serif">
+        <Text
+          color={isDark ? "#EFCBD7" : "#1B0D3F"}
+          className="view-transaction"
+          fontFamily="'Inter', sans-serif"
+        >
           <ExternalLink
             href="/VIEWTRANSACTION"
             className="start-transaction"

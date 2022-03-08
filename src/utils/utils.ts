@@ -25,7 +25,10 @@ export function formatPubkey(key: PublicKey) {
   return "";
 }
 
-export function fixedNumber(number: number | string | null | undefined, maxDecimalPlace: number = 6): string {
+export function fixedNumber(
+  number: number | string | null | undefined,
+  maxDecimalPlace: number = 6,
+): string {
   if (number === null || number === undefined) {
     return "";
   }
@@ -74,7 +77,9 @@ export function useLocalStorageStringState(
     }
     localStorageListeners[key].push(notify);
     return () => {
-      localStorageListeners[key] = localStorageListeners[key].filter((listener) => listener !== notify);
+      localStorageListeners[key] = localStorageListeners[key].filter(
+        (listener) => listener !== notify,
+      );
       if (localStorageListeners[key].length === 0) {
         delete localStorageListeners[key];
       }
@@ -101,7 +106,10 @@ export function useLocalStorageStringState(
   return [state, setState];
 }
 
-export function useLocalStorageState<T = any>(key: string, defaultState: T | null = null): [T, (newState: T) => void] {
+export function useLocalStorageState<T = any>(
+  key: string,
+  defaultState: T | null = null,
+): [T, (newState: T) => void] {
   let [stringState, setStringState] = useLocalStorageStringState(key, JSON.stringify(defaultState));
   return [
     useMemo(() => stringState && JSON.parse(stringState), [stringState]),
@@ -182,7 +190,7 @@ export const useOnClickOutside = (ref, handler) => {
 };
 
 export function chunks<T>(array: T[], size: number): T[][] {
-  return Array.apply<number, T[], T[][]>(0, new Array(Math.ceil(array.length / size))).map((_, index) =>
-    array.slice(index * size, (index + 1) * size),
+  return Array.apply<number, T[], T[][]>(0, new Array(Math.ceil(array.length / size))).map(
+    (_, index) => array.slice(index * size, (index + 1) * size),
   );
 }

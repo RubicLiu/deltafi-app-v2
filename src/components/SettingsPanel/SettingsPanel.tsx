@@ -100,7 +100,14 @@ const PriceItem = styled.li`
 `;
 
 const SettingsPanel = (props: SettingsProps): JSX.Element => {
-  const { priceImpact, isIncludeDecimal, isSmall, handleChangeImpact, handleChangeInclude, handleClose } = props;
+  const {
+    priceImpact,
+    isIncludeDecimal,
+    isSmall,
+    handleChangeImpact,
+    handleChangeInclude,
+    handleClose,
+  } = props;
   const classes = useStyles(props);
   const currencyInputRef = useRef<HTMLInputElement>();
 
@@ -162,7 +169,9 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
         </PriceList>
       </Box>
       <Box>
-        <Typography className={classes.description}>Always include decimal wrapped tokens in list?</Typography>
+        <Typography className={classes.description}>
+          Always include decimal wrapped tokens in list?
+        </Typography>
         <SwitchButton
           checked={isIncludeDecimal}
           onChange={handleChangeInclude}

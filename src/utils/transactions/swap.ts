@@ -1,4 +1,11 @@
-import { Connection, Keypair, PublicKey, Transaction, SystemProgram, TransactionInstruction } from "@solana/web3.js";
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  Transaction,
+  SystemProgram,
+  TransactionInstruction,
+} from "@solana/web3.js";
 import BN from "bn.js";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
@@ -148,9 +155,12 @@ export async function swap({
       tmpAccountLamport,
       walletPubkey,
     );
-    createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
-    initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
-    closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
+    createWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
+    initializeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
+    closeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
 
     if (buySol) {
       destinationRef = tempAccountRefKeyPair.publicKey;
@@ -191,7 +201,9 @@ export async function swap({
     const userReferralAccountInfo = await connection.getAccountInfo(userReferrerDataPubkey);
     // Check if the user referrer data is created already.
     if (!userReferralAccountInfo) {
-      const balanceForUserReferrerData = await connection.getMinimumBalanceForRentExemption(USER_REFERRER_DATA_SIZE);
+      const balanceForUserReferrerData = await connection.getMinimumBalanceForRentExemption(
+        USER_REFERRER_DATA_SIZE,
+      );
       createUserReferrerAccountTransaction = new Transaction()
         .add(
           SystemProgram.createAccountWithSeed({
@@ -239,7 +251,14 @@ export async function swap({
   // TODO: Add the referrer info to the swap instruction.
   let transaction = new Transaction();
   transaction
-    .add(createApproveInstruction(sourceRef, userTransferAuthority.publicKey, walletPubkey, swapData.amountIn))
+    .add(
+      createApproveInstruction(
+        sourceRef,
+        userTransferAuthority.publicKey,
+        walletPubkey,
+        swapData.amountIn,
+      ),
+    )
     .add(
       createSwapInstructionMethod(
         isStable,
@@ -287,6 +306,11 @@ export async function swap({
       connection,
     });
   } else {
-    return signTransaction({ transaction, feePayer: walletPubkey, signers: [userTransferAuthority], connection });
+    return signTransaction({
+      transaction,
+      feePayer: walletPubkey,
+      signers: [userTransferAuthority],
+      connection,
+    });
   }
 }

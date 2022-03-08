@@ -179,13 +179,19 @@ const MyReward: React.FC<MyRewardProps> = (props) => {
   return (
     <RewardAccordion TransitionProps={{ unmountOnExit: true }}>
       <RewardAccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" style={{ width: "100%" }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          style={{ width: "100%" }}
+        >
           <Typography variant="subtitle1" className={classes.subTitle}>
             {detail.name}
           </Typography>
           <Box style={{ textAlign: "right" }}>
             <MainSpan>
-              <SpotSpan>{detail.claimedAmount}</SpotSpan> / <SubSpan>{detail.totalAmount}DELFI</SubSpan>
+              <SpotSpan>{detail.claimedAmount}</SpotSpan> /{" "}
+              <SubSpan>{detail.totalAmount}DELFI</SubSpan>
             </MainSpan>
             <Typography variant="caption" className={classes.textColor}>
               <SpotSpan>{detail.claimed}%</SpotSpan> has claimed

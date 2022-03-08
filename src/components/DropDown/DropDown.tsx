@@ -1,5 +1,14 @@
 import { ReactNode, useState, useMemo } from "react";
-import { Avatar, Button, ClickAwayListener, makeStyles, Box, Theme, Typography, InputBase } from "@material-ui/core";
+import {
+  Avatar,
+  Button,
+  ClickAwayListener,
+  makeStyles,
+  Box,
+  Theme,
+  Typography,
+  InputBase,
+} from "@material-ui/core";
 import { SearchOutlined } from "@material-ui/icons";
 import styled from "styled-components";
 import { DropDownProps } from "./types";
@@ -151,7 +160,8 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
     () =>
       options.filter(
         (option) =>
-          option.name.toLowerCase().includes(searchValue) || option.symbol.toLowerCase().includes(searchValue),
+          option.name.toLowerCase().includes(searchValue) ||
+          option.symbol.toLowerCase().includes(searchValue),
       ),
     [options, searchValue],
   );
@@ -175,8 +185,12 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
                   return null;
                 }
 
-                const baseTokenLogoURL = tokens.find((tokenInfo) => tokenInfo.symbol === baseTokenSymbol)?.logoURI;
-                const quoteTokenLogoURL = tokens.find((tokenInfo) => tokenInfo.symbol === quoteTokenSymbol)?.logoURI;
+                const baseTokenLogoURL = tokens.find(
+                  (tokenInfo) => tokenInfo.symbol === baseTokenSymbol,
+                )?.logoURI;
+                const quoteTokenLogoURL = tokens.find(
+                  (tokenInfo) => tokenInfo.symbol === quoteTokenSymbol,
+                )?.logoURI;
                 if (!baseTokenLogoURL || !quoteTokenLogoURL) {
                   return null;
                 }
@@ -217,8 +231,19 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
                   fullWidth
                   onClick={() => handleClickItem(option)}
                 >
-                  <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", width: "100%" }}>
-                    <Avatar src={option.logoURI} alt={option.symbol} className={classes.optionItemIcon} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <Avatar
+                      src={option.logoURI}
+                      alt={option.symbol}
+                      className={classes.optionItemIcon}
+                    />
                     <Box
                       sx={{
                         display: "flex",
@@ -230,7 +255,9 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
                       }}
                     >
                       <Box>
-                        {classes.symbol && <Typography className={classes.symbol}>{option.symbol}</Typography>}
+                        {classes.symbol && (
+                          <Typography className={classes.symbol}>{option.symbol}</Typography>
+                        )}
                         <Typography className={classes.optionLabel}>{option.name}</Typography>
                       </Box>
                       {option.symbol && (

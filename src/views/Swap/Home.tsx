@@ -228,17 +228,20 @@ const Home: React.FC = (props) => {
       newTokenTo = Object.assign({}, tokenFrom.token);
     }
     if (pool && priceImpact) {
-      const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } = getSwapOutAmount(
-        pool,
-        newTokenFrom.address,
-        newTokenTo.address,
-        card.amount ?? "0",
-        parseFloat(priceImpact),
-        marketPrice,
-      );
+      const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
+        getSwapOutAmount(
+          pool,
+          newTokenFrom.address,
+          newTokenTo.address,
+          card.amount ?? "0",
+          parseFloat(priceImpact),
+          marketPrice,
+        );
 
       amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
-      amountOutWithSlippage = isNaN(quoteAmountWithSlippage) ? "" : Number(quoteAmountWithSlippage).toString();
+      amountOutWithSlippage = isNaN(quoteAmountWithSlippage)
+        ? ""
+        : Number(quoteAmountWithSlippage).toString();
     }
     setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: card.amount });
     setTokenTo({ token: newTokenTo, amount: amountOut, amountWithSlippage: amountOutWithSlippage });
@@ -253,17 +256,20 @@ const Home: React.FC = (props) => {
       newTokenFrom = Object.assign({}, tokenTo.token);
     }
     if (pool && priceImpact) {
-      const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } = getSwapOutAmount(
-        pool,
-        newTokenFrom.address,
-        newTokenTo.address,
-        tokenFrom.amount ?? "0",
-        parseFloat(priceImpact),
-        marketPrice,
-      );
+      const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
+        getSwapOutAmount(
+          pool,
+          newTokenFrom.address,
+          newTokenTo.address,
+          tokenFrom.amount ?? "0",
+          parseFloat(priceImpact),
+          marketPrice,
+        );
 
       amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
-      amountOutWithSlippage = isNaN(quoteAmountWithSlippage) ? "" : Number(quoteAmountWithSlippage).toString();
+      amountOutWithSlippage = isNaN(quoteAmountWithSlippage)
+        ? ""
+        : Number(quoteAmountWithSlippage).toString();
     }
     setTokenFrom({ ...tokenFrom, token: newTokenFrom });
     setTokenTo({ token: newTokenTo, amount: amountOut, amountWithSlippage: amountOutWithSlippage });
@@ -284,12 +290,16 @@ const Home: React.FC = (props) => {
       const referrerPubkey: PublicKey | null = appState.referrerPublicKey;
       const isNewUser: Boolean = appState.isNewUser;
 
-      const amountIn = BigInt(exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString());
+      const amountIn = BigInt(
+        exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString(),
+      );
       const minimumAmountOut = BigInt(
         exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
       );
       const swapDirection =
-        tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? SWAP_DIRECTION.SellBase : SWAP_DIRECTION.SellQuote;
+        tokenFrom.token.symbol === pool.baseTokenInfo.symbol
+          ? SWAP_DIRECTION.SellBase
+          : SWAP_DIRECTION.SellQuote;
       let transaction = await swap({
         isStable,
         connection,
@@ -309,7 +319,13 @@ const Home: React.FC = (props) => {
       });
       transaction = await signTransaction(transaction);
       if (isNewUser) {
-        dispatch(fetchReferrerThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
+        dispatch(
+          fetchReferrerThunk({
+            connection,
+            config: MARKET_CONFIG_ADDRESS,
+            walletAddress: walletPubkey,
+          }),
+        );
       }
 
       const hash = await sendSignedTransaction({ signedTransaction: transaction, connection });
@@ -328,7 +344,10 @@ const Home: React.FC = (props) => {
           parseTokenAccountData(from.account.data).amount,
           tokenFrom.token.decimals,
         );
-        const nextBalanceTo = exponentiatedBy(parseTokenAccountData(to.account.data).amount, tokenTo.token.decimals);
+        const nextBalanceTo = exponentiatedBy(
+          parseTokenAccountData(to.account.data).amount,
+          tokenTo.token.decimals,
+        );
         setTransactionResult({
           status: true,
           hash,
@@ -389,7 +408,11 @@ const Home: React.FC = (props) => {
     if (!transactionResult.status) {
       return (
         <Box display="flex" alignItems="center">
-          <img src={"/images/snack-fail.svg"} alt="snack-status-icon" className={classes.snackBarIcon} />
+          <img
+            src={"/images/snack-fail.svg"}
+            alt="snack-status-icon"
+            className={classes.snackBarIcon}
+          />
           <Box>
             <Typography variant="h6" color="primary">
               Transaction failed(try again later)
@@ -408,12 +431,18 @@ const Home: React.FC = (props) => {
 
     return (
       <Box display="flex" alignItems="center">
-        <img src={"/images/snack-success.svg"} alt="snack-status-icon" className={classes.snackBarIcon} />
+        <img
+          src={"/images/snack-success.svg"}
+          alt="snack-status-icon"
+          className={classes.snackBarIcon}
+        />
         <Box>
           <Typography variant="body1" color="primary">
-            {`Swap ${Number(base.amount).toFixed(6)} ${base.token.symbol} to ${Number(quote.amount).toFixed(6)} ${
+            {`Swap ${Number(base.amount).toFixed(6)} ${base.token.symbol} to ${Number(
+              quote.amount,
+            ).toFixed(6)} ${quote.token.symbol} for ${base.token.symbol}-${
               quote.token.symbol
-            } for ${base.token.symbol}-${quote.token.symbol} Pool`}
+            } Pool`}
           </Typography>
           <Box display="flex" alignItems="center">
             <Typography variant="subtitle2" color="primary">
@@ -451,7 +480,9 @@ const Home: React.FC = (props) => {
           tokenFrom.token.symbol === pool.baseTokenInfo.symbol
             ? pool?.poolState.quoteReserve
             : pool?.poolState.baseReserve,
-          tokenFrom.token.symbol === pool.baseTokenInfo.symbol ? tokenTo.token.decimals : tokenFrom.token.decimals,
+          tokenFrom.token.symbol === pool.baseTokenInfo.symbol
+            ? tokenTo.token.decimals
+            : tokenFrom.token.decimals,
         ).isLessThan(tokenTo.amount);
 
       return (
@@ -460,7 +491,11 @@ const Home: React.FC = (props) => {
           size="large"
           variant="outlined"
           disabled={
-            unavailable || sourceAccountNonExist || isInsufficientBalance || isInsufficientLiquidity || isProcessing
+            unavailable ||
+            sourceAccountNonExist ||
+            isInsufficientBalance ||
+            isInsufficientLiquidity ||
+            isProcessing
           }
           onClick={handleSwap}
           data-amp-analytics-on="click"
@@ -526,15 +561,28 @@ const Home: React.FC = (props) => {
               <SettingsIcon color="primary" />
             </IconButton>
           </Box>
-          <ReactCardFlip isFlipped={openSettings} containerStyle={{ position: "relative", zIndex: 2 }}>
+          <ReactCardFlip
+            isFlipped={openSettings}
+            containerStyle={{ position: "relative", zIndex: 2 }}
+          >
             <Box display="flex" flexDirection="column" alignItems="flex-end">
               <SwapCard card={tokenFrom} tokens={tokens} handleChangeCard={handleTokenFromInput} />
               {!openSettings && (
-                <Fab color="secondary" size="small" className={classes.swapIcon} onClick={handleSwapDirectionChange}>
+                <Fab
+                  color="secondary"
+                  size="small"
+                  className={classes.swapIcon}
+                  onClick={handleSwapDirectionChange}
+                >
                   <SyncAlt />
                 </Fab>
               )}
-              <SwapCard card={tokenTo} tokens={tokens} handleChangeCard={handleTokenToInput} disabled={true} />
+              <SwapCard
+                card={tokenTo}
+                tokens={tokens}
+                handleChangeCard={handleTokenToInput}
+                disabled={true}
+              />
             </Box>
             <SettingsPanel
               isOpen={openSettings}

@@ -29,7 +29,9 @@ export class PMMHelper {
         } else if (amount.eq(backToOnePayBase)) {
           result = backToOneReceiveQuote;
         } else {
-          result = backToOneReceiveQuote.plus(this.ROneSellBase(amount.minus(backToOnePayBase), state));
+          result = backToOneReceiveQuote.plus(
+            this.ROneSellBase(amount.minus(backToOnePayBase), state),
+          );
         }
       } else {
         result = this.RBelowSellBase(amount, state);
@@ -63,7 +65,9 @@ export class PMMHelper {
         } else if (amount.eq(backToOnePayQuote)) {
           result = backToOneReceiveBase;
         } else {
-          result = backToOneReceiveBase.plus(this.ROneSellQuote(amount.minus(backToOnePayQuote), state));
+          result = backToOneReceiveBase.plus(
+            this.ROneSellQuote(amount.minus(backToOnePayQuote), state),
+          );
         }
       }
       const mtFee = result.multipliedBy(state.mtFeeRate);
@@ -96,7 +100,13 @@ export class PMMHelper {
   }
 
   private ROneSellQuote(amount: BigNumber, state: PMMState): BigNumber {
-    return solveQuadraticFunctionForTrade(state.B0, state.B0, amount, new BigNumber(1).div(state.OraclePrice), state.k);
+    return solveQuadraticFunctionForTrade(
+      state.B0,
+      state.B0,
+      amount,
+      new BigNumber(1).div(state.OraclePrice),
+      state.k,
+    );
   }
 
   // =========== helper RAbove ===========
@@ -105,12 +115,24 @@ export class PMMHelper {
   }
 
   private RAboveSellQuote(amount: BigNumber, state: PMMState): BigNumber {
-    return solveQuadraticFunctionForTrade(state.B0, state.B, amount, new BigNumber(1).div(state.OraclePrice), state.k);
+    return solveQuadraticFunctionForTrade(
+      state.B0,
+      state.B,
+      amount,
+      new BigNumber(1).div(state.OraclePrice),
+      state.k,
+    );
   }
 
   // =========== helper RBelow ===========
   private RBelowSellQuote(amount: BigNumber, state: PMMState): BigNumber {
-    return integrate(state.Q0, state.Q.plus(amount), state.Q, new BigNumber(1).div(state.OraclePrice), state.k);
+    return integrate(
+      state.Q0,
+      state.Q.plus(amount),
+      state.Q,
+      new BigNumber(1).div(state.OraclePrice),
+      state.k,
+    );
   }
 
   private RBelowSellBase(amount: BigNumber, state: PMMState): BigNumber {
@@ -118,7 +140,13 @@ export class PMMHelper {
   }
 }
 
-export const integrate = (V0: BigNumber, V1: BigNumber, V2: BigNumber, i: BigNumber, k: BigNumber): BigNumber => {
+export const integrate = (
+  V0: BigNumber,
+  V1: BigNumber,
+  V2: BigNumber,
+  i: BigNumber,
+  k: BigNumber,
+): BigNumber => {
   if (V0.lte(0)) throw new Error("TARGET_IS_ZERO");
   let fairAmount = i.multipliedBy(V1.minus(V2));
   if (k.eq(0)) return fairAmount;

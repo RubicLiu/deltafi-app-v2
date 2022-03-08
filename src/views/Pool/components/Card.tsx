@@ -93,7 +93,12 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const tvl = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
+      return pmm.tvl(
+        basePrice,
+        quotePrice,
+        pool.baseTokenInfo.decimals,
+        pool.quoteTokenInfo.decimals,
+      );
     }
     return new BigNumber(0);
   }, [pmm, basePrice, quotePrice, pool]);
@@ -122,7 +127,11 @@ const PoolCard: React.FC<CardProps> = (props) => {
       <Box className={classes.content}>
         <Box display="flex" alignItems="center">
           <Img src={pool.baseTokenInfo.logoURI} alt={`${pool.baseTokenInfo.name} coin`} />
-          <Img src={pool.quoteTokenInfo.logoURI} alt={`${pool.quoteTokenInfo.name} coin`} className="coin-earning" />
+          <Img
+            src={pool.quoteTokenInfo.logoURI}
+            alt={`${pool.quoteTokenInfo.name} coin`}
+            className="coin-earning"
+          />
           <Box ml={1.5}>
             <Typography className={classes.tokenPair}>
               {`${pool.baseTokenInfo.symbol} - ${pool.quoteTokenInfo.symbol}`}
@@ -141,12 +150,16 @@ const PoolCard: React.FC<CardProps> = (props) => {
       </Box>
       <Box display="flex" justifyContent="space-between">
         <Typography className={classes.label}>Total Deposits</Typography>
-        <Typography className={classes.label}>{convertDollar(tvl.toFixed(2).toString())}</Typography>
+        <Typography className={classes.label}>
+          {convertDollar(tvl.toFixed(2).toString())}
+        </Typography>
       </Box>
       {connected && props.isUserPool && (
         <Box display="flex" justifyContent="space-between">
           <Typography className={classes.label}>Your deposits</Typography>
-          <Typography className={classes.label}>{convertDollar(sharePrice?.toFixed(2).toString())}</Typography>
+          <Typography className={classes.label}>
+            {convertDollar(sharePrice?.toFixed(2).toString())}
+          </Typography>
         </Box>
       )}
     </Box>

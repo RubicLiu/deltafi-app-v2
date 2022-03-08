@@ -43,7 +43,10 @@ export async function deposit({
 
   let createAccountTransaction: Transaction | undefined;
   if (!poolTokenRef) {
-    const result = await createTokenAccountTransaction({ walletPubkey, mintPublicKey: pool.poolMintKey });
+    const result = await createTokenAccountTransaction({
+      walletPubkey,
+      mintPublicKey: pool.poolMintKey,
+    });
     poolTokenRef = result?.newAccountPubkey;
     createAccountTransaction = result?.transaction;
   }
@@ -76,9 +79,12 @@ export async function deposit({
       tmpAccountLamport,
       walletPubkey,
     );
-    createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
-    initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
-    closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
+    createWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
+    initializeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
+    closeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
 
     if (baseSOL) {
       baseSourceRef = tempAccountRefKeyPair.publicKey;
@@ -90,10 +96,20 @@ export async function deposit({
   let transaction = new Transaction();
   transaction
     .add(
-      createApproveInstruction(baseSourceRef, userTransferAuthority.publicKey, walletPubkey, depositData.amountTokenA),
+      createApproveInstruction(
+        baseSourceRef,
+        userTransferAuthority.publicKey,
+        walletPubkey,
+        depositData.amountTokenA,
+      ),
     )
     .add(
-      createApproveInstruction(quoteSourceRef, userTransferAuthority.publicKey, walletPubkey, depositData.amountTokenB),
+      createApproveInstruction(
+        quoteSourceRef,
+        userTransferAuthority.publicKey,
+        walletPubkey,
+        depositData.amountTokenB,
+      ),
     )
     .add(
       createDepositInstruction(

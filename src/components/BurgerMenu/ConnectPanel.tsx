@@ -159,7 +159,11 @@ const ConnectPanel: React.FC = (props) => {
                 data-amp-analytics-name="click"
                 data-amp-analytics-attrs="page: Menu, target: ConnectLedger"
               >
-                <Img src={item.icon} alt={item.name} className={isAccept ? classes.grayScale : ""} />
+                <Img
+                  src={item.icon}
+                  alt={item.name}
+                  className={isAccept ? classes.grayScale : ""}
+                />
                 <Typography color={isAccept ? "primary" : "primary"} className={classes.walletName}>
                   {item.name}
                 </Typography>

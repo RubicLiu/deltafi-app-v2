@@ -67,8 +67,8 @@
   "scripts": {
     "start": "PORT=3001 ESLINT_NO_DEV_ERRORS=true REACT_APP_DEPLOYMENT_MODE=mainnet-test react-scripts start",
     "build": "GENERATE_SOURCEMAP=false REACT_APP_DEPLOYMENT_MODE=mainnet-prod react-scripts build",
-    "build-dev": "REACT_APP_DEPLOYMENT_MODE=mainnet-test GENERATE_SOURCEMAP=false react-scripts build",
-    "build-debug": "REACT_APP_DEPLOYMENT_MODE=mainnet-test react-scripts build",
+    "build-dev": "REACT_APP_DEPLOYMENT_MODE=mainnet-test DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",
+    "build-debug": "REACT_APP_DEPLOYMENT_MODE=mainnet-test DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",

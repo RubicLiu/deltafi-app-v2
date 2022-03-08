@@ -49,7 +49,13 @@ export async function createFarmUser({
       }),
     )
     .add(
-      createInitFarmUserInstruction(config.publicKey, farmPoolPubkey, farmUserPubkey, walletPubkey, SWAP_PROGRAM_ID),
+      createInitFarmUserInstruction(
+        config.publicKey,
+        farmPoolPubkey,
+        farmUserPubkey,
+        walletPubkey,
+        SWAP_PROGRAM_ID,
+      ),
     );
 
   return {

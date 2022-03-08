@@ -1,5 +1,10 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { PublicKey, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, TransactionInstruction } from "@solana/web3.js";
+import {
+  PublicKey,
+  SYSVAR_CLOCK_PUBKEY,
+  SYSVAR_RENT_PUBKEY,
+  TransactionInstruction,
+} from "@solana/web3.js";
 import { struct, u8 } from "buffer-layout";
 
 import { u64 } from "utils/layout";
@@ -23,7 +28,13 @@ export interface FarmInitializeData {
 
 /** @internal */
 export const FarmInitializeDataLayout = struct<FarmInitializeData>(
-  [u64("feeNumerator"), u64("feeDenominator"), u64("rewardsNumerator"), u64("rewardsDenominator"), u8("bumpSeed")],
+  [
+    u64("feeNumerator"),
+    u64("feeDenominator"),
+    u64("rewardsNumerator"),
+    u64("rewardsDenominator"),
+    u8("bumpSeed"),
+  ],
   "initData",
 );
 

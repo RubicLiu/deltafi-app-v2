@@ -69,36 +69,64 @@ const PoolStatsBlock = ({ ...props }) => {
     <>
       <StatsDiv>
         <StatsBlack>
-          <Text color={isDark ? "#88809C" : "#88809C"} fontFamily="'Inter', sans-serif" className="currency">
+          <Text
+            color={isDark ? "#88809C" : "#88809C"}
+            fontFamily="'Inter', sans-serif"
+            className="currency"
+          >
             Currency Reserves
           </Text>
           <FlexWrapper className="align">
             <Img src={pool?.stakingToken?.link} alt="staking coin" className="icon" />
-            <Text color={isDark ? "#FFFFFF" : "#000000"} fontFamily="'Inter', sans-serif" className="staking">
+            <Text
+              color={isDark ? "#FFFFFF" : "#000000"}
+              fontFamily="'Inter', sans-serif"
+              className="staking"
+            >
               16,547,620 USDC (52.51577%)
             </Text>
           </FlexWrapper>
           <FlexWrapper className="align">
             <Img src={pool?.earningToken?.link} alt="staking coin" className="icon" />
-            <Text color={isDark ? "#FFFFFF" : "#000000"} fontFamily="'Inter', sans-serif" className="staking">
+            <Text
+              color={isDark ? "#FFFFFF" : "#000000"}
+              fontFamily="'Inter', sans-serif"
+              className="staking"
+            >
               16,547,620 USDC (52.51577%)
             </Text>
           </FlexWrapper>
         </StatsBlack>
         <StatsGray>
           <FlexWrapper className="align">
-            <Text color={isDark ? "#88809C" : "#88809C"} fontFamily="'Inter', sans-serif" className="description">
+            <Text
+              color={isDark ? "#88809C" : "#88809C"}
+              fontFamily="'Inter', sans-serif"
+              className="description"
+            >
               Total Reserves
             </Text>
-            <Text color={isDark ? "#FFFFFF" : "#000000"} fontFamily="'Inter', sans-serif" className="value">
+            <Text
+              color={isDark ? "#FFFFFF" : "#000000"}
+              fontFamily="'Inter', sans-serif"
+              className="value"
+            >
               US$ 3150390
             </Text>
           </FlexWrapper>
           <FlexWrapper className="align">
-            <Text color={isDark ? "#88809C" : "#88809C"} fontFamily="'Inter', sans-serif" className="description">
+            <Text
+              color={isDark ? "#88809C" : "#88809C"}
+              fontFamily="'Inter', sans-serif"
+              className="description"
+            >
               APR
             </Text>
-            <Text color={isDark ? "#FFFFFF" : "#000000"} fontFamily="'Inter', sans-serif" className="value">
+            <Text
+              color={isDark ? "#FFFFFF" : "#000000"}
+              fontFamily="'Inter', sans-serif"
+              className="value"
+            >
               2.5%
             </Text>
           </FlexWrapper>

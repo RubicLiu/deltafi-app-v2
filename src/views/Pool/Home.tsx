@@ -90,7 +90,9 @@ const Home: React.FC = () => {
             <Box mt={3.5}>
               {schemas
                 .filter((schema) =>
-                  tokens?.find((token) => token.effectiveMint.toBase58() === schema.mintAddress.toBase58()),
+                  tokens?.find(
+                    (token) => token.effectiveMint.toBase58() === schema.mintAddress.toBase58(),
+                  ),
                 )
                 .map((schema) => (
                   <PoolCard isUserPool key={schema.address.toString()} poolKey={schema.address} />
@@ -109,7 +111,9 @@ const Home: React.FC = () => {
               {schemas
                 .filter(
                   (schema) =>
-                    !tokens?.find((token) => token.effectiveMint.toBase58() === schema.mintAddress.toBase58()),
+                    !tokens?.find(
+                      (token) => token.effectiveMint.toBase58() === schema.mintAddress.toBase58(),
+                    ),
                 )
                 .map((schema: PoolSchema) => (
                   <Box key={schema.address.toString()}>

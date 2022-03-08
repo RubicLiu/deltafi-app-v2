@@ -21,17 +21,20 @@ type FetchPoolsThunkArg = {
   connection: Connection;
 };
 
-export const fetchPoolsThunk = createAsyncThunk("pool/fetchPools", async (arg: FetchPoolsThunkArg) => {
-  const poolKeyToPoolInfo: PoolKeyToPoolInfo = {};
-  const pools = await getPools(arg.connection);
-  console.info("got pools " + pools.length);
-  for (const pool of pools) {
-    poolKeyToPoolInfo[pool.publicKey.toBase58()] = pool;
-  }
-  return {
-    poolKeyToPoolInfo,
-  };
-});
+export const fetchPoolsThunk = createAsyncThunk(
+  "pool/fetchPools",
+  async (arg: FetchPoolsThunkArg) => {
+    const poolKeyToPoolInfo: PoolKeyToPoolInfo = {};
+    const pools = await getPools(arg.connection);
+    console.info("got pools " + pools.length);
+    for (const pool of pools) {
+      poolKeyToPoolInfo[pool.publicKey.toBase58()] = pool;
+    }
+    return {
+      poolKeyToPoolInfo,
+    };
+  },
+);
 
 export const poolReducer = createReducer(initialState, (builder) => {
   builder.addCase(fetchPoolsThunk.fulfilled, (state, action) => {

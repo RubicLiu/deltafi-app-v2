@@ -22,13 +22,19 @@ export const loadAccount = async (
   }
 
   if (!accountInfo.owner.equals(programId)) {
-    throw new Error(`Invalid owner: expected ${programId.toBase58()}, found ${accountInfo.owner.toBase58()}`);
+    throw new Error(
+      `Invalid owner: expected ${programId.toBase58()}, found ${accountInfo.owner.toBase58()}`,
+    );
   }
 
   return accountInfo;
 };
 
-export const getMultipleAccounts = async (connection: Connection, keys: PublicKey[], commitment: Commitment) => {
+export const getMultipleAccounts = async (
+  connection: Connection,
+  keys: PublicKey[],
+  commitment: Commitment,
+) => {
   const result = await Promise.all(
     chunks(keys, 99).map((chunk) => getMultipleAccountsCore(connection, chunk, commitment)),
   );
@@ -37,14 +43,21 @@ export const getMultipleAccounts = async (connection: Connection, keys: PublicKe
   return { keys, array };
 };
 
-const getMultipleAccountsCore = async (connection: Connection, keys: PublicKey[], commitment: Commitment) => {
+const getMultipleAccountsCore = async (
+  connection: Connection,
+  keys: PublicKey[],
+  commitment: Commitment,
+) => {
   return {
     keys,
     array: await connection.getMultipleAccountsInfo(keys, commitment),
   };
 };
 
-export const getMinBalanceRentForExempt = async (connection: Connection, dataLength: number): Promise<number> => {
+export const getMinBalanceRentForExempt = async (
+  connection: Connection,
+  dataLength: number,
+): Promise<number> => {
   return connection.getMinimumBalanceForRentExemption(dataLength);
 };
 

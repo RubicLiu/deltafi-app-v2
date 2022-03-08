@@ -95,7 +95,9 @@ const SwapCard: React.FC<CardProps> = (props) => {
 
   useEffect(() => {
     if (percentage && tokenBalance) {
-      const realAmount = tokenBalance.multipliedBy(new BigNumber(percentage)).dividedBy(new BigNumber(100));
+      const realAmount = tokenBalance
+        .multipliedBy(new BigNumber(percentage))
+        .dividedBy(new BigNumber(100));
       handleChangeCard({
         ...card,
         amount: realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString(),
@@ -150,7 +152,9 @@ const SwapCard: React.FC<CardProps> = (props) => {
         />
       </Box>
       <Box display="flex" justifyContent="space-between">
-        <Typography className={classes.tokenBalance}>{`Balance: ${tokenBalance?.toString() ?? "--"}`}</Typography>
+        <Typography className={classes.tokenBalance}>{`Balance: ${
+          tokenBalance?.toString() ?? "--"
+        }`}</Typography>
       </Box>
     </Paper>
   );

@@ -114,7 +114,11 @@ const WithdrawPanel = (props: IWithdrawPanelProps): ReactElement => {
           <Box display="flex" justifyContent="space-between" className={classes.row}>
             <Typography color="textSecondary">New Pool Share</Typography>
             <Box display="flex" justifyContent="center" alignItems="center">
-              <img src={pool.baseTokenInfo.logoURI} alt={`${pool.baseTokenInfo.symbol} coin`} className={classes.img} />
+              <img
+                src={pool.baseTokenInfo.logoURI}
+                alt={`${pool.baseTokenInfo.symbol} coin`}
+                className={classes.img}
+              />
               <Typography>{0} USDC</Typography>
             </Box>
           </Box>

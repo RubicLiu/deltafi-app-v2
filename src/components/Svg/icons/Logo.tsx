@@ -26,7 +26,12 @@ const Icon: React.FC<LogoProps> = (props) => {
       </g>
       <defs>
         <clipPath id="clip0_3581_12759">
-          <rect width="20.4326" height="24.5549" fill="white" transform="translate(0.13623 0.835938)" />
+          <rect
+            width="20.4326"
+            height="24.5549"
+            fill="white"
+            transform="translate(0.13623 0.835938)"
+          />
         </clipPath>
       </defs>
     </Svg>

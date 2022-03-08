@@ -1,6 +1,15 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Box, IconButton, makeStyles, Paper, Tab, Tabs, Theme, Typography } from "@material-ui/core";
+import {
+  Box,
+  IconButton,
+  makeStyles,
+  Paper,
+  Tab,
+  Tabs,
+  Theme,
+  Typography,
+} from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 
 import { Text, LinkIcon, WalletButton, StakeIcon, WithdrawIcon } from "components";
@@ -178,7 +187,11 @@ const StakePanel: React.FC = (props) => {
   return (
     <Box width="100%">
       <Box display="flex" justifyContent="space-between" className={classes.header}>
-        {isConnectedWallet ? <WalletButton /> : <Typography variant="h6">Position Management</Typography>}
+        {isConnectedWallet ? (
+          <WalletButton />
+        ) : (
+          <Typography variant="h6">Position Management</Typography>
+        )}
         <IconButton size="small" onClick={() => setMenu(false)}>
           <CloseIcon />
         </IconButton>
@@ -187,7 +200,8 @@ const StakePanel: React.FC = (props) => {
         <Scrollbars autoHeightMax={200} autoHide={true}>
           <Box display="flex" justifyContent="center" padding={3}>
             <Typography>
-              {pool.baseTokenInfo.symbol ?? ""} - {pool.quoteTokenInfo.symbol ?? ""} Liquidity Mining
+              {pool.baseTokenInfo.symbol ?? ""} - {pool.quoteTokenInfo.symbol ?? ""} Liquidity
+              Mining
             </Typography>
             <Img src={pool.baseTokenInfo.logoURI} alt="staking coin" />
             <Img src={pool.quoteTokenInfo.logoURI} alt="earning coin" />
@@ -246,18 +260,25 @@ const StakePanel: React.FC = (props) => {
           {isConnectedWallet && (
             <LiquidDescriptonDiv isDark={isDark}>
               <Text small color={"rgba(255, 255, 255, 0.8)"}>
-                DELFI tokens are tokens which represent a share of the liquidity provided to a DeltaFi staking pool.
+                DELFI tokens are tokens which represent a share of the liquidity provided to a
+                DeltaFi staking pool.
               </Text>
               <br />
               <Text small color={"rgba(255, 255, 255, 0.8)"}>
-                You may obtain DELFI tokens by depositing USD Coin (USDC) or USDT (USDT) into the USDT-USDC pool.
+                You may obtain DELFI tokens by depositing USD Coin (USDC) or USDT (USDT) into the
+                USDT-USDC pool.
               </Text>
               <br />
               <FlexWrapper>
                 <Text small color={"rgba(255, 255, 255, 0.8)"} className="underline">
                   Deposit into the USDT-USDC Pool
                 </Text>
-                <LinkIcon className="external-link" isDark={isDark} width="15px" style={{ marginLeft: 6 }} />
+                <LinkIcon
+                  className="external-link"
+                  isDark={isDark}
+                  width="15px"
+                  style={{ marginLeft: 6 }}
+                />
               </FlexWrapper>
             </LiquidDescriptonDiv>
           )}

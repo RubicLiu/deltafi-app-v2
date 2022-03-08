@@ -67,7 +67,10 @@ const getUnclaimedReward = (
     .multipliedBy(depositBalance)
     .multipliedBy(apr);
 
-  return exponentiatedBy(unTrackedReward.plus(rewardsOwed).plus(rewardEstimated), deltafiTokenDecimals);
+  return exponentiatedBy(
+    unTrackedReward.plus(rewardsOwed).plus(rewardEstimated),
+    deltafiTokenDecimals,
+  );
 };
 
 const Stake = (): ReactElement => {
@@ -124,17 +127,25 @@ const Stake = (): ReactElement => {
   });
 
   const tokenBalance = useMemo(() => {
-    return tokenAccount?.account ? exponentiatedBy(tokenAccount.account.amount, token.decimals) : new BigNumber(0);
+    return tokenAccount?.account
+      ? exponentiatedBy(tokenAccount.account.amount, token.decimals)
+      : new BigNumber(0);
   }, [tokenAccount?.account, token]);
 
   const totalStaked = useMemo(() => {
-    return farmPool && lpMint ? exponentiatedBy(farmPool.reservedAmount.toString(), lpMint.decimals) : new BigNumber(0);
+    return farmPool && lpMint
+      ? exponentiatedBy(farmPool.reservedAmount.toString(), lpMint.decimals)
+      : new BigNumber(0);
   }, [farmPool, lpMint]);
 
   let position = farmUser?.positions[farmPoolId];
-  const apr = new BigNumber(farmPool.aprNumerator.toString()).div(new BigNumber(farmPool.aprDenominator.toString()));
+  const apr = new BigNumber(farmPool.aprNumerator.toString()).div(
+    new BigNumber(farmPool.aprDenominator.toString()),
+  );
   const depositAmount = useMemo(() => {
-    return position && lpMint ? exponentiatedBy(position.depositBalance, lpMint.decimals) : new BigNumber(0);
+    return position && lpMint
+      ? exponentiatedBy(position.depositBalance, lpMint.decimals)
+      : new BigNumber(0);
   }, [position, lpMint]);
 
   const [staking, setStaking] = useState({
@@ -246,7 +257,13 @@ const Stake = (): ReactElement => {
       } finally {
         setState((state) => ({ ...state, open: true }));
         setIsProcessingStake(false);
-        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
+        dispatch(
+          fetchFarmUsersThunk({
+            connection,
+            config: MARKET_CONFIG_ADDRESS,
+            walletAddress: walletPubkey,
+          }),
+        );
       }
     } else {
       if (staking.amount === "" || !position || depositAmount.lt(staking.amount)) {
@@ -295,7 +312,13 @@ const Stake = (): ReactElement => {
       } finally {
         setState((state) => ({ ...state, open: true }));
         setIsProcessingStake(false);
-        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
+        dispatch(
+          fetchFarmUsersThunk({
+            connection,
+            config: MARKET_CONFIG_ADDRESS,
+            walletAddress: walletPubkey,
+          }),
+        );
       }
     }
   }, [
@@ -346,7 +369,13 @@ const Stake = (): ReactElement => {
     } finally {
       setState((state) => ({ ...state, open: true }));
       setIsProcessingClaim(false);
-      dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
+      dispatch(
+        fetchFarmUsersThunk({
+          connection,
+          config: MARKET_CONFIG_ADDRESS,
+          walletAddress: walletPubkey,
+        }),
+      );
     }
   }, [
     config,
@@ -377,7 +406,11 @@ const Stake = (): ReactElement => {
     if (!transactionResult.status) {
       return (
         <Box display="flex" alignItems="center">
-          <img src={"/images/snack-fail.svg"} alt="snack-status-icon" className={classes.snackBarIcon} />
+          <img
+            src={"/images/snack-fail.svg"}
+            alt="snack-status-icon"
+            className={classes.snackBarIcon}
+          />
           <Box>
             <Typography variant="h6" color="primary">
               Transaction failed(try again later)
@@ -396,13 +429,17 @@ const Stake = (): ReactElement => {
 
     return (
       <Box display="flex" alignItems="center">
-        <img src={"/images/snack-success.svg"} alt="snack-status-icon" className={classes.snackBarIcon} />
+        <img
+          src={"/images/snack-success.svg"}
+          alt="snack-status-icon"
+          className={classes.snackBarIcon}
+        />
         <Box>
           {stake && (
             <Typography variant="body1" color="primary">
-              {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(stake?.amount).toFixed(6)} ${
-                stake.token.symbol
-              } LP`}
+              {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(stake?.amount).toFixed(
+                6,
+              )} ${stake.token.symbol} LP`}
             </Typography>
           )}
           <Box display="flex" alignItems="center">
@@ -432,7 +469,11 @@ const Stake = (): ReactElement => {
         <Box display="flex" justifyContent="space-between" pb={2}>
           <Typography variant="h6">{farmPool.name} LP Token Staking</Typography>
           <Box className={classes.iconGroup}>
-            <img src={baseTokenInfo.logoURI} alt="staking-coin" className={clx(classes.coinIcon, classes.firstCoin)} />
+            <img
+              src={baseTokenInfo.logoURI}
+              alt="staking-coin"
+              className={clx(classes.coinIcon, classes.firstCoin)}
+            />
             <img src={quoteTokenInfo.logoURI} alt="earning-coin" className={classes.coinIcon} />
           </Box>
         </Box>
@@ -453,9 +494,9 @@ const Stake = (): ReactElement => {
               About {farmPool.name} LP Tokens
             </Typography>
             <Typography variant="subtitle2">
-              LP tokens represents a share of the liquidity provided to a swap pool. You may obtain {farmPool.name} LP
-              tokens by depositing {farmPool.name.split("-")[0]} and {farmPool.name.split("-")[1]} into the{" "}
-              {farmPool.name} pool.
+              LP tokens represents a share of the liquidity provided to a swap pool. You may obtain{" "}
+              {farmPool.name} LP tokens by depositing {farmPool.name.split("-")[0]} and{" "}
+              {farmPool.name.split("-")[1]} into the {farmPool.name} pool.
             </Typography>
             <Box display="flex" alignItems="center" mt={3}>
               <Link

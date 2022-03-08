@@ -30,28 +30,38 @@ type FetchReferrerThunkArg = {
   walletAddress: PublicKey;
 };
 
-export const fetchReferrerThunk = createAsyncThunk("app/fetchReferrer", async (arg: FetchReferrerThunkArg) => {
-  const timestamp = Date.now();
-  const referralAccountPublickey = await PublicKey.createWithSeed(arg.walletAddress, "referrer", SWAP_PROGRAM_ID);
-  const referralAccountInfo = await arg.connection.getAccountInfo(referralAccountPublickey);
+export const fetchReferrerThunk = createAsyncThunk(
+  "app/fetchReferrer",
+  async (arg: FetchReferrerThunkArg) => {
+    const timestamp = Date.now();
+    const referralAccountPublickey = await PublicKey.createWithSeed(
+      arg.walletAddress,
+      "referrer",
+      SWAP_PROGRAM_ID,
+    );
+    const referralAccountInfo = await arg.connection.getAccountInfo(referralAccountPublickey);
 
-  let referrerPublicKey: PublicKey = null;
-  let isNewUser: boolean = true;
-  if (referralAccountInfo) {
-    const referralInfo = UserReferrerDataLayout.decode(referralAccountInfo.data);
-    if (arg.walletAddress !== referralInfo.referrer && referralInfo.referrer.toBase58() !== dummyReferrerAddress) {
-      referrerPublicKey = referralInfo.referrer;
+    let referrerPublicKey: PublicKey = null;
+    let isNewUser: boolean = true;
+    if (referralAccountInfo) {
+      const referralInfo = UserReferrerDataLayout.decode(referralAccountInfo.data);
+      if (
+        arg.walletAddress !== referralInfo.referrer &&
+        referralInfo.referrer.toBase58() !== dummyReferrerAddress
+      ) {
+        referrerPublicKey = referralInfo.referrer;
+      }
+      // TODO: check if the referrer is a dummy key, set it to null
+      isNewUser = false;
     }
-    // TODO: check if the referrer is a dummy key, set it to null
-    isNewUser = false;
-  }
 
-  return {
-    referrerPublicKey,
-    isNewUser,
-    timestamp,
-  };
-});
+    return {
+      referrerPublicKey,
+      isNewUser,
+      timestamp,
+    };
+  },
+);
 
 export const appReducer = createReducer(initialState, (builder) => {
   builder

@@ -5,7 +5,12 @@ import { PriceData, ProductData, parseProductData, parsePriceData } from "@pythn
 import { deployConfig } from "constants/deployConfig";
 import { getMultipleAccounts } from "utils/account";
 
-type PythData = { symbol: string; priceKey: PublicKey; productData: ProductData; priceData: PriceData };
+type PythData = {
+  symbol: string;
+  priceKey: PublicKey;
+  productData: ProductData;
+  priceData: PriceData;
+};
 type SymbolToPythData = Record<string, PythData>;
 
 export interface PythState {
@@ -16,17 +21,20 @@ const initialState: PythState = {
   symbolToPythData: {},
 };
 
-export const fetchPythDataThunk = createAsyncThunk("pyth/fetchPythData", async (connection: Connection) => {
-  const symbolToPythData: SymbolToPythData = {};
-  const pythDataList = await getPythDataList(connection);
-  console.info("found pyth data " + pythDataList.length);
-  for (const pythData of pythDataList) {
-    symbolToPythData[pythData.symbol] = pythData;
-  }
-  return {
-    symbolToPythData,
-  };
-});
+export const fetchPythDataThunk = createAsyncThunk(
+  "pyth/fetchPythData",
+  async (connection: Connection) => {
+    const symbolToPythData: SymbolToPythData = {};
+    const pythDataList = await getPythDataList(connection);
+    console.info("found pyth data " + pythDataList.length);
+    for (const pythData of pythDataList) {
+      symbolToPythData[pythData.symbol] = pythData;
+    }
+    return {
+      symbolToPythData,
+    };
+  },
+);
 
 export const pythReducer = createReducer(initialState, (builder) => {
   builder.addCase(fetchPythDataThunk.fulfilled, (state, action) => {

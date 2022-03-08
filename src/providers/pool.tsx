@@ -87,13 +87,19 @@ export function EntirePoolsProvider({ children }) {
     return () => {
       for (const subscription_id of subscription_ids) {
         connection?.removeAccountChangeListener(subscription_id).catch(() => {
-          console.warn(`Unsuccessfully attempted to remove listener for subscription id ${subscription_id}`);
+          console.warn(
+            `Unsuccessfully attempted to remove listener for subscription id ${subscription_id}`,
+          );
         });
       }
     };
   }, [schemas, connection]);
 
-  return <EntirePoolsContext.Provider value={{ pools, schemas, setSchemas }}>{children}</EntirePoolsContext.Provider>;
+  return (
+    <EntirePoolsContext.Provider value={{ pools, schemas, setSchemas }}>
+      {children}
+    </EntirePoolsContext.Provider>
+  );
 }
 
 export function usePools() {

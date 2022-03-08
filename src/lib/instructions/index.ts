@@ -6,7 +6,12 @@ export * from "./swap";
 export * from "./stableSwap";
 export * from "./dataLayout";
 
-export const createApproveInstruction = (account: PublicKey, delegate: PublicKey, owner: PublicKey, amount: bigint) => {
+export const createApproveInstruction = (
+  account: PublicKey,
+  delegate: PublicKey,
+  owner: PublicKey,
+  amount: bigint,
+) => {
   return Token.createApproveInstruction(
     TOKEN_PROGRAM_ID,
     account,

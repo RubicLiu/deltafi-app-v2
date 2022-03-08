@@ -12,7 +12,14 @@ const Icon: React.FC<SvgProps> = (props) => {
         fill="url(#paint0_linear)"
       />
       <defs>
-        <linearGradient id="paint0_linear" x1="97.4331" y1="0" x2="97.4331" y2="226.307" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="paint0_linear"
+          x1="97.4331"
+          y1="0"
+          x2="97.4331"
+          y2="226.307"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#FF5E79" />
           <stop offset="1" stopColor="#DC0640" />
         </linearGradient>

@@ -3,7 +3,11 @@ import BN from "bn.js";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
 import { PoolInfo, ExTokenAccount, MarketConfig } from "providers/types";
-import { createApproveInstruction, createStableDepositInstruction, DepositData } from "lib/instructions";
+import {
+  createApproveInstruction,
+  createStableDepositInstruction,
+  DepositData,
+} from "lib/instructions";
 import { createTokenAccountTransaction, signTransaction, mergeTransactions } from ".";
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { createFarmUser } from "./farm";
@@ -43,7 +47,10 @@ export async function stableDeposit({
 
   let createAccountTransaction: Transaction | undefined;
   if (!poolTokenRef) {
-    const result = await createTokenAccountTransaction({ walletPubkey, mintPublicKey: pool.poolMintKey });
+    const result = await createTokenAccountTransaction({
+      walletPubkey,
+      mintPublicKey: pool.poolMintKey,
+    });
     poolTokenRef = result?.newAccountPubkey;
     createAccountTransaction = result?.transaction;
   }
@@ -76,9 +83,12 @@ export async function stableDeposit({
       tmpAccountLamport,
       walletPubkey,
     );
-    createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
-    initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
-    closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
+    createWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
+    initializeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
+    closeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
 
     if (baseSOL) {
       baseSourceRef = tempAccountRefKeyPair.publicKey;
@@ -90,10 +100,20 @@ export async function stableDeposit({
   let transaction = new Transaction();
   transaction
     .add(
-      createApproveInstruction(baseSourceRef, userTransferAuthority.publicKey, walletPubkey, depositData.amountTokenA),
+      createApproveInstruction(
+        baseSourceRef,
+        userTransferAuthority.publicKey,
+        walletPubkey,
+        depositData.amountTokenA,
+      ),
     )
     .add(
-      createApproveInstruction(quoteSourceRef, userTransferAuthority.publicKey, walletPubkey, depositData.amountTokenB),
+      createApproveInstruction(
+        quoteSourceRef,
+        userTransferAuthority.publicKey,
+        walletPubkey,
+        depositData.amountTokenB,
+      ),
     )
     .add(
       createStableDepositInstruction(

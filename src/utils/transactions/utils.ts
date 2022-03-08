@@ -24,12 +24,23 @@ export function createNativeSOLHandlingTransactions(
 
   const initializeWrappedTokenAccountTransaction = new Transaction();
   initializeWrappedTokenAccountTransaction.add(
-    Token.createInitAccountInstruction(TOKEN_PROGRAM_ID, NATIVE_MINT, tempAccountRefPubkey, walletPubkey),
+    Token.createInitAccountInstruction(
+      TOKEN_PROGRAM_ID,
+      NATIVE_MINT,
+      tempAccountRefPubkey,
+      walletPubkey,
+    ),
   );
 
   const closeWrappedTokenAccountTransaction = new Transaction();
   closeWrappedTokenAccountTransaction.add(
-    Token.createCloseAccountInstruction(TOKEN_PROGRAM_ID, tempAccountRefPubkey, walletPubkey, walletPubkey, []),
+    Token.createCloseAccountInstruction(
+      TOKEN_PROGRAM_ID,
+      tempAccountRefPubkey,
+      walletPubkey,
+      walletPubkey,
+      [],
+    ),
   );
 
   return {

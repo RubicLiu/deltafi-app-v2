@@ -66,7 +66,12 @@ const PercentageSlider: React.FC<SliderProps> = (props) => {
         <Box className={classes.label} py={2} textAlign="center">
           <Typography>{value}%</Typography>
         </Box>
-        <CustomSlider value={value} onChange={handleChange} aria-labelledby="continuous-slider" step={0.01} />
+        <CustomSlider
+          value={value}
+          onChange={handleChange}
+          aria-labelledby="continuous-slider"
+          step={0.01}
+        />
       </Box>
     </Box>
   );

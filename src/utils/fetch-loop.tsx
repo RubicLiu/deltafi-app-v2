@@ -130,7 +130,8 @@ class FetchLoopInternal<T = any> {
       ++this.errors;
       console.warn(error);
       errored = true;
-      lastStatus = error instanceof Error ? (error.stack?.includes("429 Too Many Requests") ? 429 : 404) : 404;
+      lastStatus =
+        error instanceof Error ? (error.stack?.includes("429 Too Many Requests") ? 429 : 404) : 404;
     } finally {
       if (!this.timeoutId && !this.stopped) {
         let waitTime = this.refreshInterval;

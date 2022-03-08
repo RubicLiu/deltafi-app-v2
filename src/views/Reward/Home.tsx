@@ -167,14 +167,30 @@ const Home: React.FC = (props) => {
     <Page>
       <Box className={classes.root}>
         <Box className={classes.defaultWrapper}>
-          <Typography variant="h4" color="primary" align="center" className={classes.fontBold} paragraph>
+          <Typography
+            variant="h4"
+            color="primary"
+            align="center"
+            className={classes.fontBold}
+            paragraph
+          >
             Invite friends, earn crypto together
           </Typography>
 
           {/* Connect Wallet */}
           {!isConnectedWallet && (
-            <Box flexDirection="column" display="flex" alignItems="center" className={classes.mainComponentMargin}>
-              <Typography variant="subtitle1" align="center" className={classes.subContent} paragraph>
+            <Box
+              flexDirection="column"
+              display="flex"
+              alignItems="center"
+              className={classes.mainComponentMargin}
+            >
+              <Typography
+                variant="subtitle1"
+                align="center"
+                className={classes.subContent}
+                paragraph
+              >
                 Before referral, you need to connect your wallet
               </Typography>
               <ConnectButton onClick={() => setMenu(true, "connect")}>Connect Wallet</ConnectButton>
@@ -191,7 +207,11 @@ const Home: React.FC = (props) => {
               </Typography>
 
               <Paper className={classes.sharePannel}>
-                <Typography variant="subtitle1" color="primary" className={classes.subContentMargin2}>
+                <Typography
+                  variant="subtitle1"
+                  color="primary"
+                  className={classes.subContentMargin2}
+                >
                   My Referral Link
                 </Typography>
                 <Box className={`${classes.subContentMargin3} ${classes.sharePanelRow}`}>

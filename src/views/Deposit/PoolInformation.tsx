@@ -84,7 +84,10 @@ interface PoolItemProps {
 const PoolItem: FC<PoolItemProps> = (props) => {
   const { publickey, accountName } = props;
   const classes = useStylesForPoolItem();
-  const handleOnCopy = useCallback(() => copyToClipboard(publickey ? publickey.toBase58() : ""), [publickey]);
+  const handleOnCopy = useCallback(
+    () => copyToClipboard(publickey ? publickey.toBase58() : ""),
+    [publickey],
+  );
   return (
     <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom={2}>
       <Typography className={classes.label}>{accountName}</Typography>
@@ -106,8 +109,14 @@ export const PoolInformation: FC<PoolInformationProps> = (props) => {
     return [
       { accountName: "Swap Account", publickey: pool.publicKey },
       { accountName: "Pool token Address", publickey: pool.poolMintKey },
-      { accountName: `${pool.baseTokenInfo.symbol} Address`, publickey: new PublicKey(pool.baseTokenInfo.address) },
-      { accountName: `${pool.quoteTokenInfo.symbol} Address`, publickey: new PublicKey(pool.quoteTokenInfo.address) },
+      {
+        accountName: `${pool.baseTokenInfo.symbol} Address`,
+        publickey: new PublicKey(pool.baseTokenInfo.address),
+      },
+      {
+        accountName: `${pool.quoteTokenInfo.symbol} Address`,
+        publickey: new PublicKey(pool.quoteTokenInfo.address),
+      },
       { accountName: `${pool.baseTokenInfo.symbol} Reserve Address`, publickey: pool.base },
       { accountName: `${pool.quoteTokenInfo.symbol} Reserve Address`, publickey: pool.quote },
     ];
@@ -119,7 +128,13 @@ export const PoolInformation: FC<PoolInformationProps> = (props) => {
         <Typography className={classes.marketCondition}>ACCOUNT INFORMATION</Typography>
         <div className={classes.divider} />
         {poolItems.map((poolItem, index) => {
-          return <PoolItem key={index} publickey={poolItem.publickey} accountName={poolItem.accountName} />;
+          return (
+            <PoolItem
+              key={index}
+              publickey={poolItem.publickey}
+              accountName={poolItem.accountName}
+            />
+          );
         })}
       </Box>
     </Paper>

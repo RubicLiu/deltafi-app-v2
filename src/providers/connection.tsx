@@ -21,7 +21,10 @@ const ConnectionContext: React.Context<null | ConnectionContextValues> =
   React.createContext<null | ConnectionContextValues>(null);
 
 export function CustomConnectionProvider({ children }) {
-  const [endpoint, setEndpoint] = useLocalStorageState<string>("connectionEndpts", ENDPOINTS[0].endpoint);
+  const [endpoint, setEndpoint] = useLocalStorageState<string>(
+    "connectionEndpts",
+    ENDPOINTS[0].endpoint,
+  );
   const [network, setNetwork] = useLocalStorageState<string>("network", ENDPOINTS[0].name);
 
   const handleSetNetwork = (network: string) => {
@@ -65,7 +68,11 @@ export function useAccountInfo(
     } else {
       let previousInfo: AccountInfo<Buffer> | null = null;
       const subscriptionId = connection.onAccountChange(publicKey, (info) => {
-        if (!previousInfo || !previousInfo.data.equals(info.data) || previousInfo.lamports !== info.lamports) {
+        if (
+          !previousInfo ||
+          !previousInfo.data.equals(info.data) ||
+          previousInfo.lamports !== info.lamports
+        ) {
           previousInfo = info;
           setCache(cacheKey, info);
         }

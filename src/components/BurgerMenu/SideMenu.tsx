@@ -39,7 +39,8 @@ const SideMenu: React.FC = (props) => {
   const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
     if (
       event.type === "keydown" &&
-      ((event as React.KeyboardEvent).key === "Tab" || (event as React.KeyboardEvent).key === "Shift")
+      ((event as React.KeyboardEvent).key === "Tab" ||
+        (event as React.KeyboardEvent).key === "Shift")
     ) {
       return;
     }
@@ -62,10 +63,20 @@ const SideMenu: React.FC = (props) => {
 
   return (
     <>
-      <Drawer anchor="right" className={classes.sectionDesktop} open={menuOpen} onClose={toggleDrawer(false)}>
+      <Drawer
+        anchor="right"
+        className={classes.sectionDesktop}
+        open={menuOpen}
+        onClose={toggleDrawer(false)}
+      >
         <Box className={classes.root}>{content()}</Box>
       </Drawer>
-      <Drawer anchor="bottom" className={classes.sectionMobile} open={menuOpen} onClose={toggleDrawer(false)}>
+      <Drawer
+        anchor="bottom"
+        className={classes.sectionMobile}
+        open={menuOpen}
+        onClose={toggleDrawer(false)}
+      >
         <Box className={classes.root}>{content()}</Box>
       </Drawer>
     </>

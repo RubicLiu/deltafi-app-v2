@@ -219,7 +219,11 @@ const Deposit: React.FC = () => {
   const [method, switchMethod] = useState<string>("deposit");
   const pool = usePoolFromAddress(new PublicKey(poolAddress));
   const [base, setBase] = useState<ISwapCard>({ token: null, amount: "", amountWithSlippage: "" });
-  const [quote, setQuote] = useState<ISwapCard>({ token: null, amount: "", amountWithSlippage: "" });
+  const [quote, setQuote] = useState<ISwapCard>({
+    token: null,
+    amount: "",
+    amountWithSlippage: "",
+  });
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const baseTokenAccount = useTokenFromMint(pool?.baseTokenInfo.address);
   const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address);
@@ -264,14 +268,24 @@ const Deposit: React.FC = () => {
 
   const basePercent = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.basePercent(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
+      return pmm.basePercent(
+        basePrice,
+        quotePrice,
+        pool.baseTokenInfo.decimals,
+        pool.quoteTokenInfo.decimals,
+      );
     }
     return null;
   }, [pmm, basePrice, quotePrice, pool]);
 
   const quotePercent = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.quotePercent(basePrice, quotePrice, pool.quoteTokenInfo.decimals, pool.baseTokenInfo.decimals);
+      return pmm.quotePercent(
+        basePrice,
+        quotePrice,
+        pool.quoteTokenInfo.decimals,
+        pool.baseTokenInfo.decimals,
+      );
     }
     return null;
   }, [pmm, basePrice, quotePrice, pool]);
@@ -285,7 +299,11 @@ const Deposit: React.FC = () => {
 
   const [baseShare, quoteShare] = useMemo(() => {
     if (share && pmm) {
-      return pmm.amountFromShare(share.toNumber(), pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
+      return pmm.amountFromShare(
+        share.toNumber(),
+        pool.baseTokenInfo.decimals,
+        pool.quoteTokenInfo.decimals,
+      );
     }
     return [null, null];
   }, [share, pmm, pool]);
@@ -302,7 +320,12 @@ const Deposit: React.FC = () => {
 
   const tvl = useMemo(() => {
     if (pmm && basePrice && quotePrice) {
-      return pmm.tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals);
+      return pmm.tvl(
+        basePrice,
+        quotePrice,
+        pool.baseTokenInfo.decimals,
+        pool.quoteTokenInfo.decimals,
+      );
     }
     return new BigNumber(0);
   }, [pmm, basePrice, quotePrice, pool]);
@@ -348,8 +371,12 @@ const Deposit: React.FC = () => {
           basePricePythKey: pool.pythBase,
           quotePricePythKey: pool.pythQuote,
           depositData: {
-            amountTokenA: BigInt(exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString()),
-            amountTokenB: BigInt(exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString()),
+            amountTokenA: BigInt(
+              exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString(),
+            ),
+            amountTokenB: BigInt(
+              exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString(),
+            ),
             amountMintMin: BigInt(0),
           },
           config,
@@ -386,7 +413,13 @@ const Deposit: React.FC = () => {
     } finally {
       setState((state) => ({ ...state, open: true }));
       setIsProcessing(false);
-      dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
+      dispatch(
+        fetchFarmUsersThunk({
+          connection,
+          config: MARKET_CONFIG_ADDRESS,
+          walletAddress: walletPubkey,
+        }),
+      );
     }
   }, [
     connection,
@@ -442,10 +475,14 @@ const Deposit: React.FC = () => {
                 .toString(),
             ),
             minAmountTokenA: BigInt(
-              exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue(BigNumber.ROUND_FLOOR).toString(),
+              exponentiate(base.amount, pool.baseTokenInfo.decimals)
+                .integerValue(BigNumber.ROUND_FLOOR)
+                .toString(),
             ),
             minAmountTokenB: BigInt(
-              exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue(BigNumber.ROUND_FLOOR).toString(),
+              exponentiate(quote.amount, pool.quoteTokenInfo.decimals)
+                .integerValue(BigNumber.ROUND_FLOOR)
+                .toString(),
             ),
           },
           config,
@@ -483,7 +520,13 @@ const Deposit: React.FC = () => {
     } finally {
       setState({ ...state, open: true });
       setIsProcessing(false);
-      dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
+      dispatch(
+        fetchFarmUsersThunk({
+          connection,
+          config: MARKET_CONFIG_ADDRESS,
+          walletAddress: walletPubkey,
+        }),
+      );
     }
   }, [
     connection,
@@ -515,7 +558,13 @@ const Deposit: React.FC = () => {
 
       if (pool) {
         if (method === "deposit") {
-          const outAmount = getOutAmount(pool, card.amount, card.token.address, quote.token.address, 0.0);
+          const outAmount = getOutAmount(
+            pool,
+            card.amount,
+            card.token.address,
+            quote.token.address,
+            0.0,
+          );
           setQuote({
             ...quote,
             amount: isNaN(outAmount) ? "" : Number(outAmount).toString(),
@@ -523,7 +572,9 @@ const Deposit: React.FC = () => {
         } else {
           if (share && card.amount) {
             setWithdrawPercentage(
-              pmm.baseShareRate(exponentiate(card.amount, card.token.decimals).toNumber(), share).toNumber() * 100,
+              pmm
+                .baseShareRate(exponentiate(card.amount, card.token.decimals).toNumber(), share)
+                .toNumber() * 100,
             );
             setQuote({
               ...quote,
@@ -546,7 +597,13 @@ const Deposit: React.FC = () => {
 
       if (pool) {
         if (method === "deposit") {
-          const outAmount = getOutAmount(pool, card.amount, card.token.address, base.token.address, 0.0);
+          const outAmount = getOutAmount(
+            pool,
+            card.amount,
+            card.token.address,
+            base.token.address,
+            0.0,
+          );
           setBase({
             ...base,
             amount: isNaN(outAmount) ? "" : Number(outAmount).toString(),
@@ -554,7 +611,9 @@ const Deposit: React.FC = () => {
         } else {
           if (share && card.amount) {
             setWithdrawPercentage(
-              pmm.quoteShareRate(exponentiate(card.amount, card.token.decimals).toNumber(), share).toNumber() * 100,
+              pmm
+                .quoteShareRate(exponentiate(card.amount, card.token.decimals).toNumber(), share)
+                .toNumber() * 100,
             );
             setBase({ ...base, amount: pmm.baseFromQuote(parseFloat(card.amount)).toString() });
           } else if (card.amount === "") {
@@ -594,7 +653,11 @@ const Deposit: React.FC = () => {
     if (!transactionResult.status) {
       return (
         <Box display="flex" alignItems="center">
-          <img src={"/images/snack-fail.svg"} alt="snack-status-icon" className={classes.snackBarIcon} />
+          <img
+            src={"/images/snack-fail.svg"}
+            alt="snack-status-icon"
+            className={classes.snackBarIcon}
+          />
           <Box>
             <Typography variant="h6" color="primary">
               Transaction failed(try again later)
@@ -613,14 +676,18 @@ const Deposit: React.FC = () => {
 
     return (
       <Box display="flex" alignItems="center">
-        <img src={"/images/snack-success.svg"} alt="snack-status-icon" className={classes.snackBarIcon} />
+        <img
+          src={"/images/snack-success.svg"}
+          alt="snack-status-icon"
+          className={classes.snackBarIcon}
+        />
         <Box>
           <Typography variant="body1" color="primary">
-            {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(base.amount).toFixed(6)} ${
-              base.token.symbol
-            } and ${Number(quote.amount).toFixed(6)} ${quote.token.symbol} for ${base.token.symbol}-${
+            {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(base.amount).toFixed(
+              6,
+            )} ${base.token.symbol} and ${Number(quote.amount).toFixed(6)} ${
               quote.token.symbol
-            } LP`}
+            } for ${base.token.symbol}-${quote.token.symbol} LP`}
           </Typography>
           <Box display="flex" alignItems="center">
             <Typography variant="subtitle2" color="primary">
@@ -695,7 +762,10 @@ const Deposit: React.FC = () => {
       );
     } else {
       if (base && quote && baseShare && quoteShare) {
-        if (baseShare.isLessThan(new BigNumber(base.amount)) || quoteShare.isLessThan(new BigNumber(quote.amount))) {
+        if (
+          baseShare.isLessThan(new BigNumber(base.amount)) ||
+          quoteShare.isLessThan(new BigNumber(quote.amount))
+        ) {
           return (
             <ConnectButton size="large" fullWidth disabled>
               Insufficient balance
@@ -789,7 +859,10 @@ const Deposit: React.FC = () => {
           </Box>
           {method === "withdraw" ? (
             <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <WithdrawSelectCard percentage={withdrawPercentage} onUpdatePercentage={handleWithdrawSlider} />
+              <WithdrawSelectCard
+                percentage={withdrawPercentage}
+                onUpdatePercentage={handleWithdrawSlider}
+              />
               <WithdrawCard
                 card={base}
                 handleChangeCard={handleTokenFromInput}
@@ -831,9 +904,12 @@ const Deposit: React.FC = () => {
                       className={clx(classes.coinIcon, classes.statsIcon)}
                     />
                     <Typography className={classes.label}>
-                      {`${exponentiatedBy(pool.poolState.baseReserve, pool.baseTokenInfo.decimals).toFormat(2)} ${
-                        pool.baseTokenInfo.symbol
-                      }(${basePercent?.toFormat(2) || "-"}%)`}
+                      {`${exponentiatedBy(
+                        pool.poolState.baseReserve,
+                        pool.baseTokenInfo.decimals,
+                      ).toFormat(2)} ${pool.baseTokenInfo.symbol}(${
+                        basePercent?.toFormat(2) || "-"
+                      }%)`}
                     </Typography>
                   </Box>
                   <Box display="flex">
@@ -843,16 +919,21 @@ const Deposit: React.FC = () => {
                       className={clx(classes.coinIcon, classes.statsIcon)}
                     />
                     <Typography className={classes.label}>
-                      {`${exponentiatedBy(pool.poolState.quoteReserve, pool.quoteTokenInfo.decimals).toFormat(2)} ${
-                        pool.quoteTokenInfo.symbol
-                      }(${quotePercent?.toFormat(2) || "-"}%)`}
+                      {`${exponentiatedBy(
+                        pool.poolState.quoteReserve,
+                        pool.quoteTokenInfo.decimals,
+                      ).toFormat(2)} ${pool.quoteTokenInfo.symbol}(${
+                        quotePercent?.toFormat(2) || "-"
+                      }%)`}
                     </Typography>
                   </Box>
                 </Box>
               </Box>
               <Box display="flex" justifyContent="space-between" marginBottom={2}>
                 <Typography className={classes.label}>Total Reserves</Typography>
-                <Typography className={classes.label}>{convertDollar(tvl.toFixed(2).toString())}</Typography>
+                <Typography className={classes.label}>
+                  {convertDollar(tvl.toFixed(2).toString())}
+                </Typography>
               </Box>
             </Box>
           </Box>

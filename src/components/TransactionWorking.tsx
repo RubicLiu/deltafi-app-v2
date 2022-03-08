@@ -31,7 +31,11 @@ const TransactionWorking = ({ ...props }) => {
     <>
       <TransactionDiv>
         <TransactionImg src={"/images/transaction-working.png"} alt="Transaction Working" />
-        <Text color={isDark ? "#EBECF1" : "#88809C"} className="description" fontFamily="'Inter', sans-serif">
+        <Text
+          color={isDark ? "#EBECF1" : "#88809C"}
+          className="description"
+          fontFamily="'Inter', sans-serif"
+        >
           We are working on your transaction...
         </Text>
       </TransactionDiv>

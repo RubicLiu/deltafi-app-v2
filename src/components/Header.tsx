@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { AppBar, makeStyles, Theme, Container, Toolbar, Link, AppBarProps } from "@material-ui/core";
+import {
+  AppBar,
+  makeStyles,
+  Theme,
+  Container,
+  Toolbar,
+  Link,
+  AppBarProps,
+} from "@material-ui/core";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 import { ConnectButton, TabMenu, WalletButton } from "components";
@@ -89,7 +97,10 @@ const Header: React.FC = (props) => {
   useEffect(() => {
     const onScroll = () => {
       setShrunk((isShrunk) => {
-        if (!isShrunk && (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50)) {
+        if (
+          !isShrunk &&
+          (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50)
+        ) {
           return true;
         }
 
@@ -127,7 +138,11 @@ const Header: React.FC = (props) => {
           {isConnectedWallet ? (
             <WalletButton />
           ) : (
-            <ConnectButton size="small" onClick={() => setMenu(true, "connect")} className={classes.ctaButton}>
+            <ConnectButton
+              size="small"
+              onClick={() => setMenu(true, "connect")}
+              className={classes.ctaButton}
+            >
               Connect wallet
             </ConnectButton>
           )}

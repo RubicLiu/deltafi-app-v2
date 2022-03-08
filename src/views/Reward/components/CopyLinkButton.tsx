@@ -28,7 +28,13 @@ const CopyLinkButton: React.FC<ButtonProps> = (props) => {
 
   return (
     <>
-      <Button {...otherProps} variant="contained" color="primary" className={classes.button} onClick={props.onClick}>
+      <Button
+        {...otherProps}
+        variant="contained"
+        color="primary"
+        className={classes.button}
+        onClick={props.onClick}
+      >
         {children}
       </Button>
     </>

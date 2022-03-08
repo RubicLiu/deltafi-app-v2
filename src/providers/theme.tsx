@@ -1,6 +1,11 @@
 import React, { useMemo, useState, useContext } from "react";
 import { ThemeProvider as SCThemeProvider } from "styled-components";
-import { CssBaseline, ThemeProvider as MuiThemeProvider, StylesProvider, Theme } from "@material-ui/core";
+import {
+  CssBaseline,
+  ThemeProvider as MuiThemeProvider,
+  StylesProvider,
+  Theme,
+} from "@material-ui/core";
 import { darkTheme, lightTheme } from "theme";
 import GlobalStyle from "style/Global";
 

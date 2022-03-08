@@ -13,7 +13,12 @@ export function getSwapOutAmount(
 ) {
   const { poolState, fees, baseTokenInfo, quoteTokenInfo } = pool;
   const pmmHelper = new PMMHelper();
-  const { tradeFeeNumerator, tradeFeeDenominator, adminTradeFeeNumerator, adminTradeFeeDenominator } = fees;
+  const {
+    tradeFeeNumerator,
+    tradeFeeDenominator,
+    adminTradeFeeNumerator,
+    adminTradeFeeDenominator,
+  } = fees;
   const tradeFeeNumerator1 = new BigNumber(tradeFeeNumerator.toString());
   const tradeFeeDenominator1 = new BigNumber(tradeFeeDenominator.toString());
   const adminFeeNumerator1 = new BigNumber(adminTradeFeeNumerator.toString());
@@ -44,7 +49,12 @@ export function getSwapOutAmount(
 
     const afterPrice = quoteBalance.dividedBy(baseBalance);
 
-    const priceImpact = beforePrice.minus(afterPrice).abs().dividedBy(beforePrice).multipliedBy(100).toNumber();
+    const priceImpact = beforePrice
+      .minus(afterPrice)
+      .abs()
+      .dividedBy(beforePrice)
+      .multipliedBy(100)
+      .toNumber();
     return {
       amountIn: parseFloat(amount),
       amountOut: quoteAmount.toNumber(),
@@ -63,7 +73,12 @@ export function getSwapOutAmount(
 
     const afterPrice = quoteBalance.dividedBy(baseBalance);
 
-    const priceImpact = beforePrice.minus(afterPrice).abs().dividedBy(beforePrice).multipliedBy(100).toNumber();
+    const priceImpact = beforePrice
+      .minus(afterPrice)
+      .abs()
+      .dividedBy(beforePrice)
+      .multipliedBy(100)
+      .toNumber();
     return {
       amountIn: parseFloat(amount),
       amountOut: baseAmount.toNumber(),

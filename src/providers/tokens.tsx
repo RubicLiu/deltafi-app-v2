@@ -28,9 +28,19 @@ export const ACCOUNT_LAYOUT = struct<TokenAccountInfo>([
   blob(93),
 ]);
 
-export const MINT_LAYOUT = struct<MintInfo>([blob(36), u64("supply"), u8("decimals"), u8("initialized"), blob(36)]);
+export const MINT_LAYOUT = struct<MintInfo>([
+  blob(36),
+  u64("supply"),
+  u8("decimals"),
+  u8("initialized"),
+  blob(36),
+]);
 
-export function parseTokenAccountData(data: Buffer): { mint: PublicKey; owner: PublicKey; amount: BigNumber } {
+export function parseTokenAccountData(data: Buffer): {
+  mint: PublicKey;
+  owner: PublicKey;
+  amount: BigNumber;
+} {
   let { mint, owner, amount } = ACCOUNT_LAYOUT.decode(data);
   return {
     mint: new PublicKey(mint),
@@ -229,7 +239,9 @@ export function findTokenAccountByMint(
   walletPubkey: PublicKey,
   mintAddress: string,
 ): TokenAccount | null {
-  const targetTokens = tokens.filter((token) => token.effectiveMint.toBase58() === mintAddress && token.account);
+  const targetTokens = tokens.filter(
+    (token) => token.effectiveMint.toBase58() === mintAddress && token.account,
+  );
 
   if (!targetTokens || targetTokens.length === 0) {
     return null;

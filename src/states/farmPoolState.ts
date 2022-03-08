@@ -20,16 +20,19 @@ type FetchFarmPoolsThunkArg = {
   connection: Connection;
 };
 
-export const fetchFarmPoolsThunk = createAsyncThunk("farmPool/fetchFarmPools", async (arg: FetchFarmPoolsThunkArg) => {
-  const farmPoolKeyToFarmPoolInfo: FarmPoolKeyToFarmPoolInfo = {};
-  const farmPools = await getFarmPools(arg.connection);
-  for (const farmPool of farmPools) {
-    farmPoolKeyToFarmPoolInfo[farmPool.publicKey.toBase58()] = farmPool;
-  }
-  return {
-    farmPoolKeyToFarmPoolInfo,
-  };
-});
+export const fetchFarmPoolsThunk = createAsyncThunk(
+  "farmPool/fetchFarmPools",
+  async (arg: FetchFarmPoolsThunkArg) => {
+    const farmPoolKeyToFarmPoolInfo: FarmPoolKeyToFarmPoolInfo = {};
+    const farmPools = await getFarmPools(arg.connection);
+    for (const farmPool of farmPools) {
+      farmPoolKeyToFarmPoolInfo[farmPool.publicKey.toBase58()] = farmPool;
+    }
+    return {
+      farmPoolKeyToFarmPoolInfo,
+    };
+  },
+);
 
 export const farmPoolReducer = createReducer(initialState, (builder) => {
   builder.addCase(fetchFarmPoolsThunk.fulfilled, (state, action) => {

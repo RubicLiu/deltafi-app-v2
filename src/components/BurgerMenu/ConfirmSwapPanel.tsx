@@ -106,7 +106,9 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
           <Typography color="textSecondary" variant="body2">
             Estimated Received
           </Typography>
-          <Typography>{`${fixedNumber(swapOut.amountOut) ?? 0} ${data?.tokenTo.token.symbol}`}</Typography>
+          <Typography>{`${fixedNumber(swapOut.amountOut) ?? 0} ${
+            data?.tokenTo.token.symbol
+          }`}</Typography>
         </Box>
         <Box>
           <Box display="flex" justifyContent="space-between" className={classes.row}>
@@ -117,7 +119,9 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
                 alt={`${data?.tokenFrom.token.symbol} coin`}
                 className={classes.img}
               />
-              <Typography>{`${data?.tokenFrom.amount ?? 0} ${data?.tokenFrom.token.symbol}`}</Typography>
+              <Typography>{`${data?.tokenFrom.amount ?? 0} ${
+                data?.tokenFrom.token.symbol
+              }`}</Typography>
             </Box>
           </Box>
           <Box display="flex" justifyContent="space-between" className={classes.row}>
@@ -128,7 +132,9 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
                 alt={`${data?.tokenFrom.token.symbol} coin`}
                 className={classes.img}
               />
-              <Typography>{`${fixedNumber(swapOut?.fee) ?? 0} ${data?.tokenTo.token.symbol}`}</Typography>
+              <Typography>{`${fixedNumber(swapOut?.fee) ?? 0} ${
+                data?.tokenTo.token.symbol
+              }`}</Typography>
             </Box>
           </Box>
         </Box>

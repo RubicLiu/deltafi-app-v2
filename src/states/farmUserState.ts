@@ -24,16 +24,19 @@ type FetchFarmUsersThunkArg = {
   walletAddress: PublicKey;
 };
 
-export const fetchFarmUsersThunk = createAsyncThunk("farm/fetchFarmUsers", async (arg: FetchFarmUsersThunkArg) => {
-  const farmUsers = await getFarmUsers(arg.connection, arg.walletAddress);
-  const farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser = {};
-  for (const farmUser of farmUsers) {
-    farmPoolKeyToFarmUser[farmUser.farmPoolKey.toBase58()] = farmUser;
-  }
-  return {
-    farmPoolKeyToFarmUser,
-  };
-});
+export const fetchFarmUsersThunk = createAsyncThunk(
+  "farm/fetchFarmUsers",
+  async (arg: FetchFarmUsersThunkArg) => {
+    const farmUsers = await getFarmUsers(arg.connection, arg.walletAddress);
+    const farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser = {};
+    for (const farmUser of farmUsers) {
+      farmPoolKeyToFarmUser[farmUser.farmPoolKey.toBase58()] = farmUser;
+    }
+    return {
+      farmPoolKeyToFarmUser,
+    };
+  },
+);
 
 export const farmUserReducer = createReducer(initialState, (builder) => {
   builder.addCase(fetchFarmUsersThunk.fulfilled, (state, action) => {

@@ -2,7 +2,9 @@ import { PublicKey } from "@solana/web3.js";
 import React, { useContext, createContext, useState, useCallback } from "react";
 import { ModalContextInfo, ModalInfo } from "./types";
 
-const ModalContext: React.Context<null | ModalContextInfo> = createContext<null | ModalContextInfo>(null);
+const ModalContext: React.Context<null | ModalContextInfo> = createContext<null | ModalContextInfo>(
+  null,
+);
 
 export const ModalProvider = ({ children }) => {
   const [modalInfo, setMenuOpen] = useState<ModalInfo>({

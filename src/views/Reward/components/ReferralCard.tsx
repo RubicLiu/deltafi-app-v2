@@ -30,7 +30,12 @@ const ReferralCard: React.FC<CardProps> = (props) => {
   const { caption, detail, image } = props;
   return (
     <Paper className={classes.root}>
-      <Box display="flex" justifyContent="center" alignItems="center" className={classes.imageContainer}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        className={classes.imageContainer}
+      >
         <Img src={image} alt="referral_intro_card" />
       </Box>
       <Box>

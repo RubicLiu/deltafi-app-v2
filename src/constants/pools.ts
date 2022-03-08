@@ -9,13 +9,15 @@ export interface PoolSchema {
   quote: string;
 }
 
-export const pools: PoolSchema[] = deployConfig.poolInfo.map(({ name, swap, mint, base, quote }) => ({
-  name,
-  address: new PublicKey(swap),
-  mintAddress: new PublicKey(mint),
-  base,
-  quote,
-}));
+export const pools: PoolSchema[] = deployConfig.poolInfo.map(
+  ({ name, swap, mint, base, quote }) => ({
+    name,
+    address: new PublicKey(swap),
+    mintAddress: new PublicKey(mint),
+    base,
+    quote,
+  }),
+);
 
 export const listSymbols = (pools: PoolSchema[]) => {
   let list = [];

@@ -49,7 +49,8 @@ const Home: React.FC = (props) => {
         You are accessing DeltaFi from a restricted territory.
       </Typography>
       <Typography variant="h6" align="center" paragraph className={classes.content}>
-        Unfortunately, this means you will not be allowed to connect your wallet and use DeltaFi Protocol.
+        Unfortunately, this means you will not be allowed to connect your wallet and use DeltaFi
+        Protocol.
       </Typography>
       <Box display="flex" className={classes.socialLinks}>
         <Link

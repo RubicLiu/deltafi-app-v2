@@ -3,7 +3,11 @@ import BN from "bn.js";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
 import { PoolInfo, ExTokenAccount, MarketConfig } from "providers/types";
-import { createApproveInstruction, createWithdrawInstruction, WithdrawData } from "lib/instructions";
+import {
+  createApproveInstruction,
+  createWithdrawInstruction,
+  WithdrawData,
+} from "lib/instructions";
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from ".";
 import { SWAP_PROGRAM_ID } from "constants/index";
 // import { createFarmUser } from "./farm";
@@ -58,9 +62,12 @@ export async function withdraw({
       tmpAccountLamport,
       walletPubkey,
     );
-    createWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
-    initializeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
-    closeWrappedTokenAccountTransaction = nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
+    createWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
+    initializeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
+    closeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
 
     if (baseSOL) {
       baseTokenRef = tempAccountRefKeyPair.publicKey;
