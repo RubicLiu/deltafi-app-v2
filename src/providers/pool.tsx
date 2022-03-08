@@ -13,7 +13,7 @@ import { loadAccount } from "utils/account";
 const EntirePoolsContext: React.Context<null | EntirePoolsContextValues> =
   createContext<null | EntirePoolsContextValues>(null);
 
-const getPoolFromSwapInfoAccount = (schema, publicKey, poolInfo) => {
+export const getPoolFromSwapInfoAccount = (schema, publicKey, poolInfo) => {
   const { data } = parseSwapInfo(poolInfo as AccountInfo<Buffer>);
   return {
     name: schema.name,

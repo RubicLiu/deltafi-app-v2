@@ -21,6 +21,7 @@ import { deployConfig } from "constants/deployConfig";
 import { useDispatch } from "react-redux";
 import { fetchFarmPoolsThunk } from "states/farmPoolState";
 import { fetchFarmUsersThunk } from "states/farmUserState";
+import { fetchPoolsThunk } from "states/poolState";
 import { fetchPythDataThunk } from "states/PythState";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
@@ -61,6 +62,8 @@ const App: React.FC = () => {
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
+  // TODO(ypeng): Use pool state to replace provider.
+  const enablePoolState = false;
   // TODO(ypeng): Use pyth state to replace provider.
   const enablePythState = false;
 
@@ -91,6 +94,19 @@ const App: React.FC = () => {
     }, 60 * 1000);
     return () => clearInterval(interval);
   }, [connection, dispatch]);
+
+  useEffect(() => {
+    if (!enablePoolState) {
+      return;
+    }
+
+    dispatch(fetchPoolsThunk({ connection }));
+    // Refresh the farm pool every 1 minute.
+    const interval = setInterval(() => {
+      dispatch(fetchPoolsThunk({ connection }));
+    }, 60 * 1000);
+    return () => clearInterval(interval);
+  }, [connection, dispatch, enablePoolState]);
 
   useEffect(() => {
     const referrer: string = new URLSearchParams(window.location.search).get("referrer");

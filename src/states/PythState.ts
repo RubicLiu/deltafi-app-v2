@@ -22,7 +22,6 @@ export const fetchPythDataThunk = createAsyncThunk("pyth/fetchPythData", async (
   console.info("found pyth data " + pythDataList.length);
   for (const pythData of pythDataList) {
     symbolToPythData[pythData.symbol] = pythData;
-    console.info(pythData);
   }
   return {
     symbolToPythData,
