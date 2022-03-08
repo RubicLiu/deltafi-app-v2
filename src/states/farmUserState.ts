@@ -2,11 +2,11 @@ import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { AccountInfo, PublicKey, Connection } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 
+import { deployConfig } from "constants/deployConfig";
 import { SWAP_PROGRAM_ID } from "constants/index";
-import { getFilteredProgramAccounts } from "utils/account";
 import { FarmUserFlat, FarmUserLayout } from "lib/state/farm";
-import { FARM_USER_SIZE } from "lib/state/farm";
 import { StakeAccount } from "providers/types";
+import { getMultipleAccounts } from "utils/account";
 
 type FarmPoolKeyToFarmUser = Record<string, FarmUserFlat>;
 
@@ -25,7 +25,7 @@ type FetchFarmUsersThunkArg = {
 };
 
 export const fetchFarmUsersThunk = createAsyncThunk("farm/fetchFarmUsers", async (arg: FetchFarmUsersThunkArg) => {
-  const farmUsers = await getFarmUsers(arg.connection, arg.config, arg.walletAddress);
+  const farmUsers = await getFarmUsers(arg.connection, arg.walletAddress);
   const farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser = {};
   for (const farmUser of farmUsers) {
     farmPoolKeyToFarmUser[farmUser.farmPoolKey.toBase58()] = farmUser;
@@ -53,34 +53,32 @@ const parseFarmUser = (publicKey: PublicKey, info: AccountInfo<Buffer>) => {
   };
 };
 
-function getStakeFilters(config: PublicKey, walletAddress: PublicKey) {
-  return [
-    {
-      memcmp: {
-        offset: 1,
-        bytes: config.toBase58(),
-      },
-    },
-    {
-      memcmp: {
-        // isInitialized + config key + farm pool key
-        offset: 33 + 32,
-        bytes: walletAddress.toBase58(),
-      },
-    },
-    {
-      dataSize: FARM_USER_SIZE,
-    },
-  ];
-}
+async function getFarmUsers(connection: Connection, walletAddress: PublicKey) {
+  const poolInfoList = deployConfig.poolInfo;
+  const farmUserAddressList = [];
+  for (const poolConfig of poolInfoList) {
+    const seed = ("farmUser" + poolConfig.farm).substring(0, 32);
+    const publicKey = await PublicKey.createWithSeed(walletAddress, seed, SWAP_PROGRAM_ID);
+    farmUserAddressList.push(publicKey);
+  }
+  const farmUserInfos = await getMultipleAccounts(connection, farmUserAddressList, "confirmed");
 
-async function getFarmUsers(connection: Connection, config: PublicKey, walletAddress: PublicKey) {
-  const stakeFilters = getStakeFilters(config, walletAddress);
-  const farmUserAccountInfos = await getFilteredProgramAccounts(connection, SWAP_PROGRAM_ID, stakeFilters);
-  return farmUserAccountInfos
-    .map(({ publicKey, accountInfo }) => ({ publicKey, farmUserInfo: parseFarmUser(publicKey, accountInfo) }))
-    .filter(({ farmUserInfo }) => !!farmUserInfo)
-    .map(({ farmUserInfo }) => farmUserInfo);
+  const farmUsers = [];
+  for (let i = 0; i < farmUserInfos.keys.length; i++) {
+    const key = farmUserInfos.keys[i];
+    const accountInfo = farmUserInfos.array[i];
+    if (!accountInfo) {
+      continue;
+    }
+
+    const farmUserInfo = parseFarmUser(new PublicKey(key), accountInfo as AccountInfo<Buffer>);
+    if (!farmUserInfo) {
+      continue;
+    }
+
+    farmUsers.push(farmUserInfo);
+  }
+  return farmUsers;
 }
 
 export function toFarmUserPosition(farmUser: FarmUserFlat) {

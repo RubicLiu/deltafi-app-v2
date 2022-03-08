@@ -352,8 +352,6 @@ const Deposit: React.FC = () => {
           farmPool: farmPoolKey,
           farmUser: farmUser?.publicKey,
         });
-
-        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
       } else {
         setIsProcessing(false);
         return null;
@@ -376,15 +374,15 @@ const Deposit: React.FC = () => {
         base,
         quote,
       });
-      setState((state) => ({ ...state, open: true }));
-      setIsProcessing(false);
     } catch (e) {
       console.error("error", e);
       setBase((prevBase) => ({ ...prevBase, amount: "" }));
       setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
       setTransactionResult({ status: false });
+    } finally {
       setState((state) => ({ ...state, open: true }));
       setIsProcessing(false);
+      dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
     }
   }, [
     connection,
@@ -450,8 +448,6 @@ const Deposit: React.FC = () => {
           farmPool: farmPoolKey,
           farmUser: farmUser?.publicKey,
         });
-
-        dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
       } else {
         setIsProcessing(false);
         return null;
@@ -474,16 +470,16 @@ const Deposit: React.FC = () => {
         base,
         quote,
       });
-      setState({ ...state, open: true });
-      setIsProcessing(false);
     } catch (e) {
       console.error("error", e);
       setBase((prevBase) => ({ ...prevBase, amount: "", lastUpdate: Date.now() }));
       setQuote((prevQuote) => ({ ...prevQuote, amount: "", lastUpdate: Date.now() }));
       setWithdrawPercentage(0);
       setTransactionResult({ status: false });
+    } finally {
       setState({ ...state, open: true });
       setIsProcessing(false);
+      dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress: walletPubkey }));
     }
   }, [
     connection,
