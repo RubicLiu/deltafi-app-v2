@@ -42,6 +42,52 @@
         "farm": "CVZtj1kUya68WAPJfUCruqYn5f8WjqSyK2Qbj2DUEiUk",
         "token": "2izFgmBTTdBsrqkpxoQX55Caw3yHTy513KWdDSstBWGo"
       }
+    ],
+    "tokenInfo": [
+      {
+        "pyth": {
+          "usdProductName": "Crypto.USDC/USD",
+          "fixedUsdPrice": 1,
+          "price": "GBvYgUMCt4nvycUZMEBpHyLEXGbKjr6G9HjMjmLyf6mA",
+          "product": "HrZuzZTtEZ55A5t3FAvXJ1nPdGDR1mQJDwmPQdVk5NHp"
+        },
+        "mint": "2oViQjomgFonQsT4V2G9hfebciMJcLuKJUMPoXKgKFNa",
+        "symbol": "USDC",
+        "decimals": 6
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.USDT/USD",
+          "fixedUsdPrice": 1,
+          "price": "GBvYgUMCt4nvycUZMEBpHyLEXGbKjr6G9HjMjmLyf6mA",
+          "product": "HrZuzZTtEZ55A5t3FAvXJ1nPdGDR1mQJDwmPQdVk5NHp"
+        },
+        "mint": "Eoaf9mixhbXoMUMRLY5NjYvsF2hcDFtdwFedzKbvQZRf",
+        "symbol": "USDT",
+        "decimals": 6
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.SOL/USD",
+          "fixedUsdPrice": 87,
+          "price": "7VJsBtJzgTftYzEeooSDYyjKXvYRWJHdwvbwfBvTg9K",
+          "product": "GcnU8V2WKq5QXLhJwBQdt2ankU6GRGh6b1bLCxdykWnP"
+        },
+        "mint": "So11111111111111111111111111111111111111112",
+        "symbol": "SOL",
+        "decimals": 9
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.SRM/USD",
+          "fixedUsdPrice": 2,
+          "price": "74Bak9eMFPvDLHcnjCpvDWvBSGNd8sCThVe3WmDf7sZW",
+          "product": "GjAC9vA72i6UfJwwgmCBCU9B4Easmmd5wTKe48F3kfYA"
+        },
+        "mint": "59KfLKLwF2aT3YodgrFWzENYZw2zHy5AQcksDFVbNdku",
+        "symbol": "SRM",
+        "decimals": 6
+      }
     ]
   },
   "mainnet-prod": {
@@ -91,6 +137,48 @@
         "token": "7bMmkfke5tL86rRTofxuuHdZqzpk2PXwNVsEv2HzZfEc",
         "decimals": 6
       }
+    ],
+    "tokenInfo": [
+      {
+        "pyth": {
+          "usdProductName": "Crypto.USDC/USD",
+          "price": "Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD",
+          "product": "8GWTTbNiXdmyZREXbjsZBmCRuzdPrW55dnZGDkTRjWvb"
+        },
+        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "symbol": "USDC",
+        "decimals": 6
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.SOL/USD",
+          "price": "H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG",
+          "product": "ALP8SdU9oARYVLgLR7LrqMNCYBnhtnQz1cj6bwgwQmgj"
+        },
+        "mint": "So11111111111111111111111111111111111111112",
+        "symbol": "SOL",
+        "decimals": 9
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.SRM/USD",
+          "price": "3NBReDRTLKMQEKiLD5tGcx4kXbTf88b7f2xLS9UuGjym",
+          "product": "6T1eJbKWyhZXEjmuBej9gPk3SRTagzrEQovCSwAWD57P"
+        },
+        "mint": "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt",
+        "symbol": "SRM",
+        "decimals": 6
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.USDT/USD",
+          "price": "3vxLXJqLqF3JG5TCbYycbKWRBbCJQLxQmBGCkyqEEefL",
+          "product": "Av6XyAMJnyi68FdsKSPYgzfXGjYrrt6jcAMwtvzLCqaM"
+        },
+        "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "symbol": "USDT",
+        "decimals": 6
+      }
     ]
   },
   "mainnet-test": {
@@ -138,6 +226,48 @@
         "mint": "8JSg5CLxjKcA3fUHbvCG4dMrqR8RMnzYdjeDWHzQjnJJ",
         "farm": "5QYn31EzSuBRZrmS2ZQD2DKhAAPgGS6pLEwkL2E1pwag",
         "token": "2aD8XdumqTxSYpo9snywGMikskPEvk7X12HyQTjegZHq",
+        "decimals": 6
+      }
+    ],
+    "tokenInfo": [
+      {
+        "pyth": {
+          "usdProductName": "Crypto.USDC/USD",
+          "price": "Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD",
+          "product": "8GWTTbNiXdmyZREXbjsZBmCRuzdPrW55dnZGDkTRjWvb"
+        },
+        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "symbol": "USDC",
+        "decimals": 6
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.SOL/USD",
+          "price": "H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG",
+          "product": "ALP8SdU9oARYVLgLR7LrqMNCYBnhtnQz1cj6bwgwQmgj"
+        },
+        "mint": "So11111111111111111111111111111111111111112",
+        "symbol": "SOL",
+        "decimals": 9
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.SRM/USD",
+          "price": "3NBReDRTLKMQEKiLD5tGcx4kXbTf88b7f2xLS9UuGjym",
+          "product": "6T1eJbKWyhZXEjmuBej9gPk3SRTagzrEQovCSwAWD57P"
+        },
+        "mint": "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt",
+        "symbol": "SRM",
+        "decimals": 6
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.USDT/USD",
+          "price": "3vxLXJqLqF3JG5TCbYycbKWRBbCJQLxQmBGCkyqEEefL",
+          "product": "Av6XyAMJnyi68FdsKSPYgzfXGjYrrt6jcAMwtvzLCqaM"
+        },
+        "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "symbol": "USDT",
         "decimals": 6
       }
     ]

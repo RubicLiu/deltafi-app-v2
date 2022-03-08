@@ -1,17 +1,12 @@
 import { useEffect, useMemo, useState, createContext, useContext } from "react";
 import { AccountInfo, PublicKey } from "@solana/web3.js";
-import { parseMappingData, parsePriceData, parseProductData, PriceData } from "@pythnetwork/client";
+import { parsePriceData, parseProductData, PriceData } from "@pythnetwork/client";
 import { useConnection } from "@solana/wallet-adapter-react";
 
 import { getMultipleAccounts } from "utils/account";
 import { PythContextValue } from "./types";
 
 import { deployConfig } from "../constants/deployConfig";
-// TODO: update pyth pubkey
-const oraclePublicKey = {
-  "mainnet-beta": "AHtgzX45WTKfkPG53L6WYhGEXwQkN1BVknET3sVsLL8J",
-  testnet: "AFmdnt9ng1uVxqCmqwQJDAYC5cKTkw8gJKSM5PnzuF6z",
-}[deployConfig.network];
 
 const BAD_SYMBOLS = ["BCH/USD", "LTC/USD"];
 
@@ -54,44 +49,24 @@ export function PythProvider({ children }) {
     let cancelled = false;
     const subscription_ids: number[] = [];
     (async () => {
-      // read mapping account
-      const publicKey = new PublicKey(oraclePublicKey);
       try {
-        const accountInfo = await connection.getAccountInfo(publicKey);
         if (cancelled) return;
-        if (!accountInfo || !accountInfo.data) {
-          setIsLoading(false);
-          return;
-        }
-        const { productAccountKeys, nextMappingAccount } = parseMappingData(accountInfo.data);
-        let allProductAccountKeys = [...productAccountKeys];
-        let anotherMappingAccount = nextMappingAccount;
-        while (anotherMappingAccount) {
-          const accountInfo = await connection.getAccountInfo(anotherMappingAccount);
-          if (cancelled) return;
-          if (!accountInfo || !accountInfo.data) {
-            anotherMappingAccount = null;
-          } else {
-            const { productAccountKeys, nextMappingAccount } = parseMappingData(accountInfo.data);
-            allProductAccountKeys = [...allProductAccountKeys, ...productAccountKeys];
-            anotherMappingAccount = nextMappingAccount;
-          }
-        }
+
         setIsLoading(false);
-        setNumProducts(productAccountKeys.length);
-        const productsInfos = await getMultipleAccounts(connection, productAccountKeys, "confirmed");
-        if (cancelled) return;
+
+        const pythProductKeys = deployConfig.tokenInfo.map(({ pyth }) => new PublicKey(pyth.product));
+        setNumProducts(pythProductKeys.length);
+        const productsInfos = await getMultipleAccounts(connection, pythProductKeys, "confirmed");
+
         const productsData = productsInfos.array.map((p) => parseProductData(p.data as Buffer));
         const priceInfos = await getMultipleAccounts(
           connection,
           productsData.map((p) => p.priceAccountKey),
           "confirmed",
         );
-
         if (cancelled) return;
-        for (let i = 0; i < productsInfos.keys.length; i++) {
-          // const key = productsInfos.keys[i]
 
+        for (let i = 0; i < productsInfos.keys.length; i++) {
           const productData = productsData[i];
           const product = productData.product;
           const symbol = product.symbol;
@@ -112,7 +87,7 @@ export function PythProvider({ children }) {
         if (cancelled) return;
         setError(e);
         setIsLoading(false);
-        console.warn(`Failed to fetch mapping info for ${publicKey.toString()}`);
+        console.warn("Failed to fetch pyth info");
       }
     })();
     return () => {
