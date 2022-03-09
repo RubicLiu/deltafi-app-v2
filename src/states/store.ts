@@ -15,6 +15,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
+      // We need to disable it, because PublicKey is not serializable.
       serializableCheck: false,
     }),
 });

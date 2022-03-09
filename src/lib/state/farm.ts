@@ -73,38 +73,6 @@ export const loadFarmInfo = async (
   };
 };
 
-export interface FarmPosition {
-  pool: PublicKey;
-  depositedAmount: bigint;
-  rewardsOwed: bigint;
-  rewardsEstimated: bigint;
-  cumulativeInterest: bigint;
-  lastUpdateTs: bigint;
-  nextClaimTs: bigint;
-}
-
-/** @internal */
-export const FarmPositionLayout = struct<FarmPosition>([
-  publicKey("pool"),
-  u64("depositedAmount"),
-  u64("rewardsOwed"),
-  u64("rewardsEstimated"),
-  u64("cumulativeInterest"),
-  u64("lastUpdateTs"),
-  u64("nextClaimTs"),
-  u64("latestDepositSlot"),
-]);
-
-export const FARM_POSITION_SIZE = FarmPositionLayout.span;
-
-export interface FarmUser {
-  isInitialized: boolean;
-  configKey: PublicKey;
-  farmPoolKey: PublicKey;
-  owner: PublicKey;
-  positions: Array<FarmPosition>;
-}
-
 export interface FarmUserDataFlat {
   isInitialized: boolean;
   configKey: PublicKey;
@@ -155,41 +123,3 @@ export const FarmUserLayout = struct<FarmUserDataFlat>(
 );
 
 export const FARM_USER_SIZE = FarmUserLayout.span;
-
-export const isFarmUser = (info: AccountInfo<Buffer>) => info.data.length === FARM_USER_SIZE;
-
-export const parseFarmUser: AccountParser<FarmUser> = (info: AccountInfo<Buffer>) => {
-  if (!isFarmUser(info)) return;
-
-  const buffer = Buffer.from(info.data);
-  const farmUser = FarmUserLayout.decode(buffer);
-  const { isInitialized } = farmUser;
-
-  if (!isInitialized) return;
-
-  return {
-    info,
-    data: {
-      positions: [],
-      ...farmUser,
-    },
-  };
-};
-
-export const loadFarmUser = async (
-  connection: Connection,
-  key: string,
-  farmProgramId: PublicKey,
-): Promise<{ data: FarmUser; key: string }> => {
-  const address = new PublicKey(key);
-  const accountInfo = await loadAccount(connection, address, farmProgramId);
-
-  const parsed = parseFarmUser(accountInfo);
-
-  if (!parsed) throw new Error("Failed to load farm user account");
-
-  return {
-    key,
-    data: parsed.data,
-  };
-};

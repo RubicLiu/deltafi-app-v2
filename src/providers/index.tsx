@@ -3,7 +3,6 @@ import { HelmetProvider } from "react-helmet-async";
 import { CustomConnectionProvider as ConnectionProvider } from "./connection";
 import { CustomWalletProvider as WalletProvider } from "./wallet";
 import { ThemeContextProvider } from "./theme";
-import { RefreshContextProvider } from "./refresh";
 import { ModalProvider } from "./modal";
 import { ConfigProvider } from "./config";
 
@@ -14,9 +13,7 @@ export function Providers({ children }) {
         <ConfigProvider>
           <HelmetProvider>
             <ThemeContextProvider>
-              <RefreshContextProvider>
-                <ModalProvider>{children}</ModalProvider>
-              </RefreshContextProvider>
+              <ModalProvider>{children}</ModalProvider>
             </ThemeContextProvider>
           </HelmetProvider>
         </ConfigProvider>

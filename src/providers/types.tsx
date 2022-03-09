@@ -152,15 +152,3 @@ export interface StakeAccount {
   lastUpdateTs: BigNumber;
   nextClaimTs: BigNumber;
 }
-
-interface ISymbolMap {
-  [index: string]: object;
-}
-
-export interface PythContextValue {
-  symbolMap: ISymbolMap;
-  isLoading: boolean;
-  numProducts: number;
-  error: any;
-  setFilters: (filters: string[]) => void;
-}

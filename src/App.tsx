@@ -97,12 +97,14 @@ const App: React.FC = () => {
     // test is the referrer string is a valid public key
     // if the referrer string is invalid, the referrer public key is undefined
     let referrerPublicKey: PublicKey | null;
-    try {
-      referrerPublicKey = new PublicKey(referrer);
-    } catch (e) {
-      console.warn(e);
-      // if the referrer address is invalid, the referrer public key is set to null
-      referrerPublicKey = null;
+    if (referrer != null) {
+      try {
+        referrerPublicKey = new PublicKey(referrer);
+      } catch (e) {
+        console.warn(e);
+        // if the referrer address is invalid, the referrer public key is set to null
+        referrerPublicKey = null;
+      }
     }
     // This flag is added to toggle the flag for local development.
     // for test purpose, it requires enableReferral is set to be true explicitly
