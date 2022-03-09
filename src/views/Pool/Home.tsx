@@ -7,11 +7,11 @@ import Page from "components/layout/Page";
 import PoolCard from "./components/Card";
 import { PoolSchema } from "constants/pools";
 import { convertDollar } from "utils/utils";
-import { usePools } from "providers/pool";
 import { PMM } from "lib/calc";
 import { useTokenAccounts } from "providers/tokens";
+import { pools as poolSchemas } from "constants/pools";
 import { useSelector } from "react-redux";
-import { pythSelector } from "states/selectors";
+import { pythSelector, poolSelector } from "states/selectors";
 import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
@@ -43,7 +43,13 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
 
 const Home: React.FC = () => {
   const classes = useStyles();
-  const { schemas, pools } = usePools();
+
+  const schemas = poolSchemas;
+  const poolState = useSelector(poolSelector);
+  const pools = useMemo(() => {
+    return Object.values(poolState.poolKeyToPoolInfo);
+  }, [poolState.poolKeyToPoolInfo]);
+
   const [tokens] = useTokenAccounts();
 
   const pythState = useSelector(pythSelector);

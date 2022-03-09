@@ -29,7 +29,6 @@ import WithdrawCard from "components/molecules/WithdrawCard";
 
 import { useModal } from "providers/modal";
 import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
-import { usePoolFromAddress } from "providers/pool";
 import { PMM } from "lib/calc";
 import { rate, exponentiate, exponentiatedBy } from "utils/decimal";
 import { getOutAmount } from "utils/liquidity";
@@ -44,8 +43,9 @@ import { stableWithdraw } from "utils/transactions/stableWithdraw";
 import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector, useDispatch } from "react-redux";
-import { farmUserSelector } from "states/selectors";
+import { farmUserSelector, poolSelector } from "states/selectors";
 import { fetchFarmUsersThunk, toFarmUserPosition } from "states/farmUserState";
+import { fetchPoolsThunk } from "states/poolState";
 import { MARKET_CONFIG_ADDRESS } from "constants/index";
 import { getPoolConfigByPoolKey } from "constants/deployConfig";
 import { pythSelector } from "states/selectors";
@@ -218,7 +218,9 @@ const Deposit: React.FC = () => {
   });
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const [method, switchMethod] = useState<string>("deposit");
-  const pool = usePoolFromAddress(new PublicKey(poolAddress));
+  const poolState = useSelector(poolSelector);
+  const pool = poolState.poolKeyToPoolInfo[poolAddress];
+
   const [base, setBase] = useState<ISwapCard>({ token: null, amount: "", amountWithSlippage: "" });
   const [quote, setQuote] = useState<ISwapCard>({
     token: null,
@@ -426,6 +428,7 @@ const Deposit: React.FC = () => {
           walletAddress: walletPubkey,
         }),
       );
+      dispatch(fetchPoolsThunk({ connection }));
     }
   }, [
     connection,
@@ -533,6 +536,7 @@ const Deposit: React.FC = () => {
           walletAddress: walletPubkey,
         }),
       );
+      dispatch(fetchPoolsThunk({ connection }));
     }
   }, [
     connection,

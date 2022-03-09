@@ -2,14 +2,13 @@ import { ReactElement, ReactNode, useMemo } from "react";
 import { Box, IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 
-import { usePoolFromAddress } from "providers/pool";
 import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
 import { useModal } from "providers/modal";
 import { PMM } from "lib/calc";
 import { rate } from "utils/decimal";
 import { ConnectButton } from "components";
 import { useSelector } from "react-redux";
-import { pythSelector } from "states/selectors";
+import { pythSelector, poolSelector } from "states/selectors";
 import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 interface IDepositPanelProps {
@@ -61,7 +60,10 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 const DepositPanel = (props: IDepositPanelProps): ReactElement => {
   const classes = useStyles(props);
   const { address, setMenu } = useModal();
-  const pool = usePoolFromAddress(address);
+
+  const poolState = useSelector(poolSelector);
+  const pool = poolState.poolKeyToPoolInfo[address.toBase58()];
+
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
   const pythState = useSelector(pythSelector);

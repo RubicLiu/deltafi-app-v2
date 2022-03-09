@@ -19,7 +19,8 @@ import { useModal } from "providers/modal";
 import { Scrollbars } from "react-custom-scrollbars";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useDarkMode } from "providers/theme";
-import { usePoolFromAddress } from "providers/pool";
+import { useSelector } from "react-redux";
+import { poolSelector } from "states/selectors";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -159,7 +160,9 @@ const StakePanel: React.FC = (props) => {
   const { isDark } = useDarkMode();
   const classes = useStyles(props);
   const { address, setMenu } = useModal();
-  const pool = usePoolFromAddress(address);
+
+  const poolState = useSelector(poolSelector);
+  const pool = poolState.poolKeyToPoolInfo[address.toBase58()];
 
   const [tab, setTab] = useState(0);
 

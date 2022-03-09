@@ -9,12 +9,10 @@ import { ConnectButton, Text } from "components";
 import { CardProps } from "./types";
 import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
-import { usePoolFromAddress } from "providers/pool";
 import { useTokenMintAccount } from "providers/tokens";
 
 import { useSelector } from "react-redux";
-import { farmPoolSelector } from "states/selectors";
-import { pythSelector } from "states/selectors";
+import { farmPoolSelector, poolSelector, pythSelector } from "states/selectors";
 import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 const deltafiTokenDecimals = 6;
@@ -80,7 +78,8 @@ const FarmCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const history = useHistory();
   const { farm } = props;
-  const swapPool = usePoolFromAddress(farm?.poolAddress);
+  const poolState = useSelector(poolSelector);
+  const swapPool = poolState.poolKeyToPoolInfo[farm?.poolAddress.toBase58()];
 
   const farmPoolState = useSelector(farmPoolSelector);
   const farmPool = farmPoolState.farmPoolKeyToFarmPoolInfo[farm?.address.toBase58()];

@@ -5,7 +5,8 @@ import CloseIcon from "@material-ui/icons/Close";
 import { ConnectButton } from "components";
 
 import { useModal } from "providers/modal";
-import { usePoolFromAddress } from "providers/pool";
+import { useSelector } from "react-redux";
+import { poolSelector } from "states/selectors";
 
 interface IWithdrawPanelProps {
   children?: ReactNode;
@@ -55,7 +56,8 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 
 const WithdrawPanel = (props: IWithdrawPanelProps): ReactElement => {
   const { setMenu, address } = useModal();
-  const pool = usePoolFromAddress(address);
+  const poolState = useSelector(poolSelector);
+  const pool = poolState.poolKeyToPoolInfo[address.toBase58()];
 
   const classes = useStyles(props);
 

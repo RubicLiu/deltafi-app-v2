@@ -8,8 +8,6 @@ import PageLoader from "components/PageLoader";
 import Header from "components/Header";
 import Footer from "components/Footer";
 import { useConfig } from "providers/config";
-import { usePools } from "providers/pool";
-import { pools } from "constants/pools";
 import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
@@ -55,13 +53,10 @@ BigInt.prototype["toJSON"] = function () {
 const App: React.FC = () => {
   const dispatch = useDispatch();
   const { setConfigAddress } = useConfig();
-  const { setSchemas } = usePools();
   const { setNetwork } = useCustomConnection();
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
-  // TODO(ypeng): Use pool state to replace provider.
-  const enablePoolState = false;
 
   useEffect(() => {
     dispatch(fetchPythDataThunk(connection));
@@ -88,17 +83,13 @@ const App: React.FC = () => {
   }, [connection, dispatch]);
 
   useEffect(() => {
-    if (!enablePoolState) {
-      return;
-    }
-
     dispatch(fetchPoolsThunk({ connection }));
     // Refresh the farm pool every 1 minute.
     const interval = setInterval(() => {
       dispatch(fetchPoolsThunk({ connection }));
     }, 60 * 1000);
     return () => clearInterval(interval);
-  }, [connection, dispatch, enablePoolState]);
+  }, [connection, dispatch]);
 
   useEffect(() => {
     const referrer: string = new URLSearchParams(window.location.search).get("referrer");
@@ -130,9 +121,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     setConfigAddress(MARKET_CONFIG_ADDRESS);
-    setSchemas(pools);
     setNetwork(deployConfig.network);
-  }, [setConfigAddress, setSchemas, setNetwork]);
+  }, [setConfigAddress, setNetwork]);
 
   return (
     <BrowserRouter>

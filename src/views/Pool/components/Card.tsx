@@ -6,15 +6,13 @@ import BigNumber from "bignumber.js";
 import styled from "styled-components";
 
 import { ConnectButton } from "components";
-import { usePoolFromAddress } from "providers/pool";
 import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
 import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
 import { rate } from "utils/decimal";
 import { CardProps } from "./types";
-
+import { poolSelector, pythSelector } from "states/selectors";
 import { useSelector } from "react-redux";
-import { pythSelector } from "states/selectors";
 import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 const Img = styled.img`
@@ -78,7 +76,9 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const { connected } = useWallet();
   const classes = useStyles();
   const { poolKey } = props;
-  const pool = usePoolFromAddress(poolKey);
+
+  const poolState = useSelector(poolSelector);
+  const pool = poolState.poolKeyToPoolInfo[poolKey.toBase58()];
 
   const pythState = useSelector(pythSelector);
   const { price: basePrice } = getPriceBySymbol(
