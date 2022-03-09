@@ -290,7 +290,8 @@ const Home: React.FC = (props) => {
     setIsProcessing(true);
     try {
       const isStable = pool.swapType === SwapType.Stable;
-      const referrerPubkey: PublicKey | null = appState.referrerPublicKey;
+      const referrerPubkey: PublicKey | null =
+        appState.isNewUser === undefined ? null : appState.referrerPublicKey;
       const isNewUser: Boolean = appState.isNewUser;
 
       const amountIn = BigInt(
@@ -317,8 +318,8 @@ const Home: React.FC = (props) => {
           minimumAmountOut,
           swapDirection,
         },
-        referrer: referrerPubkey,
         isNewUser,
+        referrer: referrerPubkey,
       });
       transaction = await signTransaction(transaction);
 

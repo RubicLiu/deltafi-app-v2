@@ -109,8 +109,8 @@ export async function swap({
   destinationRef,
   rewardTokenRef,
   swapData,
-  referrer,
   isNewUser,
+  referrer,
 }: {
   isStable: boolean;
   connection: Connection;
@@ -121,8 +121,8 @@ export async function swap({
   destinationRef?: PublicKey;
   rewardTokenRef?: PublicKey;
   swapData: SwapData;
-  referrer: PublicKey;
   isNewUser: Boolean;
+  referrer: PublicKey | null;
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
     console.error("swap failed with null parameter");
@@ -135,7 +135,12 @@ export async function swap({
   let initializeWrappedTokenAccountTransaction: Transaction | undefined;
   let closeWrappedTokenAccountTransaction: Transaction | undefined;
   let createUserReferrerAccountTransaction: Transaction | undefined;
-  let userReferrerDataPubkey: PublicKey | undefined;
+  const referralSeed = "referrer";
+  const userReferrerDataPubkey = await PublicKey.createWithSeed(
+    walletPubkey,
+    referralSeed,
+    SWAP_PROGRAM_ID,
+  );
 
   let buySol =
     (pool.quoteTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellBase) ||
@@ -196,8 +201,6 @@ export async function swap({
   // Only create user referrer data account for non-sol operation, because otherwise the transaction
   // will fail as the transaction payload is too big.
   if (isNewUser && !(buySol || sellSol)) {
-    const seed = "referrer";
-    userReferrerDataPubkey = await PublicKey.createWithSeed(walletPubkey, seed, SWAP_PROGRAM_ID);
     const userReferralAccountInfo = await connection.getAccountInfo(userReferrerDataPubkey);
     // Check if the user referrer data is created already.
     if (!userReferralAccountInfo) {
@@ -213,7 +216,7 @@ export async function swap({
             lamports: balanceForUserReferrerData,
             space: USER_REFERRER_DATA_SIZE,
             programId: SWAP_PROGRAM_ID,
-            seed,
+            seed: referralSeed,
           }),
         )
         .add(
@@ -221,10 +224,12 @@ export async function swap({
             config.publicKey,
             walletPubkey,
             userReferrerDataPubkey,
-            referrer,
+            referrer ? referrer : new PublicKey(dummyReferrerAddress),
             SWAP_PROGRAM_ID,
           ),
         );
+    } else {
+      throw Error("Wrong referral state, user is not a new user");
     }
   }
 

@@ -110,7 +110,6 @@ const App: React.FC = () => {
     // for test purpose, it requires enableReferral is set to be true explicitly
     const enableReferral: boolean = window.localStorage.getItem("enableReferralStr") === "true";
 
-    console.info(referrer, enableReferral, referrerPublicKey);
     // TODO(ypeng): Check wallet key and reset state if wallet changes.
     dispatch(setReferrerAction({ referrerPublicKey, enableReferral }));
 

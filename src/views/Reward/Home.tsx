@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { Box, Typography, makeStyles, Theme, Grid, Paper, Link } from "@material-ui/core";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { Box, Typography, makeStyles, Theme, Grid, Paper, Link, Avatar } from "@material-ui/core";
 import Page from "components/layout/Page";
 import { ConnectButton } from "components";
 import { useModal } from "providers/modal";
@@ -11,7 +11,9 @@ import copy from "copy-to-clipboard";
 
 import { useTokenFromMint } from "providers/tokens";
 import { deployConfig } from "constants/deployConfig";
-
+import { createReferrerDeltafiTokenAccount } from "utils/transactions/createReferrerDeltafiTokenAccount";
+import { sendSignedTransaction } from "utils/transactions";
+import loadingIcon from "components/gif/loading_white.gif";
 /*
  * mockup test data for reward page
  */
@@ -119,6 +121,12 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
       fontSize: "10px",
     },
   },
+  SettingUpAccountButton: {
+    width: 40,
+    height: 40,
+    marginTop: 4,
+    marginBottom: 4,
+  },
 }));
 
 /**
@@ -132,7 +140,7 @@ const getReferralLink = (() => {
   let referrer = null;
 
   return async (deltafiTokenAccount, setLink: (link: string) => void) => {
-    if (deltafiTokenAccount === null) {
+    if (!deltafiTokenAccount) {
       return null;
     }
     if (!referralLink || referrer !== deltafiTokenAccount.pubKey.toBase58()) {
@@ -151,15 +159,22 @@ const getReferralLink = (() => {
 const Home: React.FC = (props) => {
   const classes = useStyles(props);
   const { setMenu } = useModal();
-  const { connected: isConnectedWallet } = useWallet();
+  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
+  const { connection } = useConnection();
 
-  const [buttonText, setButtonText] = useState("Copy Link");
-  const [referralLink, setReferralLink] = useState("");
+  //TODO refactory token provider with redux and get the user's DELFI token with a better method
   const deltafiTokenAccount = useTokenFromMint(deployConfig.deltafiTokenMint);
+
+  const [referralLinkState, setReferralLinkState] = useState<
+    "Unavailable" | "Ready" | "Copied" | "Processing"
+  >(deltafiTokenAccount ? "Ready" : "Unavailable");
+
+  const [referralLink, setReferralLink] = useState("");
 
   useEffect(() => {
     (async () => {
       await getReferralLink(deltafiTokenAccount, (link) => setReferralLink(link));
+      if (deltafiTokenAccount) setReferralLinkState("Ready");
     })();
   }, [isConnectedWallet, deltafiTokenAccount]);
 
@@ -215,16 +230,73 @@ const Home: React.FC = (props) => {
                   My Referral Link
                 </Typography>
                 <Box className={`${classes.subContentMargin3} ${classes.sharePanelRow}`}>
-                  <input placeholder={referralLink} className={classes.inputLink} />
-                  <CopyLinkButton
-                    onClick={() => {
-                      copy(referralLink);
-                      setButtonText("Copied!");
-                      setTimeout(() => setButtonText("Copy link"), 5000);
-                    }}
-                  >
-                    {buttonText}
-                  </CopyLinkButton>
+                  {referralLinkState === "Unavailable" ? (
+                    <input
+                      disabled={true}
+                      placeholder={"Please Create A DELFI Token Account Before Referring Others!"}
+                      className={classes.inputLink}
+                    />
+                  ) : (
+                    <input
+                      placeholder={referralLink}
+                      disabled={referralLinkState === "Processing"}
+                      className={classes.inputLink}
+                    />
+                  )}
+                  {(() => {
+                    switch (referralLinkState) {
+                      case "Unavailable": {
+                        return (
+                          <CopyLinkButton
+                            onClick={async () => {
+                              try {
+                                setReferralLinkState("Processing");
+                                let transaction = await createReferrerDeltafiTokenAccount({
+                                  connection,
+                                  walletPubkey,
+                                });
+                                transaction = await signTransaction(transaction);
+                                const hash = await sendSignedTransaction({
+                                  signedTransaction: transaction,
+                                  connection,
+                                });
+                                await connection.confirmTransaction(hash, "confirmed");
+                                setReferralLinkState("Ready");
+                              } catch (e) {
+                                console.error(e);
+                                setReferralLinkState("Unavailable");
+                              }
+                            }}
+                          >
+                            {"Wallet Set Up"}
+                          </CopyLinkButton>
+                        );
+                      }
+                      case "Ready": {
+                        return (
+                          <CopyLinkButton
+                            onClick={() => {
+                              copy(referralLink);
+                              setReferralLinkState("Copied");
+                              setTimeout(() => setReferralLinkState("Ready"), 5000);
+                            }}
+                          >
+                            {"Copy Link"}
+                          </CopyLinkButton>
+                        );
+                      }
+                      case "Copied": {
+                        return <CopyLinkButton>{"Copied"}</CopyLinkButton>;
+                      }
+                      case "Processing": {
+                        return (
+                          <CopyLinkButton disabled={true}>
+                            <Avatar className={classes.SettingUpAccountButton} src={loadingIcon} />
+                          </CopyLinkButton>
+                        );
+                      }
+                    }
+                  })()}
                 </Box>
                 <Box className={classes.sharePanelRow}>
                   <Typography variant="subtitle1" color="primary" className={classes.shareLabel}>

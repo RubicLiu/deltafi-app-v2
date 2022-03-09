@@ -21,7 +21,7 @@ export function getFarmTokenInfo(symbol: string) {
   return lpTokens.find((token) => token.symbol.toLowerCase() === symbol.toLowerCase());
 }
 
-export const ACCOUNT_LAYOUT = struct<TokenAccountInfo>([
+export const TOKEN_ACCOUNT_LAYOUT = struct<TokenAccountInfo>([
   publicKey("mint"),
   publicKey("owner"),
   u64("amount"),
@@ -41,7 +41,7 @@ export function parseTokenAccountData(data: Buffer): {
   owner: PublicKey;
   amount: BigNumber;
 } {
-  let { mint, owner, amount } = ACCOUNT_LAYOUT.decode(data);
+  let { mint, owner, amount } = TOKEN_ACCOUNT_LAYOUT.decode(data);
   return {
     mint: new PublicKey(mint),
     owner: new PublicKey(owner),
@@ -75,12 +75,12 @@ export function getOwnedAccountsFilters(publicKey: PublicKey) {
   return [
     {
       memcmp: {
-        offset: ACCOUNT_LAYOUT.offsetOf("owner"),
+        offset: TOKEN_ACCOUNT_LAYOUT.offsetOf("owner"),
         bytes: publicKey.toBase58(),
       },
     },
     {
-      dataSize: ACCOUNT_LAYOUT.span,
+      dataSize: TOKEN_ACCOUNT_LAYOUT.span,
     },
   ];
 }
@@ -138,8 +138,8 @@ export function updateTokenAccountCache(
   }
 
   if (tokenAccountPubkey === ownerAddress) {
-    tokenAccountInfo.data = Buffer.alloc(ACCOUNT_LAYOUT.span);
-    ACCOUNT_LAYOUT.encode(
+    tokenAccountInfo.data = Buffer.alloc(TOKEN_ACCOUNT_LAYOUT.span);
+    TOKEN_ACCOUNT_LAYOUT.encode(
       {
         mint: NATIVE_MINT,
         owner: ownerAddress,
@@ -185,8 +185,8 @@ export async function getTokenAccountInfo(connection: Connection, ownerAddress: 
   });
   // AccountInfo.data is empty for SPL, allocate buffer and encode it as a SOL token
   let balance = await connection.getBalance(ownerAddress);
-  account.data = Buffer.alloc(ACCOUNT_LAYOUT.span);
-  ACCOUNT_LAYOUT.encode(
+  account.data = Buffer.alloc(TOKEN_ACCOUNT_LAYOUT.span);
+  TOKEN_ACCOUNT_LAYOUT.encode(
     {
       mint: NATIVE_MINT,
       owner: ownerAddress,
