@@ -43,13 +43,12 @@ import { stableWithdraw } from "utils/transactions/stableWithdraw";
 import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector, useDispatch } from "react-redux";
-import { farmUserSelector, poolSelector } from "states/selectors";
+import { poolSelector } from "states/selectors";
 import { fetchFarmUsersThunk, toFarmUserPosition } from "states/farmUserState";
 import { fetchPoolsThunk } from "states/poolState";
 import { MARKET_CONFIG_ADDRESS } from "constants/index";
 import { getPoolConfigByPoolKey } from "constants/deployConfig";
-import { pythSelector } from "states/selectors";
-import { getMarketPrice, getPriceBySymbol } from "states/PythState";
+import { selectFarmUserByFarmPoolKey, selectPythMarketPriceByPool } from "states/selectors";
 
 interface TransactionResult {
   status: boolean | null;
@@ -238,20 +237,10 @@ const Deposit: React.FC = () => {
   }, [poolAddress]);
 
   const dispatch = useDispatch();
-  const farmState = useSelector(farmUserSelector);
-  const farmUserFlat = farmState.farmPoolKeyToFarmUser[farmPoolKey.toBase58()];
+  const farmUserFlat = useSelector(selectFarmUserByFarmPoolKey(farmPoolKey.toBase58()));
   const farmUser = toFarmUserPosition(farmUserFlat);
 
-  const pythState = useSelector(pythSelector);
-  const { price: basePrice } = getPriceBySymbol(
-    pythState.symbolToPythData,
-    pool?.baseTokenInfo.symbol,
-  );
-  const { price: quotePrice } = getPriceBySymbol(
-    pythState.symbolToPythData,
-    pool?.quoteTokenInfo.symbol,
-  );
-  const marketPrice = getMarketPrice(pythState.symbolToPythData, pool);
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
 
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({

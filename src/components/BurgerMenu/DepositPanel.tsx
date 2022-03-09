@@ -8,8 +8,8 @@ import { PMM } from "lib/calc";
 import { rate } from "utils/decimal";
 import { ConnectButton } from "components";
 import { useSelector } from "react-redux";
-import { pythSelector, poolSelector } from "states/selectors";
-import { getMarketPrice, getPriceBySymbol } from "states/PythState";
+import { selectPythMarketPriceByPool } from "states/selectors";
+import { poolSelector } from "states/selectors";
 
 interface IDepositPanelProps {
   children?: ReactNode;
@@ -66,16 +66,8 @@ const DepositPanel = (props: IDepositPanelProps): ReactElement => {
 
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
-  const pythState = useSelector(pythSelector);
-  const { price: basePrice } = getPriceBySymbol(
-    pythState.symbolToPythData,
-    pool?.baseTokenInfo.symbol,
-  );
-  const { price: quotePrice } = getPriceBySymbol(
-    pythState.symbolToPythData,
-    pool?.quoteTokenInfo.symbol,
-  );
-  const marketPrice = getMarketPrice(pythState.symbolToPythData, pool);
+
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
 
   const share = useMemo(() => {
     if (pool && poolTokenAccount && poolMint) {

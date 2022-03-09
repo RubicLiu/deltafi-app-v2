@@ -47,10 +47,9 @@ import { sleep } from "utils/utils";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
-import { appSelector, poolSelector, pythSelector } from "states/selectors";
+import { appSelector, poolSelector, selectPythMarketPriceByPool } from "states/selectors";
 import { fetchPoolsThunk } from "states/poolState";
 import { fetchReferrerThunk } from "states/appState";
-import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 interface TransactionResult {
   status: boolean | null;
@@ -175,16 +174,7 @@ const Home: React.FC = (props) => {
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
 
-  const pythState = useSelector(pythSelector);
-  const marketPrice = getMarketPrice(pythState.symbolToPythData, pool);
-  const { price: basePrice } = getPriceBySymbol(
-    pythState.symbolToPythData,
-    pool?.baseTokenInfo.symbol,
-  );
-  const { price: quotePrice } = getPriceBySymbol(
-    pythState.symbolToPythData,
-    pool?.quoteTokenInfo.symbol,
-  );
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
 
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && pool) {

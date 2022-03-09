@@ -28,7 +28,6 @@ export const fetchPythDataThunk = createAsyncThunk(
   async (connection: Connection) => {
     const symbolToPythData: SymbolToPythData = {};
     const pythDataList = await getPythDataList(connection);
-    console.info("found pyth data " + pythDataList.length);
     for (const pythData of pythDataList) {
       symbolToPythData[pythData.symbol] = pythData;
     }
@@ -85,10 +84,11 @@ export function getPriceBySymbol(
 export function getMarketPrice(symbolToPythData: SymbolToPythData, pool: PoolInfo) {
   const { price: basePrice } = getPriceBySymbol(symbolToPythData, pool?.baseTokenInfo.symbol);
   const { price: quotePrice } = getPriceBySymbol(symbolToPythData, pool?.quoteTokenInfo.symbol);
-
-  if (basePrice && quotePrice) {
-    return new BigNumber(basePrice / quotePrice);
-  } else {
-    return new BigNumber(NaN);
-  }
+  const marketPrice =
+    basePrice && quotePrice ? new BigNumber(basePrice / quotePrice) : new BigNumber(NaN);
+  return {
+    marketPrice,
+    basePrice,
+    quotePrice,
+  };
 }

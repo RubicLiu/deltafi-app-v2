@@ -34,7 +34,7 @@ import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector, useDispatch } from "react-redux";
-import { farmUserSelector, farmPoolSelector } from "states/selectors";
+import { selectFarmUserByFarmPoolKey, selectFarmPoolByFarmPoolKey } from "states/selectors";
 import { toFarmUserPosition, fetchFarmUsersThunk } from "states/farmUserState";
 import { getPoolConfigByFarmPoolKey } from "constants/deployConfig";
 import { getTokenInfo } from "providers/tokens";
@@ -79,8 +79,7 @@ const Stake = (): ReactElement => {
   const location = useLocation();
 
   const farmPoolId = location.pathname.split("/").pop();
-  const farmPoolState = useSelector(farmPoolSelector);
-  const farmPool = farmPoolState.farmPoolKeyToFarmPoolInfo[farmPoolId];
+  const farmPool = useSelector(selectFarmPoolByFarmPoolKey(farmPoolId));
 
   const { baseTokenInfo, quoteTokenInfo } = useMemo(() => {
     const poolConfig = getPoolConfigByFarmPoolKey(farmPoolId);
@@ -92,8 +91,7 @@ const Stake = (): ReactElement => {
     };
   }, [farmPoolId]);
 
-  const farmUserState = useSelector(farmUserSelector);
-  const farmUserFlat = farmUserState.farmPoolKeyToFarmUser[farmPoolId];
+  const farmUserFlat = useSelector(selectFarmUserByFarmPoolKey(farmPoolId));
   const farmUser = toFarmUserPosition(farmUserFlat);
 
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();

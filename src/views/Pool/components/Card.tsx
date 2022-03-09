@@ -11,9 +11,8 @@ import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
 import { rate } from "utils/decimal";
 import { CardProps } from "./types";
-import { poolSelector, pythSelector } from "states/selectors";
 import { useSelector } from "react-redux";
-import { getMarketPrice, getPriceBySymbol } from "states/PythState";
+import { poolSelector, selectPythMarketPriceByPool } from "states/selectors";
 
 const Img = styled.img`
   width: 20px;
@@ -80,16 +79,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const poolState = useSelector(poolSelector);
   const pool = poolState.poolKeyToPoolInfo[poolKey.toBase58()];
 
-  const pythState = useSelector(pythSelector);
-  const { price: basePrice } = getPriceBySymbol(
-    pythState.symbolToPythData,
-    pool?.baseTokenInfo.symbol,
-  );
-  const { price: quotePrice } = getPriceBySymbol(
-    pythState.symbolToPythData,
-    pool?.quoteTokenInfo.symbol,
-  );
-  const marketPrice = getMarketPrice(pythState.symbolToPythData, pool);
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
 
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const poolMint = useTokenMintAccount(pool?.poolMintKey);

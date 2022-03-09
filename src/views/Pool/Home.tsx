@@ -9,10 +9,11 @@ import { PoolSchema } from "constants/pools";
 import { convertDollar } from "utils/utils";
 import { PMM } from "lib/calc";
 import { useTokenAccounts } from "providers/tokens";
+import { getTokenInfoBySymbol } from "constants/deployConfig";
 import { pools as poolSchemas } from "constants/pools";
 import { useSelector } from "react-redux";
 import { pythSelector, poolSelector } from "states/selectors";
-import { getMarketPrice, getPriceBySymbol } from "states/PythState";
+import { getMarketPrice } from "states/PythState";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
@@ -58,14 +59,13 @@ const Home: React.FC = () => {
   const tvl = useMemo(() => {
     if (pools.length > 0) {
       return (pools as any).reduce((p, c) => {
-        const pmm = new PMM(c.poolState, getMarketPrice(symbolToPythData, c));
-        const { price: basePrice } = getPriceBySymbol(symbolToPythData, c?.baseTokenInfo.symbol);
-        const { price: quotePrice } = getPriceBySymbol(symbolToPythData, c?.quoteTokenInfo.symbol);
+        const { marketPrice, basePrice, quotePrice } = getMarketPrice(symbolToPythData, c);
+        const pmm = new PMM(c.poolState, marketPrice);
 
         let volumn = new BigNumber(0);
         if (basePrice && quotePrice) {
-          const baseDecimals = -symbolToPythData[c?.baseTokenInfo.symbol].priceData.exponent;
-          const quoteDecimals = -symbolToPythData[c?.quoteTokenInfo.symbol].priceData.exponent;
+          const baseDecimals = getTokenInfoBySymbol(c?.baseTokenInfo.symbol).decimals;
+          const quoteDecimals = getTokenInfoBySymbol(c?.quoteTokenInfo.symbol).decimals;
           volumn = pmm.tvl(basePrice, quotePrice, baseDecimals, quoteDecimals);
         }
         return p.plus(volumn);
