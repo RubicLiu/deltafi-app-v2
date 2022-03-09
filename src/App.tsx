@@ -9,13 +9,12 @@ import Header from "components/Header";
 import Footer from "components/Footer";
 import { useConfig } from "providers/config";
 import { usePools } from "providers/pool";
-import { listSymbols, pools } from "constants/pools";
+import { pools } from "constants/pools";
 import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
 import { MARKET_CONFIG_ADDRESS } from "./constants";
 import { useCustomConnection } from "providers/connection";
-import usePyth from "providers/pyth";
 import { deployConfig } from "constants/deployConfig";
 
 import { useDispatch } from "react-redux";
@@ -58,27 +57,20 @@ const App: React.FC = () => {
   const { setConfigAddress } = useConfig();
   const { setSchemas } = usePools();
   const { setNetwork } = useCustomConnection();
-  const { setFilters } = usePyth();
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
   // TODO(ypeng): Use pool state to replace provider.
   const enablePoolState = false;
-  // TODO(ypeng): Use pyth state to replace provider.
-  const enablePythState = false;
 
   useEffect(() => {
-    if (!enablePythState) {
-      return;
-    }
-
     dispatch(fetchPythDataThunk(connection));
-    // Refresh the farm pool every 5 seconds.
+    // Refresh the farm pool every 2 seconds.
     const interval = setInterval(() => {
       dispatch(fetchPythDataThunk(connection));
-    }, 1 * 1000);
+    }, 2 * 1000);
     return () => clearInterval(interval);
-  }, [connection, dispatch, enablePythState]);
+  }, [connection, dispatch]);
 
   useEffect(() => {
     if (walletAddress) {
@@ -140,8 +132,7 @@ const App: React.FC = () => {
     setConfigAddress(MARKET_CONFIG_ADDRESS);
     setSchemas(pools);
     setNetwork(deployConfig.network);
-    setFilters(listSymbols(pools));
-  }, [setConfigAddress, setSchemas, setNetwork, setFilters]);
+  }, [setConfigAddress, setSchemas, setNetwork]);
 
   return (
     <BrowserRouter>

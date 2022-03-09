@@ -4,11 +4,13 @@ import CloseIcon from "@material-ui/icons/Close";
 
 import { ConnectButton } from "components";
 
-import { usePyth, getMarketPrice } from "providers/pyth";
 import { useModal } from "providers/modal";
 import { usePoolFromSymbols } from "providers/pool";
 import { getSwapOutAmount } from "utils/swap";
 import { fixedNumber } from "utils/utils";
+import { useSelector } from "react-redux";
+import { pythSelector } from "states/selectors";
+import { getMarketPrice } from "states/PythState";
 
 interface IConfirmSwapPanelProps {
   children?: ReactNode;
@@ -62,8 +64,8 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
   const { setMenu, data } = useModal();
   const pool = usePoolFromSymbols(data?.tokenFrom.token.symbol, data?.tokenTo.token.symbol);
 
-  const { symbolMap } = usePyth();
-  const marketPrice = getMarketPrice(symbolMap, pool);
+  const pythState = useSelector(pythSelector);
+  const marketPrice = getMarketPrice(pythState.symbolToPythData, pool);
 
   const swapOut = useMemo(() => {
     if (pool && data) {

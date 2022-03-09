@@ -5,10 +5,12 @@ import CloseIcon from "@material-ui/icons/Close";
 import { usePoolFromAddress } from "providers/pool";
 import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
 import { useModal } from "providers/modal";
-import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { PMM } from "lib/calc";
 import { rate } from "utils/decimal";
 import { ConnectButton } from "components";
+import { useSelector } from "react-redux";
+import { pythSelector } from "states/selectors";
+import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 interface IDepositPanelProps {
   children?: ReactNode;
@@ -62,10 +64,16 @@ const DepositPanel = (props: IDepositPanelProps): ReactElement => {
   const pool = usePoolFromAddress(address);
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
-  const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
-  const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
-  const { symbolMap } = usePyth();
-  const marketPrice = getMarketPrice(symbolMap, pool);
+  const pythState = useSelector(pythSelector);
+  const { price: basePrice } = getPriceBySymbol(
+    pythState.symbolToPythData,
+    pool?.baseTokenInfo.symbol,
+  );
+  const { price: quotePrice } = getPriceBySymbol(
+    pythState.symbolToPythData,
+    pool?.quoteTokenInfo.symbol,
+  );
+  const marketPrice = getMarketPrice(pythState.symbolToPythData, pool);
 
   const share = useMemo(() => {
     if (pool && poolTokenAccount && poolMint) {

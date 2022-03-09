@@ -36,7 +36,6 @@ import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { swap } from "utils/transactions/swap";
 import { useConfig } from "providers/config";
 import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS, SOLSCAN_LINK } from "constants/index";
-import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
 import { getSwapOutAmount } from "utils/swap";
@@ -48,8 +47,9 @@ import { sleep } from "utils/utils";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
-import { appSelector } from "states/selectors";
+import { appSelector, pythSelector } from "states/selectors";
 import { fetchReferrerThunk } from "states/appState";
+import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 interface TransactionResult {
   status: boolean | null;
@@ -168,10 +168,16 @@ const Home: React.FC = (props) => {
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
 
-  const { symbolMap } = usePyth();
-  const marketPrice = getMarketPrice(symbolMap, pool);
-  const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
-  const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
+  const pythState = useSelector(pythSelector);
+  const marketPrice = getMarketPrice(pythState.symbolToPythData, pool);
+  const { price: basePrice } = getPriceBySymbol(
+    pythState.symbolToPythData,
+    pool?.baseTokenInfo.symbol,
+  );
+  const { price: quotePrice } = getPriceBySymbol(
+    pythState.symbolToPythData,
+    pool?.quoteTokenInfo.symbol,
+  );
 
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && pool) {

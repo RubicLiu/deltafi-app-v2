@@ -1,9 +1,11 @@
 import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { PriceData, ProductData, parseProductData, parsePriceData } from "@pythnetwork/client";
+import BigNumber from "bignumber.js";
 
 import { deployConfig } from "constants/deployConfig";
 import { getMultipleAccounts } from "utils/account";
+import { PoolInfo } from "providers/types";
 
 type PythData = {
   symbol: string;
@@ -64,4 +66,35 @@ async function getPythDataList(connection: Connection) {
     });
   }
   return pythDataList;
+}
+
+export function getPriceBySymbol(
+  symbolToPythData: SymbolToPythData,
+  tokenSymbol: string | null | undefined,
+) {
+  let result = { priceData: null, priceAccountKey: null, price: null };
+  if (!tokenSymbol) {
+    return result;
+  }
+
+  if (!symbolToPythData[tokenSymbol]) {
+    return result;
+  }
+
+  const priceData = symbolToPythData[tokenSymbol].priceData;
+  result.priceData = priceData;
+  result.priceAccountKey = symbolToPythData[tokenSymbol].priceKey;
+  result.price = priceData.price ? priceData.price : priceData.previousPrice;
+  return result;
+}
+
+export function getMarketPrice(symbolToPythData: SymbolToPythData, pool: PoolInfo) {
+  const { price: basePrice } = getPriceBySymbol(symbolToPythData, pool?.baseTokenInfo.symbol);
+  const { price: quotePrice } = getPriceBySymbol(symbolToPythData, pool?.quoteTokenInfo.symbol);
+
+  if (basePrice && quotePrice) {
+    return new BigNumber(basePrice / quotePrice);
+  } else {
+    return new BigNumber(NaN);
+  }
 }

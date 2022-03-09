@@ -10,11 +10,12 @@ import { CardProps } from "./types";
 import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
 import { usePoolFromAddress } from "providers/pool";
-import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { useTokenMintAccount } from "providers/tokens";
 
 import { useSelector } from "react-redux";
 import { farmPoolSelector } from "states/selectors";
+import { pythSelector } from "states/selectors";
+import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 const deltafiTokenDecimals = 6;
 
@@ -85,10 +86,17 @@ const FarmCard: React.FC<CardProps> = (props) => {
   const farmPool = farmPoolState.farmPoolKeyToFarmPoolInfo[farm?.address.toBase58()];
 
   const lpMint = useTokenMintAccount(swapPool?.poolMintKey);
-  const { price: basePrice } = usePriceBySymbol(swapPool?.baseTokenInfo.symbol);
-  const { price: quotePrice } = usePriceBySymbol(swapPool?.quoteTokenInfo.symbol);
-  const { symbolMap } = usePyth();
-  const marketPrice = getMarketPrice(symbolMap, swapPool);
+
+  const pythState = useSelector(pythSelector);
+  const { price: basePrice } = getPriceBySymbol(
+    pythState.symbolToPythData,
+    swapPool?.baseTokenInfo.symbol,
+  );
+  const { price: quotePrice } = getPriceBySymbol(
+    pythState.symbolToPythData,
+    swapPool?.quoteTokenInfo.symbol,
+  );
+  const marketPrice = getMarketPrice(pythState.symbolToPythData, swapPool);
 
   const pmm = useMemo(() => {
     if (swapPool) {

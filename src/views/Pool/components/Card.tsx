@@ -8,11 +8,14 @@ import styled from "styled-components";
 import { ConnectButton } from "components";
 import { usePoolFromAddress } from "providers/pool";
 import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
-import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
 import { rate } from "utils/decimal";
 import { CardProps } from "./types";
+
+import { useSelector } from "react-redux";
+import { pythSelector } from "states/selectors";
+import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 const Img = styled.img`
   width: 20px;
@@ -76,10 +79,17 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const classes = useStyles();
   const { poolKey } = props;
   const pool = usePoolFromAddress(poolKey);
-  const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
-  const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
-  const { symbolMap } = usePyth();
-  const marketPrice = getMarketPrice(symbolMap, pool);
+
+  const pythState = useSelector(pythSelector);
+  const { price: basePrice } = getPriceBySymbol(
+    pythState.symbolToPythData,
+    pool?.baseTokenInfo.symbol,
+  );
+  const { price: quotePrice } = getPriceBySymbol(
+    pythState.symbolToPythData,
+    pool?.quoteTokenInfo.symbol,
+  );
+  const marketPrice = getMarketPrice(pythState.symbolToPythData, pool);
 
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const poolMint = useTokenMintAccount(pool?.poolMintKey);

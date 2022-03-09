@@ -7,7 +7,6 @@ import { RefreshContextProvider } from "./refresh";
 import { ModalProvider } from "./modal";
 import { ConfigProvider } from "./config";
 import { EntirePoolsProvider } from "./pool";
-import { PythProvider } from "./pyth";
 
 export function Providers({ children }) {
   return (
@@ -18,9 +17,7 @@ export function Providers({ children }) {
             <ThemeContextProvider>
               <RefreshContextProvider>
                 <ModalProvider>
-                  <EntirePoolsProvider>
-                    <PythProvider>{children}</PythProvider>
-                  </EntirePoolsProvider>
+                  <EntirePoolsProvider>{children}</EntirePoolsProvider>
                 </ModalProvider>
               </RefreshContextProvider>
             </ThemeContextProvider>

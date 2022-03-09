@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { Box, makeStyles, Typography } from "@material-ui/core";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { PriceData } from "@pythnetwork/client";
 import BigNumber from "bignumber.js";
 
 import Page from "components/layout/Page";
@@ -10,8 +9,10 @@ import { PoolSchema } from "constants/pools";
 import { convertDollar } from "utils/utils";
 import { usePools } from "providers/pool";
 import { PMM } from "lib/calc";
-import usePyth, { getMarketPrice } from "providers/pyth";
 import { useTokenAccounts } from "providers/tokens";
+import { useSelector } from "react-redux";
+import { pythSelector } from "states/selectors";
+import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
@@ -45,32 +46,27 @@ const Home: React.FC = () => {
   const { schemas, pools } = usePools();
   const [tokens] = useTokenAccounts();
 
-  const { symbolMap } = usePyth();
+  const pythState = useSelector(pythSelector);
+  const symbolToPythData = pythState.symbolToPythData;
   const { connected: isConnectedWallet } = useWallet();
   const tvl = useMemo(() => {
     if (pools.length > 0) {
       return (pools as any).reduce((p, c) => {
-        const pmm = new PMM(c.poolState, getMarketPrice(symbolMap, c));
-        const baseSymbol = `Crypto.${c.baseTokenInfo.symbol.toUpperCase()}/USD`;
-        const quoteSymbol = `Crypto.${c.quoteTokenInfo.symbol.toUpperCase()}/USD`;
-        let volumn = new BigNumber(0);
-        if (symbolMap[baseSymbol] && symbolMap[quoteSymbol]) {
-          const basePrice = ((symbolMap[baseSymbol] as any).price as PriceData).price
-            ? ((symbolMap[baseSymbol] as any).price as PriceData).price
-            : ((symbolMap[baseSymbol] as any).price as PriceData).previousPrice;
-          const baseDecimals = -((symbolMap[baseSymbol] as any).price as PriceData).exponent;
-          const quotePrice = ((symbolMap[quoteSymbol] as any).price as PriceData).price
-            ? ((symbolMap[quoteSymbol] as any).price as PriceData).price
-            : ((symbolMap[quoteSymbol] as any).price as PriceData).previousPrice;
-          const quoteDecimals = -((symbolMap[quoteSymbol] as any).price as PriceData).exponent;
+        const pmm = new PMM(c.poolState, getMarketPrice(symbolToPythData, c));
+        const { price: basePrice } = getPriceBySymbol(symbolToPythData, c?.baseTokenInfo.symbol);
+        const { price: quotePrice } = getPriceBySymbol(symbolToPythData, c?.quoteTokenInfo.symbol);
 
+        let volumn = new BigNumber(0);
+        if (basePrice && quotePrice) {
+          const baseDecimals = -symbolToPythData[c?.baseTokenInfo.symbol].priceData.exponent;
+          const quoteDecimals = -symbolToPythData[c?.quoteTokenInfo.symbol].priceData.exponent;
           volumn = pmm.tvl(basePrice, quotePrice, baseDecimals, quoteDecimals);
         }
         return p.plus(volumn);
       }, new BigNumber(0)) as BigNumber;
     }
     return new BigNumber(0);
-  }, [pools, symbolMap]);
+  }, [pools, symbolToPythData]);
 
   return (
     <Page>

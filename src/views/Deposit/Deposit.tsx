@@ -30,7 +30,6 @@ import WithdrawCard from "components/molecules/WithdrawCard";
 import { useModal } from "providers/modal";
 import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
 import { usePoolFromAddress } from "providers/pool";
-import { usePriceBySymbol, usePyth, getMarketPrice } from "providers/pyth";
 import { PMM } from "lib/calc";
 import { rate, exponentiate, exponentiatedBy } from "utils/decimal";
 import { getOutAmount } from "utils/liquidity";
@@ -49,6 +48,8 @@ import { farmUserSelector } from "states/selectors";
 import { fetchFarmUsersThunk, toFarmUserPosition } from "states/farmUserState";
 import { MARKET_CONFIG_ADDRESS } from "constants/index";
 import { getPoolConfigByPoolKey } from "constants/deployConfig";
+import { pythSelector } from "states/selectors";
+import { getMarketPrice, getPriceBySymbol } from "states/PythState";
 
 interface TransactionResult {
   status: boolean | null;
@@ -239,12 +240,17 @@ const Deposit: React.FC = () => {
   const farmUserFlat = farmState.farmPoolKeyToFarmUser[farmPoolKey.toBase58()];
   const farmUser = toFarmUserPosition(farmUserFlat);
 
+  const pythState = useSelector(pythSelector);
+  const { price: basePrice } = getPriceBySymbol(
+    pythState.symbolToPythData,
+    pool?.baseTokenInfo.symbol,
+  );
+  const { price: quotePrice } = getPriceBySymbol(
+    pythState.symbolToPythData,
+    pool?.quoteTokenInfo.symbol,
+  );
+  const marketPrice = getMarketPrice(pythState.symbolToPythData, pool);
   const poolMint = useTokenMintAccount(pool?.poolMintKey);
-  const { price: basePrice } = usePriceBySymbol(pool?.baseTokenInfo.symbol);
-  const { price: quotePrice } = usePriceBySymbol(pool?.quoteTokenInfo.symbol);
-
-  const { symbolMap } = usePyth();
-  const marketPrice = getMarketPrice(symbolMap, pool);
 
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
