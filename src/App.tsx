@@ -23,6 +23,7 @@ import { fetchPythDataThunk } from "states/pythState";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { PublicKey } from "@solana/web3.js";
+import { fetchMarketConfigThunk } from "states/marketConfigState";
 import { fetchTokenAccountsThunk } from "states/tokenAccountState";
 import { clearInterval } from "timers";
 // Amplify.configure(awsconfig)
@@ -61,6 +62,15 @@ const App: React.FC = () => {
   const { connection } = useConnection();
 
   useEffect(() => {
+    dispatch(fetchMarketConfigThunk(connection));
+    // Refresh the market config every 60 seconds.
+    const interval = setInterval(() => {
+      dispatch(fetchMarketConfigThunk(connection));
+    }, 60 * 1000);
+    return () => clearInterval(interval);
+  }, [connection, dispatch]);
+
+  useEffect(() => {
     if (!walletAddress) {
       return;
     }
@@ -75,7 +85,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchPythDataThunk(connection));
-    // Refresh the farm pool every 2 seconds.
+    // Refresh the pyth data every 2 seconds.
     const interval = setInterval(() => {
       dispatch(fetchPythDataThunk(connection));
     }, 2 * 1000);

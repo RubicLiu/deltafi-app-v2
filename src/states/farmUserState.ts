@@ -25,7 +25,7 @@ type FetchFarmUsersThunkArg = {
 };
 
 export const fetchFarmUsersThunk = createAsyncThunk(
-  "farm/fetchFarmUsers",
+  "farmUser/fetchFarmUsers",
   async (arg: FetchFarmUsersThunkArg) => {
     const farmUsers = await getFarmUsers(arg.connection, arg.walletAddress);
     const farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser = {};
