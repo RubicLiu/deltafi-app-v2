@@ -23,7 +23,7 @@ import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { PublicKey } from "@solana/web3.js";
 import { fetchTokenAccountsThunk } from "states/tokenAccountState";
-import { clearInterval } from "timers";
+
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
 //   enable: true,
@@ -105,18 +105,16 @@ const App: React.FC = () => {
   }, [connection, dispatch]);
 
   useEffect(() => {
-    const referrer: string = new URLSearchParams(window.location.search).get("referrer");
-
+    const referrer: string = window.localStorage.getItem("referrer");
     // test is the referrer string is a valid public key
     // if the referrer string is invalid, the referrer public key is undefined
-    let referrerPublicKey: PublicKey | null;
+    let referrerPublicKey: PublicKey | null = null;
     if (referrer != null) {
       try {
         referrerPublicKey = new PublicKey(referrer);
       } catch (e) {
         console.warn(e);
         // if the referrer address is invalid, the referrer public key is set to null
-        referrerPublicKey = null;
       }
     }
     // This flag is added to toggle the flag for local development.
@@ -126,7 +124,7 @@ const App: React.FC = () => {
     // TODO(ypeng): Check wallet key and reset state if wallet changes.
     dispatch(setReferrerAction({ referrerPublicKey, enableReferral }));
 
-    if (!enableReferral) {
+    if (!enableReferral || !walletAddress) {
       return;
     }
 

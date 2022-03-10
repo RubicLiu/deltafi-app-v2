@@ -3,7 +3,6 @@ import {
   Keypair,
   PublicKey,
   Transaction,
-  SystemProgram,
   TransactionInstruction,
 } from "@solana/web3.js";
 import BN from "bn.js";
@@ -14,15 +13,14 @@ import {
   createSwapInstruction,
   SwapData,
   SWAP_DIRECTION,
-  createSetReferrerInstruction,
   createStableSwapInstruction,
 } from "lib/instructions";
 import { ExTokenAccount, MarketConfig, PoolInfo } from "providers/types";
-import { USER_REFERRER_DATA_SIZE } from "lib/state";
 
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from ".";
 import { AccountLayout } from "@solana/spl-token";
+import { checkAndCreateReferralDataTransaction } from "./utils";
 
 export const dummyReferrerAddress = "66666666666666666666666666666666666666666666";
 
@@ -121,7 +119,7 @@ export async function swap({
   destinationRef?: PublicKey;
   rewardTokenRef?: PublicKey;
   swapData: SwapData;
-  isNewUser: Boolean;
+  isNewUser: boolean;
   referrer: PublicKey | null;
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
@@ -134,13 +132,6 @@ export async function swap({
   let createWrappedTokenAccountTransaction: Transaction | undefined;
   let initializeWrappedTokenAccountTransaction: Transaction | undefined;
   let closeWrappedTokenAccountTransaction: Transaction | undefined;
-  let createUserReferrerAccountTransaction: Transaction | undefined;
-  const referralSeed = "referrer";
-  const userReferrerDataPubkey = await PublicKey.createWithSeed(
-    walletPubkey,
-    referralSeed,
-    SWAP_PROGRAM_ID,
-  );
 
   let buySol =
     (pool.quoteTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellBase) ||
@@ -198,40 +189,16 @@ export async function swap({
     createRewardAccountTransaction = result?.transaction;
   }
 
-  // Only create user referrer data account for non-sol operation, because otherwise the transaction
-  // will fail as the transaction payload is too big.
-  if (isNewUser && !(buySol || sellSol)) {
-    const userReferralAccountInfo = await connection.getAccountInfo(userReferrerDataPubkey);
-    // Check if the user referrer data is created already.
-    if (!userReferralAccountInfo) {
-      const balanceForUserReferrerData = await connection.getMinimumBalanceForRentExemption(
-        USER_REFERRER_DATA_SIZE,
-      );
-      createUserReferrerAccountTransaction = new Transaction()
-        .add(
-          SystemProgram.createAccountWithSeed({
-            basePubkey: walletPubkey,
-            fromPubkey: walletPubkey,
-            newAccountPubkey: userReferrerDataPubkey,
-            lamports: balanceForUserReferrerData,
-            space: USER_REFERRER_DATA_SIZE,
-            programId: SWAP_PROGRAM_ID,
-            seed: referralSeed,
-          }),
-        )
-        .add(
-          createSetReferrerInstruction(
-            config.publicKey,
-            walletPubkey,
-            userReferrerDataPubkey,
-            referrer ? referrer : new PublicKey(dummyReferrerAddress),
-            SWAP_PROGRAM_ID,
-          ),
+  const { userReferrerDataPubkey, createUserReferrerAccountTransaction } =
+    buySol || sellSol
+      ? { userReferrerDataPubkey: null, createUserReferrerAccountTransaction: null }
+      : await checkAndCreateReferralDataTransaction(
+          walletPubkey,
+          referrer,
+          config,
+          connection,
+          isNewUser,
         );
-    } else {
-      throw Error("Wrong referral state, user is not a new user");
-    }
-  }
 
   const userTransferAuthority = Keypair.generate();
   let nonce = new BN(config.bumpSeed);
@@ -253,7 +220,6 @@ export async function swap({
     }
   })();
 
-  // TODO: Add the referrer info to the swap instruction.
   let transaction = new Transaction();
   transaction
     .add(

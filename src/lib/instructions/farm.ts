@@ -208,7 +208,17 @@ export const createClaimFarmInstruction = (
   claimDestination: PublicKey,
   claimMint: PublicKey,
   programId: PublicKey,
+  userReferrerData: PublicKey,
+  referrer: PublicKey | null,
 ) => {
+  let extraReferrerAccounts = [];
+  if (userReferrerData && referrer) {
+    extraReferrerAccounts = [
+      { pubkey: userReferrerData, isSigner: false, isWritable: false },
+      { pubkey: referrer, isSigner: false, isWritable: true },
+    ];
+  }
+
   const keys = [
     { pubkey: config, isSigner: false, isWritable: false },
     { pubkey: farmPool, isSigner: false, isWritable: false },
@@ -219,7 +229,7 @@ export const createClaimFarmInstruction = (
     { pubkey: claimMint, isSigner: false, isWritable: true },
     { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ];
+  ].concat(extraReferrerAccounts);
 
   const dataLayout = struct([u8("instruction")]);
   const data = Buffer.alloc(dataLayout.span);

@@ -39,6 +39,7 @@ import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  appSelector,
   selectFarmUserByFarmPoolKey,
   selectFarmPoolByFarmPoolKey,
   tokenAccountSelector,
@@ -88,6 +89,7 @@ const Stake = (): ReactElement => {
   const location = useLocation();
 
   const tokenAccountsInfo = useSelector(tokenAccountSelector);
+  const appState = useSelector(appSelector);
 
   const farmPoolId = location.pathname.split("/").pop();
   const farmPool = useSelector(selectFarmPoolByFarmPoolKey(farmPoolId));
@@ -364,6 +366,9 @@ const Stake = (): ReactElement => {
       return null;
     }
 
+    const referrerPubkey = appState.isNewUser === undefined ? null : appState.referrerPublicKey;
+    const isNewUser: boolean = appState.isNewUser;
+
     setIsProcessingClaim(true);
     try {
       const transaction = await claim({
@@ -373,6 +378,8 @@ const Stake = (): ReactElement => {
         farmPool,
         farmUser: farmUser.publicKey,
         claimDestination: rewardsAccount?.pubkey,
+        referrer: referrerPubkey,
+        isNewUser,
       });
       const signedTransaction = await signTransaction(transaction);
 
@@ -418,6 +425,7 @@ const Stake = (): ReactElement => {
     rewardsAccount,
     dispatch,
     tokenAccountsInfo,
+    appState,
   ]);
 
   const handleSnackBarClose = useCallback(() => {

@@ -292,7 +292,7 @@ const Home: React.FC = (props) => {
       const isStable = pool.swapType === SwapType.Stable;
       const referrerPubkey: PublicKey | null =
         appState.isNewUser === undefined ? null : appState.referrerPublicKey;
-      const isNewUser: Boolean = appState.isNewUser;
+      const isNewUser: boolean = appState.isNewUser;
 
       const amountIn = BigInt(
         exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString(),

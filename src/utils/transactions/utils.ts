@@ -1,6 +1,11 @@
-import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
+import { PublicKey, Transaction, SystemProgram, Connection } from "@solana/web3.js";
 
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from "@solana/spl-token";
+import { SWAP_PROGRAM_ID } from "constants/index";
+import { MarketConfig } from "providers/types";
+import { USER_REFERRER_DATA_SIZE } from "lib/state";
+import { createSetReferrerInstruction } from "lib/instructions";
+import { dummyReferrerAddress } from "./swap";
 
 export function createNativeSOLHandlingTransactions(
   tempAccountRefPubkey: PublicKey,
@@ -47,5 +52,66 @@ export function createNativeSOLHandlingTransactions(
     createWrappedTokenAccountTransaction,
     initializeWrappedTokenAccountTransaction,
     closeWrappedTokenAccountTransaction,
+  };
+}
+
+export async function checkAndCreateReferralDataTransaction(
+  walletPubkey: PublicKey,
+  referrer: PublicKey | null,
+  config: MarketConfig,
+  connection: Connection,
+  isNewUser: boolean,
+): Promise<{
+  userReferrerDataPubkey: PublicKey;
+  createUserReferrerAccountTransaction: Transaction | null;
+}> {
+  const seed = "referrer";
+  const userReferrerDataPubkey = await PublicKey.createWithSeed(
+    walletPubkey,
+    seed,
+    SWAP_PROGRAM_ID,
+  );
+
+  const userReferralAccountInfo = await connection.getAccountInfo(userReferrerDataPubkey);
+  if ((userReferralAccountInfo && isNewUser) || (!userReferralAccountInfo && !isNewUser)) {
+    throw Error("Referral state is incorrect");
+  }
+
+  if (!isNewUser) {
+    return {
+      userReferrerDataPubkey,
+      createUserReferrerAccountTransaction: null,
+    };
+  }
+
+  const balanceForUserReferrerData = await connection.getMinimumBalanceForRentExemption(
+    USER_REFERRER_DATA_SIZE,
+  );
+
+  const createUserReferrerAccountTransaction = new Transaction()
+    .add(
+      SystemProgram.createAccountWithSeed({
+        basePubkey: walletPubkey,
+        fromPubkey: walletPubkey,
+        newAccountPubkey: userReferrerDataPubkey,
+        lamports: balanceForUserReferrerData,
+        space: USER_REFERRER_DATA_SIZE,
+        programId: SWAP_PROGRAM_ID,
+        seed,
+      }),
+    )
+    .add(
+      createSetReferrerInstruction(
+        config.publicKey,
+        walletPubkey,
+        userReferrerDataPubkey,
+        referrer ? referrer : new PublicKey(dummyReferrerAddress),
+        SWAP_PROGRAM_ID,
+      ),
+    );
+
+  return {
+    userReferrerDataPubkey,
+    createUserReferrerAccountTransaction,
   };
 }

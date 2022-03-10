@@ -51,7 +51,6 @@ export const fetchReferrerThunk = createAsyncThunk(
       ) {
         referrerPublicKey = referralInfo.referrer;
       }
-      // TODO: check if the referrer is a dummy key, set it to null
       isNewUser = false;
     }
 
