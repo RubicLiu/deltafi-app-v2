@@ -55,7 +55,9 @@
         },
         "mint": "2oViQjomgFonQsT4V2G9hfebciMJcLuKJUMPoXKgKFNa",
         "symbol": "USDC",
-        "decimals": 6
+        "decimals": 6,
+        "name": "USD Coin",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
       },
       {
         "pyth": {
@@ -66,7 +68,9 @@
         },
         "mint": "Eoaf9mixhbXoMUMRLY5NjYvsF2hcDFtdwFedzKbvQZRf",
         "symbol": "USDT",
-        "decimals": 6
+        "decimals": 6,
+        "name": "USDT",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png"
       },
       {
         "pyth": {
@@ -77,7 +81,9 @@
         },
         "mint": "So11111111111111111111111111111111111111112",
         "symbol": "SOL",
-        "decimals": 9
+        "decimals": 9,
+        "name": "SOL",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
       },
       {
         "pyth": {
@@ -88,7 +94,9 @@
         },
         "mint": "59KfLKLwF2aT3YodgrFWzENYZw2zHy5AQcksDFVbNdku",
         "symbol": "SRM",
-        "decimals": 6
+        "decimals": 6,
+        "name": "Serum",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png"
       }
     ]
   },
@@ -151,7 +159,9 @@
         },
         "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
         "symbol": "USDC",
-        "decimals": 6
+        "decimals": 6,
+        "name": "USD Coin",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
       },
       {
         "pyth": {
@@ -161,7 +171,9 @@
         },
         "mint": "So11111111111111111111111111111111111111112",
         "symbol": "SOL",
-        "decimals": 9
+        "decimals": 9,
+        "name": "SOL",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
       },
       {
         "pyth": {
@@ -171,7 +183,9 @@
         },
         "mint": "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt",
         "symbol": "SRM",
-        "decimals": 6
+        "decimals": 6,
+        "name": "Serum",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png"
       },
       {
         "pyth": {
@@ -181,7 +195,9 @@
         },
         "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
         "symbol": "USDT",
-        "decimals": 6
+        "decimals": 6,
+        "name": "USDT",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png"
       }
     ]
   },
@@ -244,7 +260,9 @@
         },
         "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
         "symbol": "USDC",
-        "decimals": 6
+        "decimals": 6,
+        "name": "USD Coin",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
       },
       {
         "pyth": {
@@ -254,7 +272,9 @@
         },
         "mint": "So11111111111111111111111111111111111111112",
         "symbol": "SOL",
-        "decimals": 9
+        "decimals": 9,
+        "name": "SOL",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
       },
       {
         "pyth": {
@@ -264,7 +284,9 @@
         },
         "mint": "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt",
         "symbol": "SRM",
-        "decimals": 6
+        "decimals": 6,
+        "name": "Serum",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png"
       },
       {
         "pyth": {
@@ -274,7 +296,9 @@
         },
         "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
         "symbol": "USDT",
-        "decimals": 6
+        "decimals": 6,
+        "name": "USDT",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png"
       }
     ]
   }
