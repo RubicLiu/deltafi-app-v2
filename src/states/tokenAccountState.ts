@@ -1,6 +1,6 @@
 import { createReducer, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { PublicKey, Connection } from "@solana/web3.js";
+import { PublicKey, Connection, AccountInfo } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { blob, struct } from "buffer-layout";
 import { deployConfig } from "constants/deployConfig";
@@ -8,9 +8,9 @@ import { DELTAFI_TOKEN_SYMBOL } from "constants/index";
 import { lpTokens, tokens } from "constants/tokens";
 import { Dispatch } from "react";
 import { getMultipleAccounts } from "utils/account";
-import { u64 } from "utils/layout";
+import { u64, publicKey } from "utils/layout";
 
-type TokenAccountInfo = { accountPublicKey: PublicKey; balance: BigNumber };
+type TokenAccountInfo = { accountPublicKey: PublicKey; balance: BigNumber; mint: PublicKey };
 /// mapping from symbol to balance and account public key
 type SymbolToTokenAccountInfo = Record<string, TokenAccountInfo | null>;
 
@@ -32,32 +32,48 @@ export const setTokenAccountAction = createAction<{
   tokenAccountInfo: TokenAccountInfo;
 }>("tokenAccount/setTokenAccount");
 
-export const TOKEN_ACCOUNT_LAYOUT = struct<{ balance: BigNumber }>([
-  blob(64),
+const SOL_MINT_ADDRESS = "So11111111111111111111111111111111111111112";
+export const TOKEN_ACCOUNT_LAYOUT = struct<{ mint: PublicKey; balance: BigNumber }>([
+  publicKey("mint"),
+  blob(32),
   u64("balance"),
   blob(93),
 ]);
+
+function parseTokenAccountInfo(publicKey: PublicKey, accountInfo: AccountInfo<Buffer>) {
+  const { balance, mint } = TOKEN_ACCOUNT_LAYOUT.decode(accountInfo.data);
+  if (!accountInfo) {
+    throw Error("invalid token account: " + publicKey.toBase58());
+  }
+  return {
+    balance: new BigNumber(balance),
+    accountPublicKey: publicKey,
+    mint,
+  };
+}
+
+function parseSolTokenAccountInfo(publicKey: PublicKey, accountInfo: AccountInfo<Buffer>) {
+  if (!accountInfo) {
+    throw Error("invalid wallet address: " + publicKey.toBase58());
+  }
+  return {
+    balance: new BigNumber(accountInfo.lamports),
+    accountPublicKey: publicKey,
+    mint: new PublicKey(SOL_MINT_ADDRESS),
+  };
+}
 
 async function getTokenAccountInfo(
   tokenAccountPublicKey: PublicKey,
   connection: Connection,
 ): Promise<TokenAccountInfo | null> {
-  try {
-    const tokenAccountInfoBuffer = await connection.getAccountInfo(tokenAccountPublicKey);
-    if (!tokenAccountInfoBuffer) {
-      return null;
-    }
+  const tokenAccountInfoBuffer = await connection.getAccountInfo(tokenAccountPublicKey);
+  return parseTokenAccountInfo(tokenAccountPublicKey, tokenAccountInfoBuffer);
+}
 
-    const { balance } = TOKEN_ACCOUNT_LAYOUT.decode(tokenAccountInfoBuffer.data);
-
-    return {
-      balance: new BigNumber(balance),
-      accountPublicKey: tokenAccountPublicKey,
-    };
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
+async function getSolTokenAccountInfo(wallet: PublicKey, connection: Connection) {
+  const walletAccountInfo = await connection.getAccountInfo(wallet);
+  return parseSolTokenAccountInfo(wallet, walletAccountInfo);
 }
 
 // helper function for swap/deposit/withdraw/unstake
@@ -75,149 +91,92 @@ export async function fecthTokenAccountInfo(
   }
 
   const { accountPublicKey } = symbolToTokenAccountInfo[symbol];
-
   try {
-    if (symbol === "SOL") {
-      const walletAccountInfo = await connection.getAccountInfo(accountPublicKey);
-      if (!walletAccountInfo) {
-        throw Error("invalid wallet address");
-      }
-
-      dispatch(
-        setTokenAccountAction({
-          symbol,
-          tokenAccountInfo: {
-            balance: new BigNumber(walletAccountInfo.lamports),
-            accountPublicKey,
-          },
-        }),
-      );
-    } else {
-      const tokenAccountInfo = await getTokenAccountInfo(accountPublicKey, connection);
-      if (!tokenAccountInfo) {
-        throw Error("cannot find token account info");
-      }
-
-      dispatch(setTokenAccountAction({ symbol, tokenAccountInfo }));
-    }
+    const tokenAccountInfo =
+      symbol === "SOL"
+        ? await getSolTokenAccountInfo(accountPublicKey, connection)
+        : await getTokenAccountInfo(accountPublicKey, connection);
+    dispatch(setTokenAccountAction({ symbol, tokenAccountInfo }));
   } catch (e) {
     console.warn(e);
   }
 }
 
-// This function fetches token accounts info of tokens that are in the
-// keys of mintAddressToSymbol to the tokenAccountInfoResult Object
-async function getTokenAcountInfoRecord(
-  mintAddressToSymbol: Record<string, string>,
+async function getTokenAcountInfoList(
+  mintAddressList: string[],
   connection: Connection,
   walletAddress: PublicKey,
-): Promise<SymbolToTokenAccountInfo> {
-  const tokenAccountInfoResult: SymbolToTokenAccountInfo = {};
-  const tokenAccountAddressToMintAddress: Record<string, string> = {};
-
-  // list of public keys of token accounts
-  // the key value is calculated from mint address and wallet public key using
-  // the official method
-  const PublicKeyList = await Promise.all(
-    Object.keys(mintAddressToSymbol).map(async (mintAddress) => {
-      if (mintAddressToSymbol[mintAddress] === "SOL") {
-        // if the token is SOL, we save the native SOL information in the form of a token account
-        // the 'token account' address is the wallet itself
-        tokenAccountAddressToMintAddress[walletAddress.toBase58()] = mintAddress;
-        return walletAddress;
-      }
-
-      // this is where we get the the token accounts' public keys
+) {
+  const tokenAddressList = [];
+  for (const mintAddress of mintAddressList) {
+    // For SOL native account, we use the wallet address directly.
+    if (mintAddress === SOL_MINT_ADDRESS) {
+      tokenAddressList.push(walletAddress);
+    } else {
       const tokenAccountPublicKey = await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
         new PublicKey(mintAddress),
         walletAddress,
       );
-
-      // need to save the mapping from token account public key to mint address for later processing
-      tokenAccountAddressToMintAddress[tokenAccountPublicKey.toBase58()] = mintAddress;
-      return tokenAccountPublicKey;
-    }),
-  );
-
-  const accountInfoList = await getMultipleAccounts(connection, PublicKeyList, "confirmed");
-  for (let i = 0; i < accountInfoList.keys.length; i++) {
-    const accountInfo = accountInfoList.array[i];
-    const tokenAccountPublicKey = accountInfoList.keys[i];
-    // get which token this token account is associated with
-    const symbol =
-      mintAddressToSymbol[tokenAccountAddressToMintAddress[tokenAccountPublicKey.toBase58()]];
-
-    if (!accountInfo) {
-      // if there the account doesn't exist, we explicitly mark it as null
-      tokenAccountInfoResult[symbol] = null;
-      continue;
-    }
-
-    if (symbol === "SOL") {
-      // for native sol, we also put its info in the form of a token account
-      try {
-        const walletAccountBalance = accountInfo.lamports;
-        if (!walletAccountBalance) {
-          // if the account info doesn't have lamport, it means there is something
-          // wrong with the wallet address, this shouldn't happend
-          throw Error("Invalid wallet address");
-        }
-
-        tokenAccountInfoResult.SOL = {
-          accountPublicKey: walletAddress,
-          balance: new BigNumber(walletAccountBalance),
-        };
-      } finally {
-        // will foward any exeption upward, and keep processing next token in the loop
-        continue;
-      }
-    }
-
-    try {
-      const { balance } = TOKEN_ACCOUNT_LAYOUT.decode(accountInfo.data as Buffer);
-
-      tokenAccountInfoResult[symbol] = {
-        accountPublicKey: tokenAccountPublicKey,
-        // the original balance is a BigNumber from BitInt,
-        // it needs to be converted again
-        balance: new BigNumber(balance),
-      };
-    } finally {
-      // will foward any exeption upward, and keep processing next token in the loop
-      continue;
+      tokenAddressList.push(tokenAccountPublicKey);
     }
   }
 
-  return tokenAccountInfoResult;
+  const tokenAccountInfoList = [];
+  const accountInfoList = await getMultipleAccounts(connection, tokenAddressList, "confirmed");
+  for (let i = 0; i < accountInfoList.keys.length; i++) {
+    const accountInfo = accountInfoList.array[i];
+    const tokenAccountPublicKey = accountInfoList.keys[i];
+    if (!accountInfo) {
+      continue;
+    }
+
+    try {
+      const tokenAccountInfo =
+        tokenAccountPublicKey === walletAddress
+          ? parseSolTokenAccountInfo(walletAddress, accountInfo as AccountInfo<Buffer>)
+          : parseTokenAccountInfo(tokenAccountPublicKey, accountInfo as AccountInfo<Buffer>);
+      tokenAccountInfoList.push(tokenAccountInfo);
+    } catch (e) {
+      // Ignore individual account error.
+      console.warn(e);
+    }
+  }
+  return tokenAccountInfoList;
 }
 
 // fetch token account based on the mint and wallet address
 export const fetchTokenAccountsThunk = createAsyncThunk(
   "tokenAccount/fetchTokenAccountsThunk",
   async (arg: fetchTokenAccountsThunkArgs) => {
-    // process both tokens and lp tokens
-    // tokens and lptokens have to common field symbol, address
+    // Get tokens, lp tokens and deltafi tokens.
+    const addressToSymbol = Object.fromEntries(
+      tokens
+        .map(({ symbol, address }) => ({ symbol, address }))
+        .concat(lpTokens.map(({ symbol, address }) => ({ symbol, address })))
+        .concat([
+          {
+            symbol: DELTAFI_TOKEN_SYMBOL,
+            address: deployConfig.deltafiTokenMint,
+          },
+        ])
+        .map(({ symbol, address }) => [address, symbol]),
+    );
 
-    const symbolToTokenAccountInfo = await getTokenAcountInfoRecord(
-      // this object concats tokens, lptokens and deltafi token information together
-      // and only take symbol and address fields
-      Object.fromEntries(
-        tokens
-          .map(({ symbol, address }) => ({ symbol, address }))
-          .concat(lpTokens.map(({ symbol, address }) => ({ symbol, address })))
-          .concat([
-            {
-              symbol: DELTAFI_TOKEN_SYMBOL,
-              address: deployConfig.deltafiTokenMint,
-            },
-          ])
-          .map(({ symbol, address }) => [address, symbol]),
-      ),
+    const tokenAccountInfoList = await getTokenAcountInfoList(
+      Object.keys(addressToSymbol),
       arg.connection,
       arg.walletAddress,
     );
+
+    const symbolToTokenAccountInfo = Object.fromEntries(
+      tokenAccountInfoList.map((tokenAccountInfo) => {
+        const symbol = addressToSymbol[tokenAccountInfo.mint.toBase58()];
+        return [symbol, tokenAccountInfo];
+      }),
+    );
+    console.info(symbolToTokenAccountInfo);
 
     return {
       symbolToTokenAccountInfo,
