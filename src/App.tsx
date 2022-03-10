@@ -23,6 +23,8 @@ import { fetchPythDataThunk } from "states/pythState";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { PublicKey } from "@solana/web3.js";
+import { fetchTokenAccountsThunk } from "states/tokenAccountState";
+import { clearInterval } from "timers";
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
 //   enable: true,
@@ -57,6 +59,19 @@ const App: React.FC = () => {
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
+
+  useEffect(() => {
+    if (!walletAddress) {
+      return;
+    }
+
+    dispatch(fetchTokenAccountsThunk({ connection, walletAddress }));
+    // refresh every 1 minute
+    const interval = setInterval(() => {
+      dispatch(fetchTokenAccountsThunk({ connection, walletAddress }));
+    }, 60 * 1000);
+    return () => clearInterval(interval);
+  }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
     dispatch(fetchPythDataThunk(connection));

@@ -42,13 +42,18 @@ import { SwapCard as ISwapCard } from "./components/types";
 import { tokens } from "constants/tokens";
 import { useCustomConnection } from "providers/connection";
 import { SwapType } from "lib/state";
-import { sleep } from "utils/utils";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
-import { appSelector, selectPoolBySymbols, selectPythMarketPriceByPool } from "states/selectors";
+import {
+  appSelector,
+  selectPoolBySymbols,
+  selectPythMarketPriceByPool,
+  tokenAccountSelector,
+} from "states/selectors";
 import { fetchPoolsThunk } from "states/poolState";
 import { fetchReferrerThunk } from "states/appState";
+import { fecthTokenAccountInfo } from "states/tokenAccountState";
 
 interface TransactionResult {
   status: boolean | null;
@@ -143,6 +148,7 @@ const Home: React.FC = (props) => {
   });
   const { config } = useConfig();
 
+  const tokenAccountsInfo = useSelector(tokenAccountSelector);
   const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
 
   const sourceAccount = useTokenFromMint(tokenFrom.token.address);
@@ -320,7 +326,21 @@ const Home: React.FC = (props) => {
       const hash = await sendSignedTransaction({ signedTransaction: transaction, connection });
 
       await connection.confirmTransaction(hash, "confirmed");
-      await sleep(0.3); // sleep here to make sure the balance up-to-date
+
+      // fetch account info and update record for from and to tokens
+      await fecthTokenAccountInfo(
+        tokenAccountsInfo.symbolToTokenAccountInfo,
+        tokenFrom.token.symbol,
+        connection,
+        dispatch,
+      );
+      await fecthTokenAccountInfo(
+        tokenAccountsInfo.symbolToTokenAccountInfo,
+        tokenTo.token.symbol,
+        connection,
+        dispatch,
+      );
+
       setTokenFrom((prevTokenFrom) => ({ ...prevTokenFrom, amount: "", lastUpdate: Date.now() }));
       setTokenTo((prevTokenTo) => ({ ...prevTokenTo, amount: "", lastUpdate: Date.now() }));
       const prevBalanceFrom = sourceBalance ?? 0;
@@ -384,6 +404,7 @@ const Home: React.FC = (props) => {
     destinationBalance,
     appState,
     dispatch,
+    tokenAccountsInfo,
   ]);
 
   const handleSwap = useCallback(async () => {

@@ -6,6 +6,8 @@ import { deployConfig } from "./deployConfig";
 export const SWAP_PROGRAM_ID = new PublicKey(deployConfig.swapProgramId);
 export const MARKET_CONFIG_ADDRESS = new PublicKey(deployConfig.marketConfigAddress);
 export const DELTAFI_TOKEN_MINT = new PublicKey(deployConfig.deltafiTokenMint);
+export const DELTAFI_TOKEN_DECIMALS = 6; // our token is always with 6 decimals
+export const DELTAFI_TOKEN_SYMBOL = "DELFI";
 
 export const WAD_LENGTH = 12;
 

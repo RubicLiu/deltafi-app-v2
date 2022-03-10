@@ -29,13 +29,23 @@ import { useModal } from "providers/modal";
 import { useConfig } from "providers/config";
 import { sendSignedTransaction, claim, stake, unstake } from "utils/transactions";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
-import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK, MARKET_CONFIG_ADDRESS } from "constants/index";
+import {
+  DELTAFI_TOKEN_MINT,
+  SOLSCAN_LINK,
+  MARKET_CONFIG_ADDRESS,
+  DELTAFI_TOKEN_SYMBOL,
+} from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector, useDispatch } from "react-redux";
-import { selectFarmUserByFarmPoolKey, selectFarmPoolByFarmPoolKey } from "states/selectors";
+import {
+  selectFarmUserByFarmPoolKey,
+  selectFarmPoolByFarmPoolKey,
+  tokenAccountSelector,
+} from "states/selectors";
 import { toFarmUserPosition, fetchFarmUsersThunk } from "states/farmUserState";
+import { fecthTokenAccountInfo } from "states/tokenAccountState";
 import { getPoolConfigByFarmPoolKey } from "constants/deployConfig";
 import { getTokenInfo } from "providers/tokens";
 
@@ -77,6 +87,8 @@ const Stake = (): ReactElement => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const location = useLocation();
+
+  const tokenAccountsInfo = useSelector(tokenAccountSelector);
 
   const farmPoolId = location.pathname.split("/").pop();
   const farmPool = useSelector(selectFarmPoolByFarmPoolKey(farmPoolId));
@@ -235,6 +247,13 @@ const Stake = (): ReactElement => {
         });
 
         await connection.confirmTransaction(hash, "confirmed");
+
+        await fecthTokenAccountInfo(
+          tokenAccountsInfo.symbolToTokenAccountInfo,
+          farmPool?.name, // lptoken symbol is same as the pool name, we find lptoken using this farm pool name
+          connection,
+          dispatch,
+        );
         setPercentage(0);
         setStaking((prevStaking) => ({
           ...prevStaking,
@@ -289,6 +308,12 @@ const Stake = (): ReactElement => {
         });
 
         await connection.confirmTransaction(hash, "confirmed");
+        await fecthTokenAccountInfo(
+          tokenAccountsInfo.symbolToTokenAccountInfo,
+          farmPool?.name, // lptoken symbol is same as the pool name, we find lptoken using this farm pool name
+          connection,
+          dispatch,
+        );
         setPercentage(0);
         setStaking((prevStaking) => ({
           ...prevStaking,
@@ -332,6 +357,7 @@ const Stake = (): ReactElement => {
     position,
     depositAmount,
     dispatch,
+    tokenAccountsInfo,
   ]);
 
   const handleClaim = useCallback(async () => {
@@ -357,6 +383,12 @@ const Stake = (): ReactElement => {
       });
 
       await connection.confirmTransaction(hash, "confirmed");
+      await fecthTokenAccountInfo(
+        tokenAccountsInfo.symbolToTokenAccountInfo,
+        DELTAFI_TOKEN_SYMBOL,
+        connection,
+        dispatch,
+      );
       setTransactionResult({
         status: true,
         action: "claim",
@@ -386,6 +418,7 @@ const Stake = (): ReactElement => {
     walletPubkey,
     rewardsAccount,
     dispatch,
+    tokenAccountsInfo,
   ]);
 
   const handleSnackBarClose = useCallback(() => {

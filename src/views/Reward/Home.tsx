@@ -14,6 +14,10 @@ import { deployConfig } from "constants/deployConfig";
 import { createReferrerDeltafiTokenAccount } from "utils/transactions/createReferrerDeltafiTokenAccount";
 import { sendSignedTransaction } from "utils/transactions";
 import loadingIcon from "components/gif/loading_white.gif";
+import { useDispatch, useSelector } from "react-redux";
+import { tokenAccountSelector } from "states";
+import { fecthTokenAccountInfo } from "states/tokenAccountState";
+import { DELTAFI_TOKEN_SYMBOL } from "constants/index";
 /*
  * mockup test data for reward page
  */
@@ -161,7 +165,9 @@ const Home: React.FC = (props) => {
   const { setMenu } = useModal();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
+  const dispatch = useDispatch();
 
+  const tokenAccountsInfo = useSelector(tokenAccountSelector);
   //TODO refactory token provider with redux and get the user's DELFI token with a better method
   const deltafiTokenAccount = useTokenFromMint(deployConfig.deltafiTokenMint);
 
@@ -261,6 +267,13 @@ const Home: React.FC = (props) => {
                                   connection,
                                 });
                                 await connection.confirmTransaction(hash, "confirmed");
+                                await fecthTokenAccountInfo(
+                                  tokenAccountsInfo.symbolToTokenAccountInfo,
+                                  DELTAFI_TOKEN_SYMBOL,
+                                  connection,
+                                  dispatch,
+                                );
+
                                 setReferralLinkState("Ready");
                               } catch (e) {
                                 console.error(e);
