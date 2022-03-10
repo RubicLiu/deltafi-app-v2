@@ -33,7 +33,6 @@ import {
 } from "providers/tokens";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { swap } from "utils/transactions/swap";
-import { useConfig } from "providers/config";
 import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS, SOLSCAN_LINK } from "constants/index";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
@@ -54,6 +53,7 @@ import {
 import { fetchPoolsThunk } from "states/poolState";
 import { fetchReferrerThunk } from "states/appState";
 import { fecthTokenAccountInfo } from "states/tokenAccountState";
+import { marketConfig } from "constants/deployConfig";
 
 interface TransactionResult {
   status: boolean | null;
@@ -146,7 +146,7 @@ const Home: React.FC = (props) => {
     amount: "",
     amountWithSlippage: "",
   });
-  const { config } = useConfig();
+  const config = marketConfig;
 
   const tokenAccountsInfo = useSelector(tokenAccountSelector);
   const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));

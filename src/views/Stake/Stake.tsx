@@ -26,7 +26,6 @@ import useStyles from "./styles";
 import { getFarmTokenInfo, useTokenFromMint, useTokenMintAccount } from "providers/tokens";
 import { lpTokens } from "constants/tokens";
 import { useModal } from "providers/modal";
-import { useConfig } from "providers/config";
 import { sendSignedTransaction, claim, stake, unstake } from "utils/transactions";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import {
@@ -46,7 +45,7 @@ import {
 } from "states/selectors";
 import { toFarmUserPosition, fetchFarmUsersThunk } from "states/farmUserState";
 import { fecthTokenAccountInfo } from "states/tokenAccountState";
-import { getPoolConfigByFarmPoolKey } from "constants/deployConfig";
+import { getPoolConfigByFarmPoolKey, marketConfig } from "constants/deployConfig";
 import { getTokenInfo } from "providers/tokens";
 
 interface TransactionResult {
@@ -127,7 +126,7 @@ const Stake = (): ReactElement => {
     horizontal: "left",
   });
 
-  const { config } = useConfig();
+  const config = marketConfig;
   const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58());
   const lpMint = useTokenMintAccount(farmPool?.poolMintKey);
   const deltafiTokenMint = useTokenMintAccount(DELTAFI_TOKEN_MINT);

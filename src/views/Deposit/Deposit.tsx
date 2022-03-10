@@ -36,7 +36,6 @@ import { deposit, withdraw, sendSignedTransaction } from "utils/transactions";
 import { convertDollar } from "utils/utils";
 import { SOLSCAN_LINK } from "constants/index";
 import { useCustomConnection } from "providers/connection";
-import { useConfig } from "providers/config";
 import { SwapType } from "lib/state";
 import { stableDeposit } from "utils/transactions/stableDeposit";
 import { stableWithdraw } from "utils/transactions/stableWithdraw";
@@ -46,7 +45,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchFarmUsersThunk, toFarmUserPosition } from "states/farmUserState";
 import { fetchPoolsThunk } from "states/poolState";
 import { MARKET_CONFIG_ADDRESS } from "constants/index";
-import { getPoolConfigByPoolKey } from "constants/deployConfig";
+import { getPoolConfigByPoolKey, marketConfig } from "constants/deployConfig";
 import {
   selectFarmUserByFarmPoolKey,
   selectPythMarketPriceByPool,
@@ -235,7 +234,7 @@ const Deposit: React.FC = () => {
   const baseTokenAccount = useTokenFromMint(pool?.baseTokenInfo.address);
   const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address);
 
-  const { config } = useConfig();
+  const config = marketConfig;
   const farmPoolKey = useMemo(() => {
     const poolConfig = getPoolConfigByPoolKey(poolAddress);
     return new PublicKey(poolConfig.farm);

@@ -1,3 +1,6 @@
+import { PublicKey } from "@solana/web3.js";
+
+import { MarketConfig } from "providers/types";
 import fullDeployConfig from "./fullDeployConfig.json";
 
 export const deployConfig =
@@ -22,3 +25,10 @@ export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String) 
 export function getTokenInfoBySymbol(symbolStr: String) {
   return deployConfig.tokenInfo.find(({ symbol }) => symbol === symbolStr);
 }
+
+export const marketConfig: MarketConfig = {
+  publicKey: new PublicKey(deployConfig.marketConfigAddress),
+  deltafiMint: new PublicKey(deployConfig.deltafiTokenMint),
+  deltafiToken: new PublicKey(deployConfig.deltafiToken),
+  bumpSeed: deployConfig.bumpSeed,
+};

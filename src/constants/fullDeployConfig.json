@@ -3,6 +3,8 @@
     "network": "localhost",
     "swapProgramId": "GTHFXBiyJNtQSuQ3HouWExrDiXEvqjrn5Hwbpe1bFB7U",
     "marketConfigAddress": "57pCgFkJVdkeHACWkz61kwBibcTct2NkCKcTiQaqgFqq",
+    "marketAuthority": "AYYUkAXcaf2geogoPiFnkju28xcrbbfVYPkwFZUzEAXd",
+    "bumpSeed": 255,
     "deltafiTokenMint": "9zuKduFQR75Qv2YBea9cVufpqUAXSwq3vHiSeDUhF6XR",
     "deltafiToken": "3Xy1hdxWXrzXf9P7Nt2RR6P1ufN2JbisLmwAL22Tkgpf",
     "poolInfo": [
@@ -94,6 +96,8 @@
     "network": "mainnet-beta",
     "swapProgramId": "3gaAmJzWkXfkVWK1Q7BcWBE5KJtU4mtG9mQ7aGBSSp3X",
     "marketConfigAddress": "5hwGxMpQkoAx21aoAvafT3NmAGk1iZTorjoQz3j2SKk6",
+    "marketAuthority": "FsWosvPyFGyyMs54ecpWdMcbV8JR4EUspinr4Kr35oDa",
+    "bumpSeed": 255,
     "deltafiTokenMint": "de1QJkP1qDCk5JYCCXCeq27bQQUdCaiv7xVKFrhPSzF",
     "deltafiToken": "J6NXoLLUwywpeDhSVbD2bawigPEmBGczgNq3dTAkA4fu",
     "poolInfo": [
@@ -185,6 +189,8 @@
     "network": "mainnet-beta",
     "swapProgramId": "8Y7g9EN4MQv5epFEU3aKpXrNcu1t2nkyM2jZpWkw6q1u",
     "marketConfigAddress": "5fb9KKiX4unmeq2F2ZjvNahc38AALL7dDQuPanDNKRt1",
+    "marketAuthority": "AayPu5EsKaNrxQ2FdVZVi4Hz2xhWw3JkoyNdagQYLD32",
+    "bumpSeed": 255,
     "deltafiTokenMint": "tstpB7nAg8n7ynm5C5mfRkQ73Q8dSTcyxkjNvR2Bspt",
     "deltafiToken": "Cajir4DbVH8Gyj8E9EjuvxmrZj9ihZYVYZJ7RNH5uBQs",
     "poolInfo": [

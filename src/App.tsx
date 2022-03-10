@@ -7,7 +7,6 @@ import SuspenseWithChunkError from "./components/SuspenseWithChunkError";
 import PageLoader from "components/PageLoader";
 import Header from "components/Header";
 import Footer from "components/Footer";
-import { useConfig } from "providers/config";
 import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
@@ -23,7 +22,6 @@ import { fetchPythDataThunk } from "states/pythState";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { PublicKey } from "@solana/web3.js";
-import { fetchMarketConfigThunk } from "states/marketConfigState";
 import { fetchTokenAccountsThunk } from "states/tokenAccountState";
 import { clearInterval } from "timers";
 // Amplify.configure(awsconfig)
@@ -55,20 +53,10 @@ BigInt.prototype["toJSON"] = function () {
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
-  const { setConfigAddress } = useConfig();
   const { setNetwork } = useCustomConnection();
   const validCountry = window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
-
-  useEffect(() => {
-    dispatch(fetchMarketConfigThunk(connection));
-    // Refresh the market config every 60 seconds.
-    const interval = setInterval(() => {
-      dispatch(fetchMarketConfigThunk(connection));
-    }, 60 * 1000);
-    return () => clearInterval(interval);
-  }, [connection, dispatch]);
 
   useEffect(() => {
     if (!walletAddress) {
@@ -146,9 +134,8 @@ const App: React.FC = () => {
   }, [dispatch, walletAddress, connection]);
 
   useEffect(() => {
-    setConfigAddress(MARKET_CONFIG_ADDRESS);
     setNetwork(deployConfig.network);
-  }, [setConfigAddress, setNetwork]);
+  }, [setNetwork]);
 
   return (
     <BrowserRouter>

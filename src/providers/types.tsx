@@ -54,11 +54,9 @@ export interface ModalContextInfo {
 }
 
 export interface MarketConfig {
-  verion: number;
   publicKey: PublicKey;
   bumpSeed: number;
   deltafiMint: PublicKey;
-  oracleProgramId: PublicKey;
   deltafiToken: PublicKey;
 }
 
