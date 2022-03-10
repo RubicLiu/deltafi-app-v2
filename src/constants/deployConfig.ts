@@ -11,6 +11,14 @@ export function getPoolConfigByPoolKey(poolKey: String) {
   return deployConfig.poolInfo.find(({ swap }) => swap === poolKey);
 }
 
+export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String) {
+  return deployConfig.poolInfo.find(
+    ({ base, quote }) =>
+      (base === baseSymbol && quote === quoteSymbol) ||
+      (base === quoteSymbol && quote === baseSymbol),
+  );
+}
+
 export function getTokenInfoBySymbol(symbolStr: String) {
   return deployConfig.tokenInfo.find(({ symbol }) => symbol === symbolStr);
 }

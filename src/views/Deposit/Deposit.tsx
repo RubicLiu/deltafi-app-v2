@@ -43,12 +43,15 @@ import { stableWithdraw } from "utils/transactions/stableWithdraw";
 import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector, useDispatch } from "react-redux";
-import { poolSelector } from "states/selectors";
 import { fetchFarmUsersThunk, toFarmUserPosition } from "states/farmUserState";
 import { fetchPoolsThunk } from "states/poolState";
 import { MARKET_CONFIG_ADDRESS } from "constants/index";
 import { getPoolConfigByPoolKey } from "constants/deployConfig";
-import { selectFarmUserByFarmPoolKey, selectPythMarketPriceByPool } from "states/selectors";
+import {
+  selectFarmUserByFarmPoolKey,
+  selectPythMarketPriceByPool,
+  selectPoolByPoolKey,
+} from "states/selectors";
 
 interface TransactionResult {
   status: boolean | null;
@@ -217,8 +220,7 @@ const Deposit: React.FC = () => {
   });
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const [method, switchMethod] = useState<string>("deposit");
-  const poolState = useSelector(poolSelector);
-  const pool = poolState.poolKeyToPoolInfo[poolAddress];
+  const pool = useSelector(selectPoolByPoolKey(poolAddress));
 
   const [base, setBase] = useState<ISwapCard>({ token: null, amount: "", amountWithSlippage: "" });
   const [quote, setQuote] = useState<ISwapCard>({

@@ -13,7 +13,7 @@ import { useTokenMintAccount } from "providers/tokens";
 
 import { useSelector } from "react-redux";
 import { selectPythMarketPriceByPool, selectFarmPoolByFarmPoolKey } from "states/selectors";
-import { poolSelector } from "states/selectors";
+import { selectPoolByPoolKey } from "states/selectors";
 
 const deltafiTokenDecimals = 6;
 
@@ -78,9 +78,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const history = useHistory();
   const { farm } = props;
-  const poolState = useSelector(poolSelector);
-  const swapPool = poolState.poolKeyToPoolInfo[farm?.poolAddress.toBase58()];
-
+  const swapPool = useSelector(selectPoolByPoolKey(farm?.poolAddress.toBase58()));
   const farmPool = useSelector(selectFarmPoolByFarmPoolKey(farm?.address.toBase58()));
 
   const lpMint = useTokenMintAccount(swapPool?.poolMintKey);

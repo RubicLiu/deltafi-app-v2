@@ -19,7 +19,7 @@ import { useDispatch } from "react-redux";
 import { fetchFarmPoolsThunk } from "states/farmPoolState";
 import { fetchFarmUsersThunk } from "states/farmUserState";
 import { fetchPoolsThunk } from "states/poolState";
-import { fetchPythDataThunk } from "states/PythState";
+import { fetchPythDataThunk } from "states/pythState";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { PublicKey } from "@solana/web3.js";

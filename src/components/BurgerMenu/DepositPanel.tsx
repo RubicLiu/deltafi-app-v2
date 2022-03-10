@@ -8,8 +8,7 @@ import { PMM } from "lib/calc";
 import { rate } from "utils/decimal";
 import { ConnectButton } from "components";
 import { useSelector } from "react-redux";
-import { selectPythMarketPriceByPool } from "states/selectors";
-import { poolSelector } from "states/selectors";
+import { selectPythMarketPriceByPool, selectPoolByPoolKey } from "states/selectors";
 
 interface IDepositPanelProps {
   children?: ReactNode;
@@ -61,8 +60,7 @@ const DepositPanel = (props: IDepositPanelProps): ReactElement => {
   const classes = useStyles(props);
   const { address, setMenu } = useModal();
 
-  const poolState = useSelector(poolSelector);
-  const pool = poolState.poolKeyToPoolInfo[address.toBase58()];
+  const pool = useSelector(selectPoolByPoolKey(address.toBase58()));
 
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
   const poolMint = useTokenMintAccount(pool?.poolMintKey);

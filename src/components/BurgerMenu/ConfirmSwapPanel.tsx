@@ -7,10 +7,9 @@ import { ConnectButton } from "components";
 import { useModal } from "providers/modal";
 import { getSwapOutAmount } from "utils/swap";
 import { fixedNumber } from "utils/utils";
-import { getPoolBySymbols } from "providers/pool";
 import { useSelector } from "react-redux";
 import { selectPythMarketPriceByPool } from "states/selectors";
-import { poolSelector } from "states/selectors";
+import { selectPoolBySymbols } from "states/selectors";
 
 interface IConfirmSwapPanelProps {
   children?: ReactNode;
@@ -62,12 +61,10 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
   const classes = useStyles(props);
   const { setMenu, data } = useModal();
-  const poolState = useSelector(poolSelector);
-  const pools = useMemo(() => {
-    return Object.values(poolState.poolKeyToPoolInfo);
-  }, [poolState.poolKeyToPoolInfo]);
-  const pool = getPoolBySymbols(pools, data?.tokenFrom.token.symbol, data?.tokenTo.token.symbol);
 
+  const pool = useSelector(
+    selectPoolBySymbols(data?.tokenFrom.token.symbol, data?.tokenTo.token.symbol),
+  );
   const { marketPrice } = useSelector(selectPythMarketPriceByPool(pool));
 
   const swapOut = useMemo(() => {

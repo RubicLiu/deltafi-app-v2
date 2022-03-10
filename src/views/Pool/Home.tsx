@@ -13,7 +13,7 @@ import { getTokenInfoBySymbol } from "constants/deployConfig";
 import { pools as poolSchemas } from "constants/pools";
 import { useSelector } from "react-redux";
 import { pythSelector, poolSelector } from "states/selectors";
-import { getMarketPrice } from "states/PythState";
+import { getMarketPrice } from "states/pythState";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {

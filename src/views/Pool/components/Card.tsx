@@ -12,7 +12,7 @@ import { convertDollar } from "utils/utils";
 import { rate } from "utils/decimal";
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
-import { poolSelector, selectPythMarketPriceByPool } from "states/selectors";
+import { selectPoolByPoolKey, selectPythMarketPriceByPool } from "states/selectors";
 
 const Img = styled.img`
   width: 20px;
@@ -76,8 +76,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const classes = useStyles();
   const { poolKey } = props;
 
-  const poolState = useSelector(poolSelector);
-  const pool = poolState.poolKeyToPoolInfo[poolKey.toBase58()];
+  const pool = useSelector(selectPoolByPoolKey(poolKey.toBase58()));
 
   const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
 

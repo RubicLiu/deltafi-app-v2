@@ -31,7 +31,6 @@ import {
   useTokenFromMint,
   findTokenAccountByMint,
 } from "providers/tokens";
-import { getPoolBySymbols } from "providers/pool";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { swap } from "utils/transactions/swap";
 import { useConfig } from "providers/config";
@@ -47,7 +46,7 @@ import { sleep } from "utils/utils";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
-import { appSelector, poolSelector, selectPythMarketPriceByPool } from "states/selectors";
+import { appSelector, selectPoolBySymbols, selectPythMarketPriceByPool } from "states/selectors";
 import { fetchPoolsThunk } from "states/poolState";
 import { fetchReferrerThunk } from "states/appState";
 
@@ -144,12 +143,7 @@ const Home: React.FC = (props) => {
   });
   const { config } = useConfig();
 
-  const poolState = useSelector(poolSelector);
-  const pools = useMemo(() => {
-    return Object.values(poolState.poolKeyToPoolInfo);
-  }, [poolState.poolKeyToPoolInfo]);
-
-  const pool = getPoolBySymbols(pools, tokenFrom.token.symbol, tokenTo.token.symbol);
+  const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
 
   const sourceAccount = useTokenFromMint(tokenFrom.token.address);
   const destinationAccount = useTokenFromMint(tokenTo.token.address);

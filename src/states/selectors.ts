@@ -1,7 +1,8 @@
-import { getMarketPrice } from "./PythState";
 import { RootState } from "./store";
 
 import { PoolInfo } from "providers/types";
+import { getPoolConfigBySymbols } from "constants/deployConfig";
+import { getMarketPrice } from "./pythState";
 
 export const appSelector = (state: RootState) => state.app;
 export const farmUserSelector = (state: RootState) => state.farmUser;
@@ -24,5 +25,18 @@ export function selectFarmPoolByFarmPoolKey(farmPoolKey: string) {
 export function selectPythMarketPriceByPool(pool: PoolInfo) {
   return (state: RootState) => {
     return getMarketPrice(state.pyth.symbolToPythData, pool);
+  };
+}
+
+export function selectPoolByPoolKey(poolKey: string) {
+  return (state: RootState) => {
+    return state.pool.poolKeyToPoolInfo[poolKey];
+  };
+}
+
+export function selectPoolBySymbols(baseSymbol: string, quoteSymbol: string) {
+  return (state: RootState) => {
+    const poolConfig = getPoolConfigBySymbols(baseSymbol, quoteSymbol);
+    return state.pool.poolKeyToPoolInfo[poolConfig?.swap];
   };
 }

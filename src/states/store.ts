@@ -3,7 +3,7 @@ import { appReducer } from "./appState";
 import { farmUserReducer } from "./farmUserState";
 import { farmPoolReducer } from "./farmPoolState";
 import { poolReducer } from "./poolState";
-import { pythReducer } from "./PythState";
+import { pythReducer } from "./pythState";
 
 export const store = configureStore({
   reducer: {

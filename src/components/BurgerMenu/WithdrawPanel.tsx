@@ -6,7 +6,7 @@ import { ConnectButton } from "components";
 
 import { useModal } from "providers/modal";
 import { useSelector } from "react-redux";
-import { poolSelector } from "states/selectors";
+import { selectPoolByPoolKey } from "states/selectors";
 
 interface IWithdrawPanelProps {
   children?: ReactNode;
@@ -56,8 +56,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 
 const WithdrawPanel = (props: IWithdrawPanelProps): ReactElement => {
   const { setMenu, address } = useModal();
-  const poolState = useSelector(poolSelector);
-  const pool = poolState.poolKeyToPoolInfo[address.toBase58()];
+  const pool = useSelector(selectPoolByPoolKey(address.toBase58()));
 
   const classes = useStyles(props);
 
