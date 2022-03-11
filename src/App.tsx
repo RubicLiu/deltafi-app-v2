@@ -52,10 +52,12 @@ BigInt.prototype["toJSON"] = function () {
   return this.toString();
 };
 
+const disableIpBlocker = true;
 const App: React.FC = () => {
   const dispatch = useDispatch();
   const { setNetwork } = useCustomConnection();
-  const validCountry = window.location.origin.includes("localhost") || FilterCountry();
+  const validCountry =
+    disableIpBlocker || window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
 
