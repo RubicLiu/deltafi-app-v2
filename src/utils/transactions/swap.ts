@@ -191,7 +191,7 @@ export async function swap({
 
   const { userReferrerDataPubkey, createUserReferrerAccountTransaction } =
     buySol || sellSol
-      ? { userReferrerDataPubkey: null, createUserReferrerAccountTransaction: null }
+      ? { userReferrerDataPubkey: null, createUserReferrerAccountTransaction: undefined }
       : await checkAndCreateReferralDataTransaction(
           walletPubkey,
           referrer,

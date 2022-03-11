@@ -45,7 +45,7 @@ export async function createTokenAccountTransaction({
 export function mergeTransactions(transactions: (Transaction | undefined)[]) {
   const transaction = new Transaction();
   transactions
-    .filter((t): t is Transaction => t !== undefined)
+    .filter((t): t is Transaction => t !== undefined && t != null)
     .forEach((t) => {
       transaction.add(t);
     });
