@@ -28,12 +28,7 @@ import { lpTokens } from "constants/tokens";
 import { useModal } from "providers/modal";
 import { sendSignedTransaction, claim, stake, unstake } from "utils/transactions";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
-import {
-  DELTAFI_TOKEN_MINT,
-  SOLSCAN_LINK,
-  MARKET_CONFIG_ADDRESS,
-  DELTAFI_TOKEN_SYMBOL,
-} from "constants/index";
+import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK, DELTAFI_TOKEN_SYMBOL } from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
@@ -278,7 +273,6 @@ const Stake = (): ReactElement => {
         dispatch(
           fetchFarmUsersThunk({
             connection,
-            config: MARKET_CONFIG_ADDRESS,
             walletAddress: walletPubkey,
           }),
         );
@@ -339,7 +333,6 @@ const Stake = (): ReactElement => {
         dispatch(
           fetchFarmUsersThunk({
             connection,
-            config: MARKET_CONFIG_ADDRESS,
             walletAddress: walletPubkey,
           }),
         );
@@ -408,7 +401,6 @@ const Stake = (): ReactElement => {
       dispatch(
         fetchFarmUsersThunk({
           connection,
-          config: MARKET_CONFIG_ADDRESS,
           walletAddress: walletPubkey,
         }),
       );

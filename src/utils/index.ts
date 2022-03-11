@@ -40,3 +40,9 @@ export const FEE_PAYERS = (() => {
   }
   return accounts;
 })();
+
+export function scheduleWithInterval(func: () => void, delay: number) {
+  func();
+  const interval = setInterval(func, delay);
+  return () => clearInterval(interval);
+}

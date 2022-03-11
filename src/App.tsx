@@ -23,6 +23,7 @@ import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { PublicKey } from "@solana/web3.js";
 import { fetchTokenAccountsThunk } from "states/tokenAccountState";
+import { scheduleWithInterval } from "utils";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -63,45 +64,32 @@ const App: React.FC = () => {
       return;
     }
 
-    dispatch(fetchTokenAccountsThunk({ connection, walletAddress }));
     // refresh every 1 minute
-    const interval = setInterval(() => {
-      dispatch(fetchTokenAccountsThunk({ connection, walletAddress }));
-    }, 60 * 1000);
-    return () => clearInterval(interval);
+    return scheduleWithInterval(
+      () => dispatch(fetchTokenAccountsThunk({ connection, walletAddress })),
+      60 * 1000,
+    );
   }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
-    dispatch(fetchPythDataThunk(connection));
     // Refresh the pyth data every 2 seconds.
-    const interval = setInterval(() => {
-      dispatch(fetchPythDataThunk(connection));
-    }, 2 * 1000);
-    return () => clearInterval(interval);
+    return scheduleWithInterval(() => dispatch(fetchPythDataThunk(connection)), 2 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {
     if (walletAddress) {
-      dispatch(fetchFarmUsersThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress }));
+      dispatch(fetchFarmUsersThunk({ connection, walletAddress }));
     }
   }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
-    dispatch(fetchFarmPoolsThunk({ connection }));
     // Refresh the farm pool every 1 minute.
-    const interval = setInterval(() => {
-      dispatch(fetchFarmPoolsThunk({ connection }));
-    }, 60 * 1000);
-    return () => clearInterval(interval);
+    return scheduleWithInterval(() => dispatch(fetchFarmPoolsThunk({ connection })), 60 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {
-    dispatch(fetchPoolsThunk({ connection }));
     // Refresh the farm pool every 1 minute.
-    const interval = setInterval(() => {
-      dispatch(fetchPoolsThunk({ connection }));
-    }, 60 * 1000);
-    return () => clearInterval(interval);
+    return scheduleWithInterval(() => dispatch(fetchPoolsThunk({ connection })), 60 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {

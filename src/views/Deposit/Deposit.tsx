@@ -44,7 +44,6 @@ import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchFarmUsersThunk, toFarmUserPosition } from "states/farmUserState";
 import { fetchPoolsThunk } from "states/poolState";
-import { MARKET_CONFIG_ADDRESS } from "constants/index";
 import { getPoolConfigByPoolKey, marketConfig } from "constants/deployConfig";
 import {
   selectFarmUserByFarmPoolKey,
@@ -431,7 +430,6 @@ const Deposit: React.FC = () => {
       dispatch(
         fetchFarmUsersThunk({
           connection,
-          config: MARKET_CONFIG_ADDRESS,
           walletAddress: walletPubkey,
         }),
       );
@@ -554,7 +552,6 @@ const Deposit: React.FC = () => {
       dispatch(
         fetchFarmUsersThunk({
           connection,
-          config: MARKET_CONFIG_ADDRESS,
           walletAddress: walletPubkey,
         }),
       );

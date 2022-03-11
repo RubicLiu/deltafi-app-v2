@@ -20,7 +20,6 @@ const initialState: FarmUserState = {
 
 type FetchFarmUsersThunkArg = {
   connection: Connection;
-  config: PublicKey;
   walletAddress: PublicKey;
 };
 
