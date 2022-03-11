@@ -133,33 +133,6 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   },
 }));
 
-/**
- * a function that links to 2 closure variables,
- * referralLink and pubKey
- * this function is called when wallet connection status changes,
- * and get the correct referral link from backend
- */
-const getReferralLink = (() => {
-  let referralLink = null;
-  let referrer = null;
-
-  return async (deltafiTokenAccount, setLink: (link: string) => void) => {
-    if (!deltafiTokenAccount) {
-      return null;
-    }
-    if (!referralLink || referrer !== deltafiTokenAccount.pubKey.toBase58()) {
-      referrer = deltafiTokenAccount.pubkey.toBase58();
-      try {
-        referralLink = process.env.REACT_APP_LOCAL_HOST + "?referrer=" + referrer;
-        setLink(referralLink);
-      } catch (err) {
-        console.warn("err :>> ", err);
-      }
-    }
-    return referralLink;
-  };
-})();
-
 const Home: React.FC = (props) => {
   const classes = useStyles(props);
   const { setMenu } = useModal();
@@ -178,11 +151,14 @@ const Home: React.FC = (props) => {
   const [referralLink, setReferralLink] = useState("");
 
   useEffect(() => {
-    (async () => {
-      await getReferralLink(deltafiTokenAccount, (link) => setReferralLink(link));
-      if (deltafiTokenAccount) setReferralLinkState("Ready");
-    })();
-  }, [isConnectedWallet, deltafiTokenAccount]);
+    setReferralLinkState(deltafiTokenAccount?.pubkey ? "Ready" : "Unavailable");
+    if (!deltafiTokenAccount?.pubkey) {
+      return;
+    }
+    setReferralLink(
+      process.env.REACT_APP_LOCAL_HOST + "?referrer=" + deltafiTokenAccount?.pubkey.toBase58(),
+    );
+  }, [isConnectedWallet, deltafiTokenAccount?.pubkey]);
 
   return (
     <Page>
