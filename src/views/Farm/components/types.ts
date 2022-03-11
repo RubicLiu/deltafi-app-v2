@@ -1,5 +1,5 @@
-import { FarmPoolSchema } from "constants/farm";
+import { PoolConfig } from "constants/deployConfig";
 
 export interface CardProps {
-  farm: FarmPoolSchema;
+  poolConfig: PoolConfig;
 }

@@ -5,8 +5,7 @@ import Page from "components/layout/Page";
 import { LinkIcon } from "components";
 import FarmCard from "./components/Card";
 import { useDarkMode } from "providers/theme";
-import { FarmPoolSchema } from "constants/farm";
-import { farmPools } from "constants/farm";
+import { PoolConfig, poolConfigs } from "constants/deployConfig";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -156,8 +155,8 @@ const Home: React.FC = (props): ReactElement => {
           <Typography variant="h6" color="primary" paragraph>
             Active Farms
           </Typography>
-          {farmPools.map((farm: FarmPoolSchema) => (
-            <FarmCard key={farm.address.toBase58()} farm={farm} />
+          {poolConfigs.map((poolConfig: PoolConfig) => (
+            <FarmCard key={poolConfig.farm} poolConfig={poolConfig} />
           ))}
         </Box>
       </Box>

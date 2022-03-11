@@ -3,7 +3,6 @@ import { AccountInfo, PublicKey } from "@solana/web3.js";
 
 import { Fees, PoolState, Rewards, SwapType } from "lib/state";
 import { TokenInfo } from "constants/tokens";
-import { FarmPoolSchema } from "constants/farm";
 
 export interface ConnectionContextValues {
   endpoint: string;
@@ -59,11 +58,6 @@ export interface MarketConfig {
   deltafiToken: PublicKey;
 }
 
-export interface ConfigContextValues {
-  config: MarketConfig;
-  setConfigAddress: (address: PublicKey) => void;
-}
-
 export interface TokenAccountInfo {
   mint: PublicKey;
   owner: PublicKey;
@@ -74,11 +68,6 @@ export interface MintInfo {
   decimals: number;
   initialized: boolean;
   supply: BigNumber;
-}
-
-export interface ConfigContextValues {
-  config: MarketConfig;
-  setConfigAddress: (address: PublicKey) => void;
 }
 
 export interface PoolInfo {
@@ -105,12 +94,6 @@ export interface TokenAccount {
   pubkey: PublicKey;
   account: AccountInfo<Buffer> | null;
   effectiveMint: PublicKey;
-}
-
-export interface FarmPoolsContextValues {
-  pools: FarmPoolInfo[];
-  schemas: FarmPoolSchema[];
-  setSchemas: (schemas: FarmPoolSchema[]) => void;
 }
 
 export interface FarmPoolInfo {

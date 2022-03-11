@@ -77,9 +77,9 @@ const Img = styled.img`
 const FarmCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const history = useHistory();
-  const { farm } = props;
-  const swapPool = useSelector(selectPoolByPoolKey(farm?.poolAddress.toBase58()));
-  const farmPool = useSelector(selectFarmPoolByFarmPoolKey(farm?.address.toBase58()));
+  const { poolConfig } = props;
+  const swapPool = useSelector(selectPoolByPoolKey(poolConfig?.swap));
+  const farmPool = useSelector(selectFarmPoolByFarmPoolKey(poolConfig?.farm));
 
   const lpMint = useTokenMintAccount(swapPool?.poolMintKey);
 
@@ -145,7 +145,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
           </Text>
         </Box>
         <ConnectButton
-          onClick={() => history.push(`/stake/${farm.address.toBase58()}`)}
+          onClick={() => history.push(`/stake/${poolConfig.farm}`)}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
           data-amp-analytics-attrs={`page: Farms, target: Deposit(${swapPool.baseTokenInfo.symbol} - ${swapPool.quoteTokenInfo.symbol})`}
