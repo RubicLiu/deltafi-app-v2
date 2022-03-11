@@ -6,16 +6,29 @@ import fullDeployConfig from "./fullDeployConfig.json";
 export const deployConfig =
   fullDeployConfig[process.env.REACT_APP_DEPLOYMENT_MODE || "mainnet-test"];
 
-export function getPoolConfigByFarmPoolKey(farmPoolKey: String) {
-  return deployConfig.poolInfo.find(({ farm }) => farm === farmPoolKey);
+export type PoolConfig = {
+  name: string;
+  base: string;
+  quote: string;
+  swap: string;
+  mint: string;
+  farm: string;
+  token: string;
+  decimals: number;
+};
+
+export const poolConfigs: PoolConfig[] = deployConfig.poolInfo;
+
+export function getPoolConfigByFarmPoolKey(farmPoolKey: String): PoolConfig {
+  return poolConfigs.find(({ farm }) => farm === farmPoolKey);
 }
 
-export function getPoolConfigByPoolKey(poolKey: String) {
-  return deployConfig.poolInfo.find(({ swap }) => swap === poolKey);
+export function getPoolConfigByPoolKey(poolKey: String): PoolConfig {
+  return poolConfigs.find(({ swap }) => swap === poolKey);
 }
 
-export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String) {
-  return deployConfig.poolInfo.find(
+export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String): PoolConfig {
+  return poolConfigs.find(
     ({ base, quote }) =>
       (base === baseSymbol && quote === quoteSymbol) ||
       (base === quoteSymbol && quote === baseSymbol),

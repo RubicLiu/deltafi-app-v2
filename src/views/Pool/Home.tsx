@@ -5,15 +5,14 @@ import BigNumber from "bignumber.js";
 
 import Page from "components/layout/Page";
 import PoolCard from "./components/Card";
-import { PoolSchema } from "constants/pools";
 import { convertDollar } from "utils/utils";
 import { PMM } from "lib/calc";
 import { useTokenAccounts } from "providers/tokens";
-import { getTokenInfoBySymbol } from "constants/deployConfig";
-import { pools as poolSchemas } from "constants/pools";
+import { getTokenInfoBySymbol, PoolConfig, poolConfigs } from "constants/deployConfig";
 import { useSelector } from "react-redux";
 import { pythSelector, poolSelector } from "states/selectors";
 import { getMarketPrice } from "states/pythState";
+import { PublicKey } from "@solana/web3.js";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
@@ -45,7 +44,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
 const Home: React.FC = () => {
   const classes = useStyles();
 
-  const schemas = poolSchemas;
   const poolState = useSelector(poolSelector);
   const pools = useMemo(() => {
     return Object.values(poolState.poolKeyToPoolInfo);
@@ -90,14 +88,16 @@ const Home: React.FC = () => {
           <Box className={classes.listContainer}>
             <Typography>Your Pools</Typography>
             <Box mt={3.5}>
-              {schemas
-                .filter((schema) =>
-                  tokens?.find(
-                    (token) => token.effectiveMint.toBase58() === schema.mintAddress.toBase58(),
-                  ),
+              {poolConfigs
+                .filter((poolConfig: PoolConfig) =>
+                  tokens?.find((token) => token.effectiveMint.toBase58() === poolConfig.mint),
                 )
-                .map((schema) => (
-                  <PoolCard isUserPool key={schema.address.toString()} poolKey={schema.address} />
+                .map((poolConfig: PoolConfig) => (
+                  <PoolCard
+                    isUserPool
+                    key={poolConfig.swap}
+                    poolKey={new PublicKey(poolConfig.swap)}
+                  />
                 ))}
             </Box>
           </Box>
@@ -108,18 +108,16 @@ const Home: React.FC = () => {
               <Typography>Other Pools</Typography>
             </Box>
           )}
-          {schemas.length > 0 && (
+          {poolConfigs.length > 0 && (
             <Box className={classes.poolCardContainer}>
-              {schemas
+              {poolConfigs
                 .filter(
-                  (schema) =>
-                    !tokens?.find(
-                      (token) => token.effectiveMint.toBase58() === schema.mintAddress.toBase58(),
-                    ),
+                  (poolConfig: PoolConfig) =>
+                    !tokens?.find((token) => token.effectiveMint.toBase58() !== poolConfig.mint),
                 )
-                .map((schema: PoolSchema) => (
-                  <Box key={schema.address.toString()}>
-                    <PoolCard poolKey={schema.address} />
+                .map((poolConfig: PoolConfig) => (
+                  <Box key={poolConfig.swap}>
+                    <PoolCard poolKey={new PublicKey(poolConfig.swap)} />
                   </Box>
                 ))}
             </Box>

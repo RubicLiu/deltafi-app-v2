@@ -1,11 +1,11 @@
 import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
-import { PublicKey, Connection } from "@solana/web3.js";
+import { PublicKey, Connection, AccountInfo } from "@solana/web3.js";
 
 import { PoolInfo } from "providers/types";
-import { getPoolFromSwapInfoAccount } from "providers/pool";
-import { deployConfig } from "constants/deployConfig";
+import { deployConfig, getPoolConfigByPoolKey } from "constants/deployConfig";
 import { getMultipleAccounts } from "utils/account";
-import { pools as poolSchemas } from "constants/pools";
+import { parseSwapInfo } from "lib/state";
+import { getTokenInfo } from "providers/tokens";
 
 type PoolKeyToPoolInfo = Record<string, PoolInfo>;
 
@@ -50,9 +50,31 @@ async function getPools(connection: Connection) {
   for (let i = 0; i < poolInfos.keys.length; i++) {
     const key = poolInfos.keys[i];
     const poolInfo = poolInfos.array[i];
-    const publicKey = new PublicKey(key);
-    const poolSchema = poolSchemas.find((s) => s.address.equals(publicKey));
-    pools.push(getPoolFromSwapInfoAccount(poolSchema, publicKey, poolInfo));
+    const poolConfig = getPoolConfigByPoolKey(key.toBase58());
+    pools.push(getPoolFromSwapInfoAccount(poolConfig, key, poolInfo));
   }
   return pools;
 }
+
+const getPoolFromSwapInfoAccount = (poolConfig, publicKey, poolInfo) => {
+  const { data } = parseSwapInfo(poolInfo as AccountInfo<Buffer>);
+  return {
+    name: poolConfig.name,
+    swapType: data.swapType,
+    publicKey: publicKey,
+    nonce: data.nonce,
+    isPaused: data.isPaused,
+    baseTokenInfo: getTokenInfo(poolConfig.base),
+    quoteTokenInfo: getTokenInfo(poolConfig.quote),
+    base: data.tokenA,
+    quote: data.tokenB,
+    pythBase: data.pythA,
+    pythQuote: data.pythB,
+    poolMintKey: data.poolMint,
+    baseFee: data.adminFeeKeyA,
+    quoteFee: data.adminFeeKeyB,
+    fees: data.fees,
+    rewards: data.rewards,
+    poolState: data.poolState,
+  };
+};

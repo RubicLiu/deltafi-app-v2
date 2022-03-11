@@ -2,7 +2,6 @@ import BigNumber from "bignumber.js";
 import { AccountInfo, PublicKey } from "@solana/web3.js";
 
 import { Fees, PoolState, Rewards, SwapType } from "lib/state";
-import { PoolSchema } from "constants/pools";
 import { TokenInfo } from "constants/tokens";
 import { FarmPoolSchema } from "constants/farm";
 
@@ -77,10 +76,6 @@ export interface MintInfo {
   supply: BigNumber;
 }
 
-export interface PoolContextValues {
-  setSchema: (schema: PoolSchema) => void;
-}
-
 export interface ConfigContextValues {
   config: MarketConfig;
   setConfigAddress: (address: PublicKey) => void;
@@ -104,17 +99,6 @@ export interface PoolInfo {
   fees: Fees;
   rewards: Rewards;
   poolState: PoolState;
-  schema: PoolSchema;
-}
-
-export interface PoolContextValues {
-  setSchema: (schema: PoolSchema) => void;
-}
-
-export interface EntirePoolsContextValues {
-  pools: PoolInfo[];
-  schemas: PoolSchema[];
-  setSchemas: (schemas: PoolSchema[]) => void;
 }
 
 export interface TokenAccount {
