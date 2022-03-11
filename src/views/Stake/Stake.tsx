@@ -111,7 +111,6 @@ const Stake = (): ReactElement => {
   const [isProcessingStake, setIsProcessingStake] = useState(false);
   const [isProcessingClaim, setIsProcessingClaim] = useState(false);
 
-  const [percentage, setPercentage] = useState(0);
   const { setMenu } = useModal();
   const [state, setState] = useState<{
     open: boolean;
@@ -159,7 +158,38 @@ const Stake = (): ReactElement => {
     token: token,
     balance: tokenBalance,
     amount: "",
+    percentage: 0,
   });
+
+  const percentage = staking.percentage;
+  const setStakePercentage = useCallback(
+    (percentage: number) => {
+      const realAmount = staking.balance
+        .multipliedBy(new BigNumber(percentage))
+        .dividedBy(new BigNumber(100));
+      const amount = realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString();
+      setStaking({ ...staking, percentage, amount });
+    },
+    [setStaking, staking],
+  );
+
+  const setStakeAmount = useCallback(
+    (value: string) => {
+      let percentage = new BigNumber(0);
+      let amount = value !== "" ? value : "0";
+      if (staking.balance) {
+        percentage = new BigNumber(amount).multipliedBy(100).dividedBy(staking.balance);
+        if (percentage === new BigNumber(NaN)) {
+          percentage = new BigNumber(0);
+        } else if (percentage.comparedTo(new BigNumber(100)) > 0) {
+          percentage = new BigNumber(100);
+          amount = staking.balance.toString();
+        }
+      }
+      setStaking({ ...staking, percentage: Number(percentage.toFixed(2)), amount });
+    },
+    [setStaking, staking],
+  );
 
   useEffect(() => {
     const balance = staking.balance;
@@ -204,12 +234,12 @@ const Stake = (): ReactElement => {
   }, [depositAmount, apr]);
 
   const handleSwitchMethod = (method: "stake" | "unstake") => {
-    setPercentage(0);
     setStaking((staking) => ({
       ...staking,
       isStake: method === "stake" ? true : false,
       balance: method === "stake" ? tokenBalance : depositAmount,
       amount: "0",
+      percentage: 0,
     }));
   };
 
@@ -250,10 +280,10 @@ const Stake = (): ReactElement => {
           connection,
           dispatch,
         );
-        setPercentage(0);
         setStaking((prevStaking) => ({
           ...prevStaking,
           amount: "0",
+          percentage: 0,
         }));
         setTransactionResult({
           status: true,
@@ -262,10 +292,10 @@ const Stake = (): ReactElement => {
           stake: staking,
         });
       } catch (e) {
-        setPercentage(0);
         setStaking((prevStaking) => ({
           ...prevStaking,
           amount: "0",
+          percentage: 0,
         }));
       } finally {
         setState((state) => ({ ...state, open: true }));
@@ -309,10 +339,10 @@ const Stake = (): ReactElement => {
           connection,
           dispatch,
         );
-        setPercentage(0);
         setStaking((prevStaking) => ({
           ...prevStaking,
           amount: "0",
+          percentage: 0,
         }));
         setTransactionResult({
           status: true,
@@ -321,10 +351,10 @@ const Stake = (): ReactElement => {
           stake: staking,
         });
       } catch (e) {
-        setPercentage(0);
         setStaking((prevStaking) => ({
           ...prevStaking,
           amount: "0",
+          percentage: 0,
         }));
         setTransactionResult({ status: false });
       } finally {
@@ -608,13 +638,13 @@ const Stake = (): ReactElement => {
             </Box>
           </Box>
           <Box mb={1}>
-            <Slider value={percentage} onChange={setPercentage} />
+            <Slider value={percentage} onChange={setStakePercentage} />
           </Box>
 
           <Box display="flex" flexDirection="column" alignItems="flex-end">
             <StakeCard
               card={staking}
-              handleChangeCard={setStaking}
+              handleChangeCard={setStakeAmount}
               tokens={lpTokens}
               disableDrop
               percentage={percentage < 0.02 ? 0 : percentage}

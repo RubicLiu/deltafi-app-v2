@@ -1,11 +1,9 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import CurrencyInput from "react-currency-input-field";
 import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
 
 import { DropDown } from "components";
 import { CardProps } from "./types";
-import { getTokenInfo } from "providers/tokens";
-import BigNumber from "bignumber.js";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -80,38 +78,20 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }));
 
 const StakeCard: React.FC<CardProps> = (props) => {
-  const { card, handleChangeCard, disabled, tokens, disableDrop, percentage } = props;
+  const { card, handleChangeCard, disabled, tokens, disableDrop } = props;
   const classes = useStyles(props);
   const tokenBalance = card.balance;
-
-  useEffect(() => {
-    if (percentage && tokenBalance) {
-      const realAmount = tokenBalance
-        .multipliedBy(new BigNumber(percentage))
-        .dividedBy(new BigNumber(100));
-      const expectedAmount = realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString();
-      if (card.amount == null || card.amount.toString() !== expectedAmount) {
-        handleChangeCard({
-          ...card,
-          amount: expectedAmount,
-        });
-      }
-    }
-  }, [card, handleChangeCard, percentage, tokenBalance]);
 
   const isDisabledInput = useMemo(() => {
     return disabled || card.token === null;
   }, [disabled, card.token]);
 
-  const handleChangeToken = (token) => {
-    const newToken = getTokenInfo(token.symbol.toLowerCase());
-    handleChangeCard({ ...card, token: newToken });
-  };
-
   const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.replace(/[^\d.-]/g, "");
-    if (isNaN(parseFloat(value)) && value !== "") return;
-    handleChangeCard({ ...card, amount: value });
+    if (isNaN(parseFloat(value)) && value !== "") {
+      return;
+    }
+    handleChangeCard(value);
   };
 
   const value = useMemo(() => {
@@ -128,7 +108,6 @@ const StakeCard: React.FC<CardProps> = (props) => {
         <DropDown
           value={card.token}
           options={tokens}
-          onChange={handleChangeToken}
           inputProps={{ placeholder: "token name, symbol" }}
           disableDrop={disableDrop}
         />
