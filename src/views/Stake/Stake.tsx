@@ -145,8 +145,8 @@ const Stake = (): ReactElement => {
   }, [farmPool, lpMint]);
 
   let position = farmUser?.positions[farmPoolId];
-  const apr = new BigNumber(farmPool.aprNumerator.toString()).div(
-    new BigNumber(farmPool.aprDenominator.toString()),
+  const apr = new BigNumber(farmPool?.aprNumerator.toString()).div(
+    new BigNumber(farmPool?.aprDenominator.toString()),
   );
   const depositAmount = useMemo(() => {
     return position && lpMint

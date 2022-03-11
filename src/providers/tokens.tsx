@@ -18,7 +18,7 @@ export function getTokenInfo(symbol: string) {
 }
 
 export function getFarmTokenInfo(symbol: string) {
-  return lpTokens.find((token) => token.symbol.toLowerCase() === symbol.toLowerCase());
+  return lpTokens.find((token) => token.symbol.toLowerCase() === symbol?.toLowerCase());
 }
 
 export const TOKEN_ACCOUNT_LAYOUT = struct<TokenAccountInfo>([
