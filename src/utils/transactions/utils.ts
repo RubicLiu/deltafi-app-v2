@@ -55,6 +55,11 @@ export function createNativeSOLHandlingTransactions(
   };
 }
 
+export async function getReferralDataAccountPublicKey(walletPublicKey: PublicKey) {
+  const seed = "referrer";
+  return PublicKey.createWithSeed(walletPublicKey, seed, SWAP_PROGRAM_ID);
+}
+
 export async function checkAndCreateReferralDataTransaction(
   walletPubkey: PublicKey,
   referrer: PublicKey | null,
@@ -62,15 +67,10 @@ export async function checkAndCreateReferralDataTransaction(
   connection: Connection,
   isNewUser: boolean,
 ): Promise<{
-  userReferrerDataPubkey: PublicKey;
+  userReferrerDataPubkey: PublicKey | null;
   createUserReferrerAccountTransaction: Transaction | null;
 }> {
-  const seed = "referrer";
-  const userReferrerDataPubkey = await PublicKey.createWithSeed(
-    walletPubkey,
-    seed,
-    SWAP_PROGRAM_ID,
-  );
+  const userReferrerDataPubkey = await getReferralDataAccountPublicKey(walletPubkey);
 
   const userReferralAccountInfo = await connection.getAccountInfo(userReferrerDataPubkey);
   if ((userReferralAccountInfo && isNewUser) || (!userReferralAccountInfo && !isNewUser)) {
@@ -80,7 +80,7 @@ export async function checkAndCreateReferralDataTransaction(
   if (!isNewUser) {
     return {
       userReferrerDataPubkey,
-      createUserReferrerAccountTransaction: null,
+      createUserReferrerAccountTransaction: undefined,
     };
   }
 
@@ -97,7 +97,7 @@ export async function checkAndCreateReferralDataTransaction(
         lamports: balanceForUserReferrerData,
         space: USER_REFERRER_DATA_SIZE,
         programId: SWAP_PROGRAM_ID,
-        seed,
+        seed: "referrer",
       }),
     )
     .add(

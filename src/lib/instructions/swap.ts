@@ -1,10 +1,5 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import {
-  PublicKey,
-  SYSVAR_CLOCK_PUBKEY,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from "@solana/web3.js";
+import { PublicKey, SYSVAR_RENT_PUBKEY, TransactionInstruction } from "@solana/web3.js";
 import { struct, u8 } from "buffer-layout";
 import {
   SwapData,
@@ -70,7 +65,6 @@ export const createSwapInstruction = (
     { pubkey: adminFeeDestination, isSigner: false, isWritable: true },
     { pubkey: pythA, isSigner: false, isWritable: false },
     { pubkey: pythB, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ].concat(extraReferrerAccounts);
 
@@ -118,7 +112,6 @@ export const createDepositInstruction = (
     { pubkey: destination, isSigner: false, isWritable: true },
     { pubkey: pythA, isSigner: false, isWritable: false },
     { pubkey: pythB, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 
@@ -170,7 +163,6 @@ export const createWithdrawInstruction = (
     { pubkey: adminFeeB, isSigner: false, isWritable: true },
     { pubkey: pythA, isSigner: false, isWritable: false },
     { pubkey: pythB, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 

@@ -47,7 +47,7 @@ function createSwapInstructionMethod(
   pythB: PublicKey,
   swapData: SwapData,
   programId: PublicKey,
-  userReferrerData: PublicKey,
+  userReferrerData: PublicKey | null,
   referrer: PublicKey | null,
 ): TransactionInstruction {
   if (isStable) {
@@ -165,6 +165,20 @@ export async function swap({
     }
   }
 
+  const { userReferrerDataPubkey, createUserReferrerAccountTransaction } =
+    (buySol || sellSol) && (!destinationRef || !rewardTokenRef)
+      ? {
+          userReferrerDataPubkey: null,
+          createUserReferrerAccountTransaction: undefined,
+        }
+      : await checkAndCreateReferralDataTransaction(
+          walletPubkey,
+          referrer,
+          config,
+          connection,
+          isNewUser,
+        );
+
   let createDestinationAccountTransaction: Transaction | undefined;
   if (!destinationRef) {
     const result = await createTokenAccountTransaction({
@@ -188,17 +202,6 @@ export async function swap({
     rewardTokenRef = result?.newAccountPubkey;
     createRewardAccountTransaction = result?.transaction;
   }
-
-  const { userReferrerDataPubkey, createUserReferrerAccountTransaction } =
-    buySol || sellSol
-      ? { userReferrerDataPubkey: null, createUserReferrerAccountTransaction: undefined }
-      : await checkAndCreateReferralDataTransaction(
-          walletPubkey,
-          referrer,
-          config,
-          connection,
-          isNewUser,
-        );
 
   const userTransferAuthority = Keypair.generate();
   let nonce = new BN(config.bumpSeed);
@@ -269,6 +272,7 @@ export async function swap({
     transaction,
     closeWrappedTokenAccountTransaction,
   ]);
+
   if (buySol || sellSol) {
     return signTransaction({
       transaction,

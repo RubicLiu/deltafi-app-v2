@@ -1,10 +1,5 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import {
-  PublicKey,
-  SYSVAR_CLOCK_PUBKEY,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from "@solana/web3.js";
+import { PublicKey, SYSVAR_RENT_PUBKEY, TransactionInstruction } from "@solana/web3.js";
 import { struct, u8 } from "buffer-layout";
 
 import { u64 } from "utils/layout";
@@ -96,7 +91,6 @@ export const createFarmDepositInstruction = (
     { pubkey: destination, isSigner: false, isWritable: true },
     { pubkey: farmUser, isSigner: false, isWritable: true },
     { pubkey: farmOwner, isSigner: true, isWritable: false },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 
@@ -144,7 +138,6 @@ export const createFarmWithdrawInstruction = (
     { pubkey: source, isSigner: false, isWritable: true },
     { pubkey: destination, isSigner: false, isWritable: true },
     { pubkey: farmOwner, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 
@@ -179,7 +172,6 @@ export const createInitFarmUserInstruction = (
     { pubkey: farmUser, isSigner: false, isWritable: true },
     { pubkey: farmOwner, isSigner: true, isWritable: false },
     { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
   ];
 
   const dataLayout = struct([u8("instruction")]);
@@ -227,7 +219,6 @@ export const createClaimFarmInstruction = (
     { pubkey: marketAuthority, isSigner: false, isWritable: false },
     { pubkey: claimDestination, isSigner: false, isWritable: true },
     { pubkey: claimMint, isSigner: false, isWritable: true },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ].concat(extraReferrerAccounts);
 
@@ -255,7 +246,6 @@ export const createRefreshFarmInstruction = (
 ) => {
   const keys = [
     { pubkey: farmPool, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
     ...farmUsers.map((farmUser) => ({ pubkey: farmUser, isSigner: false, isWritable: true })),
   ];
 
