@@ -1,9 +1,9 @@
 import { PublicKey, Transaction, SystemProgram, Connection } from "@solana/web3.js";
 
 import { AccountLayout, Token, TOKEN_PROGRAM_ID, NATIVE_MINT } from "@solana/spl-token";
-import { SWAP_PROGRAM_ID } from "constants/index";
+import { MARKET_CONFIG_ADDRESS, SWAP_PROGRAM_ID } from "constants/index";
 import { MarketConfig } from "providers/types";
-import { USER_REFERRER_DATA_SIZE } from "lib/state";
+import { UserReferrerDataLayout, USER_REFERRER_DATA_SIZE } from "lib/state";
 import { createSetReferrerInstruction } from "lib/instructions";
 import { dummyReferrerAddress } from "./swap";
 
@@ -56,31 +56,40 @@ export function createNativeSOLHandlingTransactions(
 }
 
 export async function getReferralDataAccountPublicKey(walletPublicKey: PublicKey) {
-  const seed = "referrer";
+  const seed = ("referrer" + MARKET_CONFIG_ADDRESS.toBase58()).substring(0, 32);
   return PublicKey.createWithSeed(walletPublicKey, seed, SWAP_PROGRAM_ID);
 }
 
-export async function checkAndCreateReferralDataTransaction(
+export async function checkOrCreateReferralDataTransaction(
   walletPubkey: PublicKey,
+  enableReferral: boolean,
   referrer: PublicKey | null,
   config: MarketConfig,
   connection: Connection,
-  isNewUser: boolean,
 ): Promise<{
   userReferrerDataPubkey: PublicKey | null;
   createUserReferrerAccountTransaction: Transaction | null;
+  referrerPubkey: PublicKey | null;
 }> {
-  const userReferrerDataPubkey = await getReferralDataAccountPublicKey(walletPubkey);
-
-  const userReferralAccountInfo = await connection.getAccountInfo(userReferrerDataPubkey);
-  if ((userReferralAccountInfo && isNewUser) || (!userReferralAccountInfo && !isNewUser)) {
-    throw Error("Referral state is incorrect");
+  // Return null if referral is not enabled.
+  if (!enableReferral) {
+    return {
+      userReferrerDataPubkey: null,
+      createUserReferrerAccountTransaction: undefined,
+      referrerPubkey: null,
+    };
   }
 
-  if (!isNewUser) {
+  const userReferrerDataPubkey = await getReferralDataAccountPublicKey(walletPubkey);
+  const userReferralAccountInfo = await connection.getAccountInfo(userReferrerDataPubkey);
+
+  // If the user referrer data exsts, use the referrer address in it.
+  if (userReferralAccountInfo) {
+    const referralInfo = UserReferrerDataLayout.decode(userReferralAccountInfo.data);
     return {
       userReferrerDataPubkey,
       createUserReferrerAccountTransaction: undefined,
+      referrerPubkey: referralInfo.referrer,
     };
   }
 
@@ -88,6 +97,7 @@ export async function checkAndCreateReferralDataTransaction(
     USER_REFERRER_DATA_SIZE,
   );
 
+  const seed = ("referrer" + MARKET_CONFIG_ADDRESS.toBase58()).substring(0, 32);
   const createUserReferrerAccountTransaction = new Transaction()
     .add(
       SystemProgram.createAccountWithSeed({
@@ -97,7 +107,7 @@ export async function checkAndCreateReferralDataTransaction(
         lamports: balanceForUserReferrerData,
         space: USER_REFERRER_DATA_SIZE,
         programId: SWAP_PROGRAM_ID,
-        seed: "referrer",
+        seed,
       }),
     )
     .add(
@@ -113,5 +123,6 @@ export async function checkAndCreateReferralDataTransaction(
   return {
     userReferrerDataPubkey,
     createUserReferrerAccountTransaction,
+    referrerPubkey: referrer,
   };
 }

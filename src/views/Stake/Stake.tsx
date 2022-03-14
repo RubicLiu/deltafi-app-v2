@@ -389,8 +389,8 @@ const Stake = (): ReactElement => {
       return null;
     }
 
-    const referrerPubkey = appState.isNewUser === undefined ? null : appState.referrerPublicKey;
-    const isNewUser: boolean = appState.isNewUser;
+    const referrerPubkey = appState.referrerPublicKey;
+    const enableReferral = appState.enableReferral;
 
     setIsProcessingClaim(true);
     try {
@@ -402,7 +402,7 @@ const Stake = (): ReactElement => {
         farmUser: farmUser.publicKey,
         claimDestination: rewardsAccount?.pubkey,
         referrer: referrerPubkey,
-        isNewUser,
+        enableReferral,
       });
       const signedTransaction = await signTransaction(transaction);
 

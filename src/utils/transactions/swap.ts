@@ -20,7 +20,7 @@ import { ExTokenAccount, MarketConfig, PoolInfo } from "providers/types";
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from ".";
 import { AccountLayout } from "@solana/spl-token";
-import { checkAndCreateReferralDataTransaction } from "./utils";
+import { checkOrCreateReferralDataTransaction } from "./utils";
 
 export const dummyReferrerAddress = "66666666666666666666666666666666666666666666";
 
@@ -107,7 +107,7 @@ export async function swap({
   destinationRef,
   rewardTokenRef,
   swapData,
-  isNewUser,
+  enableReferral,
   referrer,
 }: {
   isStable: boolean;
@@ -119,7 +119,7 @@ export async function swap({
   destinationRef?: PublicKey;
   rewardTokenRef?: PublicKey;
   swapData: SwapData;
-  isNewUser: boolean;
+  enableReferral: boolean;
   referrer: PublicKey | null;
 }) {
   if (!connection || !walletPubkey || !pool || !config || !source) {
@@ -165,18 +165,19 @@ export async function swap({
     }
   }
 
-  const { userReferrerDataPubkey, createUserReferrerAccountTransaction } =
+  const { userReferrerDataPubkey, createUserReferrerAccountTransaction, referrerPubkey } =
     (buySol || sellSol) && (!destinationRef || !rewardTokenRef)
       ? {
           userReferrerDataPubkey: null,
           createUserReferrerAccountTransaction: undefined,
+          referrerPubkey: null,
         }
-      : await checkAndCreateReferralDataTransaction(
+      : await checkOrCreateReferralDataTransaction(
           walletPubkey,
+          enableReferral,
           referrer,
           config,
           connection,
-          isNewUser,
         );
 
   let createDestinationAccountTransaction: Transaction | undefined;
@@ -259,7 +260,7 @@ export async function swap({
         swapData,
         SWAP_PROGRAM_ID,
         userReferrerDataPubkey,
-        referrer,
+        referrerPubkey,
       ),
     );
 

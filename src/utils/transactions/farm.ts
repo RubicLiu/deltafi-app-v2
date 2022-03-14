@@ -15,7 +15,7 @@ import { ExTokenAccount, FarmPoolInfo, MarketConfig } from "providers/types";
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { createApproveInstruction } from "lib/instructions";
 import { mergeTransactions, signTransaction } from ".";
-import { checkAndCreateReferralDataTransaction } from "./utils";
+import { checkOrCreateReferralDataTransaction } from "./utils";
 
 export async function createFarmUser({
   connection,
@@ -173,7 +173,7 @@ export async function claim({
   farmUser,
   claimDestination,
   referrer,
-  isNewUser,
+  enableReferral,
 }: {
   connection: Connection;
   config: MarketConfig;
@@ -182,7 +182,7 @@ export async function claim({
   farmUser: PublicKey;
   claimDestination: PublicKey;
   referrer: PublicKey | null;
-  isNewUser: boolean;
+  enableReferral: boolean;
 }) {
   if (!connection || !walletPubkey || !farmPool || !farmUser || !claimDestination) {
     console.error("farm claim failed with null parameter");
@@ -195,13 +195,13 @@ export async function claim({
     SWAP_PROGRAM_ID,
   );
 
-  const { userReferrerDataPubkey, createUserReferrerAccountTransaction } =
-    await checkAndCreateReferralDataTransaction(
+  const { userReferrerDataPubkey, createUserReferrerAccountTransaction, referrerPubkey } =
+    await checkOrCreateReferralDataTransaction(
       walletPubkey,
+      enableReferral,
       referrer,
       config,
       connection,
-      isNewUser,
     );
 
   const claimTransaction = new Transaction().add(
@@ -215,7 +215,7 @@ export async function claim({
       config.deltafiToken,
       SWAP_PROGRAM_ID,
       userReferrerDataPubkey,
-      referrer,
+      referrerPubkey,
     ),
   );
 

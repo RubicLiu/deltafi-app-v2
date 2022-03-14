@@ -1,9 +1,9 @@
 import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { createAction } from "@reduxjs/toolkit";
 import { PublicKey, Connection } from "@solana/web3.js";
-import { SWAP_PROGRAM_ID } from "constants/index";
 import { UserReferrerDataLayout } from "lib/state";
 import { dummyReferrerAddress } from "utils/transactions/swap";
+import { getReferralDataAccountPublicKey } from "utils/transactions/utils";
 
 export interface AppState {
   referrerPublicKey?: PublicKey | null;
@@ -34,11 +34,7 @@ export const fetchReferrerThunk = createAsyncThunk(
   "app/fetchReferrer",
   async (arg: FetchReferrerThunkArg) => {
     const timestamp = Date.now();
-    const referralAccountPublickey = await PublicKey.createWithSeed(
-      arg.walletAddress,
-      "referrer",
-      SWAP_PROGRAM_ID,
-    );
+    const referralAccountPublickey = await getReferralDataAccountPublicKey(arg.walletAddress);
     const referralAccountInfo = await arg.connection.getAccountInfo(referralAccountPublickey);
 
     let referrerPublicKey: PublicKey = null;
