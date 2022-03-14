@@ -35,8 +35,37 @@ export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String):
   );
 }
 
-export function getTokenInfoBySymbol(symbolStr: String) {
-  return deployConfig.tokenInfo.find(({ symbol }) => symbol === symbolStr);
+export type PythConfig = {
+  price: string;
+  product: string;
+};
+
+export type TokenConfig = {
+  pyth: PythConfig;
+  symbol: string;
+  mint: string;
+  logoURI: string;
+  name: string;
+  decimals: number;
+};
+
+export const tokenConfigs: TokenConfig[] = deployConfig.tokenInfo.concat(
+  poolConfigs.map(({ name, mint, decimals }) => ({
+    pyth: null,
+    mint,
+    symbol: name,
+    name: "LP " + name,
+    decimals,
+    logoURI: null,
+  })),
+);
+
+export function getTokenConfigBySymbol(symbolStr: String): TokenConfig {
+  return tokenConfigs.find(({ symbol }) => symbol === symbolStr);
+}
+
+export function getTokenConfigByMint(mintStr: String): TokenConfig {
+  return tokenConfigs.find(({ mint }) => mint === mintStr);
 }
 
 export const marketConfig: MarketConfig = {

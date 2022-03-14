@@ -8,7 +8,7 @@ import PoolCard from "./components/Card";
 import { convertDollar } from "utils/utils";
 import { PMM } from "lib/calc";
 import { useTokenAccounts } from "providers/tokens";
-import { getTokenInfoBySymbol, PoolConfig, poolConfigs } from "constants/deployConfig";
+import { getTokenConfigBySymbol, PoolConfig, poolConfigs } from "constants/deployConfig";
 import { useSelector } from "react-redux";
 import { pythSelector, poolSelector } from "states/selectors";
 import { getMarketPrice } from "states/pythState";
@@ -62,8 +62,8 @@ const Home: React.FC = () => {
 
         let volumn = new BigNumber(0);
         if (basePrice && quotePrice) {
-          const baseDecimals = getTokenInfoBySymbol(c?.baseTokenInfo.symbol).decimals;
-          const quoteDecimals = getTokenInfoBySymbol(c?.quoteTokenInfo.symbol).decimals;
+          const baseDecimals = getTokenConfigBySymbol(c?.baseTokenInfo.symbol).decimals;
+          const quoteDecimals = getTokenConfigBySymbol(c?.quoteTokenInfo.symbol).decimals;
           volumn = pmm.tvl(basePrice, quotePrice, baseDecimals, quoteDecimals);
         }
         return p.plus(volumn);

@@ -23,12 +23,17 @@ import Page from "components/layout/Page";
 import { ConnectButton, LinkIcon } from "components";
 
 import useStyles from "./styles";
-import { getFarmTokenInfo, useTokenFromMint, useTokenMintAccount } from "providers/tokens";
+import { getFarmTokenInfo, useTokenFromMint } from "providers/tokens";
 import { lpTokens } from "constants/tokens";
 import { useModal } from "providers/modal";
 import { sendSignedTransaction, claim, stake, unstake } from "utils/transactions";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
-import { DELTAFI_TOKEN_MINT, SOLSCAN_LINK, DELTAFI_TOKEN_SYMBOL } from "constants/index";
+import {
+  DELTAFI_TOKEN_MINT,
+  SOLSCAN_LINK,
+  DELTAFI_TOKEN_SYMBOL,
+  DELTAFI_TOKEN_DECIMALS,
+} from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
@@ -41,7 +46,11 @@ import {
 } from "states/selectors";
 import { toFarmUserPosition, fetchFarmUsersThunk } from "states/farmUserState";
 import { fecthTokenAccountInfo } from "states/tokenAccountState";
-import { getPoolConfigByFarmPoolKey, marketConfig } from "constants/deployConfig";
+import {
+  getPoolConfigByFarmPoolKey,
+  getTokenConfigByMint,
+  marketConfig,
+} from "constants/deployConfig";
 import { getTokenInfo } from "providers/tokens";
 
 interface TransactionResult {
@@ -124,8 +133,8 @@ const Stake = (): ReactElement => {
 
   const config = marketConfig;
   const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58());
-  const lpMint = useTokenMintAccount(farmPool?.poolMintKey);
-  const deltafiTokenMint = useTokenMintAccount(DELTAFI_TOKEN_MINT);
+  const lpTokenConfig = getTokenConfigByMint(farmPool?.poolMintKey.toBase58());
+
   const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
@@ -138,20 +147,20 @@ const Stake = (): ReactElement => {
   }, [tokenAccount?.account, token]);
 
   const totalStaked = useMemo(() => {
-    return farmPool && lpMint
-      ? exponentiatedBy(farmPool.reservedAmount.toString(), lpMint.decimals)
+    return farmPool && lpTokenConfig
+      ? exponentiatedBy(farmPool.reservedAmount.toString(), lpTokenConfig.decimals)
       : new BigNumber(0);
-  }, [farmPool, lpMint]);
+  }, [farmPool, lpTokenConfig]);
 
   let position = farmUser?.positions[farmPoolId];
   const apr = new BigNumber(farmPool?.aprNumerator.toString()).div(
     new BigNumber(farmPool?.aprDenominator.toString()),
   );
   const depositAmount = useMemo(() => {
-    return position && lpMint
-      ? exponentiatedBy(position.depositBalance, lpMint.decimals)
+    return position && lpTokenConfig
+      ? exponentiatedBy(position.depositBalance, lpTokenConfig.decimals)
       : new BigNumber(0);
-  }, [position, lpMint]);
+  }, [position, lpTokenConfig]);
 
   const [staking, setStaking] = useState({
     isStake: true,
@@ -205,7 +214,7 @@ const Stake = (): ReactElement => {
   }, [staking, tokenBalance, depositAmount]);
 
   const unclaimedReward = (() => {
-    if (position && deltafiTokenMint) {
+    if (position) {
       return getUnclaimedReward(
         apr,
         position.lastUpdateTs,
@@ -213,7 +222,7 @@ const Stake = (): ReactElement => {
         position.rewardsOwed,
         position.rewardEstimated,
         position.depositBalance,
-        deltafiTokenMint.decimals,
+        DELTAFI_TOKEN_DECIMALS,
       );
     }
     return new BigNumber(0);
@@ -244,7 +253,7 @@ const Stake = (): ReactElement => {
   };
 
   const handleStake = useCallback(async () => {
-    if (!connection || !farmPool || !walletPubkey || !lpMint || !lpToken) {
+    if (!connection || !farmPool || !walletPubkey || !lpTokenConfig || !lpToken) {
       return null;
     }
     if (staking.isStake) {
@@ -262,7 +271,9 @@ const Stake = (): ReactElement => {
           farmUser: farmUser?.publicKey,
           poolTokenAccount: lpToken,
           stakeData: {
-            amount: BigInt(exponentiate(staking.amount, lpMint.decimals).integerValue().toString()),
+            amount: BigInt(
+              exponentiate(staking.amount, lpTokenConfig.decimals).integerValue().toString(),
+            ),
           },
         });
 
@@ -322,7 +333,9 @@ const Stake = (): ReactElement => {
           farmUser: farmUser?.publicKey,
           poolTokenAccount: lpToken,
           unstakeData: {
-            amount: BigInt(exponentiate(staking.amount, lpMint.decimals).integerValue().toString()),
+            amount: BigInt(
+              exponentiate(staking.amount, lpTokenConfig.decimals).integerValue().toString(),
+            ),
           },
         });
 
@@ -375,7 +388,7 @@ const Stake = (): ReactElement => {
     farmPool,
     farmUser,
     staking,
-    lpMint,
+    lpTokenConfig,
     lpToken,
     signTransaction,
     position,
@@ -385,7 +398,7 @@ const Stake = (): ReactElement => {
   ]);
 
   const handleClaim = useCallback(async () => {
-    if (!connection || !farmPool || !walletPubkey || !lpMint || !lpToken) {
+    if (!connection || !farmPool || !walletPubkey || !lpTokenConfig || !lpToken) {
       return null;
     }
 
@@ -440,7 +453,7 @@ const Stake = (): ReactElement => {
     connection,
     farmPool,
     farmUser,
-    lpMint,
+    lpTokenConfig,
     lpToken,
     signTransaction,
     walletPubkey,
@@ -609,7 +622,7 @@ const Stake = (): ReactElement => {
           </Box>
           <Box className={classes.cardBottom}>
             <Typography className={classes.amount}>
-              {deltafiTokenMint ? unclaimedReward.toFixed(deltafiTokenMint.decimals) : "--"}
+              {unclaimedReward.toFixed(DELTAFI_TOKEN_DECIMALS)}
             </Typography>
           </Box>
         </Box>
