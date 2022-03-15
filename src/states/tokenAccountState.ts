@@ -3,8 +3,7 @@ import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from "@solana/sp
 import { PublicKey, Connection, AccountInfo } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { blob, struct } from "buffer-layout";
-import { deployConfig } from "constants/deployConfig";
-import { lpTokens, tokens } from "constants/tokens";
+import { allTokenConfigs } from "constants/deployConfig";
 import { Dispatch } from "react";
 import { getMultipleAccounts } from "utils/account";
 import { u64, publicKey } from "utils/layout";
@@ -134,12 +133,7 @@ async function getTokenAcountInfoList(
 export const fetchTokenAccountsThunk = createAsyncThunk(
   "tokenAccount/fetchTokenAccountsThunk",
   async (arg: fetchTokenAccountsThunkArgs) => {
-    // Get tokens, lp tokens and deltafi tokens.
-    const mintAddressList = tokens
-      .map(({ address }) => address)
-      .concat(lpTokens.map(({ address }) => address))
-      .concat([deployConfig.deltafiTokenMint]);
-
+    const mintAddressList = allTokenConfigs.map(({ mint }) => mint);
     const tokenAccountInfoList = await getTokenAcountInfoList(
       mintAddressList,
       arg.connection,

@@ -6,6 +6,9 @@ import fullDeployConfig from "./fullDeployConfig.json";
 export const deployConfig =
   fullDeployConfig[process.env.REACT_APP_DEPLOYMENT_MODE || "mainnet-test"];
 
+export const DELTAFI_TOKEN_DECIMALS = 6; // our token is always with 6 decimals
+export const DELTAFI_TOKEN_SYMBOL = "DELFI";
+
 export type PoolConfig = {
   name: string;
   base: string;
@@ -58,7 +61,16 @@ export const lpTokenConfigs: TokenConfig[] = poolConfigs.map(({ name, mint, deci
   decimals,
   logoURI: null,
 }));
-export const allTokenConfigs: TokenConfig[] = tokenConfigs.concat(lpTokenConfigs);
+export const allTokenConfigs: TokenConfig[] = tokenConfigs.concat(lpTokenConfigs).concat([
+  {
+    pyth: null,
+    mint: deployConfig.deltafiTokenMint,
+    symbol: DELTAFI_TOKEN_SYMBOL,
+    name: DELTAFI_TOKEN_SYMBOL,
+    decimals: DELTAFI_TOKEN_DECIMALS,
+    logoURI: null,
+  },
+]);
 
 export function getTokenConfigBySymbol(symbolStr: String): TokenConfig {
   return allTokenConfigs.find(({ symbol }) => symbol === symbolStr);

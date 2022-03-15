@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { AccountInfo, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 
 import { Fees, PoolState, Rewards, SwapType } from "lib/state";
 import { TokenConfig } from "constants/deployConfig";
@@ -10,33 +10,10 @@ export interface ConnectionContextValues {
   setNetwork: (network: string) => void;
 }
 
-export interface TokenAccount {
-  pubkey: PublicKey;
-  account: AccountInfo<Buffer> | null;
-  effectiveMint: PublicKey;
-}
-
-export interface ExTokenAccount {
-  pubkey: PublicKey;
-  effectiveMint: PublicKey;
-  account: {
-    mint: PublicKey;
-    owner: PublicKey;
-    amount: BigNumber;
-  };
-}
-
 export interface EndpointInfo {
   name: string;
   endpoint: string;
   custom: boolean;
-}
-
-/**
- * {tokenMint: preferred token account's base58 encoded public key}
- */
-export interface SelectedTokenAccounts {
-  [tokenMint: string]: string;
 }
 
 export interface ModalInfo {
@@ -58,12 +35,6 @@ export interface MarketConfig {
   deltafiToken: PublicKey;
 }
 
-export interface TokenAccountInfo {
-  mint: PublicKey;
-  owner: PublicKey;
-  amount: BigNumber;
-}
-
 export interface PoolInfo {
   name: string;
   swapType: SwapType;
@@ -82,12 +53,6 @@ export interface PoolInfo {
   fees: Fees;
   rewards: Rewards;
   poolState: PoolState;
-}
-
-export interface TokenAccount {
-  pubkey: PublicKey;
-  account: AccountInfo<Buffer> | null;
-  effectiveMint: PublicKey;
 }
 
 export interface FarmPoolInfo {

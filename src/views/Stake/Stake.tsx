@@ -220,18 +220,24 @@ const Stake = (): ReactElement => {
   })();
 
   const poolRateByDay = useMemo(() => {
-    if (farmPool && totalStaked) {
-      return totalStaked.multipliedBy(apr).dividedBy(365).toFixed(6);
+    if (farmPool && totalStaked && token) {
+      return exponentiatedBy(
+        exponentiate(totalStaked.multipliedBy(apr).dividedBy(365), token.decimals),
+        DELTAFI_TOKEN_DECIMALS,
+      ).toFixed(6);
     }
     return "--";
-  }, [farmPool, totalStaked, apr]);
+  }, [farmPool, totalStaked, apr, token]);
 
   const rewardRateByDay = useMemo(() => {
-    if (depositAmount) {
-      return depositAmount.multipliedBy(apr).dividedBy(365).toFixed(6);
+    if (depositAmount && token) {
+      return exponentiatedBy(
+        exponentiate(depositAmount.multipliedBy(apr).dividedBy(365), token.decimals),
+        DELTAFI_TOKEN_DECIMALS,
+      ).toFixed(6);
     }
     return "--";
-  }, [depositAmount, apr]);
+  }, [depositAmount, apr, token]);
 
   const handleSwitchMethod = (method: "stake" | "unstake") => {
     setStaking((staking) => ({

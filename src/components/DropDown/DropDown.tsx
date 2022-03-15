@@ -12,10 +12,9 @@ import {
 import { SearchOutlined } from "@material-ui/icons";
 import styled from "styled-components";
 import { DropDownProps } from "./types";
-import { tokens } from "constants/tokens";
 import { ArrowDown } from "components";
 import { useDarkMode } from "providers/theme";
-import { TokenConfig } from "constants/deployConfig";
+import { getTokenConfigBySymbol, TokenConfig } from "constants/deployConfig";
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
@@ -186,12 +185,8 @@ const DropDown = <T extends TokenConfig>(props: DropDownProps<T> & { children?: 
                   return null;
                 }
 
-                const baseTokenLogoURL = tokens.find(
-                  (tokenInfo) => tokenInfo.symbol === baseTokenSymbol,
-                )?.logoURI;
-                const quoteTokenLogoURL = tokens.find(
-                  (tokenInfo) => tokenInfo.symbol === quoteTokenSymbol,
-                )?.logoURI;
+                const baseTokenLogoURL = getTokenConfigBySymbol(baseTokenSymbol)?.logoURI;
+                const quoteTokenLogoURL = getTokenConfigBySymbol(quoteTokenSymbol)?.logoURI;
                 if (!baseTokenLogoURL || !quoteTokenLogoURL) {
                   return null;
                 }
