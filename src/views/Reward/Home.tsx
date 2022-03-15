@@ -9,14 +9,14 @@ import CopyLinkButton from "./components/CopyLinkButton";
 import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from "components";
 import copy from "copy-to-clipboard";
 
-import { useTokenFromMint } from "providers/tokens";
 import { deployConfig } from "constants/deployConfig";
 import { createReferrerDeltafiTokenAccount } from "utils/transactions/createReferrerDeltafiTokenAccount";
 import { sendSignedTransaction } from "utils/transactions";
 import loadingIcon from "components/gif/loading_white.gif";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 import { DELTAFI_TOKEN_MINT } from "constants/index";
+import { selectTokenAccountInfoByMint } from "states";
 /*
  * mockup test data for reward page
  */
@@ -139,8 +139,9 @@ const Home: React.FC = (props) => {
   const { connection } = useConnection();
   const dispatch = useDispatch();
 
-  //TODO refactory token provider with redux and get the user's DELFI token with a better method
-  const deltafiTokenAccount = useTokenFromMint(deployConfig.deltafiTokenMint);
+  const deltafiTokenAccount = useSelector(
+    selectTokenAccountInfoByMint(deployConfig.deltafiTokenMint),
+  );
 
   const [referralLinkState, setReferralLinkState] = useState<
     "Unavailable" | "Ready" | "Copied" | "Processing"
@@ -149,14 +150,14 @@ const Home: React.FC = (props) => {
   const [referralLink, setReferralLink] = useState("");
 
   useEffect(() => {
-    setReferralLinkState(deltafiTokenAccount?.pubkey ? "Ready" : "Unavailable");
-    if (!deltafiTokenAccount?.pubkey) {
+    setReferralLinkState(deltafiTokenAccount?.publicKey ? "Ready" : "Unavailable");
+    if (!deltafiTokenAccount?.publicKey) {
       return;
     }
     setReferralLink(
-      process.env.REACT_APP_LOCAL_HOST + "?referrer=" + deltafiTokenAccount?.pubkey.toBase58(),
+      process.env.REACT_APP_LOCAL_HOST + "?referrer=" + deltafiTokenAccount?.publicKey.toBase58(),
     );
-  }, [isConnectedWallet, deltafiTokenAccount?.pubkey]);
+  }, [isConnectedWallet, deltafiTokenAccount?.publicKey]);
 
   return (
     <Page>

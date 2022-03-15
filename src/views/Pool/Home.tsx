@@ -7,12 +7,20 @@ import Page from "components/layout/Page";
 import PoolCard from "./components/Card";
 import { convertDollar } from "utils/utils";
 import { PMM } from "lib/calc";
-import { useTokenAccounts } from "providers/tokens";
 import { getTokenConfigBySymbol, PoolConfig, poolConfigs } from "constants/deployConfig";
 import { useSelector } from "react-redux";
-import { pythSelector, poolSelector } from "states/selectors";
+import { pythSelector, poolSelector, tokenAccountSelector } from "states/selectors";
 import { getMarketPrice } from "states/pythState";
 import { PublicKey } from "@solana/web3.js";
+import { MintToTokenAccountInfo } from "states/tokenAccountState";
+
+function hasDeposit(mintToTokenAccountInfo: MintToTokenAccountInfo, mint: string) {
+  if (mintToTokenAccountInfo == null) {
+    return false;
+  }
+  const tokenInfo = mintToTokenAccountInfo[mint];
+  return tokenInfo && tokenInfo.amount.comparedTo(new BigNumber(0)) > 0;
+}
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
@@ -49,7 +57,7 @@ const Home: React.FC = () => {
     return Object.values(poolState.poolKeyToPoolInfo);
   }, [poolState.poolKeyToPoolInfo]);
 
-  const [tokens] = useTokenAccounts();
+  const mintToTokenAccountInfo = useSelector(tokenAccountSelector).mintToTokenAccountInfo;
 
   const pythState = useSelector(pythSelector);
   const symbolToPythData = pythState.symbolToPythData;
@@ -90,7 +98,7 @@ const Home: React.FC = () => {
             <Box mt={3.5}>
               {poolConfigs
                 .filter((poolConfig: PoolConfig) =>
-                  tokens?.find((token) => token.effectiveMint.toBase58() === poolConfig.mint),
+                  hasDeposit(mintToTokenAccountInfo, poolConfig.mint),
                 )
                 .map((poolConfig: PoolConfig) => (
                   <PoolCard
@@ -112,8 +120,7 @@ const Home: React.FC = () => {
             <Box className={classes.poolCardContainer}>
               {poolConfigs
                 .filter(
-                  (poolConfig: PoolConfig) =>
-                    !tokens?.find((token) => token.effectiveMint.toBase58() !== poolConfig.mint),
+                  (poolConfig: PoolConfig) => !hasDeposit(mintToTokenAccountInfo, poolConfig.mint),
                 )
                 .map((poolConfig: PoolConfig) => (
                   <Box key={poolConfig.swap}>

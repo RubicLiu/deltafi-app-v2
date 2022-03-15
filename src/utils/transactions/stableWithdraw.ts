@@ -2,7 +2,7 @@ import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import BN from "bn.js";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
-import { PoolInfo, ExTokenAccount, MarketConfig } from "providers/types";
+import { PoolInfo, MarketConfig } from "providers/types";
 import {
   createApproveInstruction,
   createStableWithdrawInstruction,
@@ -12,6 +12,7 @@ import { createTokenAccountTransaction, mergeTransactions, signTransaction } fro
 import { SWAP_PROGRAM_ID } from "constants/index";
 // import { createFarmUser } from "./farm";
 import { AccountLayout } from "@solana/spl-token";
+import { TokenAccountInfo } from "states/tokenAccountState";
 
 export async function stableWithdraw({
   connection,
@@ -29,7 +30,7 @@ export async function stableWithdraw({
 }: {
   connection: Connection;
   walletPubkey: PublicKey;
-  poolTokenAccount: ExTokenAccount;
+  poolTokenAccount: TokenAccountInfo;
   pool: PoolInfo;
   baseTokenRef?: PublicKey;
   quteTokenRef?: PublicKey;
@@ -107,7 +108,7 @@ export async function stableWithdraw({
   transaction
     .add(
       createApproveInstruction(
-        poolTokenAccount.pubkey,
+        poolTokenAccount.publicKey,
         userTransferAuthority.publicKey,
         walletPubkey,
         withdrawData.amountPoolToken,
@@ -118,7 +119,7 @@ export async function stableWithdraw({
         pool.publicKey,
         swapAuthority,
         userTransferAuthority.publicKey,
-        poolTokenAccount.pubkey,
+        poolTokenAccount.publicKey,
         pool.base,
         pool.quote,
         baseTokenRef,

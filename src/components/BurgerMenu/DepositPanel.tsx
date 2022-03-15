@@ -2,13 +2,16 @@ import { ReactElement, ReactNode, useMemo } from "react";
 import { Box, IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 
-import { useTokenFromMint } from "providers/tokens";
 import { useModal } from "providers/modal";
 import { PMM } from "lib/calc";
 import { rate } from "utils/decimal";
 import { ConnectButton } from "components";
 import { useSelector } from "react-redux";
-import { selectPythMarketPriceByPool, selectPoolByPoolKey } from "states/selectors";
+import {
+  selectPythMarketPriceByPool,
+  selectPoolByPoolKey,
+  selectTokenAccountInfoByMint,
+} from "states/selectors";
 
 interface IDepositPanelProps {
   children?: ReactNode;
@@ -62,13 +65,13 @@ const DepositPanel = (props: IDepositPanelProps): ReactElement => {
 
   const pool = useSelector(selectPoolByPoolKey(address.toBase58()));
 
-  const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
+  const poolTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.poolMintKey.toBase58()));
 
   const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
 
   const share = useMemo(() => {
     if (pool && poolTokenAccount) {
-      return rate(poolTokenAccount.account.amount, pool.poolState.totalSupply);
+      return rate(poolTokenAccount.amount, pool.poolState.totalSupply);
     }
     return 0;
   }, [pool, poolTokenAccount]);

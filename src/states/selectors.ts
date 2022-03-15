@@ -41,3 +41,12 @@ export function selectPoolBySymbols(baseSymbol: string, quoteSymbol: string) {
     return state.pool.poolKeyToPoolInfo[poolConfig?.swap];
   };
 }
+
+export function selectTokenAccountInfoByMint(mint: string) {
+  return (state: RootState) => {
+    if (state.tokenAccount.mintToTokenAccountInfo == null) {
+      return null;
+    }
+    return state.tokenAccount.mintToTokenAccountInfo[mint];
+  };
+}

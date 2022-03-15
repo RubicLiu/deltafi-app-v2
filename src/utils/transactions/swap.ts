@@ -15,12 +15,13 @@ import {
   SWAP_DIRECTION,
   createStableSwapInstruction,
 } from "lib/instructions";
-import { ExTokenAccount, MarketConfig, PoolInfo } from "providers/types";
+import { MarketConfig, PoolInfo } from "providers/types";
 
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { createTokenAccountTransaction, mergeTransactions, signTransaction } from ".";
 import { AccountLayout } from "@solana/spl-token";
 import { checkOrCreateReferralDataTransaction } from "./utils";
+import { TokenAccountInfo } from "states/tokenAccountState";
 
 export const dummyReferrerAddress = "66666666666666666666666666666666666666666666";
 
@@ -115,7 +116,7 @@ export async function swap({
   walletPubkey: PublicKey;
   config: MarketConfig;
   pool: PoolInfo;
-  source: ExTokenAccount;
+  source: TokenAccountInfo;
   destinationRef?: PublicKey;
   rewardTokenRef?: PublicKey;
   swapData: SwapData;
@@ -141,7 +142,7 @@ export async function swap({
     (pool.quoteTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellQuote) ||
     (pool.baseTokenInfo.symbol === "SOL" && swapData.swapDirection === SWAP_DIRECTION.SellBase);
 
-  let sourceRef: PublicKey = source.pubkey;
+  let sourceRef: PublicKey = source.publicKey;
 
   if (buySol || sellSol) {
     let tmpAccountLamport = buySol ? lamports * 2 : Number(swapData.amountIn) + lamports * 2;
@@ -185,7 +186,7 @@ export async function swap({
     const result = await createTokenAccountTransaction({
       walletPubkey,
       mintPublicKey: new PublicKey(
-        pool.baseTokenInfo.address === source.account.mint.toString()
+        pool.baseTokenInfo.address === source.mint.toBase58()
           ? pool.quoteTokenInfo.address
           : pool.baseTokenInfo.address,
       ),
@@ -244,11 +245,11 @@ export async function swap({
         userTransferAuthority.publicKey,
         sourceRef,
         swapSource,
-        source.account.mint,
+        source.mint,
         swapDestination,
         destinationRef,
         new PublicKey(
-          pool.baseTokenInfo.address === source.account.mint.toBase58()
+          pool.baseTokenInfo.address === source.mint.toBase58()
             ? pool.quoteTokenInfo.address
             : pool.baseTokenInfo.address,
         ),

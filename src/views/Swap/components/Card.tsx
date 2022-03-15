@@ -5,9 +5,10 @@ import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
 import { DropDown } from "components";
 import { CardProps } from "./types";
 import { getTokenInfo } from "providers/tokens";
-import { useTokenFromMint } from "providers/tokens";
 import { exponentiatedBy } from "utils/decimal";
 import BigNumber from "bignumber.js";
+import { useSelector } from "react-redux";
+import { selectTokenAccountInfoByMint } from "states";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -84,11 +85,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 const SwapCard: React.FC<CardProps> = (props) => {
   const { card, handleChangeCard, disabled, tokens, disableDrop, percentage } = props;
   const classes = useStyles(props);
-  const tokenAccount = useTokenFromMint(card.token?.address);
+  const tokenAccount = useSelector(selectTokenAccountInfoByMint(card.token?.address));
 
   const tokenBalance = useMemo(() => {
     if (tokenAccount && card) {
-      return exponentiatedBy(tokenAccount.account.amount, card.token.decimals);
+      return exponentiatedBy(tokenAccount.amount, card.token.decimals);
     }
     return null;
   }, [tokenAccount, card]);

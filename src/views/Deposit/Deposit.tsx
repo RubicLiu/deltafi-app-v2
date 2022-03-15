@@ -28,7 +28,6 @@ import { WithdrawSelectCard } from "components/molecules";
 import WithdrawCard from "components/molecules/WithdrawCard";
 
 import { useModal } from "providers/modal";
-import { useTokenFromMint } from "providers/tokens";
 import { PMM } from "lib/calc";
 import { rate, exponentiate, exponentiatedBy } from "utils/decimal";
 import { getOutAmount } from "utils/liquidity";
@@ -49,6 +48,7 @@ import {
   selectFarmUserByFarmPoolKey,
   selectPythMarketPriceByPool,
   selectPoolByPoolKey,
+  selectTokenAccountInfoByMint,
 } from "states/selectors";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 
@@ -227,9 +227,10 @@ const Deposit: React.FC = () => {
     amount: "",
     amountWithSlippage: "",
   });
-  const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
-  const baseTokenAccount = useTokenFromMint(pool?.baseTokenInfo.address);
-  const quoteTokenAccount = useTokenFromMint(pool?.quoteTokenInfo.address);
+
+  const poolTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.poolMintKey.toBase58()));
+  const baseTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.baseTokenInfo.address));
+  const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.quoteTokenInfo.address));
 
   const config = marketConfig;
   const farmPoolKey = useMemo(() => {
@@ -289,7 +290,7 @@ const Deposit: React.FC = () => {
 
   const share = useMemo(() => {
     if (pool && poolTokenAccount) {
-      return rate(poolTokenAccount.account.amount, pool.poolState.totalSupply);
+      return rate(poolTokenAccount.amount, pool.poolState.totalSupply);
     }
     return 0;
   }, [pool, poolTokenAccount]);
@@ -364,7 +365,7 @@ const Deposit: React.FC = () => {
           pool,
           baseAccount: baseTokenAccount,
           quoteAccount: quoteTokenAccount,
-          poolTokenRef: poolTokenAccount?.pubkey,
+          poolTokenRef: poolTokenAccount?.publicKey,
           basePricePythKey: pool.pythBase,
           quotePricePythKey: pool.pythQuote,
           depositData: {
@@ -435,7 +436,7 @@ const Deposit: React.FC = () => {
     base,
     quote,
     signTransaction,
-    poolTokenAccount?.pubkey,
+    poolTokenAccount?.publicKey,
     config,
     farmPoolKey,
     farmUser,
@@ -458,8 +459,8 @@ const Deposit: React.FC = () => {
           walletPubkey,
           poolTokenAccount,
           pool,
-          baseTokenRef: baseTokenAccount?.pubkey,
-          quteTokenRef: quoteTokenAccount?.pubkey,
+          baseTokenRef: baseTokenAccount?.publicKey,
+          quteTokenRef: quoteTokenAccount?.publicKey,
           basePricePythKey: pool.pythBase,
           quotePricePythKey: pool.pythQuote,
           withdrawData: {
@@ -468,7 +469,7 @@ const Deposit: React.FC = () => {
                 .poolTokenFromAmount(
                   exponentiate(base.amount, pool.baseTokenInfo.decimals),
                   exponentiate(quote.amount, pool.quoteTokenInfo.decimals),
-                  poolTokenAccount.account.amount,
+                  poolTokenAccount.amount,
                   share,
                 )
                 // round ceil makes sure the amount of token the lp token
@@ -550,8 +551,8 @@ const Deposit: React.FC = () => {
     base,
     quote,
     signTransaction,
-    baseTokenAccount?.pubkey,
-    quoteTokenAccount?.pubkey,
+    baseTokenAccount?.publicKey,
+    quoteTokenAccount?.publicKey,
     config,
     farmPoolKey,
     farmUser,
@@ -746,10 +747,10 @@ const Deposit: React.FC = () => {
     if (method === "deposit") {
       if (base.token && quote.token && baseTokenAccount && quoteTokenAccount) {
         const isInsufficient =
-          exponentiatedBy(baseTokenAccount.account.amount, base.token.decimals).isLessThan(
+          exponentiatedBy(baseTokenAccount.amount, base.token.decimals).isLessThan(
             new BigNumber(base.amount || 0),
           ) ||
-          exponentiatedBy(quoteTokenAccount.account.amount, quote.token.decimals).isLessThan(
+          exponentiatedBy(quoteTokenAccount.amount, quote.token.decimals).isLessThan(
             new BigNumber(quote.amount),
           );
         if (isInsufficient) {

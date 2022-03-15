@@ -9,8 +9,12 @@ import { Dispatch } from "react";
 import { getMultipleAccounts } from "utils/account";
 import { u64, publicKey } from "utils/layout";
 
-type TokenAccountInfo = { accountPublicKey: PublicKey; balance: BigNumber; mint: PublicKey };
-type MintToTokenAccountInfo = Record<string, TokenAccountInfo | null>;
+export type TokenAccountInfo = {
+  publicKey: PublicKey;
+  amount: BigNumber;
+  mint: PublicKey;
+};
+export type MintToTokenAccountInfo = Record<string, TokenAccountInfo | null>;
 
 export interface TokenAccountState {
   mintToTokenAccountInfo: MintToTokenAccountInfo | null;
@@ -31,21 +35,21 @@ export const setTokenAccountAction = createAction<{
 }>("tokenAccount/setTokenAccount");
 
 const SOL_MINT_ADDRESS = "So11111111111111111111111111111111111111112";
-export const TOKEN_ACCOUNT_LAYOUT = struct<{ mint: PublicKey; balance: BigNumber }>([
+export const TOKEN_ACCOUNT_LAYOUT = struct<{ mint: PublicKey; amount: BigNumber }>([
   publicKey("mint"),
   blob(32),
-  u64("balance"),
+  u64("amount"),
   blob(93),
 ]);
 
 function parseTokenAccountInfo(publicKey: PublicKey, accountInfo: AccountInfo<Buffer>) {
-  const { balance, mint } = TOKEN_ACCOUNT_LAYOUT.decode(accountInfo.data);
+  const { amount, mint } = TOKEN_ACCOUNT_LAYOUT.decode(accountInfo.data);
   if (!accountInfo) {
     throw Error("invalid token account: " + publicKey.toBase58());
   }
   return {
-    balance: new BigNumber(balance),
-    accountPublicKey: publicKey,
+    amount: new BigNumber(amount),
+    publicKey,
     mint,
   };
 }
@@ -55,8 +59,8 @@ function parseSolTokenAccountInfo(publicKey: PublicKey, accountInfo: AccountInfo
     throw Error("invalid wallet address: " + publicKey.toBase58());
   }
   return {
-    balance: new BigNumber(accountInfo.lamports),
-    accountPublicKey: publicKey,
+    amount: new BigNumber(accountInfo.lamports),
+    publicKey,
     mint: new PublicKey(SOL_MINT_ADDRESS),
   };
 }
@@ -72,9 +76,9 @@ export async function fecthTokenAccountInfoList(
 ) {
   const tokenAccountInfoList = await getTokenAcountInfoList(mintAddressList, connection, wallet);
   for (const tokenAccountInfo of tokenAccountInfoList) {
-    console.info(tokenAccountInfo);
     dispatch(setTokenAccountAction({ mint: tokenAccountInfo.mint.toBase58(), tokenAccountInfo }));
   }
+  return tokenAccountInfoList;
 }
 
 async function getTokenAccountAddress(mintAddress: String, wallet: PublicKey) {
@@ -146,7 +150,6 @@ export const fetchTokenAccountsThunk = createAsyncThunk(
     for (const tokenAccountInfo of tokenAccountInfoList) {
       mintToTokenAccountInfo[tokenAccountInfo.mint.toBase58()] = tokenAccountInfo;
     }
-    console.info(mintToTokenAccountInfo);
 
     return {
       mintToTokenAccountInfo,

@@ -2,7 +2,7 @@ import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import BN from "bn.js";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
-import { PoolInfo, ExTokenAccount, MarketConfig } from "providers/types";
+import { PoolInfo, MarketConfig } from "providers/types";
 import {
   createApproveInstruction,
   createStableDepositInstruction,
@@ -12,6 +12,7 @@ import { createTokenAccountTransaction, signTransaction, mergeTransactions } fro
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { createFarmUser } from "./farm";
 import { AccountLayout } from "@solana/spl-token";
+import { TokenAccountInfo } from "states/tokenAccountState";
 
 export async function stableDeposit({
   connection,
@@ -30,8 +31,8 @@ export async function stableDeposit({
   connection: Connection;
   walletPubkey: PublicKey;
   pool: PoolInfo;
-  baseAccount: ExTokenAccount;
-  quoteAccount: ExTokenAccount;
+  baseAccount: TokenAccountInfo;
+  quoteAccount: TokenAccountInfo;
   poolTokenRef?: PublicKey;
   basePricePythKey: PublicKey;
   quotePricePythKey: PublicKey;
@@ -62,8 +63,8 @@ export async function stableDeposit({
     SWAP_PROGRAM_ID,
   );
 
-  let baseSourceRef = baseAccount.pubkey;
-  let quoteSourceRef = quoteAccount.pubkey;
+  let baseSourceRef = baseAccount.publicKey;
+  let quoteSourceRef = quoteAccount.publicKey;
   let createWrappedTokenAccountTransaction: Transaction | undefined;
   let initializeWrappedTokenAccountTransaction: Transaction | undefined;
   let closeWrappedTokenAccountTransaction: Transaction | undefined;

@@ -24,13 +24,7 @@ import { ConnectButton } from "components";
 import SettingsPanel from "components/SettingsPanel/SettingsPanel";
 import SwapCard from "./components/Card";
 import { useModal } from "providers/modal";
-import {
-  getTokenAccountInfo,
-  getTokenInfo,
-  parseTokenAccountData,
-  useTokenFromMint,
-  findTokenAccountByMint,
-} from "providers/tokens";
+import { getTokenInfo } from "providers/tokens";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { swap } from "utils/transactions/swap";
 import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS, SOLSCAN_LINK } from "constants/index";
@@ -44,7 +38,12 @@ import { SwapType } from "lib/state";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
-import { appSelector, selectPoolBySymbols, selectPythMarketPriceByPool } from "states/selectors";
+import {
+  appSelector,
+  selectPoolBySymbols,
+  selectPythMarketPriceByPool,
+  selectTokenAccountInfoByMint,
+} from "states/selectors";
 import { fetchPoolsThunk } from "states/poolState";
 import { fetchReferrerThunk } from "states/appState";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
@@ -145,22 +144,23 @@ const Home: React.FC = (props) => {
 
   const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
 
-  const sourceAccount = useTokenFromMint(tokenFrom.token.address);
-  const destinationAccount = useTokenFromMint(tokenTo.token.address);
+  const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.address));
+  const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.address));
+
   const sourceBalance = useMemo(() => {
     if (sourceAccount && tokenFrom) {
-      return exponentiatedBy(sourceAccount.account.amount, tokenFrom.token.decimals);
+      return exponentiatedBy(sourceAccount.amount, tokenFrom.token.decimals);
     }
     return null;
   }, [sourceAccount, tokenFrom]);
   const destinationBalance = useMemo(() => {
     if (destinationAccount && tokenTo) {
-      return exponentiatedBy(destinationAccount.account.amount, tokenTo.token.decimals);
+      return exponentiatedBy(destinationAccount.amount, tokenTo.token.decimals);
     }
     return null;
   }, [destinationAccount, tokenTo]);
 
-  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
+  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(DELTAFI_TOKEN_MINT.toBase58()));
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [priceImpact, setPriceImpact] = useState("2.0");
@@ -305,8 +305,8 @@ const Home: React.FC = (props) => {
         config,
         pool,
         source: sourceAccount,
-        destinationRef: destinationAccount?.pubkey,
-        rewardTokenRef: rewardsAccount?.pubkey,
+        destinationRef: destinationAccount?.publicKey,
+        rewardTokenRef: rewardsAccount?.publicKey,
         swapData: {
           amountIn,
           minimumAmountOut,
@@ -322,7 +322,7 @@ const Home: React.FC = (props) => {
       await connection.confirmTransaction(hash, "confirmed");
 
       // fetch account info and update record for from and to tokens
-      await fecthTokenAccountInfoList(
+      const [newFromAccount, newToAccount] = await fecthTokenAccountInfoList(
         [tokenFrom.token.address, tokenTo.token.address],
         walletPubkey,
         connection,
@@ -333,18 +333,10 @@ const Home: React.FC = (props) => {
       setTokenTo((prevTokenTo) => ({ ...prevTokenTo, amount: "", lastUpdate: Date.now() }));
       const prevBalanceFrom = sourceBalance ?? 0;
       const prevBalanceTo = destinationBalance ?? 0;
-      const tokenAccounts = await getTokenAccountInfo(connection, walletPubkey);
-      const from = findTokenAccountByMint(tokenAccounts, walletPubkey, tokenFrom.token.address);
-      const to = findTokenAccountByMint(tokenAccounts, walletPubkey, tokenTo.token.address);
-      if (from && to) {
-        const nextBalanceFrom = exponentiatedBy(
-          parseTokenAccountData(from.account.data).amount,
-          tokenFrom.token.decimals,
-        );
-        const nextBalanceTo = exponentiatedBy(
-          parseTokenAccountData(to.account.data).amount,
-          tokenTo.token.decimals,
-        );
+
+      if (newFromAccount && newToAccount) {
+        const nextBalanceFrom = exponentiatedBy(newFromAccount.amount, tokenFrom.token.decimals);
+        const nextBalanceTo = exponentiatedBy(newToAccount.amount, tokenTo.token.decimals);
         setTransactionResult({
           status: true,
           hash,
@@ -386,8 +378,8 @@ const Home: React.FC = (props) => {
     tokenTo,
     // priceImpact,
     connection,
-    destinationAccount?.pubkey,
-    rewardsAccount?.pubkey,
+    destinationAccount?.publicKey,
+    rewardsAccount?.publicKey,
     signTransaction,
     destinationBalance,
     appState,

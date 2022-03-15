@@ -11,11 +11,12 @@ import {
   FarmWithdrawData,
 } from "lib/instructions/farm";
 import { FARM_USER_SIZE } from "lib/state/farm";
-import { ExTokenAccount, FarmPoolInfo, MarketConfig } from "providers/types";
+import { FarmPoolInfo, MarketConfig } from "providers/types";
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { createApproveInstruction } from "lib/instructions";
 import { mergeTransactions, signTransaction } from ".";
 import { checkOrCreateReferralDataTransaction } from "./utils";
+import { TokenAccountInfo } from "states/tokenAccountState";
 
 export async function createFarmUser({
   connection,
@@ -78,7 +79,7 @@ export async function stake({
   config: MarketConfig;
   farmPool: FarmPoolInfo;
   farmUser: PublicKey | undefined;
-  poolTokenAccount: ExTokenAccount;
+  poolTokenAccount: TokenAccountInfo;
   stakeData: FarmDepositData;
 }) {
   if (!connection || !walletPubkey || !farmPool || !poolTokenAccount || !config || !stakeData) {
@@ -93,7 +94,7 @@ export async function stake({
   let transaction = new Transaction()
     .add(
       createApproveInstruction(
-        poolTokenAccount.pubkey,
+        poolTokenAccount.publicKey,
         userTransferAuthority.publicKey,
         walletPubkey,
         stakeData.amount,
@@ -104,7 +105,7 @@ export async function stake({
         config.publicKey,
         farmPool.publicKey,
         userTransferAuthority.publicKey,
-        poolTokenAccount.pubkey,
+        poolTokenAccount.publicKey,
         farmPool.poolToken,
         farmUser,
         walletPubkey,
@@ -133,7 +134,7 @@ export async function unstake({
   config: MarketConfig;
   farmPool: FarmPoolInfo;
   farmUser: PublicKey;
-  poolTokenAccount: ExTokenAccount;
+  poolTokenAccount: TokenAccountInfo;
   unstakeData: FarmWithdrawData;
 }) {
   if (!connection || !walletPubkey || !farmPool || !farmUser || !poolTokenAccount || !unstakeData) {
@@ -156,7 +157,7 @@ export async function unstake({
       walletPubkey,
       farmPoolAuthority,
       farmPool.poolToken,
-      poolTokenAccount.pubkey,
+      poolTokenAccount.publicKey,
       unstakeData,
       SWAP_PROGRAM_ID,
     ),

@@ -32,7 +32,7 @@ export function parseTokenAccountData(data: Buffer): {
   owner: PublicKey;
   amount: BigNumber;
 } {
-  let { mint, owner, amount } = TOKEN_ACCOUNT_LAYOUT.decode(data);
+  const { mint, owner, amount } = TOKEN_ACCOUNT_LAYOUT.decode(data);
   return {
     mint: new PublicKey(mint),
     owner: new PublicKey(owner),

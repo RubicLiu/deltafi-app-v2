@@ -23,7 +23,7 @@ import Page from "components/layout/Page";
 import { ConnectButton, LinkIcon } from "components";
 
 import useStyles from "./styles";
-import { getFarmTokenInfo, useTokenFromMint } from "providers/tokens";
+import { getFarmTokenInfo } from "providers/tokens";
 import { lpTokens } from "constants/tokens";
 import { useModal } from "providers/modal";
 import { sendSignedTransaction, claim, stake, unstake } from "utils/transactions";
@@ -37,6 +37,7 @@ import {
   appSelector,
   selectFarmUserByFarmPoolKey,
   selectFarmPoolByFarmPoolKey,
+  selectTokenAccountInfoByMint,
 } from "states/selectors";
 import { toFarmUserPosition, fetchFarmUsersThunk } from "states/farmUserState";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
@@ -108,7 +109,7 @@ const Stake = (): ReactElement => {
   const { connection } = useConnection();
   const { network } = useCustomConnection();
   const token = getFarmTokenInfo(farmPool?.name);
-  const tokenAccount = useTokenFromMint(token?.address);
+  const tokenAccount = useSelector(selectTokenAccountInfoByMint(token?.address));
 
   const [isProcessingStake, setIsProcessingStake] = useState(false);
   const [isProcessingClaim, setIsProcessingClaim] = useState(false);
@@ -125,19 +126,17 @@ const Stake = (): ReactElement => {
   });
 
   const config = marketConfig;
-  const lpToken = useTokenFromMint(farmPool?.poolMintKey.toBase58());
+  const lpToken = useSelector(selectTokenAccountInfoByMint(farmPool?.poolMintKey.toBase58()));
   const lpTokenConfig = getTokenConfigByMint(farmPool?.poolMintKey.toBase58());
 
-  const rewardsAccount = useTokenFromMint(DELTAFI_TOKEN_MINT.toBase58());
+  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(DELTAFI_TOKEN_MINT.toBase58()));
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
   });
 
   const tokenBalance = useMemo(() => {
-    return tokenAccount?.account
-      ? exponentiatedBy(tokenAccount.account.amount, token.decimals)
-      : new BigNumber(0);
-  }, [tokenAccount?.account, token]);
+    return tokenAccount ? exponentiatedBy(tokenAccount.amount, token.decimals) : new BigNumber(0);
+  }, [tokenAccount, token]);
 
   const totalStaked = useMemo(() => {
     return farmPool && lpTokenConfig
@@ -250,7 +249,7 @@ const Stake = (): ReactElement => {
       return null;
     }
     if (staking.isStake) {
-      if (staking.amount === "" || new BigNumber(lpToken.account.amount).lt(staking.amount)) {
+      if (staking.amount === "" || new BigNumber(lpToken.amount).lt(staking.amount)) {
         return null;
       }
 
@@ -405,7 +404,7 @@ const Stake = (): ReactElement => {
         walletPubkey,
         farmPool,
         farmUser: farmUser.publicKey,
-        claimDestination: rewardsAccount?.pubkey,
+        claimDestination: rewardsAccount?.publicKey,
         referrer: referrerPubkey,
         enableReferral,
       });
