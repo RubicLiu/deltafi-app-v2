@@ -64,12 +64,6 @@ export interface TokenAccountInfo {
   amount: BigNumber;
 }
 
-export interface MintInfo {
-  decimals: number;
-  initialized: boolean;
-  supply: BigNumber;
-}
-
 export interface PoolInfo {
   name: string;
   swapType: SwapType;

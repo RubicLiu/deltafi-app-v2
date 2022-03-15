@@ -28,7 +28,7 @@ import { WithdrawSelectCard } from "components/molecules";
 import WithdrawCard from "components/molecules/WithdrawCard";
 
 import { useModal } from "providers/modal";
-import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
+import { useTokenFromMint } from "providers/tokens";
 import { PMM } from "lib/calc";
 import { rate, exponentiate, exponentiatedBy } from "utils/decimal";
 import { getOutAmount } from "utils/liquidity";
@@ -244,7 +244,6 @@ const Deposit: React.FC = () => {
   const farmUser = toFarmUserPosition(farmUserFlat);
 
   const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
-  const poolMint = useTokenMintAccount(pool?.poolMintKey);
 
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
@@ -291,11 +290,11 @@ const Deposit: React.FC = () => {
   }, [pmm, basePrice, quotePrice, pool]);
 
   const share = useMemo(() => {
-    if (pool && poolTokenAccount && poolMint) {
-      return rate(poolTokenAccount.account.amount, poolMint.supply);
+    if (pool && poolTokenAccount) {
+      return rate(poolTokenAccount.account.amount, pool.poolState.totalSupply);
     }
     return 0;
-  }, [pool, poolTokenAccount, poolMint]);
+  }, [pool, poolTokenAccount]);
 
   const [baseShare, quoteShare] = useMemo(() => {
     if (share && pmm) {

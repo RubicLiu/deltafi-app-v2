@@ -6,7 +6,7 @@ import BigNumber from "bignumber.js";
 import styled from "styled-components";
 
 import { ConnectButton } from "components";
-import { useTokenFromMint, useTokenMintAccount } from "providers/tokens";
+import { useTokenFromMint } from "providers/tokens";
 import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
 import { rate } from "utils/decimal";
@@ -81,7 +81,6 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
 
   const poolTokenAccount = useTokenFromMint(pool?.poolMintKey.toBase58());
-  const poolMint = useTokenMintAccount(pool?.poolMintKey);
 
   const pmm = useMemo(() => {
     if (pool) {
@@ -103,11 +102,11 @@ const PoolCard: React.FC<CardProps> = (props) => {
   }, [pmm, basePrice, quotePrice, pool]);
 
   const share = useMemo(() => {
-    if (pool && poolTokenAccount && poolMint) {
-      return rate(poolTokenAccount.account.amount, poolMint.supply);
+    if (pool && poolTokenAccount) {
+      return rate(poolTokenAccount.account.amount, pool.poolState.totalSupply);
     }
     return 0;
-  }, [pool, poolTokenAccount, poolMint]);
+  }, [pool, poolTokenAccount]);
 
   const sharePrice = useMemo(() => {
     if (pmm && basePrice && quotePrice) {

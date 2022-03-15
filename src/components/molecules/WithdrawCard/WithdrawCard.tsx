@@ -82,7 +82,6 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
             {`${withdrawal || 0} ${card.token?.symbol}`}
           </Typography>
         </Box>
-        <Typography className={classes.tokenBalance}>%--</Typography>
       </Box>
     </Paper>
   );

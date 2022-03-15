@@ -9,7 +9,6 @@ import { ConnectButton, Text } from "components";
 import { CardProps } from "./types";
 import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
-import { useTokenMintAccount } from "providers/tokens";
 
 import { useSelector } from "react-redux";
 import { selectPythMarketPriceByPool, selectFarmPoolByFarmPoolKey } from "states/selectors";
@@ -81,8 +80,6 @@ const FarmCard: React.FC<CardProps> = (props) => {
   const swapPool = useSelector(selectPoolByPoolKey(poolConfig?.swap));
   const farmPool = useSelector(selectFarmPoolByFarmPoolKey(poolConfig?.farm));
 
-  const lpMint = useTokenMintAccount(swapPool?.poolMintKey);
-
   const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(swapPool));
 
   const pmm = useMemo(() => {
@@ -93,7 +90,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
   }, [swapPool, marketPrice]);
 
   const tvl = useMemo(() => {
-    if (swapPool && farmPool && basePrice && quotePrice && lpMint && pmm) {
+    if (swapPool && farmPool && basePrice && quotePrice && pmm) {
       return pmm
         .tvl(
           basePrice,
@@ -102,10 +99,10 @@ const FarmCard: React.FC<CardProps> = (props) => {
           swapPool.quoteTokenInfo.decimals,
         )
         .multipliedBy(farmPool.reservedAmount.toString())
-        .dividedBy(lpMint.supply);
+        .dividedBy(swapPool.poolState.totalSupply);
     }
     return 0;
-  }, [swapPool, farmPool, basePrice, quotePrice, pmm, lpMint]);
+  }, [swapPool, farmPool, basePrice, quotePrice, pmm]);
 
   const apy = useMemo(() => {
     if (farmPool) {

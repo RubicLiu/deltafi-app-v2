@@ -1,14 +1,13 @@
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import BigNumber from "bignumber.js";
 import { AccountInfo, PublicKey, Connection, Context } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID, NATIVE_MINT } from "@solana/spl-token";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import tuple from "immutable-tuple";
-import { u8, struct, blob } from "buffer-layout";
+import { struct, blob } from "buffer-layout";
 import { publicKey, u64 } from "utils/layout";
 import { lpTokens, tokens } from "constants/tokens";
-import { useAccountInfo } from "./connection";
-import { MintInfo, TokenAccount, TokenAccountInfo } from "./types";
+import { TokenAccount, TokenAccountInfo } from "./types";
 import { useAsyncData } from "utils/fetch-loop";
 import hash from "object-hash";
 
@@ -28,14 +27,6 @@ export const TOKEN_ACCOUNT_LAYOUT = struct<TokenAccountInfo>([
   blob(93),
 ]);
 
-export const MINT_LAYOUT = struct<MintInfo>([
-  blob(36),
-  u64("supply"),
-  u8("decimals"),
-  u8("initialized"),
-  blob(36),
-]);
-
 export function parseTokenAccountData(data: Buffer): {
   mint: PublicKey;
   owner: PublicKey;
@@ -47,28 +38,6 @@ export function parseTokenAccountData(data: Buffer): {
     owner: new PublicKey(owner),
     amount,
   };
-}
-
-export function parseTokenMintData(info: AccountInfo<Buffer>): MintInfo {
-  let { decimals, initialized, supply } = MINT_LAYOUT.decode(info.data);
-  return {
-    decimals,
-    initialized: !!initialized,
-    supply: new BigNumber(supply),
-  };
-}
-
-export function useTokenMintAccount(mint: PublicKey | null) {
-  const [mintInfo] = useAccountInfo(mint);
-  const [mintData, setMintData] = useState<null | MintInfo>(null);
-
-  useEffect(() => {
-    if (mintInfo) {
-      setMintData(parseTokenMintData(mintInfo));
-    }
-  }, [mintInfo, setMintData]);
-
-  return mintData;
 }
 
 export function getOwnedAccountsFilters(publicKey: PublicKey) {
