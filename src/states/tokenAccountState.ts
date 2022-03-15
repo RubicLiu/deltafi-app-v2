@@ -4,22 +4,20 @@ import { PublicKey, Connection, AccountInfo } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { blob, struct } from "buffer-layout";
 import { deployConfig } from "constants/deployConfig";
-import { DELTAFI_TOKEN_SYMBOL } from "constants/index";
 import { lpTokens, tokens } from "constants/tokens";
 import { Dispatch } from "react";
 import { getMultipleAccounts } from "utils/account";
 import { u64, publicKey } from "utils/layout";
 
 type TokenAccountInfo = { accountPublicKey: PublicKey; balance: BigNumber; mint: PublicKey };
-/// mapping from symbol to balance and account public key
-type SymbolToTokenAccountInfo = Record<string, TokenAccountInfo | null>;
+type MintToTokenAccountInfo = Record<string, TokenAccountInfo | null>;
 
 export interface TokenAccountState {
-  symbolToTokenAccountInfo: SymbolToTokenAccountInfo | null;
+  mintToTokenAccountInfo: MintToTokenAccountInfo | null;
 }
 
 const initialState: TokenAccountState = {
-  symbolToTokenAccountInfo: null,
+  mintToTokenAccountInfo: null,
 };
 
 type fetchTokenAccountsThunkArgs = {
@@ -28,7 +26,7 @@ type fetchTokenAccountsThunkArgs = {
 };
 
 export const setTokenAccountAction = createAction<{
-  symbol: string;
+  mint: string;
   tokenAccountInfo: TokenAccountInfo;
 }>("tokenAccount/setTokenAccount");
 
@@ -63,43 +61,34 @@ function parseSolTokenAccountInfo(publicKey: PublicKey, accountInfo: AccountInfo
   };
 }
 
-async function getTokenAccountInfo(
-  tokenAccountPublicKey: PublicKey,
-  connection: Connection,
-): Promise<TokenAccountInfo | null> {
-  const tokenAccountInfoBuffer = await connection.getAccountInfo(tokenAccountPublicKey);
-  return parseTokenAccountInfo(tokenAccountPublicKey, tokenAccountInfoBuffer);
-}
-
-async function getSolTokenAccountInfo(wallet: PublicKey, connection: Connection) {
-  const walletAccountInfo = await connection.getAccountInfo(wallet);
-  return parseSolTokenAccountInfo(wallet, walletAccountInfo);
-}
-
 // helper function for swap/deposit/withdraw/unstake
 // this is used by react components under view/ when they have confirmed a transaction
 // and need to do a forced balance update
-export async function fecthTokenAccountInfo(
-  symbolToTokenAccountInfo: SymbolToTokenAccountInfo,
-  symbol: string,
+export async function fecthTokenAccountInfoList(
+  mintAddressList: string[],
+  wallet: PublicKey,
   connection: Connection,
   dispatch: Dispatch<any>,
 ) {
-  if (!symbolToTokenAccountInfo || !symbolToTokenAccountInfo[symbol]) {
-    console.error("Symbol", symbol, "does not exist");
-    return;
+  const tokenAccountInfoList = await getTokenAcountInfoList(mintAddressList, connection, wallet);
+  for (const tokenAccountInfo of tokenAccountInfoList) {
+    console.info(tokenAccountInfo);
+    dispatch(setTokenAccountAction({ mint: tokenAccountInfo.mint.toBase58(), tokenAccountInfo }));
+  }
+}
+
+async function getTokenAccountAddress(mintAddress: String, wallet: PublicKey) {
+  // For SOL native account, we use the wallet address directly.
+  if (mintAddress === SOL_MINT_ADDRESS) {
+    return wallet;
   }
 
-  const { accountPublicKey } = symbolToTokenAccountInfo[symbol];
-  try {
-    const tokenAccountInfo =
-      symbol === "SOL"
-        ? await getSolTokenAccountInfo(accountPublicKey, connection)
-        : await getTokenAccountInfo(accountPublicKey, connection);
-    dispatch(setTokenAccountAction({ symbol, tokenAccountInfo }));
-  } catch (e) {
-    console.warn(e);
-  }
+  return Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    new PublicKey(mintAddress),
+    wallet,
+  );
 }
 
 async function getTokenAcountInfoList(
@@ -109,17 +98,8 @@ async function getTokenAcountInfoList(
 ) {
   const tokenAddressList = [];
   for (const mintAddress of mintAddressList) {
-    // For SOL native account, we use the wallet address directly.
-    if (mintAddress === SOL_MINT_ADDRESS) {
-      tokenAddressList.push(walletAddress);
-    } else {
-      const tokenAccountPublicKey = await Token.getAssociatedTokenAddress(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        new PublicKey(mintAddress),
-        walletAddress,
-      );
-      tokenAddressList.push(tokenAccountPublicKey);
+    if (mintAddress) {
+      tokenAddressList.push(await getTokenAccountAddress(mintAddress, walletAddress));
     }
   }
 
@@ -151,35 +131,25 @@ export const fetchTokenAccountsThunk = createAsyncThunk(
   "tokenAccount/fetchTokenAccountsThunk",
   async (arg: fetchTokenAccountsThunkArgs) => {
     // Get tokens, lp tokens and deltafi tokens.
-    const addressToSymbol = Object.fromEntries(
-      tokens
-        .map(({ symbol, address }) => ({ symbol, address }))
-        .concat(lpTokens.map(({ symbol, address }) => ({ symbol, address })))
-        .concat([
-          {
-            symbol: DELTAFI_TOKEN_SYMBOL,
-            address: deployConfig.deltafiTokenMint,
-          },
-        ])
-        .map(({ symbol, address }) => [address, symbol]),
-    );
+    const mintAddressList = tokens
+      .map(({ address }) => address)
+      .concat(lpTokens.map(({ address }) => address))
+      .concat([deployConfig.deltafiTokenMint]);
 
     const tokenAccountInfoList = await getTokenAcountInfoList(
-      Object.keys(addressToSymbol),
+      mintAddressList,
       arg.connection,
       arg.walletAddress,
     );
 
-    const symbolToTokenAccountInfo = Object.fromEntries(
-      tokenAccountInfoList.map((tokenAccountInfo) => {
-        const symbol = addressToSymbol[tokenAccountInfo.mint.toBase58()];
-        return [symbol, tokenAccountInfo];
-      }),
-    );
-    console.info(symbolToTokenAccountInfo);
+    const mintToTokenAccountInfo = {};
+    for (const tokenAccountInfo of tokenAccountInfoList) {
+      mintToTokenAccountInfo[tokenAccountInfo.mint.toBase58()] = tokenAccountInfo;
+    }
+    console.info(mintToTokenAccountInfo);
 
     return {
-      symbolToTokenAccountInfo,
+      mintToTokenAccountInfo,
     };
   },
 );
@@ -187,12 +157,12 @@ export const fetchTokenAccountsThunk = createAsyncThunk(
 export const tokenAccountReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(fetchTokenAccountsThunk.fulfilled, (state, action) => {
-      state.symbolToTokenAccountInfo = action.payload.symbolToTokenAccountInfo;
+      state.mintToTokenAccountInfo = action.payload.mintToTokenAccountInfo;
     })
     .addCase(setTokenAccountAction, (state, action) => {
-      if (!state.symbolToTokenAccountInfo) {
-        state.symbolToTokenAccountInfo = {};
+      if (!state.mintToTokenAccountInfo) {
+        state.mintToTokenAccountInfo = {};
       }
-      state.symbolToTokenAccountInfo[action.payload.symbol] = action.payload.tokenAccountInfo;
+      state.mintToTokenAccountInfo[action.payload.mint] = action.payload.tokenAccountInfo;
     });
 });

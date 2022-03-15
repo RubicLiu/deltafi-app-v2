@@ -48,10 +48,9 @@ import { getPoolConfigByPoolKey, marketConfig } from "constants/deployConfig";
 import {
   selectFarmUserByFarmPoolKey,
   selectPythMarketPriceByPool,
-  tokenAccountSelector,
   selectPoolByPoolKey,
 } from "states/selectors";
-import { fecthTokenAccountInfo } from "states/tokenAccountState";
+import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 
 interface TransactionResult {
   status: boolean | null;
@@ -220,7 +219,6 @@ const Deposit: React.FC = () => {
   });
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const [method, switchMethod] = useState<string>("deposit");
-  const tokenAccountsInfo = useSelector(tokenAccountSelector);
   const pool = useSelector(selectPoolByPoolKey(poolAddress));
 
   const [base, setBase] = useState<ISwapCard>({ token: null, amount: "", amountWithSlippage: "" });
@@ -396,15 +394,9 @@ const Deposit: React.FC = () => {
 
       await connection.confirmTransaction(hash, "confirmed");
 
-      await fecthTokenAccountInfo(
-        tokenAccountsInfo.symbolToTokenAccountInfo,
-        base.token.symbol,
-        connection,
-        dispatch,
-      );
-      await fecthTokenAccountInfo(
-        tokenAccountsInfo.symbolToTokenAccountInfo,
-        quote.token.symbol,
+      await fecthTokenAccountInfoList(
+        [base.token.address, quote.token.address],
+        walletPubkey,
         connection,
         dispatch,
       );
@@ -448,7 +440,6 @@ const Deposit: React.FC = () => {
     farmPoolKey,
     farmUser,
     dispatch,
-    tokenAccountsInfo,
   ]);
 
   const handleWithdraw = useCallback(async () => {
@@ -516,15 +507,9 @@ const Deposit: React.FC = () => {
 
       await connection.confirmTransaction(hash, "confirmed");
 
-      await fecthTokenAccountInfo(
-        tokenAccountsInfo.symbolToTokenAccountInfo,
-        base.token.symbol,
-        connection,
-        dispatch,
-      );
-      await fecthTokenAccountInfo(
-        tokenAccountsInfo.symbolToTokenAccountInfo,
-        quote.token.symbol,
+      await fecthTokenAccountInfoList(
+        [base.token.address, quote.token.address],
+        walletPubkey,
         connection,
         dispatch,
       );
@@ -573,7 +558,6 @@ const Deposit: React.FC = () => {
     dispatch,
     pmm,
     share,
-    tokenAccountsInfo,
   ]);
 
   const handleSnackBarClose = useCallback(() => {

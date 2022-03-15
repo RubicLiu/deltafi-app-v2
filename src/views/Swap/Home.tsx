@@ -44,15 +44,10 @@ import { SwapType } from "lib/state";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  appSelector,
-  selectPoolBySymbols,
-  selectPythMarketPriceByPool,
-  tokenAccountSelector,
-} from "states/selectors";
+import { appSelector, selectPoolBySymbols, selectPythMarketPriceByPool } from "states/selectors";
 import { fetchPoolsThunk } from "states/poolState";
 import { fetchReferrerThunk } from "states/appState";
-import { fecthTokenAccountInfo } from "states/tokenAccountState";
+import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 import { marketConfig } from "constants/deployConfig";
 
 interface TransactionResult {
@@ -148,7 +143,6 @@ const Home: React.FC = (props) => {
   });
   const config = marketConfig;
 
-  const tokenAccountsInfo = useSelector(tokenAccountSelector);
   const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
 
   const sourceAccount = useTokenFromMint(tokenFrom.token.address);
@@ -328,15 +322,9 @@ const Home: React.FC = (props) => {
       await connection.confirmTransaction(hash, "confirmed");
 
       // fetch account info and update record for from and to tokens
-      await fecthTokenAccountInfo(
-        tokenAccountsInfo.symbolToTokenAccountInfo,
-        tokenFrom.token.symbol,
-        connection,
-        dispatch,
-      );
-      await fecthTokenAccountInfo(
-        tokenAccountsInfo.symbolToTokenAccountInfo,
-        tokenTo.token.symbol,
+      await fecthTokenAccountInfoList(
+        [tokenFrom.token.address, tokenTo.token.address],
+        walletPubkey,
         connection,
         dispatch,
       );
@@ -404,7 +392,6 @@ const Home: React.FC = (props) => {
     destinationBalance,
     appState,
     dispatch,
-    tokenAccountsInfo,
   ]);
 
   const handleSwap = useCallback(async () => {
