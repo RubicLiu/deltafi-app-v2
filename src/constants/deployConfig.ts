@@ -49,23 +49,23 @@ export type TokenConfig = {
   decimals: number;
 };
 
-export const tokenConfigs: TokenConfig[] = deployConfig.tokenInfo.concat(
-  poolConfigs.map(({ name, mint, decimals }) => ({
-    pyth: null,
-    mint,
-    symbol: name,
-    name: "LP " + name,
-    decimals,
-    logoURI: null,
-  })),
-);
+export const tokenConfigs: TokenConfig[] = deployConfig.tokenInfo;
+export const lpTokenConfigs: TokenConfig[] = poolConfigs.map(({ name, mint, decimals }) => ({
+  pyth: null,
+  mint,
+  symbol: name,
+  name: "LP " + name,
+  decimals,
+  logoURI: null,
+}));
+export const allTokenConfigs: TokenConfig[] = tokenConfigs.concat(lpTokenConfigs);
 
 export function getTokenConfigBySymbol(symbolStr: String): TokenConfig {
-  return tokenConfigs.find(({ symbol }) => symbol === symbolStr);
+  return allTokenConfigs.find(({ symbol }) => symbol === symbolStr);
 }
 
 export function getTokenConfigByMint(mintStr: String): TokenConfig {
-  return tokenConfigs.find(({ mint }) => mint === mintStr);
+  return allTokenConfigs.find(({ mint }) => mint === mintStr);
 }
 
 export const marketConfig: MarketConfig = {

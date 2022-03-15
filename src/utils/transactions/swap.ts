@@ -186,9 +186,9 @@ export async function swap({
     const result = await createTokenAccountTransaction({
       walletPubkey,
       mintPublicKey: new PublicKey(
-        pool.baseTokenInfo.address === source.mint.toBase58()
-          ? pool.quoteTokenInfo.address
-          : pool.baseTokenInfo.address,
+        pool.baseTokenInfo.mint === source.mint.toBase58()
+          ? pool.quoteTokenInfo.mint
+          : pool.baseTokenInfo.mint,
       ),
     });
     destinationRef = result?.newAccountPubkey;
@@ -249,9 +249,9 @@ export async function swap({
         swapDestination,
         destinationRef,
         new PublicKey(
-          pool.baseTokenInfo.address === source.mint.toBase58()
-            ? pool.quoteTokenInfo.address
-            : pool.baseTokenInfo.address,
+          pool.baseTokenInfo.mint === source.mint.toBase58()
+            ? pool.quoteTokenInfo.mint
+            : pool.baseTokenInfo.mint,
         ),
         rewardTokenRef,
         config.deltafiToken,

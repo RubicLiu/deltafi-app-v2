@@ -1,8 +1,7 @@
 import { InputBaseProps } from "@material-ui/core";
+import { TokenConfig } from "constants/deployConfig";
 
-import { TokenInfo } from "constants/tokens";
-
-export interface DropDownProps<T extends TokenInfo> {
+export interface DropDownProps<T extends TokenConfig> {
   value: T;
   options: Array<T>;
   onChange: (value: T) => void;

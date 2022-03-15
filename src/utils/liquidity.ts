@@ -20,10 +20,10 @@ export function getOutAmount(
   let outAmount = new BigNumber(0);
   const percent = new BigNumber(100).plus(slippage).dividedBy(100);
 
-  if (fromTokenMint === baseTokenInfo.address && toTokenMint === quoteTokenInfo.address) {
+  if (fromTokenMint === baseTokenInfo.mint && toTokenMint === quoteTokenInfo.mint) {
     outAmount = fromAmount.multipliedBy(price);
     outAmount = outAmount.multipliedBy(percent);
-  } else if (fromTokenMint === quoteTokenInfo.address && toTokenMint === baseTokenInfo.address) {
+  } else if (fromTokenMint === quoteTokenInfo.mint && toTokenMint === baseTokenInfo.mint) {
     outAmount = fromAmount.dividedBy(price);
     outAmount = outAmount.multipliedBy(percent);
   }

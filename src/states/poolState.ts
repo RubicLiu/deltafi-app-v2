@@ -2,10 +2,13 @@ import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { PublicKey, Connection, AccountInfo } from "@solana/web3.js";
 
 import { PoolInfo } from "providers/types";
-import { deployConfig, getPoolConfigByPoolKey } from "constants/deployConfig";
+import {
+  deployConfig,
+  getPoolConfigByPoolKey,
+  getTokenConfigBySymbol,
+} from "constants/deployConfig";
 import { getMultipleAccounts } from "utils/account";
 import { parseSwapInfo } from "lib/state";
-import { getTokenInfo } from "providers/tokens";
 
 type PoolKeyToPoolInfo = Record<string, PoolInfo>;
 
@@ -64,8 +67,8 @@ const getPoolFromSwapInfoAccount = (poolConfig, publicKey, poolInfo) => {
     publicKey: publicKey,
     nonce: data.nonce,
     isPaused: data.isPaused,
-    baseTokenInfo: getTokenInfo(poolConfig.base),
-    quoteTokenInfo: getTokenInfo(poolConfig.quote),
+    baseTokenInfo: getTokenConfigBySymbol(poolConfig.base),
+    quoteTokenInfo: getTokenConfigBySymbol(poolConfig.quote),
     base: data.tokenA,
     quote: data.tokenB,
     pythBase: data.pythA,

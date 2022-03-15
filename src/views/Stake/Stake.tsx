@@ -23,8 +23,6 @@ import Page from "components/layout/Page";
 import { ConnectButton, LinkIcon } from "components";
 
 import useStyles from "./styles";
-import { getFarmTokenInfo } from "providers/tokens";
-import { lpTokens } from "constants/tokens";
 import { useModal } from "providers/modal";
 import { sendSignedTransaction, claim, stake, unstake } from "utils/transactions";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
@@ -44,9 +42,10 @@ import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 import {
   getPoolConfigByFarmPoolKey,
   getTokenConfigByMint,
+  getTokenConfigBySymbol,
+  lpTokenConfigs,
   marketConfig,
 } from "constants/deployConfig";
-import { getTokenInfo } from "providers/tokens";
 
 interface TransactionResult {
   status: boolean | null;
@@ -94,8 +93,8 @@ const Stake = (): ReactElement => {
 
   const { baseTokenInfo, quoteTokenInfo } = useMemo(() => {
     const poolConfig = getPoolConfigByFarmPoolKey(farmPoolId);
-    const baseTokenInfo = getTokenInfo(poolConfig.base);
-    const quoteTokenInfo = getTokenInfo(poolConfig.quote);
+    const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
+    const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
     return {
       baseTokenInfo,
       quoteTokenInfo,
@@ -108,8 +107,8 @@ const Stake = (): ReactElement => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
   const { network } = useCustomConnection();
-  const token = getFarmTokenInfo(farmPool?.name);
-  const tokenAccount = useSelector(selectTokenAccountInfoByMint(token?.address));
+  const token = getTokenConfigBySymbol(farmPool?.name);
+  const tokenAccount = useSelector(selectTokenAccountInfoByMint(token?.mint));
 
   const [isProcessingStake, setIsProcessingStake] = useState(false);
   const [isProcessingClaim, setIsProcessingClaim] = useState(false);
@@ -648,7 +647,7 @@ const Stake = (): ReactElement => {
             <StakeCard
               card={staking}
               handleChangeCard={setStakeAmount}
-              tokens={lpTokens}
+              tokens={lpTokenConfigs}
               disableDrop
               percentage={percentage < 0.02 ? 0 : percentage}
             />

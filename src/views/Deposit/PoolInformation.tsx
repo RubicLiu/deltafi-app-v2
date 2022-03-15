@@ -111,11 +111,11 @@ export const PoolInformation: FC<PoolInformationProps> = (props) => {
       { accountName: "Pool token Address", publickey: pool.poolMintKey },
       {
         accountName: `${pool.baseTokenInfo.symbol} Address`,
-        publickey: new PublicKey(pool.baseTokenInfo.address),
+        publickey: new PublicKey(pool.baseTokenInfo.mint),
       },
       {
         accountName: `${pool.quoteTokenInfo.symbol} Address`,
-        publickey: new PublicKey(pool.quoteTokenInfo.address),
+        publickey: new PublicKey(pool.quoteTokenInfo.mint),
       },
       { accountName: `${pool.baseTokenInfo.symbol} Reserve Address`, publickey: pool.base },
       { accountName: `${pool.quoteTokenInfo.symbol} Reserve Address`, publickey: pool.quote },

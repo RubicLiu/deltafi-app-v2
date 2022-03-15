@@ -24,7 +24,6 @@ import { ConnectButton } from "components";
 import SettingsPanel from "components/SettingsPanel/SettingsPanel";
 import SwapCard from "./components/Card";
 import { useModal } from "providers/modal";
-import { getTokenInfo } from "providers/tokens";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { swap } from "utils/transactions/swap";
 import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS, SOLSCAN_LINK } from "constants/index";
@@ -32,7 +31,6 @@ import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
 import { getSwapOutAmount } from "utils/swap";
 import { SwapCard as ISwapCard } from "./components/types";
-import { tokens } from "constants/tokens";
 import { useCustomConnection } from "providers/connection";
 import { SwapType } from "lib/state";
 import loadingIcon from "components/gif/loading_white.gif";
@@ -47,7 +45,7 @@ import {
 import { fetchPoolsThunk } from "states/poolState";
 import { fetchReferrerThunk } from "states/appState";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
-import { marketConfig } from "constants/deployConfig";
+import { getTokenConfigBySymbol, marketConfig, tokenConfigs } from "constants/deployConfig";
 
 interface TransactionResult {
   status: boolean | null;
@@ -131,12 +129,12 @@ const Home: React.FC = (props) => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
   const [tokenFrom, setTokenFrom] = useState<ISwapCard>({
-    token: getTokenInfo("SOL"),
+    token: getTokenConfigBySymbol("SOL"),
     amount: "",
     amountWithSlippage: "",
   });
   const [tokenTo, setTokenTo] = useState<ISwapCard>({
-    token: getTokenInfo("USDC"),
+    token: getTokenConfigBySymbol("USDC"),
     amount: "",
     amountWithSlippage: "",
   });
@@ -144,8 +142,8 @@ const Home: React.FC = (props) => {
 
   const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
 
-  const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.address));
-  const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.address));
+  const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
+  const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.mint));
 
   const sourceBalance = useMemo(() => {
     if (sourceAccount && tokenFrom) {
@@ -221,15 +219,15 @@ const Home: React.FC = (props) => {
     let newTokenTo = tokenTo.token;
     let amountOut = "";
     let amountOutWithSlippage = "";
-    if (tokenTo.token.address === newTokenFrom.address) {
+    if (tokenTo.token.mint === newTokenFrom.mint) {
       newTokenTo = Object.assign({}, tokenFrom.token);
     }
     if (pool && priceImpact) {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           pool,
-          newTokenFrom.address,
-          newTokenTo.address,
+          newTokenFrom.mint,
+          newTokenTo.mint,
           card.amount ?? "0",
           parseFloat(priceImpact),
           marketPrice,
@@ -249,15 +247,15 @@ const Home: React.FC = (props) => {
     let newTokenTo = card.token;
     let amountOut = "";
     let amountOutWithSlippage = "";
-    if (tokenFrom.token.address === newTokenTo.address) {
+    if (tokenFrom.token.mint === newTokenTo.mint) {
       newTokenFrom = Object.assign({}, tokenTo.token);
     }
     if (pool && priceImpact) {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           pool,
-          newTokenFrom.address,
-          newTokenTo.address,
+          newTokenFrom.mint,
+          newTokenTo.mint,
           tokenFrom.amount ?? "0",
           parseFloat(priceImpact),
           marketPrice,
@@ -323,7 +321,7 @@ const Home: React.FC = (props) => {
 
       // fetch account info and update record for from and to tokens
       const [newFromAccount, newToAccount] = await fecthTokenAccountInfoList(
-        [tokenFrom.token.address, tokenTo.token.address],
+        [tokenFrom.token.mint, tokenTo.token.mint],
         walletPubkey,
         connection,
         dispatch,
@@ -559,7 +557,11 @@ const Home: React.FC = (props) => {
             containerStyle={{ position: "relative", zIndex: 2 }}
           >
             <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <SwapCard card={tokenFrom} tokens={tokens} handleChangeCard={handleTokenFromInput} />
+              <SwapCard
+                card={tokenFrom}
+                tokens={tokenConfigs}
+                handleChangeCard={handleTokenFromInput}
+              />
               {!openSettings && (
                 <Fab
                   color="secondary"
@@ -572,7 +574,7 @@ const Home: React.FC = (props) => {
               )}
               <SwapCard
                 card={tokenTo}
-                tokens={tokens}
+                tokens={tokenConfigs}
                 handleChangeCard={handleTokenToInput}
                 disabled={true}
               />

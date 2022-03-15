@@ -12,9 +12,10 @@ import {
 import { SearchOutlined } from "@material-ui/icons";
 import styled from "styled-components";
 import { DropDownProps } from "./types";
-import { TokenInfo, tokens } from "constants/tokens";
+import { tokens } from "constants/tokens";
 import { ArrowDown } from "components";
 import { useDarkMode } from "providers/theme";
+import { TokenConfig } from "constants/deployConfig";
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
@@ -141,7 +142,7 @@ const Img = styled.img`
   }
 `;
 
-const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: ReactNode }) => {
+const DropDown = <T extends TokenConfig>(props: DropDownProps<T> & { children?: ReactNode }) => {
   const classes = useStyles();
   const { value, options, onChange, inputProps, disableDrop } = props;
   const { isDark } = useDarkMode();
@@ -226,7 +227,7 @@ const DropDown = <T extends TokenInfo>(props: DropDownProps<T> & { children?: Re
             <Box sx={{ mt: 1 }}>
               {optionList.map((option) => (
                 <Button
-                  key={option.address}
+                  key={option.mint}
                   className={classes.optionItem}
                   fullWidth
                   onClick={() => handleClickItem(option)}

@@ -4,11 +4,11 @@ import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
 
 import { DropDown } from "components";
 import { CardProps } from "./types";
-import { getTokenInfo } from "providers/tokens";
 import { exponentiatedBy } from "utils/decimal";
 import BigNumber from "bignumber.js";
 import { useSelector } from "react-redux";
 import { selectTokenAccountInfoByMint } from "states";
+import { getTokenConfigBySymbol } from "constants/deployConfig";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -85,7 +85,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 const SwapCard: React.FC<CardProps> = (props) => {
   const { card, handleChangeCard, disabled, tokens, disableDrop, percentage } = props;
   const classes = useStyles(props);
-  const tokenAccount = useSelector(selectTokenAccountInfoByMint(card.token?.address));
+  const tokenAccount = useSelector(selectTokenAccountInfoByMint(card.token?.mint));
 
   const tokenBalance = useMemo(() => {
     if (tokenAccount && card) {
@@ -111,7 +111,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
   }, [disabled, card.token]);
 
   const handleChangeToken = (token) => {
-    const newToken = getTokenInfo(token.symbol.toLowerCase());
+    const newToken = getTokenConfigBySymbol(token.symbol);
     handleChangeCard({ ...card, token: newToken });
   };
 

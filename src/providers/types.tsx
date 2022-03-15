@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { AccountInfo, PublicKey } from "@solana/web3.js";
 
 import { Fees, PoolState, Rewards, SwapType } from "lib/state";
-import { TokenInfo } from "constants/tokens";
+import { TokenConfig } from "constants/deployConfig";
 
 export interface ConnectionContextValues {
   endpoint: string;
@@ -70,8 +70,8 @@ export interface PoolInfo {
   publicKey: PublicKey;
   nonce: number;
   isPaused: boolean;
-  baseTokenInfo: TokenInfo;
-  quoteTokenInfo: TokenInfo;
+  baseTokenInfo: TokenConfig;
+  quoteTokenInfo: TokenConfig;
   base: PublicKey;
   quote: PublicKey;
   pythBase: PublicKey;
@@ -97,8 +97,8 @@ export interface FarmPoolInfo {
   poolAddress: PublicKey;
   poolMintKey: PublicKey;
   poolToken: PublicKey;
-  baseTokenInfo: TokenInfo;
-  quoteTokenInfo: TokenInfo;
+  baseTokenInfo: TokenConfig;
+  quoteTokenInfo: TokenConfig;
   reservedAmount: bigint;
   aprNumerator: bigint;
   aprDenominator: bigint;

@@ -5,11 +5,10 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import clx from "classnames";
 
-import { tokens } from "constants/tokens";
 import { DropDown } from "components";
 import useStyles from "./styles";
 import { SwapCard } from "views/Swap/components/types";
-import { getTokenInfo } from "providers/tokens";
+import { getTokenConfigBySymbol, tokenConfigs } from "constants/deployConfig";
 
 export interface SettingsProps {
   priceImpact: string;
@@ -38,7 +37,7 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
   };
 
   const handleChangeToken = (token) => {
-    const newToken = getTokenInfo(token.symbol);
+    const newToken = getTokenConfigBySymbol(token.symbol);
     handleChangeCard({ ...card, token: newToken });
   };
 
@@ -55,7 +54,7 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
       <Box display="flex" justifyContent="space-between" marginBottom={2}>
         <DropDown
           value={card.token}
-          options={tokens}
+          options={tokenConfigs}
           disableDrop={disableDrop}
           onChange={handleChangeToken}
           inputProps={{ placeholder: "token name, symbol" }}

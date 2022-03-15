@@ -81,7 +81,7 @@ export async function withdraw({
   if (!baseTokenRef) {
     const result = await createTokenAccountTransaction({
       walletPubkey,
-      mintPublicKey: new PublicKey(pool.baseTokenInfo.address),
+      mintPublicKey: new PublicKey(pool.baseTokenInfo.mint),
     });
     baseTokenRef = result?.newAccountPubkey;
     createBaseTokenTransaction = result?.transaction;
@@ -91,7 +91,7 @@ export async function withdraw({
   if (!quteTokenRef) {
     const result = await createTokenAccountTransaction({
       walletPubkey,
-      mintPublicKey: new PublicKey(pool.baseTokenInfo.address),
+      mintPublicKey: new PublicKey(pool.baseTokenInfo.mint),
     });
     quteTokenRef = result?.newAccountPubkey;
     createQuoteTokenTransaction = result?.transaction;

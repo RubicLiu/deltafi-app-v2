@@ -35,7 +35,7 @@ export function getSwapOutAmount(
     lpFeeRate: adminFeeDenominator1.minus(adminFeeNumerator1).dividedBy(adminFeeDenominator1),
   });
 
-  if (fromTokenMint === baseTokenInfo.address && toTokenMint === quoteTokenInfo.address) {
+  if (fromTokenMint === baseTokenInfo.mint && toTokenMint === quoteTokenInfo.mint) {
     const baseAmount = new BigNumber(amount);
     const quoteAmount = pmmHelper.querySellBase(baseAmount, pmmState);
     const fee = quoteAmount.multipliedBy(pmmState.mtFeeRate);

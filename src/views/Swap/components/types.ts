@@ -1,4 +1,4 @@
-import { TokenInfo } from "constants/tokens";
+import { TokenConfig } from "constants/deployConfig";
 
 export interface SettingsProps {
   priceImpact: string;
@@ -10,7 +10,7 @@ export interface SettingsProps {
 }
 
 export interface SwapCard {
-  token: TokenInfo | null | undefined;
+  token: TokenConfig | null | undefined;
   amount: string;
   amountWithSlippage: string;
 }
@@ -19,7 +19,7 @@ export interface CardProps {
   card: SwapCard;
   handleChangeCard: any;
   disabled?: boolean;
-  tokens?: TokenInfo[];
+  tokens?: TokenConfig[];
   disableDrop?: boolean;
   percentage?: number;
 }

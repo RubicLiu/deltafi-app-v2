@@ -229,8 +229,8 @@ const Deposit: React.FC = () => {
   });
 
   const poolTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.poolMintKey.toBase58()));
-  const baseTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.baseTokenInfo.address));
-  const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.quoteTokenInfo.address));
+  const baseTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.baseTokenInfo.mint));
+  const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.quoteTokenInfo.mint));
 
   const config = marketConfig;
   const farmPoolKey = useMemo(() => {
@@ -396,7 +396,7 @@ const Deposit: React.FC = () => {
       await connection.confirmTransaction(hash, "confirmed");
 
       await fecthTokenAccountInfoList(
-        [base.token.address, quote.token.address],
+        [base.token.mint, quote.token.mint],
         walletPubkey,
         connection,
         dispatch,
@@ -509,7 +509,7 @@ const Deposit: React.FC = () => {
       await connection.confirmTransaction(hash, "confirmed");
 
       await fecthTokenAccountInfoList(
-        [base.token.address, quote.token.address],
+        [base.token.mint, quote.token.mint],
         walletPubkey,
         connection,
         dispatch,
@@ -572,13 +572,7 @@ const Deposit: React.FC = () => {
 
       if (pool) {
         if (method === "deposit") {
-          const outAmount = getOutAmount(
-            pool,
-            card.amount,
-            card.token.address,
-            quote.token.address,
-            0.0,
-          );
+          const outAmount = getOutAmount(pool, card.amount, card.token.mint, quote.token.mint, 0.0);
           setQuote({
             ...quote,
             amount: isNaN(outAmount) ? "" : Number(outAmount).toString(),
@@ -611,13 +605,7 @@ const Deposit: React.FC = () => {
 
       if (pool) {
         if (method === "deposit") {
-          const outAmount = getOutAmount(
-            pool,
-            card.amount,
-            card.token.address,
-            base.token.address,
-            0.0,
-          );
+          const outAmount = getOutAmount(pool, card.amount, card.token.mint, base.token.mint, 0.0);
           setBase({
             ...base,
             amount: isNaN(outAmount) ? "" : Number(outAmount).toString(),
