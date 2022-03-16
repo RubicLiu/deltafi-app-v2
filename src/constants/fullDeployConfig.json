@@ -110,6 +110,36 @@
     "deltafiToken": "J6NXoLLUwywpeDhSVbD2bawigPEmBGczgNq3dTAkA4fu",
     "poolInfo": [
       {
+        "name": "BTC-USDC",
+        "base": "BTC",
+        "quote": "USDC",
+        "swap": "J2CJXoBQbqEtVePJdwgmqJYmPgTNdeGjtAbwLmSiJqsQ",
+        "mint": "9FGaF2gdmHygWYvijajL4MUzky2NJdJevhBXQt2BWnKZ",
+        "farm": "BhQ2Qw2ikznnP7sTVFsCWFHCGTZr9wzSm14svxGjYgC6",
+        "token": "6cutLcqHYVHC3fh6heH78PvUFEnP5nHtX2QuM4z244Yj",
+        "decimals": 6
+      },
+      {
+        "name": "ETH-USDC",
+        "base": "ETH",
+        "quote": "USDC",
+        "swap": "7n23hGuJPxjrHZqiCWsuKGtjaMkXLy42KkLg9Cq3G9Ct",
+        "mint": "98krQYXiEST1EsTH1TJYUenvhPpLhu8w2iWSsXDUJ5Mj",
+        "farm": "6qJwszR6RFLbQ3fuetnUAPb4BtaWcKf9V9XCvcD3rsW1",
+        "token": "EszuvnneEw7MMZBuwfLR9ink7Zd6Ek4wSiENrUrcqmvY",
+        "decimals": 8
+      },
+      {
+        "name": "LUNA-USDC",
+        "base": "LUNA",
+        "quote": "USDC",
+        "swap": "4AJSHReHbC5VKYuXwvoQCUamPThjwtxcLQr37Sw3ATXf",
+        "mint": "3AMgSMCx1yGbai3zgTrhi7Fn2FHWtwaB3fBkXyniY1vb",
+        "farm": "Hx1KJHUTko7Mf2ND1oifLPxk3CUAKdbVuhBfCapZqmuk",
+        "token": "JCo69Qc24zuGwas5SH8i4cpJsUDgZSMLACAwTzY3t8Nv",
+        "decimals": 6
+      },
+      {
         "name": "SOL-SRM",
         "base": "SOL",
         "quote": "SRM",
@@ -147,6 +177,26 @@
         "mint": "8hVHAGeNHytsJWGu1RxtRDskPvBBu3KfCoZvV6eFSbDs",
         "farm": "FsW2ViEiJMXGoRgFVagsF1D7tR3wV3QdPe5D9KuVveTS",
         "token": "7bMmkfke5tL86rRTofxuuHdZqzpk2PXwNVsEv2HzZfEc",
+        "decimals": 6
+      },
+      {
+        "name": "USDC-mSOL",
+        "base": "USDC",
+        "quote": "mSOL",
+        "swap": "HcVjVSefVGtwqynYRobmvpkpvZpBHsVmDuHbeBYXJckR",
+        "mint": "B5K3QLCTPD7wRiBvCCL6YiNrNBNSgjZGn7NUDxkrTPA",
+        "farm": "8FE4fDaE7ssu3ZEubHsKhvPuJCVrp6daTucxfF2Q2nrM",
+        "token": "3tTSJWN4UxvBQRNJNxsEwczwoQt1gnLaEQmySS6mcMgY",
+        "decimals": 6
+      },
+      {
+        "name": "USDC-stSOL",
+        "base": "USDC",
+        "quote": "stSOL",
+        "swap": "6BZqs42Dg6NCyAKswWqvDdZLmTawDFvmFBHvmi1QN45e",
+        "mint": "GnE2hoRoS6CMM93yvzNHZ86a9QcMYKsfdb8R5Usq9oNL",
+        "farm": "4pVzHGWxqey57RafMxq9gKzhKKXKX3BPH9gN4oGGda2p",
+        "token": "DeN8PNCSU6N8DPRPGTsW1HGjGxHJadza3LCNEMu9QEwF",
         "decimals": 6
       }
     ],
@@ -198,6 +248,66 @@
         "decimals": 6,
         "name": "USDT",
         "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4/logo.png"
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.ETH/USD",
+          "price": "JBu1AL4obBcCMqKBBxhpWCNUt136ijcuMZLFvTP7iWdB",
+          "product": "EMkxjGC1CQ7JLiutDbfYb7UKb3zm9SJcUmr1YicBsdpZ"
+        },
+        "mint": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+        "symbol": "ETH",
+        "decimals": 8,
+        "name": "Ether (Wormhole)",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs/logo.png"
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.LUNA/USD",
+          "price": "5bmWuR1dgP4avtGYMNKLuxumZTVKGgoN2BCMXWDNL9nY",
+          "product": "2Lg3b2UdD4hzrxHpcwhgShuUdccTKFoo2doAUZawEdPH"
+        },
+        "mint": "F6v4wfAdJB8D8p77bMXZgYt8TDKsYxLYxH5AFhUkYx9W",
+        "symbol": "LUNA",
+        "decimals": 6,
+        "name": "LUNA (Wormhole)",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/F6v4wfAdJB8D8p77bMXZgYt8TDKsYxLYxH5AFhUkYx9W/logo.png"
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.STSOL/USD",
+          "price": "Bt1hEbY62aMriY1SyQqbeZbm8VmSbQVGBFzSzMuVNWzN",
+          "product": "9mpaSy5ocwPvoaxWZc4S8MhUUeUKmmFqymBJTfY6CJ6o"
+        },
+        "mint": "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj",
+        "symbol": "stSOL",
+        "decimals": 9,
+        "name": "Lido Staked SOL",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj/logo.png"
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.MSOL/USD",
+          "price": "E4v1BBgoso9s64TQvmyownAVJbhbEPGyzA3qn4n46qj9",
+          "product": "BS2iAqT67j8hA9Jji4B8UpL3Nfw9kwPfU5s4qeaf1e7r"
+        },
+        "mint": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+        "symbol": "mSOL",
+        "decimals": 9,
+        "name": "Marinade staked SOL (mSOL)",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So/logo.png"
+      },
+      {
+        "pyth": {
+          "usdProductName": "Crypto.BTC/USD",
+          "price": "GVXRSBjFk6e6J3NbVPXohDJetcTjaeeuykUpbQF8UoMU",
+          "product": "4aDoSXJ5o3AuvL7QFeR6h44jALQfTmUUCTVGDD6aoJTM"
+        },
+        "mint": "9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E",
+        "symbol": "BTC",
+        "decimals": 6,
+        "name": "Wrapped Bitcoin (Sollet)",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png"
       }
     ]
   },
