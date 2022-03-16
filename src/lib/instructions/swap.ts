@@ -95,8 +95,6 @@ export const createDepositInstruction = (
   swapTokenB: PublicKey,
   poolMint: PublicKey,
   destination: PublicKey,
-  pythA: PublicKey,
-  pythB: PublicKey,
   depositData: DepositData,
   programId: PublicKey,
 ) => {
@@ -110,8 +108,6 @@ export const createDepositInstruction = (
     { pubkey: swapTokenB, isSigner: false, isWritable: true },
     { pubkey: poolMint, isSigner: false, isWritable: true },
     { pubkey: destination, isSigner: false, isWritable: true },
-    { pubkey: pythA, isSigner: false, isWritable: false },
-    { pubkey: pythB, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 
@@ -144,8 +140,6 @@ export const createWithdrawInstruction = (
   poolMint: PublicKey,
   adminFeeA: PublicKey,
   adminFeeB: PublicKey,
-  pythA: PublicKey,
-  pythB: PublicKey,
   withdrawData: WithdrawData,
   programId: PublicKey,
 ) => {
@@ -161,8 +155,6 @@ export const createWithdrawInstruction = (
     { pubkey: destinationTokenB, isSigner: false, isWritable: true },
     { pubkey: adminFeeA, isSigner: false, isWritable: true },
     { pubkey: adminFeeB, isSigner: false, isWritable: true },
-    { pubkey: pythA, isSigner: false, isWritable: false },
-    { pubkey: pythB, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ];
 

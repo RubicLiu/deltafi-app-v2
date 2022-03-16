@@ -127,22 +127,12 @@ export async function withdraw({
         pool.poolMintKey,
         pool.baseFee,
         pool.quoteFee,
-        basePricePythKey,
-        quotePricePythKey,
         withdrawData,
         SWAP_PROGRAM_ID,
       ),
     );
 
   let signers = [userTransferAuthority];
-  // if (!farmUser) {
-  //   const { transaction: createFarmUserTransaction } = await createFarmUser({
-  //     connection,
-  //     walletPubkey,
-  //     config,
-  //   });
-  //   transaction = mergeTransactions([createFarmUserTransaction, transaction]);
-  // }
 
   transaction = mergeTransactions([
     createWrappedTokenAccountTransaction,

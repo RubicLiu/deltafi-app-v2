@@ -123,8 +123,6 @@ export async function deposit({
         pool.quote,
         pool.poolMintKey,
         poolTokenRef,
-        basePricePythKey,
-        quotePricePythKey,
         depositData,
         SWAP_PROGRAM_ID,
       ),
