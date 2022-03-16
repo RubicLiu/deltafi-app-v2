@@ -104,9 +104,9 @@ const FarmCard: React.FC<CardProps> = (props) => {
     return 0;
   }, [swapPool, farmPool, basePrice, quotePrice, pmm]);
 
-  const apy = useMemo(() => {
-    if (farmPool) {
-      const apr = exponentiatedBy(
+  const apr = useMemo(() => {
+    if (farmPool && basePrice) {
+      const rawApr = exponentiatedBy(
         exponentiate(
           new BigNumber(farmPool.aprNumerator.toString()).div(
             new BigNumber(farmPool.aprDenominator.toString()),
@@ -115,15 +115,11 @@ const FarmCard: React.FC<CardProps> = (props) => {
         ),
         deltafiTokenDecimals,
       );
-      return new BigNumber(1)
-        .plus(apr.dividedBy(365))
-        .pow(365)
-        .minus(1)
-        .multipliedBy(100)
-        .toFixed(2);
+
+      return rawApr.dividedBy(basePrice).multipliedBy(100).toFixed(2);
     }
     return 0;
-  }, [farmPool, swapPool]);
+  }, [farmPool, swapPool, basePrice]);
 
   if (!swapPool || !farmPool) return null;
 
@@ -155,8 +151,8 @@ const FarmCard: React.FC<CardProps> = (props) => {
         <Typography className={classes.label}>{convertDollar(tvl.toFixed(2))}</Typography>
       </Box>
       <Box display="flex" justifyContent="space-between" mt={1.5}>
-        <Typography className={classes.label}>APY</Typography>
-        <Typography className={classes.label}>{apy}%</Typography>
+        <Typography className={classes.label}>APR</Typography>
+        <Typography className={classes.label}>{apr}%</Typography>
       </Box>
     </Box>
   );
