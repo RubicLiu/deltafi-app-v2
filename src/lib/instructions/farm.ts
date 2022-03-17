@@ -13,57 +13,6 @@ export enum FarmInstruction {
   Withdraw,
 }
 
-export interface FarmInitializeData {
-  feeNumerator: bigint;
-  feeDenominator: bigint;
-  rewardsNumerator: bigint;
-  rewardsDenominator: bigint;
-  bumpSeed: number;
-}
-
-/** @internal */
-export const FarmInitializeDataLayout = struct<FarmInitializeData>(
-  [
-    u64("feeNumerator"),
-    u64("feeDenominator"),
-    u64("rewardsNumerator"),
-    u64("rewardsDenominator"),
-    u8("bumpSeed"),
-  ],
-  "initData",
-);
-
-// Instruction for initialize farm
-export const createInitFarmInstruction = (
-  config: PublicKey,
-  swap: PublicKey,
-  farmPool: PublicKey,
-  authority: PublicKey,
-  poolToken: PublicKey,
-  initData: FarmInitializeData,
-  programId: PublicKey,
-): TransactionInstruction => {
-  const keys = [
-    { pubkey: config, isSigner: false, isWritable: false },
-    { pubkey: swap, isSigner: false, isWritable: false },
-    { pubkey: farmPool, isSigner: false, isWritable: true },
-    { pubkey: authority, isSigner: false, isWritable: false },
-    { pubkey: poolToken, isSigner: false, isWritable: false },
-    { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
-    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-  ];
-
-  const dataLayout = struct([u8("instruction"), FarmInitializeDataLayout]);
-  const data = Buffer.alloc(dataLayout.span);
-  dataLayout.encode({ instruction: FarmInstruction.Initialize, initData }, data);
-
-  return new TransactionInstruction({
-    keys,
-    programId,
-    data,
-  });
-};
-
 export interface FarmDepositData {
   amount: bigint;
 }
@@ -227,33 +176,6 @@ export const createClaimFarmInstruction = (
   dataLayout.encode(
     {
       instruction: FarmInstruction.Claim,
-    },
-    data,
-  );
-
-  return new TransactionInstruction({
-    keys,
-    programId,
-    data,
-  });
-};
-
-// Instruction for refresh farm
-export const createRefreshFarmInstruction = (
-  farmPool: PublicKey,
-  programId: PublicKey,
-  farmUsers: Array<PublicKey>,
-) => {
-  const keys = [
-    { pubkey: farmPool, isSigner: false, isWritable: false },
-    ...farmUsers.map((farmUser) => ({ pubkey: farmUser, isSigner: false, isWritable: true })),
-  ];
-
-  const dataLayout = struct([u8("instruction")]);
-  const data = Buffer.alloc(dataLayout.span);
-  dataLayout.encode(
-    {
-      instruction: FarmInstruction.Refresh,
     },
     data,
   );

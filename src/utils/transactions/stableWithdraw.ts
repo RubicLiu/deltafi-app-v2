@@ -2,7 +2,7 @@ import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import BN from "bn.js";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
-import { PoolInfo, MarketConfig } from "providers/types";
+import { PoolInfo } from "providers/types";
 import {
   createApproveInstruction,
   createStableWithdrawInstruction,
@@ -21,12 +21,7 @@ export async function stableWithdraw({
   pool,
   baseTokenRef,
   quteTokenRef,
-  basePricePythKey,
-  quotePricePythKey,
   withdrawData,
-  config,
-  farmPool,
-  farmUser,
 }: {
   connection: Connection;
   walletPubkey: PublicKey;
@@ -34,12 +29,7 @@ export async function stableWithdraw({
   pool: PoolInfo;
   baseTokenRef?: PublicKey;
   quteTokenRef?: PublicKey;
-  basePricePythKey: PublicKey;
-  quotePricePythKey: PublicKey;
   withdrawData: WithdrawData;
-  config: MarketConfig;
-  farmPool?: PublicKey;
-  farmUser?: PublicKey;
 }) {
   if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
     console.error("stable withdraw failed with null parameter");
@@ -133,14 +123,6 @@ export async function stableWithdraw({
     );
 
   let signers = [userTransferAuthority];
-  // if (!farmUser) {
-  //   const { transaction: createFarmUserTransaction } = await createFarmUser({
-  //     connection,
-  //     walletPubkey,
-  //     config,
-  //   });
-  //   transaction = mergeTransactions([createFarmUserTransaction, transaction]);
-  // }
 
   transaction = mergeTransactions([
     createWrappedTokenAccountTransaction,

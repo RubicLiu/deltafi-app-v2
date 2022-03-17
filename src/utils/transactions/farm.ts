@@ -6,7 +6,6 @@ import {
   createFarmDepositInstruction,
   createFarmWithdrawInstruction,
   createInitFarmUserInstruction,
-  createRefreshFarmInstruction,
   FarmDepositData,
   FarmWithdrawData,
 } from "lib/instructions/farm";
@@ -221,32 +220,6 @@ export async function claim({
   );
 
   const transaction = mergeTransactions([createUserReferrerAccountTransaction, claimTransaction]);
-
-  return signTransaction({ transaction, feePayer: walletPubkey, connection });
-}
-
-export async function refresh({
-  connection,
-  swap,
-  farmPool,
-  poolMint,
-  walletPubkey,
-  farmUser,
-}: {
-  connection: Connection;
-  swap: PublicKey;
-  farmPool: PublicKey;
-  poolMint: PublicKey;
-  walletPubkey: PublicKey;
-  farmUser: PublicKey;
-}) {
-  if (!connection || !farmPool || !poolMint || !walletPubkey || !farmUser) {
-    console.error("farm refresh failed with null parameter");
-    return null;
-  }
-
-  const transaction = new Transaction();
-  transaction.add(createRefreshFarmInstruction(swap, SWAP_PROGRAM_ID, [farmUser]));
 
   return signTransaction({ transaction, feePayer: walletPubkey, connection });
 }

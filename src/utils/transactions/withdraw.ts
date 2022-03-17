@@ -2,7 +2,7 @@ import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import BN from "bn.js";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
-import { PoolInfo, MarketConfig } from "providers/types";
+import { PoolInfo } from "providers/types";
 import {
   createApproveInstruction,
   createWithdrawInstruction,
@@ -21,12 +21,7 @@ export async function withdraw({
   pool,
   baseTokenRef,
   quteTokenRef,
-  basePricePythKey,
-  quotePricePythKey,
   withdrawData,
-  config,
-  farmPool,
-  farmUser,
 }: {
   connection: Connection;
   walletPubkey: PublicKey;
@@ -34,12 +29,7 @@ export async function withdraw({
   pool: PoolInfo;
   baseTokenRef?: PublicKey;
   quteTokenRef?: PublicKey;
-  basePricePythKey: PublicKey;
-  quotePricePythKey: PublicKey;
   withdrawData: WithdrawData;
-  config: MarketConfig;
-  farmPool?: PublicKey;
-  farmUser?: PublicKey;
 }) {
   if (!connection || !walletPubkey || !pool || !poolTokenAccount) {
     console.error("withdraw failed with null parameter");

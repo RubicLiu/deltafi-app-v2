@@ -366,8 +366,6 @@ const Deposit: React.FC = () => {
           baseAccount: baseTokenAccount,
           quoteAccount: quoteTokenAccount,
           poolTokenRef: poolTokenAccount?.publicKey,
-          basePricePythKey: pool.pythBase,
-          quotePricePythKey: pool.pythQuote,
           depositData: {
             amountTokenA: BigInt(
               exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString(),
@@ -396,7 +394,7 @@ const Deposit: React.FC = () => {
       await connection.confirmTransaction(hash, "confirmed");
 
       await fecthTokenAccountInfoList(
-        [base.token.mint, quote.token.mint],
+        [base.token.mint, quote.token.mint, pool.poolMintKey.toBase58()],
         walletPubkey,
         connection,
         dispatch,
@@ -461,8 +459,6 @@ const Deposit: React.FC = () => {
           pool,
           baseTokenRef: baseTokenAccount?.publicKey,
           quteTokenRef: quoteTokenAccount?.publicKey,
-          basePricePythKey: pool.pythBase,
-          quotePricePythKey: pool.pythQuote,
           withdrawData: {
             amountPoolToken: BigInt(
               pmm
@@ -491,9 +487,6 @@ const Deposit: React.FC = () => {
                 .toString(),
             ),
           },
-          config,
-          farmPool: farmPoolKey,
-          farmUser: farmUser?.publicKey,
         });
       } else {
         setIsProcessing(false);
@@ -509,7 +502,7 @@ const Deposit: React.FC = () => {
       await connection.confirmTransaction(hash, "confirmed");
 
       await fecthTokenAccountInfoList(
-        [base.token.mint, quote.token.mint],
+        [base.token.mint, quote.token.mint, pool.poolMintKey.toBase58()],
         walletPubkey,
         connection,
         dispatch,
@@ -529,7 +522,6 @@ const Deposit: React.FC = () => {
       console.error("error", e);
       setBase((prevBase) => ({ ...prevBase, amount: "", lastUpdate: Date.now() }));
       setQuote((prevQuote) => ({ ...prevQuote, amount: "", lastUpdate: Date.now() }));
-      setWithdrawPercentage(0);
       setTransactionResult({ status: false });
     } finally {
       setState({ ...state, open: true });
@@ -553,9 +545,6 @@ const Deposit: React.FC = () => {
     signTransaction,
     baseTokenAccount?.publicKey,
     quoteTokenAccount?.publicKey,
-    config,
-    farmPoolKey,
-    farmUser,
     dispatch,
     pmm,
     share,

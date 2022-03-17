@@ -21,8 +21,6 @@ export async function stableDeposit({
   baseAccount,
   quoteAccount,
   poolTokenRef = undefined,
-  basePricePythKey,
-  quotePricePythKey,
   depositData,
   config,
   farmPool,
@@ -34,8 +32,6 @@ export async function stableDeposit({
   baseAccount: TokenAccountInfo;
   quoteAccount: TokenAccountInfo;
   poolTokenRef?: PublicKey;
-  basePricePythKey: PublicKey;
-  quotePricePythKey: PublicKey;
   depositData: DepositData;
   config: MarketConfig;
   farmPool?: PublicKey;
