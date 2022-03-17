@@ -107,11 +107,10 @@ const App: React.FC = () => {
         // if the referrer address is invalid, the referrer public key is set to null
       }
     }
-    // This flag is added to toggle the flag for local development.
-    // for test purpose, it requires enableReferral is set to be true explicitly
-    const enableReferral: boolean = window.localStorage.getItem("enableReferralStr") === "true";
 
-    // TODO(ypeng): Check wallet key and reset state if wallet changes.
+    // Enable referral feature explicitly
+    const enableReferral: boolean = true;
+
     dispatch(setReferrerAction({ referrerPublicKey, enableReferral }));
 
     if (!enableReferral || !walletAddress) {
