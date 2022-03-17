@@ -110,26 +110,6 @@
     "deltafiToken": "J6NXoLLUwywpeDhSVbD2bawigPEmBGczgNq3dTAkA4fu",
     "poolInfo": [
       {
-        "name": "BTC-USDC",
-        "base": "BTC",
-        "quote": "USDC",
-        "swap": "J2CJXoBQbqEtVePJdwgmqJYmPgTNdeGjtAbwLmSiJqsQ",
-        "mint": "9FGaF2gdmHygWYvijajL4MUzky2NJdJevhBXQt2BWnKZ",
-        "farm": "BhQ2Qw2ikznnP7sTVFsCWFHCGTZr9wzSm14svxGjYgC6",
-        "token": "6cutLcqHYVHC3fh6heH78PvUFEnP5nHtX2QuM4z244Yj",
-        "decimals": 6
-      },
-      {
-        "name": "ETH-USDC",
-        "base": "ETH",
-        "quote": "USDC",
-        "swap": "7n23hGuJPxjrHZqiCWsuKGtjaMkXLy42KkLg9Cq3G9Ct",
-        "mint": "98krQYXiEST1EsTH1TJYUenvhPpLhu8w2iWSsXDUJ5Mj",
-        "farm": "6qJwszR6RFLbQ3fuetnUAPb4BtaWcKf9V9XCvcD3rsW1",
-        "token": "EszuvnneEw7MMZBuwfLR9ink7Zd6Ek4wSiENrUrcqmvY",
-        "decimals": 8
-      },
-      {
         "name": "LUNA-USDC",
         "base": "LUNA",
         "quote": "USDC",
@@ -143,20 +123,20 @@
         "name": "SOL-SRM",
         "base": "SOL",
         "quote": "SRM",
-        "swap": "35AZDUGx1nDKJYHMTiCT5xA9zhzPAP4uXYw8aZm48WmD",
-        "mint": "9fHwPURxFVwGUuzM5NRpHc7aD5bjbeUryM2EPHkrWtnU",
-        "farm": "CDpftATsN8TqFNyG4Xrog2EHLvECJWgEEZ1BDUXpkMGU",
-        "token": "FVTL1TfdWDEmYATeoa6qqYHWDYWpqbenDY7ApdDQDeAF",
+        "swap": "EXtM3YpBwiEt41wG3CEFg782Uftfj2EhNnzFKXn5qR5q",
+        "mint": "3mVYofMiCma455jvpEUHSTtVDBa9mSdPqDPVGXjdTd1n",
+        "farm": "4Nr5czcrNM2jkX6jkcgeY557XQxqK3XihdVNZ6gcwZDP",
+        "token": "ABsGeTefueyqEgABT86HhSDPehaFxc8aDF5hAfc21MpB",
         "decimals": 9
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swap": "BetnYScwkgk5wzRMMurjf5m1g9Fp2oFmm4QXzM3PwEte",
-        "mint": "6mUAz8crd161da7riGTQABU86LEV3ykNHDkZXy3MMX4S",
-        "farm": "H4x8neZ7wMVw5uhTn8944CkVfD31h1jbGw9BTrcQvXjL",
-        "token": "4yZKCNKF7Fys6ckUNdHad1AhgdnNraLTjbdyv4AEEQEj",
+        "swap": "8KTcA3j7U4tMh1jBPbF5tD5uCUiCd1CDcX964iwPcPrg",
+        "mint": "8sxLm5bamigCgnZGVEx4WG2EeuaAkj6qYHZH8dJCLuEQ",
+        "farm": "Bqzx8oFD8DQ9tgdrWm5Y6JtyLwdDokMmuRkWy3DuEymM",
+        "token": "HCJXFFYjQgrUu5Jx3mzU3HD9hociQehSnZgySvvjyYMo",
         "decimals": 9
       },
       {
@@ -167,6 +147,26 @@
         "mint": "7pa4L3kCAhxGm7uwVESsBWXrpt6SVEbJCoDAwpQQ272w",
         "farm": "4rZWRLHHeVz9a3qm1H62aD74RhTSRpuJULdMoYEE6Tjz",
         "token": "7AAbRbDKZPf6mLiSjkiTLJqKpjgMjhUtXL3saktzJHaL",
+        "decimals": 6
+      },
+      {
+        "name": "USDC-BTC",
+        "base": "USDC",
+        "quote": "BTC",
+        "swap": "2zLfRKZ3Kj1Uke95BhvoPuKHvfQxGVMu7UKrpfe6h7C9",
+        "mint": "5qyxLj1DE9WJ1HdvbRxeH5vKTuJtmXCE7YpZUduHhMwU",
+        "farm": "8LRYG3B5cWpGgvLbeuaqzYKkvqvKrpHfcZbsTSk5eiYD",
+        "token": "DPCLCqb3SthhMGURFH3rHRCB6iXoH45SH7ZkGysKvegw",
+        "decimals": 6
+      },
+      {
+        "name": "USDC-ETH",
+        "base": "USDC",
+        "quote": "ETH",
+        "swap": "7rJo7bKnjg32ixi8Y5iQgPoH4XCMCDqWNJ4Ud5LT9XVn",
+        "mint": "77Qs5EjWs7AXWcHrNCdL7Lmbs5ECPVczGNdtfn4u39fQ",
+        "farm": "2XoMLd64TVxGB1rwQEbzZ22oFpbuac3LT8FDgFQfk1sq",
+        "token": "4Kdd2ZSYeokYSthKCjXGmfuTAercVYYG6JvPNA5roxk8",
         "decimals": 6
       },
       {
@@ -193,10 +193,10 @@
         "name": "USDC-stSOL",
         "base": "USDC",
         "quote": "stSOL",
-        "swap": "6BZqs42Dg6NCyAKswWqvDdZLmTawDFvmFBHvmi1QN45e",
-        "mint": "GnE2hoRoS6CMM93yvzNHZ86a9QcMYKsfdb8R5Usq9oNL",
-        "farm": "4pVzHGWxqey57RafMxq9gKzhKKXKX3BPH9gN4oGGda2p",
-        "token": "DeN8PNCSU6N8DPRPGTsW1HGjGxHJadza3LCNEMu9QEwF",
+        "swap": "6JQ4bkvBVzjnhscrSRu6er1FuFY6JeF9JjakcriUeeGm",
+        "mint": "9oXjWYFJ94aqRnH6C23kGQFRr5PDyQQf2VaCrjtCKtg7",
+        "farm": "7ryKwqBu5uJYo9enNi89qm6YJYwHo2mdiDxvP1hA4AzQ",
+        "token": "GnMMKYTQDAN1ipCjA4uYkxxdBg5pxA3Je22y67hcsBBv",
         "decimals": 6
       }
     ],
