@@ -45,7 +45,12 @@ import {
 import { fetchPoolsThunk } from "states/poolState";
 import { fetchReferrerThunk } from "states/appState";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
-import { getTokenConfigBySymbol, marketConfig, tokenConfigs } from "constants/deployConfig";
+import {
+  getTokenConfigBySymbol,
+  marketConfig,
+  poolConfigs,
+  tokenConfigs,
+} from "constants/deployConfig";
 
 interface TransactionResult {
   status: boolean | null;
@@ -121,6 +126,20 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   },
 }));
 
+function getPossibleTokenToConfigs(tokenFrom: ISwapCard) {
+  const possibleTokenToConfigs = [];
+  for (const poolConfig of poolConfigs) {
+    const { base, quote } = poolConfig;
+    if (base === tokenFrom.token.symbol) {
+      possibleTokenToConfigs.push(getTokenConfigBySymbol(quote));
+    }
+    if (quote === tokenFrom.token.symbol) {
+      possibleTokenToConfigs.push(getTokenConfigBySymbol(base));
+    }
+  }
+  return possibleTokenToConfigs;
+}
+
 const Home: React.FC = (props) => {
   const dispatch = useDispatch();
   const appState = useSelector(appSelector);
@@ -191,6 +210,8 @@ const Home: React.FC = (props) => {
     status: null,
   });
   const { network } = useCustomConnection();
+
+  const possibleTokenToConfigs = useMemo(() => getPossibleTokenToConfigs(tokenFrom), [tokenFrom]);
 
   const handleSwapDirectionChange = () => {
     const temp = Object.assign({}, tokenFrom);
@@ -528,8 +549,6 @@ const Home: React.FC = (props) => {
     classes.actionLoadingButton,
   ]);
 
-  // if (!pool) return null
-
   const { open, vertical, horizontal } = state;
 
   return (
@@ -574,7 +593,7 @@ const Home: React.FC = (props) => {
               )}
               <SwapCard
                 card={tokenTo}
-                tokens={tokenConfigs}
+                tokens={possibleTokenToConfigs}
                 handleChangeCard={handleTokenToInput}
                 disabled={true}
               />
