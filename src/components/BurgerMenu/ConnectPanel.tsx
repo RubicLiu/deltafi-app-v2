@@ -120,17 +120,15 @@ const ConnectPanel: React.FC = (props) => {
         notFound = !(window as any)?.solflare?.isSolflare;
         break;
       case WalletName.Coin98:
-        notFound = !(window as any)?.isCoin98;
+        notFound = !(window as any)?.coin98;
         break;
       case WalletName.SolletExtension:
         notFound = !(window as any)?.sollet;
         break;
       case WalletName.Slope:
-        notFound = !(window as any)?.slope;
+        notFound = !(window as any)?.Slope;
         break;
-      case WalletName.Ledger:
       case WalletName.Sollet:
-      case WalletName.SafePal:
     }
 
     if (notFound) {

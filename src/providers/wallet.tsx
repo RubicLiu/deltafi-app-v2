@@ -1,9 +1,7 @@
 import { useMemo, useCallback } from "react";
 import {
   getCoin98Wallet,
-  getLedgerWallet,
   getPhantomWallet,
-  // getSafePalWallet,
   getSlopeWallet,
   getSolflareWallet,
   getSolflareWebWallet,
@@ -21,11 +19,9 @@ export function CustomWalletProvider({ children }) {
       getPhantomWallet(),
       getSolflareWallet(),
       getSolflareWebWallet(),
-      getLedgerWallet(),
       getSolletWallet({ network }),
       getSolletExtensionWallet({ network }),
       getCoin98Wallet(),
-      // getSafePalWallet(),
       getSlopeWallet(),
     ],
     [network],

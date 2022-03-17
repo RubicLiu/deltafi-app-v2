@@ -27,13 +27,11 @@ export const MAINNET_CHAIN_ID = 1;
 export const connectorLocalStorageKey = "connectorId";
 
 export const WALLETS = {
-  LEDGER: "Ledger",
   SOLFLARE: "Solflare",
   SOLFLARE_EXTENSION: "Solflare Extension",
   SOLLET: "Sollet",
   SOLLET_EXTENSION: "Sollet Extension",
   PHANTOM: "Phantom",
   COIN98: "Coin98",
-  SAFEPAL: "Safepal",
   MATHWALLLET: "MathWallet",
 };
