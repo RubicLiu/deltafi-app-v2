@@ -17,6 +17,7 @@ import {
   selectPythMarketPriceByPool,
   selectTokenAccountInfoByMint,
 } from "states/selectors";
+import { getTokenPairByPoolName } from "utils";
 
 const Img = styled.img`
   width: 20px;
@@ -135,20 +136,20 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   if (!pool) return null;
 
+  const [firstTokenInfo, secondTokenInfo] = getTokenPairByPoolName(pool);
+
   return (
     <Box className={classes.container}>
       <Box className={classes.content}>
         <Box display="flex" alignItems="center">
-          <Img src={pool.baseTokenInfo.logoURI} alt={`${pool.baseTokenInfo.name} coin`} />
+          <Img src={firstTokenInfo.logoURI} alt={`${firstTokenInfo.name} coin`} />
           <Img
-            src={pool.quoteTokenInfo.logoURI}
-            alt={`${pool.quoteTokenInfo.name} coin`}
+            src={secondTokenInfo.logoURI}
+            alt={`${secondTokenInfo.name} coin`}
             className="coin-earning"
           />
           <Box ml={1.5}>
-            <Typography className={classes.tokenPair}>
-              {`${pool.baseTokenInfo.symbol} - ${pool.quoteTokenInfo.symbol}`}
-            </Typography>
+            <Typography className={classes.tokenPair}>{`${pool.name}`}</Typography>
           </Box>
         </Box>
         <ConnectButton

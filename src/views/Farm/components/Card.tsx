@@ -13,6 +13,7 @@ import { convertDollar } from "utils/utils";
 import { useSelector } from "react-redux";
 import { selectPythMarketPriceByPool, selectFarmPoolByFarmPoolKey } from "states/selectors";
 import { selectPoolByPoolKey } from "states/selectors";
+import { getTokenPairByPoolName } from "utils";
 
 const deltafiTokenDecimals = 6;
 
@@ -123,19 +124,19 @@ const FarmCard: React.FC<CardProps> = (props) => {
 
   if (!swapPool || !farmPool) return null;
 
+  const [firstTokenInfo, secondTokenInfo] = getTokenPairByPoolName(swapPool);
+
   return (
     <Box className={classes.root}>
       <Box className={classes.content}>
         <Box display="flex" alignItems="center">
-          <Img src={swapPool.baseTokenInfo.logoURI} alt={`${swapPool.baseTokenInfo.symbol} coin`} />
+          <Img src={firstTokenInfo.logoURI} alt={`${firstTokenInfo.symbol} coin`} />
           <Img
-            src={swapPool.quoteTokenInfo.logoURI}
-            alt={`${swapPool.quoteTokenInfo.symbol} coin`}
+            src={secondTokenInfo.logoURI}
+            alt={`${secondTokenInfo.symbol} coin`}
             className="coin-earning"
           />
-          <Text className={classes.tokenPair}>
-            {`${swapPool.baseTokenInfo.symbol} - ${swapPool.quoteTokenInfo.symbol}`}
-          </Text>
+          <Text className={classes.tokenPair}>{`${swapPool.name}`}</Text>
         </Box>
         <ConnectButton
           onClick={() => history.push(`/stake/${poolConfig.farm}`)}
