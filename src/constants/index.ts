@@ -13,7 +13,7 @@ export const WAD_LENGTH = 12;
 
 export const WAD = new BigNumber(`1e+${WAD_LENGTH}`);
 
-export const HOMEPAGE_LINK = process.env.REACT_HOMPAGE_URL || "https://deltafi.ai";
+export const HOMEPAGE_LINK = process.env.REACT_HOMPAGE_URL || "https://deltafi.trade";
 export const APP_LINK = process.env.REACT_APP_URL || "http://localhost:3001";
 export const BLOG_LINK = "https://medium.com/deltafi";
 export const TWITTER_LINK = "https://twitter.com/deltafi_ai";
