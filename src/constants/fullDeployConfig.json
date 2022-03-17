@@ -321,26 +321,6 @@
     "deltafiToken": "Cajir4DbVH8Gyj8E9EjuvxmrZj9ihZYVYZJ7RNH5uBQs",
     "poolInfo": [
       {
-        "name": "BTC-USDC",
-        "base": "BTC",
-        "quote": "USDC",
-        "swap": "EAZoJwWaghpN9qWUwUGWuc7WYwpRzDHWSBwjwhPovFXJ",
-        "mint": "9D1owSozwms3PGAtAYvmPbiB2ZE9WhiCghBB3DSCrJ46",
-        "farm": "4cfLDpvpTq1XNKYkRa5nvVoxLiLMDs4a96zTw6Z8YSjL",
-        "token": "CiQmCZBgfiajQMTM8ZdY6TbifZKC3qFx6ZhkP4n9g4eL",
-        "decimals": 6
-      },
-      {
-        "name": "ETH-USDC",
-        "base": "ETH",
-        "quote": "USDC",
-        "swap": "Gy3Vy1G1UnUKQWS2fkyHdA2fT8EpefzSDbJLoGe6LsAX",
-        "mint": "GAT9BQRR4wRiQYTn54TdyVDr9N7rWkPq8FkE1SV1xzYF",
-        "farm": "GmiLZ9LkQB9cG8j65SmPAfUB5p7o2CswrGVKbn9pthXD",
-        "token": "EKU2XJJCTJHFahrnAN32skxtiPo5GcTupcbiNoN3Cceq",
-        "decimals": 8
-      },
-      {
         "name": "LUNA-USDC",
         "base": "LUNA",
         "quote": "USDC",
@@ -378,6 +358,26 @@
         "mint": "DGepQvYSGKP49mEk2P9dtTLKkqnjZ9Qg6fb4f9r9SSZ2",
         "farm": "64gEGuaACTLkzGFxYnhknj5ZLAURDvf8ut2jbjgJbQun",
         "token": "AmBamE89XLtF2ta12bYZajKhKjE4YXzg5rPAiF5J1SWL",
+        "decimals": 6
+      },
+      {
+        "name": "USDC-BTC",
+        "base": "USDC",
+        "quote": "BTC",
+        "swap": "GHFaCjfv5xdRfVvb7hgHikQL8bzLrTTF7tVTUrduUwTc",
+        "mint": "25aDuiGRJguqtBkHFzd6FnMJ5zYRMUZVjjNtqWATTebg",
+        "farm": "DNUPxzxEJvREPYWojP1U9nzaZS6gb15DVKG82h9Gd6ft",
+        "token": "3GzDQVABsZtBQABCW7fuBweBSjAA41sdCCkWfN17d5Fc",
+        "decimals": 6
+      },
+      {
+        "name": "USDC-ETH",
+        "base": "USDC",
+        "quote": "ETH",
+        "swap": "Fct36KqgtLwShMx4nt2miwF7JMxg2M9L9AuVUHuDCwYS",
+        "mint": "2AFdQuLLeitjFjxtgNbqAk1FaSGjSoYRQHcDKZYpRjkx",
+        "farm": "9oiCK1imbLLk76YNYm5P4of8wHgEx3VCC9CS3b1Uhxk2",
+        "token": "FrqwhgsMveYBdanmAj2TwybS9sXK4HzZRNV5d4Au6AMP",
         "decimals": 6
       },
       {
