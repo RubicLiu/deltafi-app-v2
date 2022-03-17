@@ -9,17 +9,34 @@ import { convertDollar } from "utils/utils";
 import { PMM } from "lib/calc";
 import { getTokenConfigBySymbol, PoolConfig, poolConfigs } from "constants/deployConfig";
 import { useSelector } from "react-redux";
-import { pythSelector, poolSelector, tokenAccountSelector } from "states/selectors";
+import {
+  pythSelector,
+  poolSelector,
+  tokenAccountSelector,
+  farmUserSelector,
+} from "states/selectors";
 import { getMarketPrice } from "states/pythState";
-import { PublicKey } from "@solana/web3.js";
 import { MintToTokenAccountInfo } from "states/tokenAccountState";
+import { FarmPoolKeyToFarmUser } from "states/farmUserState";
 
-function hasDeposit(mintToTokenAccountInfo: MintToTokenAccountInfo, mint: string) {
+function hasDeposit(
+  mintToTokenAccountInfo: MintToTokenAccountInfo,
+  farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser,
+  poolConfig: PoolConfig,
+) {
   if (mintToTokenAccountInfo == null) {
     return false;
   }
-  const tokenInfo = mintToTokenAccountInfo[mint];
-  return tokenInfo && tokenInfo.amount.comparedTo(new BigNumber(0)) > 0;
+  const tokenInfo = mintToTokenAccountInfo[poolConfig.mint];
+  if (tokenInfo && tokenInfo.amount.comparedTo(new BigNumber(0)) > 0) {
+    return true;
+  }
+
+  if (farmPoolKeyToFarmUser == null) {
+    return false;
+  }
+  const farmUser = farmPoolKeyToFarmUser[poolConfig.farm];
+  return farmUser && farmUser.depositedAmount > 0;
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
@@ -58,6 +75,7 @@ const Home: React.FC = () => {
   }, [poolState.poolKeyToPoolInfo]);
 
   const mintToTokenAccountInfo = useSelector(tokenAccountSelector).mintToTokenAccountInfo;
+  const farmPoolKeyToFarmUser = useSelector(farmUserSelector).farmPoolKeyToFarmUser;
 
   const pythState = useSelector(pythSelector);
   const symbolToPythData = pythState.symbolToPythData;
@@ -98,14 +116,10 @@ const Home: React.FC = () => {
             <Box mt={3.5}>
               {poolConfigs
                 .filter((poolConfig: PoolConfig) =>
-                  hasDeposit(mintToTokenAccountInfo, poolConfig.mint),
+                  hasDeposit(mintToTokenAccountInfo, farmPoolKeyToFarmUser, poolConfig),
                 )
                 .map((poolConfig: PoolConfig) => (
-                  <PoolCard
-                    isUserPool
-                    key={poolConfig.swap}
-                    poolKey={new PublicKey(poolConfig.swap)}
-                  />
+                  <PoolCard isUserPool key={poolConfig.swap} poolConfig={poolConfig} />
                 ))}
             </Box>
           </Box>
@@ -120,11 +134,12 @@ const Home: React.FC = () => {
             <Box className={classes.poolCardContainer}>
               {poolConfigs
                 .filter(
-                  (poolConfig: PoolConfig) => !hasDeposit(mintToTokenAccountInfo, poolConfig.mint),
+                  (poolConfig: PoolConfig) =>
+                    !hasDeposit(mintToTokenAccountInfo, farmPoolKeyToFarmUser, poolConfig),
                 )
                 .map((poolConfig: PoolConfig) => (
                   <Box key={poolConfig.swap}>
-                    <PoolCard poolKey={new PublicKey(poolConfig.swap)} />
+                    <PoolCard poolConfig={poolConfig} />
                   </Box>
                 ))}
             </Box>

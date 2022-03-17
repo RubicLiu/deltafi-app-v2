@@ -12,6 +12,7 @@ import { rate } from "utils/decimal";
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
 import {
+  selectFarmUserByFarmPoolKey,
   selectPoolByPoolKey,
   selectPythMarketPriceByPool,
   selectTokenAccountInfoByMint,
@@ -73,13 +74,21 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   },
 }));
 
+function getLpTokenValue(pmm, basePrice, quotePrice, pool, lpTokenAmount) {
+  return pmm
+    .tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals)
+    .multipliedBy(rate(lpTokenAmount, pool.poolState.totalSupply))
+    .div(100);
+}
+
 const PoolCard: React.FC<CardProps> = (props) => {
   const history = useHistory();
   const { connected } = useWallet();
   const classes = useStyles();
-  const { poolKey } = props;
+  const { poolConfig } = props;
 
-  const pool = useSelector(selectPoolByPoolKey(poolKey.toBase58()));
+  const pool = useSelector(selectPoolByPoolKey(poolConfig.swap));
+  const farmUser = useSelector(selectFarmUserByFarmPoolKey(poolConfig.farm));
 
   const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
 
@@ -104,22 +113,25 @@ const PoolCard: React.FC<CardProps> = (props) => {
     return new BigNumber(0);
   }, [pmm, basePrice, quotePrice, pool]);
 
-  const share = useMemo(() => {
-    if (pool && poolTokenAccount) {
-      return rate(poolTokenAccount.amount, pool.poolState.totalSupply);
-    }
-    return 0;
-  }, [pool, poolTokenAccount]);
-
   const sharePrice = useMemo(() => {
-    if (pmm && basePrice && quotePrice) {
-      return pmm
-        .tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals)
-        .multipliedBy(share)
-        .div(100);
+    if (pmm && basePrice && quotePrice && poolTokenAccount) {
+      return getLpTokenValue(pmm, basePrice, quotePrice, pool, poolTokenAccount.amount);
     }
     return new BigNumber(0);
-  }, [pmm, basePrice, quotePrice, share, pool]);
+  }, [pmm, basePrice, quotePrice, poolTokenAccount, pool]);
+
+  const stakingPrice = useMemo(() => {
+    if (pmm && basePrice && quotePrice && farmUser) {
+      return getLpTokenValue(
+        pmm,
+        basePrice,
+        quotePrice,
+        pool,
+        new BigNumber(farmUser.depositedAmount.toString()),
+      );
+    }
+    return new BigNumber(0);
+  }, [pmm, basePrice, quotePrice, farmUser, pool]);
 
   if (!pool) return null;
 
@@ -160,6 +172,14 @@ const PoolCard: React.FC<CardProps> = (props) => {
           <Typography className={classes.label}>Your deposits</Typography>
           <Typography className={classes.label}>
             {convertDollar(sharePrice?.toFixed(2).toString())}
+          </Typography>
+        </Box>
+      )}
+      {connected && props.isUserPool && stakingPrice && (
+        <Box display="flex" justifyContent="space-between">
+          <Typography className={classes.label}>Your staking</Typography>
+          <Typography className={classes.label}>
+            {convertDollar(stakingPrice?.toFixed(2).toString())}
           </Typography>
         </Box>
       )}

@@ -1,6 +1,6 @@
-import { PublicKey } from "@solana/web3.js";
+import { PoolConfig } from "constants/deployConfig";
 
 export interface CardProps {
   isUserPool?: boolean;
-  poolKey: PublicKey;
+  poolConfig: PoolConfig;
 }

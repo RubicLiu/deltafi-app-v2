@@ -8,7 +8,7 @@ import { FarmUserFlat, FarmUserLayout } from "lib/state/farm";
 import { StakeAccount } from "providers/types";
 import { getMultipleAccounts } from "utils/account";
 
-type FarmPoolKeyToFarmUser = Record<string, FarmUserFlat>;
+export type FarmPoolKeyToFarmUser = Record<string, FarmUserFlat>;
 
 export interface FarmUserState {
   farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser;
