@@ -798,6 +798,19 @@ const Deposit: React.FC = () => {
 
   const { open, vertical, horizontal } = state;
 
+  const reserveDisplay = (reserve: BigNumber, decimals: number): string => {
+    if (!reserve || !decimals) {
+      return "0.00";
+    }
+
+    const displayThreshold = 1;
+    const value = exponentiatedBy(reserve, decimals);
+    if (value.toNumber() < displayThreshold) {
+      return value.toFormat(decimals);
+    }
+    return value.toFormat(2);
+  };
+
   return (
     <Page>
       <Container className={classes.container}>
@@ -895,12 +908,10 @@ const Deposit: React.FC = () => {
                       className={clx(classes.coinIcon, classes.statsIcon)}
                     />
                     <Typography className={classes.label}>
-                      {`${exponentiatedBy(
+                      {`${reserveDisplay(
                         pool.poolState.baseReserve,
                         pool.baseTokenInfo.decimals,
-                      ).toFormat(2)} ${pool.baseTokenInfo.symbol}(${
-                        basePercent?.toFormat(2) || "-"
-                      }%)`}
+                      )} ${pool.baseTokenInfo.symbol}(${basePercent?.toFormat(2) || "-"}%)`}
                     </Typography>
                   </Box>
                   <Box display="flex">
@@ -910,12 +921,10 @@ const Deposit: React.FC = () => {
                       className={clx(classes.coinIcon, classes.statsIcon)}
                     />
                     <Typography className={classes.label}>
-                      {`${exponentiatedBy(
+                      {`${reserveDisplay(
                         pool.poolState.quoteReserve,
                         pool.quoteTokenInfo.decimals,
-                      ).toFormat(2)} ${pool.quoteTokenInfo.symbol}(${
-                        quotePercent?.toFormat(2) || "-"
-                      }%)`}
+                      )} ${pool.quoteTokenInfo.symbol}(${quotePercent?.toFormat(2) || "-"}%)`}
                     </Typography>
                   </Box>
                 </Box>
