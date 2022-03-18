@@ -95,13 +95,15 @@ const SwapCard: React.FC<CardProps> = (props) => {
   }, [tokenAccount, card]);
 
   useEffect(() => {
-    if (percentage && tokenBalance) {
+    if (percentage && tokenBalance && card?.token?.decimals) {
+      const minAmount: number = Number(`1e-${card.token.decimals}`);
+      const zeroWithDecimals = `0.${"0".repeat(card.token.decimals)}`;
       const realAmount = tokenBalance
         .multipliedBy(new BigNumber(percentage))
         .dividedBy(new BigNumber(100));
       handleChangeCard({
         ...card,
-        amount: realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString(),
+        amount: realAmount.toNumber() < minAmount ? zeroWithDecimals : realAmount.toString(),
       });
     }
   }, [card, handleChangeCard, percentage, tokenBalance]);
@@ -123,11 +125,27 @@ const SwapCard: React.FC<CardProps> = (props) => {
 
   const value = useMemo(() => {
     const pointIdx = card.amount.indexOf(".");
-    if (pointIdx > 0) {
-      return card.amount.slice(0, pointIdx) + card.amount.slice(pointIdx, pointIdx + 7);
+    if (pointIdx !== card.amount.length - 1 && card.amount[card.amount.length - 1] === ".") {
+      // if there are more than one decimal points in the number string
+      // we need to remove the extra point
+      // value gets updated every time the user input value
+      // so we only need to check if there is an extra point at theend of string
+      card.amount = card.amount.substring(0, card.amount.length - 1);
     }
+
+    if (
+      card?.token?.decimals &&
+      pointIdx > 0 &&
+      pointIdx < card.amount.length - 1 - card.token.decimals
+    ) {
+      // if the decimal point exist in the input value
+      // and the input decimals is larger than the card token's decimals
+      // we should fix the decimals to the token's decimals
+      return Number(card.amount).toFixed(card.token.decimals);
+    }
+
     return card.amount;
-  }, [card.amount]);
+  }, [card]);
 
   return (
     <Paper className={classes.root}>
