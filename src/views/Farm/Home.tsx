@@ -133,7 +133,7 @@ const Home: React.FC = (props): ReactElement => {
           <Box display="flex" alignItems="center" mt={2}>
             <Typography className={classes.description}>Read more about</Typography>
             <Link
-              href="https://solscan.io/token/de1QJkP1qDCk5JYCCXCeq27bQQUdCaiv7xVKFrhPSzF"
+              href="https://coinmarketcap.com/currencies/deltafi/"
               target="_blank"
               rel="noreferrer noopener"
               underline="always"
