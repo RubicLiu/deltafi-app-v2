@@ -190,6 +190,16 @@
         "decimals": 6
       },
       {
+        "name": "soFTT-USDC",
+        "base": "USDC",
+        "quote": "soFTT",
+        "swap": "GjFTEMox2YMT8tt13UijwZC5LRir833zrwmD7DSvEPcy",
+        "mint": "DzUFsfbmfEtGoaVqB12j54mzxNmYE7CBcCycANZQCdhN",
+        "farm": "3teoGmayuqynRnvePnCAFGRNNLkYvRdHk6h2iQK2U47A",
+        "token": "12ZGP9XxB463jGNKfMkaeG3bmcC3Pxkty28HS35iGXpb",
+        "decimals": 6
+      },
+      {
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
