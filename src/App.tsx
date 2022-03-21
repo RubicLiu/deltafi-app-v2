@@ -10,7 +10,7 @@ import Footer from "components/Footer";
 import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
-import { MARKET_CONFIG_ADDRESS } from "./constants";
+import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS } from "./constants";
 import { useCustomConnection } from "providers/connection";
 import { deployConfig } from "constants/deployConfig";
 
@@ -24,6 +24,7 @@ import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 import { PublicKey } from "@solana/web3.js";
 import { fetchTokenAccountsThunk } from "states/tokenAccountState";
 import { scheduleWithInterval } from "utils";
+import { AccountLayout } from "@solana/spl-token";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -95,29 +96,47 @@ const App: React.FC = () => {
   }, [connection, dispatch]);
 
   useEffect(() => {
-    const referrer: string = window.localStorage.getItem("referrer");
-    // test is the referrer string is a valid public key
-    // if the referrer string is invalid, the referrer public key is undefined
-    let referrerPublicKey: PublicKey | null = null;
-    if (referrer != null) {
-      try {
-        referrerPublicKey = new PublicKey(referrer);
-      } catch (e) {
-        console.warn(e);
-        // if the referrer address is invalid, the referrer public key is set to null
-      }
-    }
-
     // Enable referral feature explicitly
     const enableReferral: boolean = true;
+    // wrap the logic with an async function because we have to to await async function here
+    (async () => {
+      if (!enableReferral || !walletAddress) {
+        return;
+      }
+      const referrer: string = window.localStorage.getItem("referrer");
+      // test is the referrer string is a valid public key
+      // if the referrer string is invalid, the referrer public key is undefined
+      let referrerPublicKey: PublicKey | null = null;
+      if (referrer !== null && referrer !== "") {
+        try {
+          // creating public key will fail and throw and execption
+          // if the referrer address is not a valid public key
+          referrerPublicKey = new PublicKey(referrer);
+          const referrerAccountInfo = await connection.getAccountInfo(referrerPublicKey);
+          // the referrer must be a valid spl token account
+          const { mint, owner } = AccountLayout.decode(referrerAccountInfo.data);
+          const mintPublicKey = new PublicKey(mint);
+          const ownerPublicKey = new PublicKey(owner);
+          // the referrer account cannot be owned by the user's wallet
+          if (ownerPublicKey.equals(walletAddress)) {
+            throw Error("Referrer token account is owned by current the user");
+          }
+          // the referrer's mint must be the DELFI
+          if (!mintPublicKey.equals(DELTAFI_TOKEN_MINT)) {
+            throw Error("Referrer token account has wrong mint");
+          }
+        } catch (e) {
+          console.warn(e);
+          // if the referrer address is invalid, the referrer public key is set to null
+          referrerPublicKey = null;
+          // also clear the referrer data in the local storage because it is invalid
+          window.localStorage.removeItem("referrer");
+        }
+      }
 
-    dispatch(setReferrerAction({ referrerPublicKey, enableReferral }));
-
-    if (!enableReferral || !walletAddress) {
-      return;
-    }
-
-    dispatch(fetchReferrerThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress }));
+      dispatch(setReferrerAction({ referrerPublicKey, enableReferral }));
+      dispatch(fetchReferrerThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress }));
+    })();
   }, [dispatch, walletAddress, connection]);
 
   useEffect(() => {
