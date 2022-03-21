@@ -1,6 +1,6 @@
 import { createReducer, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { PublicKey, Connection, AccountInfo } from "@solana/web3.js";
+import { PublicKey, Connection, AccountInfo, Commitment } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { blob, struct } from "buffer-layout";
 import { allTokenConfigs } from "constants/deployConfig";
@@ -72,11 +72,18 @@ export async function fecthTokenAccountInfoList(
   wallet: PublicKey,
   connection: Connection,
   dispatch: Dispatch<any>,
+  commitment: Commitment = "confirmed",
 ) {
-  const tokenAccountInfoList = await getTokenAcountInfoList(mintAddressList, connection, wallet);
+  const tokenAccountInfoList = await getTokenAcountInfoList(
+    mintAddressList,
+    connection,
+    wallet,
+    commitment,
+  );
   for (const tokenAccountInfo of tokenAccountInfoList) {
     dispatch(setTokenAccountAction({ mint: tokenAccountInfo.mint.toBase58(), tokenAccountInfo }));
   }
+
   return tokenAccountInfoList;
 }
 
@@ -98,16 +105,17 @@ async function getTokenAcountInfoList(
   mintAddressList: string[],
   connection: Connection,
   walletAddress: PublicKey,
+  commitment: Commitment = "confirmed",
 ) {
-  const tokenAddressList = [];
+  const tokenAddressList: PublicKey[] = [];
   for (const mintAddress of mintAddressList) {
     if (mintAddress) {
       tokenAddressList.push(await getTokenAccountAddress(mintAddress, walletAddress));
     }
   }
 
-  const tokenAccountInfoList = [];
-  const accountInfoList = await getMultipleAccounts(connection, tokenAddressList, "confirmed");
+  const tokenAccountInfoList: TokenAccountInfo[] = [];
+  const accountInfoList = await getMultipleAccounts(connection, tokenAddressList, commitment);
   for (let i = 0; i < accountInfoList.keys.length; i++) {
     const accountInfo = accountInfoList.array[i];
     const tokenAccountPublicKey = accountInfoList.keys[i];

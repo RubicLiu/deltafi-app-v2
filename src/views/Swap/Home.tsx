@@ -51,10 +51,12 @@ import {
   poolConfigs,
   tokenConfigs,
 } from "constants/deployConfig";
+import BigNumber from "bignumber.js";
+import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 
 interface TransactionResult {
   status: boolean | null;
-  hash?: string;
+  signature?: string;
   base?: ISwapCard;
   quote?: ISwapCard;
 }
@@ -170,12 +172,6 @@ const Home: React.FC = (props) => {
     }
     return null;
   }, [sourceAccount, tokenFrom]);
-  const destinationBalance = useMemo(() => {
-    if (destinationAccount && tokenTo) {
-      return exponentiatedBy(destinationAccount.amount, tokenTo.token.decimals);
-    }
-    return null;
-  }, [destinationAccount, tokenTo]);
 
   const rewardsAccount = useSelector(selectTokenAccountInfoByMint(DELTAFI_TOKEN_MINT.toBase58()));
 
@@ -317,7 +313,7 @@ const Home: React.FC = (props) => {
         tokenFrom.token.symbol === pool.baseTokenInfo.symbol
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
-      let transaction = await swap({
+      let { transaction, createAccountsCost, destinationRef } = await swap({
         isStable,
         connection,
         walletPubkey,
@@ -334,44 +330,86 @@ const Home: React.FC = (props) => {
         enableReferral,
         referrer: referrerPubkey,
       });
+
       transaction = await signTransaction(transaction);
-
-      const hash = await sendSignedTransaction({ signedTransaction: transaction, connection });
-
-      await connection.confirmTransaction(hash, "confirmed");
-
+      const signature = await sendSignedTransaction({ signedTransaction: transaction, connection });
+      await connection.confirmTransaction(signature, "confirmed");
       // fetch account info and update record for from and to tokens
-      const [newFromAccount, newToAccount] = await fecthTokenAccountInfoList(
+      // this process does not have to blocking because we no longer need its result anymore
+      fecthTokenAccountInfoList(
         [tokenFrom.token.mint, tokenTo.token.mint],
         walletPubkey,
         connection,
         dispatch,
-      );
+        "confirmed",
+      )
+        // in most case, getting account info with confirmed commitment
+        // will update the balance correctly
+        // but it does not guarantee the result is correct
+        // we need to further wait for the transaction to finalize and then
+        // fetch the finalized balance
+        .then(() => connection.confirmTransaction(signature, "finalized"))
+        .then(() =>
+          fecthTokenAccountInfoList(
+            [tokenFrom.token.mint, tokenTo.token.mint],
+            walletPubkey,
+            connection,
+            dispatch,
+            "finalized",
+          ),
+        );
 
       setTokenFrom((prevTokenFrom) => ({ ...prevTokenFrom, amount: "", lastUpdate: Date.now() }));
       setTokenTo((prevTokenTo) => ({ ...prevTokenTo, amount: "", lastUpdate: Date.now() }));
-      const prevBalanceFrom = sourceBalance ?? 0;
-      const prevBalanceTo = destinationBalance ?? 0;
 
-      if (newFromAccount && newToAccount) {
-        const nextBalanceFrom = exponentiatedBy(newFromAccount.amount, tokenFrom.token.decimals);
-        const nextBalanceTo = exponentiatedBy(newToAccount.amount, tokenTo.token.decimals);
-        setTransactionResult({
-          status: true,
-          hash,
-          base: {
-            ...tokenFrom,
-            amount: nextBalanceFrom.minus(prevBalanceFrom).abs().toString(),
-          },
-          quote: {
-            ...tokenTo,
-            amount: nextBalanceTo.minus(prevBalanceTo).abs().toString(),
-          },
-        });
-        setState((_state) => ({ ..._state, open: true }));
-      } else {
-        throw Error("Cannot find associated token account to confirm transaction");
+      // get the actual difference of source and base token account from the transaction record
+      const { fromTokenBalanceDiff, toTokenBalanceDiff } = await getTokenBalanceDiffFromTransaction(
+        connection,
+        signature,
+        sourceAccount,
+        destinationAccount
+          ? destinationAccount
+          : {
+              publicKey: destinationRef,
+              amount: undefined,
+              mint: new PublicKey(tokenTo.token.mint),
+            },
+      );
+
+      // when calculating how much solana is actually swapped
+      // we need to ignore the transaction fee and cost for creating new token/referral accounts
+
+      // get transaction fee function of this transaction
+      const getTransactionFee = async () =>
+        (await connection.getFeeForMessage(transaction.compileMessage(), "confirmed")).value;
+
+      // get total "process fee" that should be ignored in the token balance difference
+      // if the token is not SOL, this value is always 0 because we only have transaction fee
+      // and account creation cost in SOL
+      let fromProcessFee = 0;
+      let toProcessFee = 0;
+      if (tokenFrom.token.symbol === "SOL") {
+        fromProcessFee = (await getTransactionFee()) + createAccountsCost;
+      } else if (tokenTo.token.symbol === "SOL") {
+        toProcessFee = (await getTransactionFee()) + createAccountsCost;
       }
+
+      const actualAmountFrom = new BigNumber(-fromTokenBalanceDiff - fromProcessFee);
+      const actualAmountTo = new BigNumber(toTokenBalanceDiff + toProcessFee);
+
+      setTransactionResult({
+        status: true,
+        signature,
+        base: {
+          ...tokenFrom,
+          amount: exponentiatedBy(actualAmountFrom, tokenFrom.token.decimals).toString(),
+        },
+        quote: {
+          ...tokenTo,
+          amount: exponentiatedBy(actualAmountTo, tokenTo.token.decimals).toString(),
+        },
+      });
+      setState((_state) => ({ ..._state, open: true }));
     } catch (e) {
       console.error(e);
       setTransactionResult({ status: false });
@@ -397,10 +435,9 @@ const Home: React.FC = (props) => {
     tokenTo,
     // priceImpact,
     connection,
-    destinationAccount?.publicKey,
-    rewardsAccount?.publicKey,
+    destinationAccount,
+    rewardsAccount,
     signTransaction,
-    destinationBalance,
     appState,
     dispatch,
   ]);
@@ -439,7 +476,7 @@ const Home: React.FC = (props) => {
       );
     }
 
-    const { base, quote, hash } = transactionResult;
+    const { base, quote, signature } = transactionResult;
 
     return (
       <Box display="flex" alignItems="center">
@@ -450,11 +487,11 @@ const Home: React.FC = (props) => {
         />
         <Box>
           <Typography variant="body1" color="primary">
-            {`Swap ${Number(base.amount).toFixed(6)} ${base.token.symbol} to ${Number(
-              quote.amount,
-            ).toFixed(6)} ${quote.token.symbol} for ${base.token.symbol}-${
-              quote.token.symbol
-            } Pool`}
+            {`Swap ${Number(base.amount).toFixed(base.token.decimals)} ${
+              base.token.symbol
+            } to ${Number(quote.amount).toFixed(quote.token.decimals)} ${quote.token.symbol} for ${
+              base.token.symbol
+            }-${quote.token.symbol} Pool`}
           </Typography>
           <Box display="flex" alignItems="center">
             <Typography variant="subtitle2" color="primary">
@@ -463,9 +500,9 @@ const Home: React.FC = (props) => {
             <Link
               className={classes.snackBarLink}
               target="_blank"
-              href={`${SOLSCAN_LINK}/tx/${hash}?cluster=${network}`}
+              href={`${SOLSCAN_LINK}/tx/${signature}?cluster=${network}`}
             >
-              {hash.slice(0, 7) + "..." + hash.slice(-7)}
+              {signature.slice(0, 7) + "..." + signature.slice(-7)}
             </Link>
           </Box>
         </Box>
@@ -492,9 +529,7 @@ const Home: React.FC = (props) => {
           tokenFrom.token.symbol === pool.baseTokenInfo.symbol
             ? pool?.poolState.quoteReserve
             : pool?.poolState.baseReserve,
-          tokenFrom.token.symbol === pool.baseTokenInfo.symbol
-            ? tokenTo.token.decimals
-            : tokenFrom.token.decimals,
+          tokenTo.token.decimals,
         ).isLessThan(tokenTo.amount);
 
       return (

@@ -128,7 +128,10 @@ export async function swap({
     return null;
   }
 
-  const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
+  let createAccountsCost = 0;
+  const createTokenAccountCost = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span,
+  );
   const tempAccountRefKeyPair = Keypair.generate();
   let createWrappedTokenAccountTransaction: Transaction | undefined;
   let initializeWrappedTokenAccountTransaction: Transaction | undefined;
@@ -145,7 +148,9 @@ export async function swap({
   let sourceRef: PublicKey = source.publicKey;
 
   if (buySol || sellSol) {
-    let tmpAccountLamport = buySol ? lamports * 2 : Number(swapData.amountIn) + lamports * 2;
+    let tmpAccountLamport = buySol
+      ? createTokenAccountCost * 2
+      : Number(swapData.amountIn) + createTokenAccountCost * 2;
 
     const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(
       tempAccountRefKeyPair.publicKey,
@@ -166,12 +171,18 @@ export async function swap({
     }
   }
 
-  const { userReferrerDataPubkey, createUserReferrerAccountTransaction, referrerPubkey } =
+  const {
+    userReferrerDataPubkey,
+    createUserReferrerAccountTransaction,
+    referrerPubkey,
+    createReferralDataCost,
+  } =
     (buySol || sellSol) && (!destinationRef || !rewardTokenRef)
       ? {
           userReferrerDataPubkey: null,
           createUserReferrerAccountTransaction: undefined,
           referrerPubkey: null,
+          createReferralDataCost: 0,
         }
       : await checkOrCreateReferralDataTransaction(
           walletPubkey,
@@ -180,6 +191,7 @@ export async function swap({
           config,
           connection,
         );
+  createAccountsCost += createReferralDataCost;
 
   let createDestinationAccountTransaction: Transaction | undefined;
   if (!destinationRef) {
@@ -193,6 +205,7 @@ export async function swap({
     });
     destinationRef = result?.newAccountPubkey;
     createDestinationAccountTransaction = result?.transaction;
+    createAccountsCost += createTokenAccountCost;
   }
 
   let createRewardAccountTransaction: Transaction | undefined;
@@ -203,6 +216,7 @@ export async function swap({
     });
     rewardTokenRef = result?.newAccountPubkey;
     createRewardAccountTransaction = result?.transaction;
+    createAccountsCost += createTokenAccountCost;
   }
 
   const userTransferAuthority = Keypair.generate();
@@ -275,19 +289,20 @@ export async function swap({
     closeWrappedTokenAccountTransaction,
   ]);
 
-  if (buySol || sellSol) {
-    return signTransaction({
-      transaction,
-      feePayer: walletPubkey,
-      signers: [userTransferAuthority, tempAccountRefKeyPair],
-      connection,
-    });
-  } else {
-    return signTransaction({
-      transaction,
-      feePayer: walletPubkey,
-      signers: [userTransferAuthority],
-      connection,
-    });
-  }
+  const resultTransaction =
+    buySol || sellSol
+      ? await signTransaction({
+          transaction,
+          feePayer: walletPubkey,
+          signers: [userTransferAuthority, tempAccountRefKeyPair],
+          connection,
+        })
+      : await signTransaction({
+          transaction,
+          feePayer: walletPubkey,
+          signers: [userTransferAuthority],
+          connection,
+        });
+
+  return { transaction: resultTransaction, createAccountsCost, destinationRef };
 }
