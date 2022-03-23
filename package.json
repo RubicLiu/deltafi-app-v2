@@ -66,6 +66,7 @@
   },
   "scripts": {
     "start": "PORT=3001 ESLINT_NO_DEV_ERRORS=true REACT_APP_DEPLOYMENT_MODE=mainnet-test react-scripts start",
+    "start-dev-2": "PORT=3001 ESLINT_NO_DEV_ERRORS=true REACT_APP_DEPLOYMENT_MODE=mainnet-test-2 react-scripts start",
     "build": "GENERATE_SOURCEMAP=false REACT_APP_DEPLOYMENT_MODE=mainnet-prod react-scripts build",
     "build-dev": "REACT_APP_DEPLOYMENT_MODE=mainnet-test DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",
     "build-dev-2": "REACT_APP_DEPLOYMENT_MODE=mainnet-test-2 DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",

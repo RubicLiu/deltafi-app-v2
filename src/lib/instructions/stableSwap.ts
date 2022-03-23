@@ -15,6 +15,7 @@ export enum StableSwapInstruction {
   Swap,
   Deposit,
   Withdraw,
+  SwapV2,
 }
 
 export const createStableSwapInstruction = (
@@ -158,6 +159,64 @@ export const createStableWithdrawInstruction = (
     {
       instruction: StableSwapInstruction.Withdraw,
       withdrawData,
+    },
+    data,
+  );
+
+  return new TransactionInstruction({
+    keys,
+    programId,
+    data,
+  });
+};
+
+export const createStableSwapV2Instruction = (
+  config: PublicKey,
+  tokenSwap: PublicKey,
+  marketAuthority: PublicKey,
+  swapAuthority: PublicKey,
+  userTransferAuthority: PublicKey,
+  source: PublicKey,
+  swapSource: PublicKey,
+  swapDestination: PublicKey,
+  destination: PublicKey,
+  rewardToken: PublicKey,
+  sourceRewardToken: PublicKey,
+  adminFeeDestination: PublicKey,
+  swapData: SwapData,
+  programId: PublicKey,
+  userReferrerData?: PublicKey,
+  referrer?: PublicKey,
+) => {
+  let extraReferrerAccounts = [];
+  if (userReferrerData && referrer) {
+    extraReferrerAccounts = [
+      { pubkey: userReferrerData, isSigner: false, isWritable: false },
+      { pubkey: referrer, isSigner: false, isWritable: true },
+    ];
+  }
+  const keys = [
+    { pubkey: config, isSigner: false, isWritable: false },
+    { pubkey: tokenSwap, isSigner: false, isWritable: true },
+    { pubkey: marketAuthority, isSigner: false, isWritable: false },
+    { pubkey: swapAuthority, isSigner: false, isWritable: false },
+    { pubkey: userTransferAuthority, isSigner: true, isWritable: false },
+    { pubkey: source, isSigner: false, isWritable: true },
+    { pubkey: swapSource, isSigner: false, isWritable: true },
+    { pubkey: swapDestination, isSigner: false, isWritable: true },
+    { pubkey: destination, isSigner: false, isWritable: true },
+    { pubkey: rewardToken, isSigner: false, isWritable: true },
+    { pubkey: sourceRewardToken, isSigner: false, isWritable: true },
+    { pubkey: adminFeeDestination, isSigner: false, isWritable: true },
+    { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+  ].concat(extraReferrerAccounts);
+
+  const dataLayout = struct([u8("instruction"), SwapDataLayout]);
+  const data = Buffer.alloc(dataLayout.span);
+  dataLayout.encode(
+    {
+      instruction: StableSwapInstruction.SwapV2,
+      swapData,
     },
     data,
   );
