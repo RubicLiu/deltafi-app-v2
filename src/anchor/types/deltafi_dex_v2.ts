@@ -1,0 +1,3827 @@
+export type DeltafiDexV2 = {
+  "version": "0.1.0",
+  "name": "deltafi_dex_v2",
+  "instructions": [
+    {
+      "name": "createMarketConfig",
+      "accounts": [
+        {
+          "name": "seed",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marketConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiToken",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pythProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "createSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "seed",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mintA",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintB",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "adminFeeTokenA",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "adminFeeTokenB",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "swapType",
+          "type": {
+            "defined": "SwapType"
+          }
+        },
+        {
+          "name": "swapConfig",
+          "type": {
+            "defined": "SwapConfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateSwapConfig",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "swapConfig",
+          "type": {
+            "defined": "SwapConfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initNormalSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceA",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceB",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountA",
+          "type": "u64"
+        },
+        {
+          "name": "amountB",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initStableSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountA",
+          "type": "u64"
+        },
+        {
+          "name": "amountB",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "swap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceA",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceB",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountIn",
+          "type": "u64"
+        },
+        {
+          "name": "minAmountOut",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "stableSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountIn",
+          "type": "u64"
+        },
+        {
+          "name": "minAmountOut",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositToSwap",
+      "accounts": [
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountA",
+          "type": "u64"
+        },
+        {
+          "name": "amountB",
+          "type": "u64"
+        },
+        {
+          "name": "minLpAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawFromSwap",
+      "accounts": [
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminFeeTokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminFeeTokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "lpAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minAmountA",
+          "type": "u64"
+        },
+        {
+          "name": "minAmountB",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "setReferrer",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userReferrerData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerToken",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "createFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lpToken",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "farmConfig",
+          "type": {
+            "defined": "FarmConfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateFarmConfig",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "farmConfig",
+          "type": {
+            "defined": "FarmConfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createFarmUser",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "depositToFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawFromFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "claimFarmRewards",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "farmInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpToken",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "reservedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "farmConfig",
+            "type": {
+              "defined": "FarmConfig"
+            }
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u64",
+                8
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "farmUser",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "farmKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "position",
+            "type": {
+              "defined": "FarmPosition"
+            }
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u64",
+                8
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "marketConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "adminKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "deltafiMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "deltafiToken",
+            "type": "publicKey"
+          },
+          {
+            "name": "pythProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "reservedU64",
+            "type": {
+              "array": [
+                "u8",
+                16
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "userReferrerData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "swapInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "swapType",
+            "type": {
+              "defined": "SwapType"
+            }
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintA",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintB",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenA",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenB",
+            "type": "publicKey"
+          },
+          {
+            "name": "adminFeeTokenA",
+            "type": "publicKey"
+          },
+          {
+            "name": "adminFeeTokenB",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintADecimals",
+            "type": "u8"
+          },
+          {
+            "name": "mintBDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "pythPriceA",
+            "type": "publicKey"
+          },
+          {
+            "name": "pythPriceB",
+            "type": "publicKey"
+          },
+          {
+            "name": "poolState",
+            "type": {
+              "defined": "PoolState"
+            }
+          },
+          {
+            "name": "swapConfig",
+            "type": {
+              "defined": "SwapConfig"
+            }
+          },
+          {
+            "name": "reservedU64",
+            "type": {
+              "array": [
+                "u8",
+                16
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "PoolState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "marketPrice",
+            "type": "u128"
+          },
+          {
+            "name": "baseReserve",
+            "type": "u128"
+          },
+          {
+            "name": "quoteReserve",
+            "type": "u128"
+          },
+          {
+            "name": "baseTarget",
+            "type": "u128"
+          },
+          {
+            "name": "quoteTarget",
+            "type": "u128"
+          },
+          {
+            "name": "totalSupply",
+            "type": "u64"
+          },
+          {
+            "name": "multiplier",
+            "type": {
+              "defined": "Multiplier"
+            }
+          },
+          {
+            "name": "lastPythPrice",
+            "type": "u128"
+          },
+          {
+            "name": "lastValidPythPriceSlot",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FarmConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "aprNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "aprDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "minClaimPeriod",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FarmPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "depositedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "rewardsOwed",
+            "type": "u64"
+          },
+          {
+            "name": "rewardsEstimated",
+            "type": "u64"
+          },
+          {
+            "name": "cumulativeInterest",
+            "type": "u64"
+          },
+          {
+            "name": "lastUpdateTs",
+            "type": "i64"
+          },
+          {
+            "name": "nextClaimTs",
+            "type": "i64"
+          },
+          {
+            "name": "latestDepositSlot",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SwapConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isPaused",
+            "type": "bool"
+          },
+          {
+            "name": "maxSwapPercentage",
+            "type": "u8"
+          },
+          {
+            "name": "slope",
+            "type": "u128"
+          },
+          {
+            "name": "adminTradeFeeNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "adminTradeFeeDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "adminWithdrawFeeNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "adminWithdrawFeeDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "tradeFeeNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "tradeFeeDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawFeeNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawFeeDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "tradeRewardNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "tradeRewardDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "tradeRewardCap",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Multiplier",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "One"
+          },
+          {
+            "name": "AboveOne"
+          },
+          {
+            "name": "BelowOne"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SwapDirection",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SellBase"
+          },
+          {
+            "name": "SellQuote"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccountType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unknown"
+          },
+          {
+            "name": "Mapping"
+          },
+          {
+            "name": "Product"
+          },
+          {
+            "name": "Price"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PriceStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unknown"
+          },
+          {
+            "name": "Trading"
+          },
+          {
+            "name": "Halted"
+          },
+          {
+            "name": "Auction"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CorpAction",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NoCorpAct"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PriceType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unknown"
+          },
+          {
+            "name": "Price"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SwapType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Normal"
+          },
+          {
+            "name": "Stable"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "AlreadyInUse",
+      "msg": "Swap account already in use"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidAdmin",
+      "msg": "Address of the admin fee account is incorrect"
+    },
+    {
+      "code": 6002,
+      "name": "ActiveTransfer",
+      "msg": "Active admin transfer in progress"
+    },
+    {
+      "code": 6003,
+      "name": "NoActiveTransfer",
+      "msg": "No active admin transfer in progress"
+    },
+    {
+      "code": 6004,
+      "name": "AdminDeadlineExceeded",
+      "msg": "Admin transfer deadline exceeded"
+    },
+    {
+      "code": 6005,
+      "name": "Unauthorized",
+      "msg": "Account is not authorized to execute this instruction"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidAccountOwner",
+      "msg": "Input account owner is not the program"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidOwner",
+      "msg": "Input account owner is not the program address"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidSigner",
+      "msg": "Input account must be signer"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidOutputOwner",
+      "msg": "Output pool account owner cannot be the program address"
+    },
+    {
+      "code": 6010,
+      "name": "IncorrectSwapAccount",
+      "msg": "Address of the provided swap token account is incorrect"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidProgramAddress",
+      "msg": "Invalid program address generated from nonce and key"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidCloseAuthority",
+      "msg": "Token account has a close authority"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidFreezeAuthority",
+      "msg": "Pool token mint has a freeze authority"
+    },
+    {
+      "code": 6014,
+      "name": "IncorrectTokenProgramId",
+      "msg": "Incorrect token program ID"
+    },
+    {
+      "code": 6015,
+      "name": "IncorrectMint",
+      "msg": "Address of the provided token mint is incorrect"
+    },
+    {
+      "code": 6016,
+      "name": "UnexpectedMint",
+      "msg": "Deserialized account is not an SPL Token mint"
+    },
+    {
+      "code": 6017,
+      "name": "RepeatedMint",
+      "msg": "Swap input token accounts have the same mint"
+    },
+    {
+      "code": 6018,
+      "name": "ExpectedAccount",
+      "msg": "Deserialized account is not an SPL Token account"
+    },
+    {
+      "code": 6019,
+      "name": "InvalidInstruction",
+      "msg": "Invalid instruction"
+    },
+    {
+      "code": 6020,
+      "name": "InstructionUnpackError",
+      "msg": "Instruction unpack is failed"
+    },
+    {
+      "code": 6021,
+      "name": "EmptyPool",
+      "msg": "Pool token supply is 0"
+    },
+    {
+      "code": 6022,
+      "name": "EmptySupply",
+      "msg": "Input token account empty"
+    },
+    {
+      "code": 6023,
+      "name": "InvalidSupply",
+      "msg": "Pool token mint has a non-zero supply"
+    },
+    {
+      "code": 6024,
+      "name": "InvalidDelegate",
+      "msg": "Token account has a delegate"
+    },
+    {
+      "code": 6025,
+      "name": "InvalidInput",
+      "msg": "InvalidInput"
+    },
+    {
+      "code": 6026,
+      "name": "IsPaused",
+      "msg": "Swap pool is paused"
+    },
+    {
+      "code": 6027,
+      "name": "NotRentExempt",
+      "msg": "Lamport balance below rent-exempt threshold"
+    },
+    {
+      "code": 6028,
+      "name": "CalculationFailure",
+      "msg": "CalculationFailure"
+    },
+    {
+      "code": 6029,
+      "name": "ExceededSlippage",
+      "msg": "Swap instruction exceeds desired slippage limit"
+    },
+    {
+      "code": 6030,
+      "name": "MismatchedDecimals",
+      "msg": "Token mints must have same decimals"
+    },
+    {
+      "code": 6031,
+      "name": "InvalidPythConfig",
+      "msg": "Input pyth config is invalid"
+    },
+    {
+      "code": 6032,
+      "name": "InsufficientLiquidity",
+      "msg": "Insufficient liquidity available"
+    },
+    {
+      "code": 6033,
+      "name": "LiquidityPositionEmpty",
+      "msg": "User has no liquidity position"
+    },
+    {
+      "code": 6034,
+      "name": "InvalidPositionKey",
+      "msg": "Invalid position key"
+    },
+    {
+      "code": 6035,
+      "name": "InvalidClaimTime",
+      "msg": "Invalid claim timestamp"
+    },
+    {
+      "code": 6036,
+      "name": "InsufficientClaimAmount",
+      "msg": "Insufficient claim amount"
+    },
+    {
+      "code": 6037,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds"
+    },
+    {
+      "code": 6038,
+      "name": "WithdrawNotEnough",
+      "msg": "Withdraw not enough"
+    },
+    {
+      "code": 6039,
+      "name": "TokenInitializeMintFailed",
+      "msg": "Mint initialization failed"
+    },
+    {
+      "code": 6040,
+      "name": "InvalidSlope",
+      "msg": "Invalid slope"
+    },
+    {
+      "code": 6041,
+      "name": "InvalidAccount",
+      "msg": "Invalid account"
+    },
+    {
+      "code": 6042,
+      "name": "TokenTransferFailed",
+      "msg": "Token transfer failed"
+    },
+    {
+      "code": 6043,
+      "name": "TokenMintToFailed",
+      "msg": "Token mint to failed"
+    },
+    {
+      "code": 6044,
+      "name": "TokenBurnFailed",
+      "msg": "Token burn failed"
+    },
+    {
+      "code": 6045,
+      "name": "StalePythPrice",
+      "msg": "Stale pyth price"
+    },
+    {
+      "code": 6046,
+      "name": "UnstablePythPrice",
+      "msg": "Unstable pyth price"
+    },
+    {
+      "code": 6047,
+      "name": "InconfidentPythPrice",
+      "msg": "Pyth confidence interval is too large"
+    },
+    {
+      "code": 6048,
+      "name": "IndexOutOfRange",
+      "msg": "Index of out rage"
+    },
+    {
+      "code": 6049,
+      "name": "InvalidMarketConfig",
+      "msg": "Input market config is invalid"
+    },
+    {
+      "code": 6050,
+      "name": "InvalidPythProgramId",
+      "msg": "Pyth program id is invalid"
+    },
+    {
+      "code": 6051,
+      "name": "PotentialFlashLoanAttack",
+      "msg": "Potential Flash Loan Attack"
+    },
+    {
+      "code": 6052,
+      "name": "IncorrectSwapType",
+      "msg": "Incorrect swap type"
+    },
+    {
+      "code": 6053,
+      "name": "IncorrectStablePrice",
+      "msg": "Incorrect stable price"
+    },
+    {
+      "code": 6054,
+      "name": "InvalidTokenDecimals",
+      "msg": "Invalid token decimals"
+    },
+    {
+      "code": 6055,
+      "name": "InconsistentPoolState",
+      "msg": "Inconsistent pool state"
+    },
+    {
+      "code": 6056,
+      "name": "InvalidReferrer",
+      "msg": "Invalid referrer address"
+    },
+    {
+      "code": 6057,
+      "name": "InconsistentInitialPoolTokenBalance",
+      "msg": "Inconsistent initial pool token balance"
+    },
+    {
+      "code": 6058,
+      "name": "ExceededSwapOutAmount",
+      "msg": "Swap out amount exceeds the limit"
+    },
+    {
+      "code": 6059,
+      "name": "AlreadyInitialized",
+      "msg": "Already initialized"
+    },
+    {
+      "code": 6060,
+      "name": "NotInitialized",
+      "msg": "Not initialized"
+    },
+    {
+      "code": 6061,
+      "name": "InvalidSwapConfig",
+      "msg": "Invalid swap config"
+    },
+    {
+      "code": 6062,
+      "name": "InvalidFarmConfig",
+      "msg": "Invalid farm config"
+    }
+  ]
+};
+
+export const IDL: DeltafiDexV2 = {
+  "version": "0.1.0",
+  "name": "deltafi_dex_v2",
+  "instructions": [
+    {
+      "name": "createMarketConfig",
+      "accounts": [
+        {
+          "name": "seed",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "marketConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiToken",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pythProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "createSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "seed",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mintA",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintB",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "adminFeeTokenA",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "adminFeeTokenB",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "swapType",
+          "type": {
+            "defined": "SwapType"
+          }
+        },
+        {
+          "name": "swapConfig",
+          "type": {
+            "defined": "SwapConfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateSwapConfig",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "swapConfig",
+          "type": {
+            "defined": "SwapConfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "initNormalSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceA",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceB",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountA",
+          "type": "u64"
+        },
+        {
+          "name": "amountB",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initStableSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountA",
+          "type": "u64"
+        },
+        {
+          "name": "amountB",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "swap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceA",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceB",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountIn",
+          "type": "u64"
+        },
+        {
+          "name": "minAmountOut",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "stableSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountIn",
+          "type": "u64"
+        },
+        {
+          "name": "minAmountOut",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositToSwap",
+      "accounts": [
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountA",
+          "type": "u64"
+        },
+        {
+          "name": "amountB",
+          "type": "u64"
+        },
+        {
+          "name": "minLpAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawFromSwap",
+      "accounts": [
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminFeeTokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminFeeTokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "lpAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minAmountA",
+          "type": "u64"
+        },
+        {
+          "name": "minAmountB",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "setReferrer",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userReferrerData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerToken",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "createFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lpToken",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "farmConfig",
+          "type": {
+            "defined": "FarmConfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateFarmConfig",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "farmConfig",
+          "type": {
+            "defined": "FarmConfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createFarmUser",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "depositToFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawFromFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userLpToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "claimFarmRewards",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "farmInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpToken",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "reservedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "farmConfig",
+            "type": {
+              "defined": "FarmConfig"
+            }
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u64",
+                8
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "farmUser",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "farmKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "position",
+            "type": {
+              "defined": "FarmPosition"
+            }
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u64",
+                8
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "marketConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "adminKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "deltafiMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "deltafiToken",
+            "type": "publicKey"
+          },
+          {
+            "name": "pythProgramId",
+            "type": "publicKey"
+          },
+          {
+            "name": "reservedU64",
+            "type": {
+              "array": [
+                "u8",
+                16
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "userReferrerData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "swapInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "seed",
+            "type": "publicKey"
+          },
+          {
+            "name": "swapType",
+            "type": {
+              "defined": "SwapType"
+            }
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintA",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintB",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenA",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenB",
+            "type": "publicKey"
+          },
+          {
+            "name": "adminFeeTokenA",
+            "type": "publicKey"
+          },
+          {
+            "name": "adminFeeTokenB",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintADecimals",
+            "type": "u8"
+          },
+          {
+            "name": "mintBDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "pythPriceA",
+            "type": "publicKey"
+          },
+          {
+            "name": "pythPriceB",
+            "type": "publicKey"
+          },
+          {
+            "name": "poolState",
+            "type": {
+              "defined": "PoolState"
+            }
+          },
+          {
+            "name": "swapConfig",
+            "type": {
+              "defined": "SwapConfig"
+            }
+          },
+          {
+            "name": "reservedU64",
+            "type": {
+              "array": [
+                "u8",
+                16
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "PoolState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "marketPrice",
+            "type": "u128"
+          },
+          {
+            "name": "baseReserve",
+            "type": "u128"
+          },
+          {
+            "name": "quoteReserve",
+            "type": "u128"
+          },
+          {
+            "name": "baseTarget",
+            "type": "u128"
+          },
+          {
+            "name": "quoteTarget",
+            "type": "u128"
+          },
+          {
+            "name": "totalSupply",
+            "type": "u64"
+          },
+          {
+            "name": "multiplier",
+            "type": {
+              "defined": "Multiplier"
+            }
+          },
+          {
+            "name": "lastPythPrice",
+            "type": "u128"
+          },
+          {
+            "name": "lastValidPythPriceSlot",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FarmConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "aprNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "aprDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "minClaimPeriod",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FarmPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "depositedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "rewardsOwed",
+            "type": "u64"
+          },
+          {
+            "name": "rewardsEstimated",
+            "type": "u64"
+          },
+          {
+            "name": "cumulativeInterest",
+            "type": "u64"
+          },
+          {
+            "name": "lastUpdateTs",
+            "type": "i64"
+          },
+          {
+            "name": "nextClaimTs",
+            "type": "i64"
+          },
+          {
+            "name": "latestDepositSlot",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SwapConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isPaused",
+            "type": "bool"
+          },
+          {
+            "name": "maxSwapPercentage",
+            "type": "u8"
+          },
+          {
+            "name": "slope",
+            "type": "u128"
+          },
+          {
+            "name": "adminTradeFeeNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "adminTradeFeeDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "adminWithdrawFeeNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "adminWithdrawFeeDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "tradeFeeNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "tradeFeeDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawFeeNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawFeeDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "tradeRewardNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "tradeRewardDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "tradeRewardCap",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Multiplier",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "One"
+          },
+          {
+            "name": "AboveOne"
+          },
+          {
+            "name": "BelowOne"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SwapDirection",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SellBase"
+          },
+          {
+            "name": "SellQuote"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccountType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unknown"
+          },
+          {
+            "name": "Mapping"
+          },
+          {
+            "name": "Product"
+          },
+          {
+            "name": "Price"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PriceStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unknown"
+          },
+          {
+            "name": "Trading"
+          },
+          {
+            "name": "Halted"
+          },
+          {
+            "name": "Auction"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CorpAction",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NoCorpAct"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PriceType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unknown"
+          },
+          {
+            "name": "Price"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SwapType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Normal"
+          },
+          {
+            "name": "Stable"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "AlreadyInUse",
+      "msg": "Swap account already in use"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidAdmin",
+      "msg": "Address of the admin fee account is incorrect"
+    },
+    {
+      "code": 6002,
+      "name": "ActiveTransfer",
+      "msg": "Active admin transfer in progress"
+    },
+    {
+      "code": 6003,
+      "name": "NoActiveTransfer",
+      "msg": "No active admin transfer in progress"
+    },
+    {
+      "code": 6004,
+      "name": "AdminDeadlineExceeded",
+      "msg": "Admin transfer deadline exceeded"
+    },
+    {
+      "code": 6005,
+      "name": "Unauthorized",
+      "msg": "Account is not authorized to execute this instruction"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidAccountOwner",
+      "msg": "Input account owner is not the program"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidOwner",
+      "msg": "Input account owner is not the program address"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidSigner",
+      "msg": "Input account must be signer"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidOutputOwner",
+      "msg": "Output pool account owner cannot be the program address"
+    },
+    {
+      "code": 6010,
+      "name": "IncorrectSwapAccount",
+      "msg": "Address of the provided swap token account is incorrect"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidProgramAddress",
+      "msg": "Invalid program address generated from nonce and key"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidCloseAuthority",
+      "msg": "Token account has a close authority"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidFreezeAuthority",
+      "msg": "Pool token mint has a freeze authority"
+    },
+    {
+      "code": 6014,
+      "name": "IncorrectTokenProgramId",
+      "msg": "Incorrect token program ID"
+    },
+    {
+      "code": 6015,
+      "name": "IncorrectMint",
+      "msg": "Address of the provided token mint is incorrect"
+    },
+    {
+      "code": 6016,
+      "name": "UnexpectedMint",
+      "msg": "Deserialized account is not an SPL Token mint"
+    },
+    {
+      "code": 6017,
+      "name": "RepeatedMint",
+      "msg": "Swap input token accounts have the same mint"
+    },
+    {
+      "code": 6018,
+      "name": "ExpectedAccount",
+      "msg": "Deserialized account is not an SPL Token account"
+    },
+    {
+      "code": 6019,
+      "name": "InvalidInstruction",
+      "msg": "Invalid instruction"
+    },
+    {
+      "code": 6020,
+      "name": "InstructionUnpackError",
+      "msg": "Instruction unpack is failed"
+    },
+    {
+      "code": 6021,
+      "name": "EmptyPool",
+      "msg": "Pool token supply is 0"
+    },
+    {
+      "code": 6022,
+      "name": "EmptySupply",
+      "msg": "Input token account empty"
+    },
+    {
+      "code": 6023,
+      "name": "InvalidSupply",
+      "msg": "Pool token mint has a non-zero supply"
+    },
+    {
+      "code": 6024,
+      "name": "InvalidDelegate",
+      "msg": "Token account has a delegate"
+    },
+    {
+      "code": 6025,
+      "name": "InvalidInput",
+      "msg": "InvalidInput"
+    },
+    {
+      "code": 6026,
+      "name": "IsPaused",
+      "msg": "Swap pool is paused"
+    },
+    {
+      "code": 6027,
+      "name": "NotRentExempt",
+      "msg": "Lamport balance below rent-exempt threshold"
+    },
+    {
+      "code": 6028,
+      "name": "CalculationFailure",
+      "msg": "CalculationFailure"
+    },
+    {
+      "code": 6029,
+      "name": "ExceededSlippage",
+      "msg": "Swap instruction exceeds desired slippage limit"
+    },
+    {
+      "code": 6030,
+      "name": "MismatchedDecimals",
+      "msg": "Token mints must have same decimals"
+    },
+    {
+      "code": 6031,
+      "name": "InvalidPythConfig",
+      "msg": "Input pyth config is invalid"
+    },
+    {
+      "code": 6032,
+      "name": "InsufficientLiquidity",
+      "msg": "Insufficient liquidity available"
+    },
+    {
+      "code": 6033,
+      "name": "LiquidityPositionEmpty",
+      "msg": "User has no liquidity position"
+    },
+    {
+      "code": 6034,
+      "name": "InvalidPositionKey",
+      "msg": "Invalid position key"
+    },
+    {
+      "code": 6035,
+      "name": "InvalidClaimTime",
+      "msg": "Invalid claim timestamp"
+    },
+    {
+      "code": 6036,
+      "name": "InsufficientClaimAmount",
+      "msg": "Insufficient claim amount"
+    },
+    {
+      "code": 6037,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds"
+    },
+    {
+      "code": 6038,
+      "name": "WithdrawNotEnough",
+      "msg": "Withdraw not enough"
+    },
+    {
+      "code": 6039,
+      "name": "TokenInitializeMintFailed",
+      "msg": "Mint initialization failed"
+    },
+    {
+      "code": 6040,
+      "name": "InvalidSlope",
+      "msg": "Invalid slope"
+    },
+    {
+      "code": 6041,
+      "name": "InvalidAccount",
+      "msg": "Invalid account"
+    },
+    {
+      "code": 6042,
+      "name": "TokenTransferFailed",
+      "msg": "Token transfer failed"
+    },
+    {
+      "code": 6043,
+      "name": "TokenMintToFailed",
+      "msg": "Token mint to failed"
+    },
+    {
+      "code": 6044,
+      "name": "TokenBurnFailed",
+      "msg": "Token burn failed"
+    },
+    {
+      "code": 6045,
+      "name": "StalePythPrice",
+      "msg": "Stale pyth price"
+    },
+    {
+      "code": 6046,
+      "name": "UnstablePythPrice",
+      "msg": "Unstable pyth price"
+    },
+    {
+      "code": 6047,
+      "name": "InconfidentPythPrice",
+      "msg": "Pyth confidence interval is too large"
+    },
+    {
+      "code": 6048,
+      "name": "IndexOutOfRange",
+      "msg": "Index of out rage"
+    },
+    {
+      "code": 6049,
+      "name": "InvalidMarketConfig",
+      "msg": "Input market config is invalid"
+    },
+    {
+      "code": 6050,
+      "name": "InvalidPythProgramId",
+      "msg": "Pyth program id is invalid"
+    },
+    {
+      "code": 6051,
+      "name": "PotentialFlashLoanAttack",
+      "msg": "Potential Flash Loan Attack"
+    },
+    {
+      "code": 6052,
+      "name": "IncorrectSwapType",
+      "msg": "Incorrect swap type"
+    },
+    {
+      "code": 6053,
+      "name": "IncorrectStablePrice",
+      "msg": "Incorrect stable price"
+    },
+    {
+      "code": 6054,
+      "name": "InvalidTokenDecimals",
+      "msg": "Invalid token decimals"
+    },
+    {
+      "code": 6055,
+      "name": "InconsistentPoolState",
+      "msg": "Inconsistent pool state"
+    },
+    {
+      "code": 6056,
+      "name": "InvalidReferrer",
+      "msg": "Invalid referrer address"
+    },
+    {
+      "code": 6057,
+      "name": "InconsistentInitialPoolTokenBalance",
+      "msg": "Inconsistent initial pool token balance"
+    },
+    {
+      "code": 6058,
+      "name": "ExceededSwapOutAmount",
+      "msg": "Swap out amount exceeds the limit"
+    },
+    {
+      "code": 6059,
+      "name": "AlreadyInitialized",
+      "msg": "Already initialized"
+    },
+    {
+      "code": 6060,
+      "name": "NotInitialized",
+      "msg": "Not initialized"
+    },
+    {
+      "code": 6061,
+      "name": "InvalidSwapConfig",
+      "msg": "Invalid swap config"
+    },
+    {
+      "code": 6062,
+      "name": "InvalidFarmConfig",
+      "msg": "Invalid farm config"
+    }
+  ]
+};
