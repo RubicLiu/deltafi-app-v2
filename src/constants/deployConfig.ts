@@ -18,10 +18,13 @@ export type PoolConfig = {
   farm: string;
   token: string;
   decimals: number;
+  serumMarket: string;
 };
 
-export const poolConfigs: PoolConfig[] = deployConfig.poolInfo;
-
+// ignore pool with serumMarket address for now
+export const poolConfigs: PoolConfig[] = deployConfig.poolInfo.filter(
+  (info) => info.serumMarket === undefined,
+);
 export function getPoolConfigByFarmPoolKey(farmPoolKey: String): PoolConfig {
   return poolConfigs.find(({ farm }) => farm === farmPoolKey);
 }
@@ -52,7 +55,10 @@ export type TokenConfig = {
   decimals: number;
 };
 
-export const tokenConfigs: TokenConfig[] = deployConfig.tokenInfo;
+// ignore token without pyth for now
+export const tokenConfigs: TokenConfig[] = deployConfig.tokenInfo.filter(
+  (info) => info.pyth !== undefined,
+);
 export const lpTokenConfigs: TokenConfig[] = poolConfigs.map(({ name, mint, decimals }) => ({
   pyth: null,
   mint,

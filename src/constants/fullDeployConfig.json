@@ -579,20 +579,31 @@
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swap": "38Nt4kn9XQM5UFy7jGxRYFzv41ZkBeP1AXFXbNm5d6cz",
-        "mint": "4c7fpkdNuCTUiLo4xRcwLwdUgPsUno2r6wcEequL9ruH",
-        "farm": "4bacTZ9TBakuAUEA27VB4VfPAksMCBhk3PRtMxbu2dhH",
-        "token": "J2nUD8VmkXZiXDWwjkoAHzxyAzjbZNJNuxWgjvUw3rwU",
+        "swap": "BnGsJnNJHjMuBTXtpABMDJT7RYfWRPhAXFh8RmZPpgq7",
+        "mint": "7gmfJUE4Zw7CgBBWwr2agcjouxWcE1ZwdfyUxMEVfGqj",
+        "farm": "GJk5kcnSgw3RFUNrogKEbVT5dyTUTtUkQqJjoXWmKGKC",
+        "token": "AgQaFTAqnmNvDoNCLtcPJodm4vudABaWiEaciGDz3JDp",
         "decimals": 9
+      },
+      {
+        "name": "soLINK-USDT",
+        "base": "soLINK",
+        "quote": "USDT",
+        "swap": "DR6iYsvZBUiURxMm1zw8srcB48fEwXChjsLdMdRgC1gy",
+        "mint": "C4cMRMryUZHGtFHXsS2TeVMr24niq3R1onsinZ4cb4Jt",
+        "farm": "o2qLefTkJKtWLmKirWKpgFd4ceUxVNGtwLJgQRaTB5w",
+        "token": "8jJrXPJ5SzVVSQKiZ3LscFMdQfDPnQYW9rkeLbenrgLz",
+        "decimals": 6,
+        "serumMarket": "3yEZ9ZpXSQapmKjLAGKZEzUNA1rcupJtsDp5mPBWmGZR"
       },
       {
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swap": "FvJeMERGhv66LmY8rpr6hPuRk9juZ9DQ241HAKJRXPhs",
-        "mint": "3nhZMBwWJ3Avq5LUPap2WrU7T2uzAQ9M96wfgp4SjJ13",
-        "farm": "EKDV9mn5n6BNEQychXH6jSJXrE5Pg6vsgV8ci4KCsGh1",
-        "token": "rgQrjt5H1gi3ydvodcKv6ANcUV3uTLgDUcXbBtgGGQE",
+        "swap": "9SEf6MrN9erqnDYVvVxmMSQZuVMSi6w7pG7NtFaL8fbT",
+        "mint": "FyrGd8VaQJRQEbMiTpCEefexL7qSfvaTkSsAyM8nEXLM",
+        "farm": "9AnZSW8Raed9J4yrKMF75RhqXMKKPkqxAHAUVMeN4qjA",
+        "token": "EisjYKLCEn3N71yZwxETr3iyr4SyA3RrPVEdFvbYDM5k",
         "decimals": 6
       }
     ],
@@ -632,6 +643,13 @@
         "decimals": 6,
         "name": "USDT",
         "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg"
+      },
+      {
+        "mint": "CWE8jPTUYhdCTZYWPTe1o5DFqfdjzWKc9WKz6rSjQUdG",
+        "symbol": "soLINK",
+        "decimals": 6,
+        "name": "Wrapped Chainlink (Sollet)",
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/CWE8jPTUYhdCTZYWPTe1o5DFqfdjzWKc9WKz6rSjQUdG/logo.png"
       }
     ]
   }
