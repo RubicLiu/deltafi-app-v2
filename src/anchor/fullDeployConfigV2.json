@@ -11,19 +11,15 @@
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "6DgtSdrmDhEYao7UfRpexzps6YZiKuBzTCfXqUhjAPA8",
-        "lpMint": "FSD6ciFQsjyVqcbwMmcWNEXKpLPcDNHHWAz5Km32XuWh",
-        "farmInfo": "Ea38cAqJJzEuCy5ZpwiQ15wpnsbfxJd9Nv1KivRWxEAr",
-        "lpToken": "AUDaoVH1UwFgMJ4uJXjpxLCq1MctHYGnmn1zU4UA9mqk"
+        "swapInfo": "GZgjDDJhJ1uRsMhe7n6UBbznaVoVSdXe87PErhcnYWuG",
+        "farmInfo": "3UPrCoKGq7F5q1ReetASP7nzuTRPhxKQKWMmMLwt7n6A"
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "FRj1kzEVLCpg3ujy7drFfKNfFPm1Tk1ShmL31bfUmwCw",
-        "lpMint": "781DGPKHYv1qBGqqXza4DncCrq6Jxqz4wTUAF8Bh1Kzc",
-        "farmInfo": "Ge2VCPapD2gfLjWP1HnegkJei412oy6FXY7dUUjA3VZ1",
-        "lpToken": "DBDSA3GydBgHRW7qGP6oUgXsN3aGg7tF1mNbddgfNxwj"
+        "swapInfo": "DD2j4iFH4rL3nGzRvT9Z5KHYuEiZP3nWhqi9bJyhf2fR",
+        "farmInfo": "5iBrByUm2NRzFs8Gkrq79KsBxxB7VWgF4oCJfT8V9b9w"
       }
     ],
     "tokenInfoList": [
