@@ -15,6 +15,13 @@ export enum SwapType {
   Stable,
 }
 
+export enum OraclePriority {
+  /// Only use Oracle from PYTH
+  PYTH_ONLY = 0,
+  /// Only use Oracle from SERUM
+  SERUM_ONLY = 1,
+}
+
 export interface SwapInfo {
   isInitialized: boolean;
   isPaused: boolean;
@@ -33,6 +40,11 @@ export interface SwapInfo {
   fees: Fees;
   rewards: Rewards;
   poolState: PoolState;
+  tokenADecimals: number;
+  tokenBDecimals: number;
+  swapOutLimitPercentage: number;
+  oraclePriorityFlags: number;
+  serumCombinedAddress: PublicKey;
 }
 
 /** @internal */
@@ -55,7 +67,12 @@ export const SwapInfoLayout = struct<SwapInfo>(
     FeesLayout("fees"),
     RewardsLayout("rewards"),
     PoolStateLayout("poolState"),
-    blob(64, "reserved"),
+    u8("tokenADecimals"),
+    u8("tokenBDecimals"),
+    u8("swapOutLimitPercentage"),
+    u8("oraclePriorityFlags"),
+    publicKey("serumCombinedAddress"),
+    blob(28, "reserved"),
   ],
   "swapInfo",
 );

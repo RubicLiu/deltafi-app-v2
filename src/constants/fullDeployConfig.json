@@ -7,6 +7,7 @@
     "bumpSeed": 255,
     "deltafiTokenMint": "9zuKduFQR75Qv2YBea9cVufpqUAXSwq3vHiSeDUhF6XR",
     "deltafiToken": "3Xy1hdxWXrzXf9P7Nt2RR6P1ufN2JbisLmwAL22Tkgpf",
+    "serumProgramId": "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin",
     "poolInfo": [
       {
         "name": "SOL-USDC",
@@ -108,6 +109,7 @@
     "bumpSeed": 255,
     "deltafiTokenMint": "de1QJkP1qDCk5JYCCXCeq27bQQUdCaiv7xVKFrhPSzF",
     "deltafiToken": "J6NXoLLUwywpeDhSVbD2bawigPEmBGczgNq3dTAkA4fu",
+    "serumProgramId": "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin",
     "poolInfo": [
       {
         "name": "SOL-USDC",
@@ -117,7 +119,8 @@
         "mint": "8sxLm5bamigCgnZGVEx4WG2EeuaAkj6qYHZH8dJCLuEQ",
         "farm": "Bqzx8oFD8DQ9tgdrWm5Y6JtyLwdDokMmuRkWy3DuEymM",
         "token": "HCJXFFYjQgrUu5Jx3mzU3HD9hociQehSnZgySvvjyYMo",
-        "decimals": 9
+        "decimals": 9,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "SOL-SRM",
@@ -127,7 +130,8 @@
         "mint": "3mVYofMiCma455jvpEUHSTtVDBa9mSdPqDPVGXjdTd1n",
         "farm": "4Nr5czcrNM2jkX6jkcgeY557XQxqK3XihdVNZ6gcwZDP",
         "token": "ABsGeTefueyqEgABT86HhSDPehaFxc8aDF5hAfc21MpB",
-        "decimals": 9
+        "decimals": 9,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "SRM-USDC",
@@ -137,7 +141,8 @@
         "mint": "7pa4L3kCAhxGm7uwVESsBWXrpt6SVEbJCoDAwpQQ272w",
         "farm": "4rZWRLHHeVz9a3qm1H62aD74RhTSRpuJULdMoYEE6Tjz",
         "token": "7AAbRbDKZPf6mLiSjkiTLJqKpjgMjhUtXL3saktzJHaL",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "LUNA-USDC",
@@ -147,7 +152,8 @@
         "mint": "3AMgSMCx1yGbai3zgTrhi7Fn2FHWtwaB3fBkXyniY1vb",
         "farm": "Hx1KJHUTko7Mf2ND1oifLPxk3CUAKdbVuhBfCapZqmuk",
         "token": "JCo69Qc24zuGwas5SH8i4cpJsUDgZSMLACAwTzY3t8Nv",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "ETH-USDC",
@@ -157,7 +163,8 @@
         "mint": "77Qs5EjWs7AXWcHrNCdL7Lmbs5ECPVczGNdtfn4u39fQ",
         "farm": "2XoMLd64TVxGB1rwQEbzZ22oFpbuac3LT8FDgFQfk1sq",
         "token": "4Kdd2ZSYeokYSthKCjXGmfuTAercVYYG6JvPNA5roxk8",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "mSOL-USDC",
@@ -167,7 +174,8 @@
         "mint": "B5K3QLCTPD7wRiBvCCL6YiNrNBNSgjZGn7NUDxkrTPA",
         "farm": "8FE4fDaE7ssu3ZEubHsKhvPuJCVrp6daTucxfF2Q2nrM",
         "token": "3tTSJWN4UxvBQRNJNxsEwczwoQt1gnLaEQmySS6mcMgY",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "stSOL-USDC",
@@ -177,7 +185,8 @@
         "mint": "9oXjWYFJ94aqRnH6C23kGQFRr5PDyQQf2VaCrjtCKtg7",
         "farm": "7ryKwqBu5uJYo9enNi89qm6YJYwHo2mdiDxvP1hA4AzQ",
         "token": "GnMMKYTQDAN1ipCjA4uYkxxdBg5pxA3Je22y67hcsBBv",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "BTC-USDC",
@@ -187,7 +196,8 @@
         "mint": "5qyxLj1DE9WJ1HdvbRxeH5vKTuJtmXCE7YpZUduHhMwU",
         "farm": "8LRYG3B5cWpGgvLbeuaqzYKkvqvKrpHfcZbsTSk5eiYD",
         "token": "DPCLCqb3SthhMGURFH3rHRCB6iXoH45SH7ZkGysKvegw",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "soFTT-USDC",
@@ -197,7 +207,8 @@
         "mint": "DzUFsfbmfEtGoaVqB12j54mzxNmYE7CBcCycANZQCdhN",
         "farm": "3teoGmayuqynRnvePnCAFGRNNLkYvRdHk6h2iQK2U47A",
         "token": "12ZGP9XxB463jGNKfMkaeG3bmcC3Pxkty28HS35iGXpb",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "USDC-USDT",
@@ -341,6 +352,7 @@
     "bumpSeed": 255,
     "deltafiTokenMint": "tstpB7nAg8n7ynm5C5mfRkQ73Q8dSTcyxkjNvR2Bspt",
     "deltafiToken": "Cajir4DbVH8Gyj8E9EjuvxmrZj9ihZYVYZJ7RNH5uBQs",
+    "serumProgramId": "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin",
     "poolInfo": [
       {
         "name": "SOL-USDC",
@@ -350,7 +362,8 @@
         "mint": "DnRuYKY5d2Rw8PY5DfB6Q2DcKuUCMXcsd41yzcJGzzH8",
         "farm": "9J44Ex8PBvzeeTEPcwqeuZ4HJYswX8PFcdGBQpH6M3fD",
         "token": "AGvDuH6aYrbeetgttaMdtY9Jp5UidWpcGVVWXWSGf9GC",
-        "decimals": 9
+        "decimals": 9,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "SOL-SRM",
@@ -360,7 +373,8 @@
         "mint": "AYeBNmoFWFHMLtu8oJs9BkDt7Z2gqUCZEbFB3izryAHg",
         "farm": "DsEzfpo5YrPW5jCZVMddjMuze2sK7AgLyWSZrrGEgzPK",
         "token": "FSmiCZA6NTsMvqWSt2vV6XqcDX9ou3TtmS34KwLombKy",
-        "decimals": 9
+        "decimals": 9,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "SRM-USDC",
@@ -370,7 +384,8 @@
         "mint": "DGepQvYSGKP49mEk2P9dtTLKkqnjZ9Qg6fb4f9r9SSZ2",
         "farm": "64gEGuaACTLkzGFxYnhknj5ZLAURDvf8ut2jbjgJbQun",
         "token": "AmBamE89XLtF2ta12bYZajKhKjE4YXzg5rPAiF5J1SWL",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "LUNA-USDC",
@@ -380,7 +395,8 @@
         "mint": "9Dw3Q5CSonygdXgSRSDZrxBDusrXMpM5weELqUN1N5cr",
         "farm": "7oBB3ij6xmrTagfURSSjJAGMc9AsrUXmeYSrrQruMkhR",
         "token": "E752xak1AzxceRBc5jbo98oG7WCn9ZyaTbVAvLYYuSV8",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "ETH-USDC",
@@ -390,7 +406,8 @@
         "mint": "2AFdQuLLeitjFjxtgNbqAk1FaSGjSoYRQHcDKZYpRjkx",
         "farm": "9oiCK1imbLLk76YNYm5P4of8wHgEx3VCC9CS3b1Uhxk2",
         "token": "FrqwhgsMveYBdanmAj2TwybS9sXK4HzZRNV5d4Au6AMP",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "mSOL-USDC",
@@ -400,7 +417,8 @@
         "mint": "5xi2F2bW56GUpUoHfyz1enPVMKoutYuiWFo8mEPnLHZR",
         "farm": "3ecc2jzxgEQJzdwz1vTWTcaANhnNgTLA8As6QSztvVCA",
         "token": "2pwGw2mvQbheidgKuGRiJ8F7GXmytizxC8ssjMyPQKZ3",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "stSOL-USDC",
@@ -410,7 +428,8 @@
         "mint": "DTatec3S5ZsR1KBV3ePqn3rUfVXjZL7BNadU5GtrbXVD",
         "farm": "CpnzMuS2dtgktmgxra7mD1KHrSLF2jmXiGuoPE7G8EyQ",
         "token": "BFDMVrfmk3HescXrYC5peUeRAWN3RGP67kG6xZYRwMkJ",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "BTC-USDC",
@@ -420,7 +439,8 @@
         "mint": "25aDuiGRJguqtBkHFzd6FnMJ5zYRMUZVjjNtqWATTebg",
         "farm": "DNUPxzxEJvREPYWojP1U9nzaZS6gb15DVKG82h9Gd6ft",
         "token": "3GzDQVABsZtBQABCW7fuBweBSjAA41sdCCkWfN17d5Fc",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "soFTT-USDC",
@@ -430,7 +450,8 @@
         "mint": "E7RFqQRGg8VZJuvcVsNu9UqTgFxkStrvCZZHJ3H6KxNP",
         "farm": "BtuQEGR5SaR6psm8zVD5qzxiBSi9jMeTbLZpanq8Bpmn",
         "token": "6SdscKHaaYAd1xsmrcVGJYQ58ZDEdWLzun1wcdvvDGts",
-        "decimals": 6
+        "decimals": 6,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "USDC-USDT",
@@ -574,6 +595,7 @@
     "bumpSeed": 255,
     "deltafiTokenMint": "tstpB7nAg8n7ynm5C5mfRkQ73Q8dSTcyxkjNvR2Bspt",
     "deltafiToken": "9pYEVHb2ZhJ7oQi93XSjXTyLyfHn6S9e7nMxhzkK34C9",
+    "serumProgramId": "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin",
     "poolInfo": [
       {
         "name": "SOL-USDC",
@@ -583,7 +605,8 @@
         "mint": "7gmfJUE4Zw7CgBBWwr2agcjouxWcE1ZwdfyUxMEVfGqj",
         "farm": "GJk5kcnSgw3RFUNrogKEbVT5dyTUTtUkQqJjoXWmKGKC",
         "token": "AgQaFTAqnmNvDoNCLtcPJodm4vudABaWiEaciGDz3JDp",
-        "decimals": 9
+        "decimals": 9,
+        "oraclePriority": "PYTH_ONLY"
       },
       {
         "name": "soLINK-USDT",
@@ -594,7 +617,10 @@
         "farm": "o2qLefTkJKtWLmKirWKpgFd4ceUxVNGtwLJgQRaTB5w",
         "token": "8jJrXPJ5SzVVSQKiZ3LscFMdQfDPnQYW9rkeLbenrgLz",
         "decimals": 6,
-        "serumMarket": "3yEZ9ZpXSQapmKjLAGKZEzUNA1rcupJtsDp5mPBWmGZR"
+        "oraclePriority": "SERUM_ONLY",
+        "serumMarket": "3yEZ9ZpXSQapmKjLAGKZEzUNA1rcupJtsDp5mPBWmGZR",
+        "serumBids": "9fkA2oJQ7BKP5n2WxdLkY7mDA1mzBrGZ9osqVhvdBkH7",
+        "serumAsks": "G8c3xQURJk1oukLqJd3W4SJykmRq4wq3GrSWJwWipECH"
       },
       {
         "name": "USDC-USDT",

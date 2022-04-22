@@ -4,6 +4,7 @@ import { farmUserReducer } from "./farmUserState";
 import { farmPoolReducer } from "./farmPoolState";
 import { poolReducer } from "./poolState";
 import { pythReducer } from "./pythState";
+import { serumReducer } from "./serumState";
 import { tokenAccountReducer } from "./tokenAccountState";
 
 export const store = configureStore({
@@ -14,6 +15,7 @@ export const store = configureStore({
     pool: poolReducer,
     pyth: pythReducer,
     tokenAccount: tokenAccountReducer,
+    serum: serumReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

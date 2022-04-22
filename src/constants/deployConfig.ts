@@ -18,13 +18,22 @@ export type PoolConfig = {
   farm: string;
   token: string;
   decimals: number;
+  oraclePriority: string;
   serumMarket: string;
+  serumBids: string;
+  serumAsks: string;
 };
 
-// ignore pool with serumMarket address for now
-export const poolConfigs: PoolConfig[] = deployConfig.poolInfo.filter(
-  (info) => info.serumMarket === undefined,
+export const poolConfigs: PoolConfig[] = deployConfig.poolInfo;
+
+export const poolConfigsWithPyth: PoolConfig[] = deployConfig.poolInfo.filter(
+  (info) => info.oraclePriority === "PYTH_ONLY" || info.oraclePriority === undefined,
 );
+
+export const poolConfigsWithSerum: PoolConfig[] = deployConfig.poolInfo.filter(
+  (info) => info.oraclePriority === "SERUM_ONLY",
+);
+
 export function getPoolConfigByFarmPoolKey(farmPoolKey: String): PoolConfig {
   return poolConfigs.find(({ farm }) => farm === farmPoolKey);
 }
@@ -55,8 +64,9 @@ export type TokenConfig = {
   decimals: number;
 };
 
-// ignore token without pyth for now
-export const tokenConfigs: TokenConfig[] = deployConfig.tokenInfo.filter(
+export const tokenConfigs: TokenConfig[] = deployConfig.tokenInfo;
+
+export const tokenConfigsWithPyth: TokenConfig[] = deployConfig.tokenInfo.filter(
   (info) => info.pyth !== undefined,
 );
 export const lpTokenConfigs: TokenConfig[] = poolConfigs.map(({ name, mint, decimals }) => ({

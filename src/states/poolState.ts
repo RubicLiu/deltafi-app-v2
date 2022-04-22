@@ -3,7 +3,7 @@ import { PublicKey, Connection, AccountInfo } from "@solana/web3.js";
 
 import { PoolInfo } from "providers/types";
 import {
-  poolConfigs,
+  poolConfigsWithPyth,
   getPoolConfigByPoolKey,
   getTokenConfigBySymbol,
 } from "constants/deployConfig";
@@ -45,8 +45,7 @@ export const poolReducer = createReducer(initialState, (builder) => {
 });
 
 async function getPools(connection: Connection) {
-  const poolConfigList = poolConfigs;
-  const poolAddressList = poolConfigList.map(({ swap }) => new PublicKey(swap));
+  const poolAddressList = poolConfigsWithPyth.map(({ swap }) => new PublicKey(swap));
   const poolInfos = await getMultipleAccounts(connection, poolAddressList, "confirmed");
 
   const pools = [];
@@ -79,5 +78,6 @@ const getPoolFromSwapInfoAccount = (poolConfig, publicKey, poolInfo) => {
     fees: data.fees,
     rewards: data.rewards,
     poolState: data.poolState,
+    oraclePriority: data.oraclePriorityFlags,
   };
 };

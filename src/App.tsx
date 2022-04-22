@@ -19,6 +19,7 @@ import { fetchFarmPoolsThunk } from "states/farmPoolState";
 import { fetchFarmUsersThunk } from "states/farmUserState";
 import { fetchPoolsThunk } from "states/poolState";
 import { fetchPythDataThunk } from "states/pythState";
+import { fetchSerumDataThunk } from "states/serumState";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { PublicKey } from "@solana/web3.js";
@@ -77,6 +78,11 @@ const App: React.FC = () => {
   useEffect(() => {
     // Refresh the pyth data every 2 seconds.
     return scheduleWithInterval(() => dispatch(fetchPythDataThunk(connection)), 2 * 1000);
+  }, [connection, dispatch]);
+
+  useEffect(() => {
+    // Refresh the serum data every 2 seconds.
+    return scheduleWithInterval(() => dispatch(fetchSerumDataThunk(connection)), 2 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {
