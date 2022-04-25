@@ -268,13 +268,13 @@
         {
           "name": "farmConfig",
           "type": {
-            "defined": "FarmV2Config"
+            "defined": "FarmConfig"
           }
         }
       ]
     },
     {
-      "name": "initNormalSwapV2",
+      "name": "initNormalSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -359,7 +359,7 @@
       ]
     },
     {
-      "name": "initStableSwapV2",
+      "name": "initStableSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -475,7 +475,7 @@
       ]
     },
     {
-      "name": "depositToNormalSwapV2",
+      "name": "depositToNormalSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -550,7 +550,7 @@
       ]
     },
     {
-      "name": "depositToStableSwapV2",
+      "name": "depositToStableSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -615,7 +615,7 @@
       ]
     },
     {
-      "name": "withdrawFromNormalSwapV2",
+      "name": "withdrawFromNormalSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -700,7 +700,7 @@
       ]
     },
     {
-      "name": "withdrawFromStableSwapV2",
+      "name": "withdrawFromStableSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -775,7 +775,7 @@
       ]
     },
     {
-      "name": "normalSwapV2",
+      "name": "normalSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -865,7 +865,7 @@
       ]
     },
     {
-      "name": "stableSwapV2",
+      "name": "stableSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -945,7 +945,7 @@
       ]
     },
     {
-      "name": "createFarmV2",
+      "name": "createFarm",
       "accounts": [
         {
           "name": "marketConfig",
@@ -991,13 +991,13 @@
         {
           "name": "farmConfig",
           "type": {
-            "defined": "FarmV2Config"
+            "defined": "FarmConfig"
           }
         }
       ]
     },
     {
-      "name": "depositToFarmV2",
+      "name": "depositToFarm",
       "accounts": [
         {
           "name": "marketConfig",
@@ -1037,7 +1037,7 @@
       ]
     },
     {
-      "name": "withdrawFromFarmV2",
+      "name": "withdrawFromFarm",
       "accounts": [
         {
           "name": "marketConfig",
@@ -1077,7 +1077,7 @@
       ]
     },
     {
-      "name": "claimFarmRewardsV2",
+      "name": "claimFarmRewards",
       "accounts": [
         {
           "name": "marketConfig",
@@ -1125,7 +1125,7 @@
   ],
   "accounts": [
     {
-      "name": "FarmV2Info",
+      "name": "FarmInfo",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1152,7 +1152,7 @@
           {
             "name": "farmConfig",
             "type": {
-              "defined": "FarmV2Config"
+              "defined": "FarmConfig"
             }
           },
           {
@@ -1304,9 +1304,9 @@
             "type": "publicKey"
           },
           {
-            "name": "poolStateV2",
+            "name": "poolState",
             "type": {
-              "defined": "PoolStateV2"
+              "defined": "PoolState"
             }
           },
           {
@@ -1383,7 +1383,7 @@
   ],
   "types": [
     {
-      "name": "PoolStateV2",
+      "name": "PoolState",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1460,7 +1460,7 @@
       }
     },
     {
-      "name": "FarmV2Config",
+      "name": "FarmConfig",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1654,10 +1654,10 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "NormalSwapV2"
+            "name": "NormalSwap"
           },
           {
-            "name": "StableSwapV2"
+            "name": "StableSwap"
           }
         ]
       }

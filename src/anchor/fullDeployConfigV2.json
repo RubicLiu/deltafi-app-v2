@@ -2,24 +2,24 @@
   "testnet": {
     "network": "testnet",
     "deltafiMint": "EkzSXG99ngsVx8SSWCszMYivRXN1SZhhxsWhryzEuHgg",
-    "deltafiToken": "GCMxs5x9sLZsgy3nFvcXoFGdLZdPU4NwRu2rCmPmv97r",
+    "deltafiToken": "4FreBG9u7hUDZjeAaQYVgJh1r2B6sdfCba7BAUCdEDBJ",
     "pythProgramId": "8tfDNiaEyrV6Q1U4DEXrEigs9DoDtkugzFbybENEbCDz",
     "programId": "HcWvS1XyweYMrCvY8TEeDxXgbWJagizUZXxCSLC2E89N",
-    "marketConfig": "BkPoyAb9qFFaVMnmuWB54DCC2icSyH88Uzp771bgj6ot",
+    "marketConfig": "Fbw3D8GYVL2BwHJvyXsWr46N5kYTfvaxP2yTv8VC2KJY",
     "poolInfoList": [
       {
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "GZgjDDJhJ1uRsMhe7n6UBbznaVoVSdXe87PErhcnYWuG",
-        "farmInfo": "3UPrCoKGq7F5q1ReetASP7nzuTRPhxKQKWMmMLwt7n6A"
+        "swapInfo": "EGjoYe7ShKhu5L6E22HkCDAPRb9sWfBQ6XoWxNhjbYMU",
+        "farmInfo": "2N3prmanVtLcaKsCWMVLAVifSZZ4dXDcgtTPk814JJEp"
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "DD2j4iFH4rL3nGzRvT9Z5KHYuEiZP3nWhqi9bJyhf2fR",
-        "farmInfo": "5iBrByUm2NRzFs8Gkrq79KsBxxB7VWgF4oCJfT8V9b9w"
+        "swapInfo": "Ew4Pja5RwoA85n19xJbdNL4Bx3pZ7N83ZbtfMAWNTYh2",
+        "farmInfo": "BGFd1gBqZGyeEK3KcqhxNAKKpMkoPLypTroGuNDvpsMQ"
       }
     ],
     "tokenInfoList": [

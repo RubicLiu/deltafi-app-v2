@@ -7,6 +7,8 @@ import { pythReducer } from "./pythState";
 import { serumReducer } from "./serumState";
 import { tokenAccountReducer } from "./tokenAccountState";
 
+import { swapV2Reducer } from "./swapV2State";
+
 export const store = configureStore({
   reducer: {
     app: appReducer,
@@ -16,6 +18,7 @@ export const store = configureStore({
     pyth: pythReducer,
     tokenAccount: tokenAccountReducer,
     serum: serumReducer,
+    swapV2: swapV2Reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

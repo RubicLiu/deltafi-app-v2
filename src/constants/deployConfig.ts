@@ -3,8 +3,8 @@ import { PublicKey } from "@solana/web3.js";
 import { MarketConfig } from "providers/types";
 import fullDeployConfig from "./fullDeployConfig.json";
 
-export const deployConfig =
-  fullDeployConfig[process.env.REACT_APP_DEPLOYMENT_MODE || "mainnet-test"];
+export const deployMode = process.env.REACT_APP_DEPLOYMENT_MODE || "mainnet-test";
+export const deployConfig = fullDeployConfig[deployMode];
 
 export const DELTAFI_TOKEN_DECIMALS = 6; // our token is always with 6 decimals
 export const DELTAFI_TOKEN_SYMBOL = "DELFI";

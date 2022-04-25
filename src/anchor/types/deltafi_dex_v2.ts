@@ -268,13 +268,13 @@ export type DeltafiDexV2 = {
         {
           "name": "farmConfig",
           "type": {
-            "defined": "FarmV2Config"
+            "defined": "FarmConfig"
           }
         }
       ]
     },
     {
-      "name": "initNormalSwapV2",
+      "name": "initNormalSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -359,7 +359,7 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "initStableSwapV2",
+      "name": "initStableSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -475,7 +475,7 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "depositToNormalSwapV2",
+      "name": "depositToNormalSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -550,7 +550,7 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "depositToStableSwapV2",
+      "name": "depositToStableSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -615,7 +615,7 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "withdrawFromNormalSwapV2",
+      "name": "withdrawFromNormalSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -700,7 +700,7 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "withdrawFromStableSwapV2",
+      "name": "withdrawFromStableSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -775,7 +775,7 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "normalSwapV2",
+      "name": "normalSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -865,7 +865,7 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "stableSwapV2",
+      "name": "stableSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -945,7 +945,7 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "createFarmV2",
+      "name": "createFarm",
       "accounts": [
         {
           "name": "marketConfig",
@@ -991,13 +991,13 @@ export type DeltafiDexV2 = {
         {
           "name": "farmConfig",
           "type": {
-            "defined": "FarmV2Config"
+            "defined": "FarmConfig"
           }
         }
       ]
     },
     {
-      "name": "depositToFarmV2",
+      "name": "depositToFarm",
       "accounts": [
         {
           "name": "marketConfig",
@@ -1037,7 +1037,7 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "withdrawFromFarmV2",
+      "name": "withdrawFromFarm",
       "accounts": [
         {
           "name": "marketConfig",
@@ -1077,7 +1077,7 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "claimFarmRewardsV2",
+      "name": "claimFarmRewards",
       "accounts": [
         {
           "name": "marketConfig",
@@ -1125,7 +1125,7 @@ export type DeltafiDexV2 = {
   ],
   "accounts": [
     {
-      "name": "farmV2Info",
+      "name": "farmInfo",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1152,7 +1152,7 @@ export type DeltafiDexV2 = {
           {
             "name": "farmConfig",
             "type": {
-              "defined": "FarmV2Config"
+              "defined": "FarmConfig"
             }
           },
           {
@@ -1304,9 +1304,9 @@ export type DeltafiDexV2 = {
             "type": "publicKey"
           },
           {
-            "name": "poolStateV2",
+            "name": "poolState",
             "type": {
-              "defined": "PoolStateV2"
+              "defined": "PoolState"
             }
           },
           {
@@ -1383,7 +1383,7 @@ export type DeltafiDexV2 = {
   ],
   "types": [
     {
-      "name": "PoolStateV2",
+      "name": "PoolState",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1460,7 +1460,7 @@ export type DeltafiDexV2 = {
       }
     },
     {
-      "name": "FarmV2Config",
+      "name": "FarmConfig",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1654,10 +1654,10 @@ export type DeltafiDexV2 = {
         "kind": "enum",
         "variants": [
           {
-            "name": "NormalSwapV2"
+            "name": "NormalSwap"
           },
           {
-            "name": "StableSwapV2"
+            "name": "StableSwap"
           }
         ]
       }
@@ -2252,13 +2252,13 @@ export const IDL: DeltafiDexV2 = {
         {
           "name": "farmConfig",
           "type": {
-            "defined": "FarmV2Config"
+            "defined": "FarmConfig"
           }
         }
       ]
     },
     {
-      "name": "initNormalSwapV2",
+      "name": "initNormalSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -2343,7 +2343,7 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "initStableSwapV2",
+      "name": "initStableSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -2459,7 +2459,7 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "depositToNormalSwapV2",
+      "name": "depositToNormalSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -2534,7 +2534,7 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "depositToStableSwapV2",
+      "name": "depositToStableSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -2599,7 +2599,7 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "withdrawFromNormalSwapV2",
+      "name": "withdrawFromNormalSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -2684,7 +2684,7 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "withdrawFromStableSwapV2",
+      "name": "withdrawFromStableSwap",
       "accounts": [
         {
           "name": "swapInfo",
@@ -2759,7 +2759,7 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "normalSwapV2",
+      "name": "normalSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -2849,7 +2849,7 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "stableSwapV2",
+      "name": "stableSwap",
       "accounts": [
         {
           "name": "marketConfig",
@@ -2929,7 +2929,7 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "createFarmV2",
+      "name": "createFarm",
       "accounts": [
         {
           "name": "marketConfig",
@@ -2975,13 +2975,13 @@ export const IDL: DeltafiDexV2 = {
         {
           "name": "farmConfig",
           "type": {
-            "defined": "FarmV2Config"
+            "defined": "FarmConfig"
           }
         }
       ]
     },
     {
-      "name": "depositToFarmV2",
+      "name": "depositToFarm",
       "accounts": [
         {
           "name": "marketConfig",
@@ -3021,7 +3021,7 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "withdrawFromFarmV2",
+      "name": "withdrawFromFarm",
       "accounts": [
         {
           "name": "marketConfig",
@@ -3061,7 +3061,7 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "claimFarmRewardsV2",
+      "name": "claimFarmRewards",
       "accounts": [
         {
           "name": "marketConfig",
@@ -3109,7 +3109,7 @@ export const IDL: DeltafiDexV2 = {
   ],
   "accounts": [
     {
-      "name": "farmV2Info",
+      "name": "farmInfo",
       "type": {
         "kind": "struct",
         "fields": [
@@ -3136,7 +3136,7 @@ export const IDL: DeltafiDexV2 = {
           {
             "name": "farmConfig",
             "type": {
-              "defined": "FarmV2Config"
+              "defined": "FarmConfig"
             }
           },
           {
@@ -3288,9 +3288,9 @@ export const IDL: DeltafiDexV2 = {
             "type": "publicKey"
           },
           {
-            "name": "poolStateV2",
+            "name": "poolState",
             "type": {
-              "defined": "PoolStateV2"
+              "defined": "PoolState"
             }
           },
           {
@@ -3367,7 +3367,7 @@ export const IDL: DeltafiDexV2 = {
   ],
   "types": [
     {
-      "name": "PoolStateV2",
+      "name": "PoolState",
       "type": {
         "kind": "struct",
         "fields": [
@@ -3444,7 +3444,7 @@ export const IDL: DeltafiDexV2 = {
       }
     },
     {
-      "name": "FarmV2Config",
+      "name": "FarmConfig",
       "type": {
         "kind": "struct",
         "fields": [
@@ -3638,10 +3638,10 @@ export const IDL: DeltafiDexV2 = {
         "kind": "enum",
         "variants": [
           {
-            "name": "NormalSwapV2"
+            "name": "NormalSwap"
           },
           {
-            "name": "StableSwapV2"
+            "name": "StableSwap"
           }
         ]
       }

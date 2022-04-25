@@ -12,7 +12,7 @@ import { FilterCountry } from "utils/checkJurisdiction";
 // import awsconfig from './aws-exports'
 import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS } from "./constants";
 import { useCustomConnection } from "providers/connection";
-import { deployConfig } from "constants/deployConfig";
+import { deployConfig, deployMode } from "constants/deployConfig";
 
 import { useDispatch } from "react-redux";
 import { fetchFarmPoolsThunk } from "states/farmPoolState";
@@ -25,7 +25,10 @@ import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 import { PublicKey } from "@solana/web3.js";
 import { fetchTokenAccountsThunk } from "states/tokenAccountState";
 import { scheduleWithInterval } from "utils";
+import { getClusterApiUrl, deployConfigV2 } from "anchor/utils";
 import { AccountLayout } from "@solana/spl-token";
+import { web3 } from "@project-serum/anchor";
+import { fetchSwapsV2Thunk } from "states/swapV2State";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -62,6 +65,17 @@ const App: React.FC = () => {
     disableIpBlocker || window.location.origin.includes("localhost") || FilterCountry();
   const { publicKey: walletAddress } = useWallet();
   const { connection } = useConnection();
+
+  useEffect(() => {
+    // Only enable it for mainnet-test
+    if (deployMode !== "mainnet-test") {
+      return;
+    }
+
+    const clustApiUrl = getClusterApiUrl(deployConfigV2.network);
+    const connection = new web3.Connection(clustApiUrl, "confirmed");
+    dispatch(fetchSwapsV2Thunk({ connection, walletAddress }));
+  }, [walletAddress, dispatch]);
 
   useEffect(() => {
     if (!walletAddress) {
