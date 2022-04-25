@@ -54,9 +54,6 @@ export interface PoolInfo {
   rewards: Rewards;
   poolState: PoolState;
   oraclePriority: number;
-  serumMarket: string;
-  serumBids: string;
-  serumAsks: string;
 }
 
 export interface FarmPoolInfo {

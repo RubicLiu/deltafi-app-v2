@@ -60,7 +60,7 @@ async function getPythDataList(connection: Connection) {
   return pythDataList;
 }
 
-export function getPriceBySymbol(
+export function getPythPriceBySymbol(
   symbolToPythData: SymbolToPythData,
   tokenSymbol: string | null | undefined,
 ) {
@@ -80,9 +80,9 @@ export function getPriceBySymbol(
   return result;
 }
 
-export function getMarketPrice(symbolToPythData: SymbolToPythData, pool: PoolInfo) {
-  const { price: basePrice } = getPriceBySymbol(symbolToPythData, pool?.baseTokenInfo.symbol);
-  const { price: quotePrice } = getPriceBySymbol(symbolToPythData, pool?.quoteTokenInfo.symbol);
+export function getPythMarketPrice(symbolToPythData: SymbolToPythData, pool: PoolInfo) {
+  const { price: basePrice } = getPythPriceBySymbol(symbolToPythData, pool?.baseTokenInfo.symbol);
+  const { price: quotePrice } = getPythPriceBySymbol(symbolToPythData, pool?.quoteTokenInfo.symbol);
   const marketPrice =
     basePrice && quotePrice ? new BigNumber(basePrice / quotePrice) : new BigNumber(NaN);
   return {

@@ -2,7 +2,9 @@ import { RootState } from "./store";
 
 import { PoolInfo } from "providers/types";
 import { getPoolConfigBySymbols } from "constants/deployConfig";
-import { getMarketPrice } from "./pythState";
+import { getPythMarketPrice, getPythPriceBySymbol } from "./pythState";
+import { getserumMarketPrice } from "./serumState";
+import { OraclePriority } from "lib/state";
 
 export const appSelector = (state: RootState) => state.app;
 export const farmUserSelector = (state: RootState) => state.farmUser;
@@ -24,9 +26,21 @@ export function selectFarmPoolByFarmPoolKey(farmPoolKey: string) {
   };
 }
 
-export function selectPythMarketPriceByPool(pool: PoolInfo) {
+export function getMarketPrice(symbolToPythData, poolNameToSerumPrice, pool) {
+  if (pool?.oraclePriority === OraclePriority.PYTH_ONLY) {
+    return getPythMarketPrice(symbolToPythData, pool);
+  } else {
+    const { price: quotePrice } = getPythPriceBySymbol(
+      symbolToPythData,
+      pool?.quoteTokenInfo.symbol,
+    );
+    return getserumMarketPrice(poolNameToSerumPrice, pool, quotePrice);
+  }
+}
+
+export function selectMarketPriceByPool(pool: PoolInfo) {
   return (state: RootState) => {
-    return getMarketPrice(state.pyth.symbolToPythData, pool);
+    return getMarketPrice(state.pyth.symbolToPythData, state.serum.poolNameToSerumPrice, pool);
   };
 }
 

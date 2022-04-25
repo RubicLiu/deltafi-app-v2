@@ -2,6 +2,8 @@ import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { deployConfig, poolConfigsWithSerum } from "constants/deployConfig";
 import { Market } from "@project-serum/serum";
+import BigNumber from "bignumber.js";
+import { PoolInfo } from "providers/types";
 
 const serumProgramId = new PublicKey(deployConfig.serumProgramId);
 
@@ -73,4 +75,19 @@ export function getSerumMarketPriceByPoolName(
     return null;
   }
   return poolNameToSerumPrice[poolName];
+}
+
+export function getserumMarketPrice(
+  serumNameToMarketPrice: SerumNameToMarketPrice,
+  pool: PoolInfo,
+  quotePrice: any,
+) {
+  const price = getSerumMarketPriceByPoolName(serumNameToMarketPrice, pool?.name);
+  const basePrice = price * quotePrice;
+  const marketPrice = new BigNumber(price);
+  return {
+    marketPrice,
+    basePrice,
+    quotePrice,
+  };
 }

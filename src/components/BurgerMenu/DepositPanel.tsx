@@ -8,7 +8,7 @@ import { rate } from "utils/decimal";
 import { ConnectButton } from "components";
 import { useSelector } from "react-redux";
 import {
-  selectPythMarketPriceByPool,
+  selectMarketPriceByPool,
   selectPoolByPoolKey,
   selectTokenAccountInfoByMint,
 } from "states/selectors";
@@ -67,7 +67,7 @@ const DepositPanel = (props: IDepositPanelProps): ReactElement => {
 
   const poolTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.poolMintKey.toBase58()));
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(pool));
 
   const share = useMemo(() => {
     if (pool && poolTokenAccount) {

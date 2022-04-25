@@ -14,8 +14,9 @@ import {
   poolSelector,
   tokenAccountSelector,
   farmUserSelector,
+  serumSelector,
+  getMarketPrice,
 } from "states/selectors";
-import { getMarketPrice } from "states/pythState";
 import { MintToTokenAccountInfo } from "states/tokenAccountState";
 import { FarmPoolKeyToFarmUser } from "states/farmUserState";
 
@@ -79,11 +80,17 @@ const Home: React.FC = () => {
 
   const pythState = useSelector(pythSelector);
   const symbolToPythData = pythState.symbolToPythData;
+  const serumState = useSelector(serumSelector);
+  const poolNameToSerumPrice = serumState.poolNameToSerumPrice;
   const { connected: isConnectedWallet } = useWallet();
   const tvl = useMemo(() => {
     if (pools.length > 0) {
       return (pools as any).reduce((p, c) => {
-        const { marketPrice, basePrice, quotePrice } = getMarketPrice(symbolToPythData, c);
+        const { marketPrice, basePrice, quotePrice } = getMarketPrice(
+          symbolToPythData,
+          poolNameToSerumPrice,
+          c,
+        );
         const pmm = new PMM(c.poolState, marketPrice);
 
         let volumn = new BigNumber(0);
@@ -96,7 +103,7 @@ const Home: React.FC = () => {
       }, new BigNumber(0)) as BigNumber;
     }
     return new BigNumber(0);
-  }, [pools, symbolToPythData]);
+  }, [pools, symbolToPythData, poolNameToSerumPrice]);
 
   return (
     <Page>

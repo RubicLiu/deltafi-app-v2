@@ -11,7 +11,7 @@ import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
 
 import { useSelector } from "react-redux";
-import { selectPythMarketPriceByPool, selectFarmPoolByFarmPoolKey } from "states/selectors";
+import { selectMarketPriceByPool, selectFarmPoolByFarmPoolKey } from "states/selectors";
 import { selectPoolByPoolKey } from "states/selectors";
 import { getTokenPairByPoolName } from "utils";
 
@@ -81,7 +81,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
   const swapPool = useSelector(selectPoolByPoolKey(poolConfig?.swap));
   const farmPool = useSelector(selectFarmPoolByFarmPoolKey(poolConfig?.farm));
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(swapPool));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(swapPool));
 
   const pmm = useMemo(() => {
     if (swapPool) {

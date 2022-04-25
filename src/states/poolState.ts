@@ -3,7 +3,7 @@ import { PublicKey, Connection, AccountInfo } from "@solana/web3.js";
 
 import { PoolInfo } from "providers/types";
 import {
-  poolConfigsWithPyth,
+  poolConfigs,
   getPoolConfigByPoolKey,
   getTokenConfigBySymbol,
 } from "constants/deployConfig";
@@ -45,7 +45,7 @@ export const poolReducer = createReducer(initialState, (builder) => {
 });
 
 async function getPools(connection: Connection) {
-  const poolAddressList = poolConfigsWithPyth.map(({ swap }) => new PublicKey(swap));
+  const poolAddressList = poolConfigs.map(({ swap }) => new PublicKey(swap));
   const poolInfos = await getMultipleAccounts(connection, poolAddressList, "confirmed");
 
   const pools = [];

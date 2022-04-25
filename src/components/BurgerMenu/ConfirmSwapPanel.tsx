@@ -8,7 +8,7 @@ import { useModal } from "providers/modal";
 import { getSwapOutAmount } from "utils/swap";
 import { fixedNumber } from "utils/utils";
 import { useSelector } from "react-redux";
-import { selectPythMarketPriceByPool } from "states/selectors";
+import { selectMarketPriceByPool } from "states/selectors";
 import { selectPoolBySymbols } from "states/selectors";
 
 interface IConfirmSwapPanelProps {
@@ -65,7 +65,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
   const pool = useSelector(
     selectPoolBySymbols(data?.tokenFrom.token.symbol, data?.tokenTo.token.symbol),
   );
-  const { marketPrice } = useSelector(selectPythMarketPriceByPool(pool));
+  const { marketPrice } = useSelector(selectMarketPriceByPool(pool));
 
   const swapOut = useMemo(() => {
     if (pool && data) {

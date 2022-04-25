@@ -39,7 +39,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   appSelector,
   selectPoolBySymbols,
-  selectPythMarketPriceByPool,
+  selectMarketPriceByPool,
   selectTokenAccountInfoByMint,
 } from "states/selectors";
 import { fetchPoolsThunk } from "states/poolState";
@@ -181,7 +181,7 @@ const Home: React.FC = (props) => {
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(pool));
 
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && pool) {

@@ -14,7 +14,7 @@ import { useSelector } from "react-redux";
 import {
   selectFarmUserByFarmPoolKey,
   selectPoolByPoolKey,
-  selectPythMarketPriceByPool,
+  selectMarketPriceByPool,
   selectTokenAccountInfoByMint,
 } from "states/selectors";
 import { getTokenPairByPoolName } from "utils";
@@ -91,7 +91,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const pool = useSelector(selectPoolByPoolKey(poolConfig.swap));
   const farmUser = useSelector(selectFarmUserByFarmPoolKey(poolConfig.farm));
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(pool));
 
   const poolTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.poolMintKey.toBase58()));
 

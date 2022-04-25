@@ -46,7 +46,7 @@ import { fetchPoolsThunk } from "states/poolState";
 import { getPoolConfigByPoolKey, marketConfig } from "constants/deployConfig";
 import {
   selectFarmUserByFarmPoolKey,
-  selectPythMarketPriceByPool,
+  selectMarketPriceByPool,
   selectPoolByPoolKey,
   selectTokenAccountInfoByMint,
 } from "states/selectors";
@@ -242,7 +242,7 @@ const Deposit: React.FC = () => {
   const farmUserFlat = useSelector(selectFarmUserByFarmPoolKey(farmPoolKey.toBase58()));
   const farmUser = toFarmUserPosition(farmUserFlat);
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectPythMarketPriceByPool(pool));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(pool));
 
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
