@@ -82,32 +82,32 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "mintA",
+          "name": "mintBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "mintB",
+          "name": "mintQuote",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "adminFeeTokenA",
+          "name": "adminFeeTokenBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "adminFeeTokenB",
+          "name": "adminFeeTokenQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -287,12 +287,12 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -302,22 +302,22 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "pythPriceA",
+          "name": "pythPriceBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "pythPriceB",
+          "name": "pythPriceQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -349,11 +349,11 @@ export type DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "amountA",
+          "name": "baseAmount",
           "type": "u64"
         },
         {
-          "name": "amountB",
+          "name": "quoteAmount",
           "type": "u64"
         }
       ]
@@ -372,12 +372,12 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -387,12 +387,12 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -424,11 +424,11 @@ export type DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "amountA",
+          "name": "baseAmount",
           "type": "u64"
         },
         {
-          "name": "amountB",
+          "name": "quoteAmount",
           "type": "u64"
         }
       ]
@@ -483,12 +483,12 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -498,22 +498,22 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "pythPriceA",
+          "name": "pythPriceBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "pythPriceB",
+          "name": "pythPriceQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -540,11 +540,11 @@ export type DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "amountA",
+          "name": "baseAmount",
           "type": "u64"
         },
         {
-          "name": "amountB",
+          "name": "quoteAmount",
           "type": "u64"
         }
       ]
@@ -558,12 +558,12 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -573,12 +573,12 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -605,11 +605,11 @@ export type DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "amountA",
+          "name": "baseAmount",
           "type": "u64"
         },
         {
-          "name": "amountB",
+          "name": "quoteAmount",
           "type": "u64"
         }
       ]
@@ -623,12 +623,12 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -638,32 +638,32 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "pythPriceA",
+          "name": "pythPriceBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "pythPriceB",
+          "name": "pythPriceQuote",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "adminFeeTokenA",
+          "name": "adminFeeTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "adminFeeTokenB",
+          "name": "adminFeeTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -690,11 +690,11 @@ export type DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "tokenAShare",
+          "name": "baseShare",
           "type": "u64"
         },
         {
-          "name": "tokenBShare",
+          "name": "quoteShare",
           "type": "u64"
         }
       ]
@@ -708,12 +708,12 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -723,22 +723,22 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "adminFeeTokenA",
+          "name": "adminFeeTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "adminFeeTokenB",
+          "name": "adminFeeTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -765,11 +765,11 @@ export type DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "tokenAShare",
+          "name": "baseShare",
           "type": "u64"
         },
         {
-          "name": "tokenBShare",
+          "name": "quoteShare",
           "type": "u64"
         }
       ]
@@ -823,12 +823,12 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "pythPriceA",
+          "name": "pythPriceBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "pythPriceB",
+          "name": "pythPriceQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -1264,43 +1264,43 @@ export type DeltafiDexV2 = {
             "type": "publicKey"
           },
           {
-            "name": "mintA",
+            "name": "mintBase",
             "type": "publicKey"
           },
           {
-            "name": "mintB",
+            "name": "mintQuote",
             "type": "publicKey"
           },
           {
-            "name": "tokenA",
+            "name": "tokenBase",
             "type": "publicKey"
           },
           {
-            "name": "tokenB",
+            "name": "tokenQuote",
             "type": "publicKey"
           },
           {
-            "name": "adminFeeTokenA",
+            "name": "adminFeeTokenBase",
             "type": "publicKey"
           },
           {
-            "name": "adminFeeTokenB",
+            "name": "adminFeeTokenQuote",
             "type": "publicKey"
           },
           {
-            "name": "mintADecimals",
+            "name": "mintBaseDecimals",
             "type": "u8"
           },
           {
-            "name": "mintBDecimals",
+            "name": "mintQuoteDecimals",
             "type": "u8"
           },
           {
-            "name": "pythPriceA",
+            "name": "pythPriceBase",
             "type": "publicKey"
           },
           {
-            "name": "pythPriceB",
+            "name": "pythPriceQuote",
             "type": "publicKey"
           },
           {
@@ -2066,32 +2066,32 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "mintA",
+          "name": "mintBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "mintB",
+          "name": "mintQuote",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": true
         },
         {
-          "name": "adminFeeTokenA",
+          "name": "adminFeeTokenBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "adminFeeTokenB",
+          "name": "adminFeeTokenQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -2271,12 +2271,12 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2286,22 +2286,22 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "pythPriceA",
+          "name": "pythPriceBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "pythPriceB",
+          "name": "pythPriceQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -2333,11 +2333,11 @@ export const IDL: DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "amountA",
+          "name": "baseAmount",
           "type": "u64"
         },
         {
-          "name": "amountB",
+          "name": "quoteAmount",
           "type": "u64"
         }
       ]
@@ -2356,12 +2356,12 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2371,12 +2371,12 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2408,11 +2408,11 @@ export const IDL: DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "amountA",
+          "name": "baseAmount",
           "type": "u64"
         },
         {
-          "name": "amountB",
+          "name": "quoteAmount",
           "type": "u64"
         }
       ]
@@ -2467,12 +2467,12 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2482,22 +2482,22 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "pythPriceA",
+          "name": "pythPriceBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "pythPriceB",
+          "name": "pythPriceQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -2524,11 +2524,11 @@ export const IDL: DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "amountA",
+          "name": "baseAmount",
           "type": "u64"
         },
         {
-          "name": "amountB",
+          "name": "quoteAmount",
           "type": "u64"
         }
       ]
@@ -2542,12 +2542,12 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2557,12 +2557,12 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2589,11 +2589,11 @@ export const IDL: DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "amountA",
+          "name": "baseAmount",
           "type": "u64"
         },
         {
-          "name": "amountB",
+          "name": "quoteAmount",
           "type": "u64"
         }
       ]
@@ -2607,12 +2607,12 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2622,32 +2622,32 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "pythPriceA",
+          "name": "pythPriceBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "pythPriceB",
+          "name": "pythPriceQuote",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "adminFeeTokenA",
+          "name": "adminFeeTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "adminFeeTokenB",
+          "name": "adminFeeTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2674,11 +2674,11 @@ export const IDL: DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "tokenAShare",
+          "name": "baseShare",
           "type": "u64"
         },
         {
-          "name": "tokenBShare",
+          "name": "quoteShare",
           "type": "u64"
         }
       ]
@@ -2692,12 +2692,12 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "userTokenA",
+          "name": "userTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "userTokenB",
+          "name": "userTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2707,22 +2707,22 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "tokenA",
+          "name": "tokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenB",
+          "name": "tokenQuote",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "adminFeeTokenA",
+          "name": "adminFeeTokenBase",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "adminFeeTokenB",
+          "name": "adminFeeTokenQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2749,11 +2749,11 @@ export const IDL: DeltafiDexV2 = {
       ],
       "args": [
         {
-          "name": "tokenAShare",
+          "name": "baseShare",
           "type": "u64"
         },
         {
-          "name": "tokenBShare",
+          "name": "quoteShare",
           "type": "u64"
         }
       ]
@@ -2807,12 +2807,12 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "pythPriceA",
+          "name": "pythPriceBase",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "pythPriceB",
+          "name": "pythPriceQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -3248,43 +3248,43 @@ export const IDL: DeltafiDexV2 = {
             "type": "publicKey"
           },
           {
-            "name": "mintA",
+            "name": "mintBase",
             "type": "publicKey"
           },
           {
-            "name": "mintB",
+            "name": "mintQuote",
             "type": "publicKey"
           },
           {
-            "name": "tokenA",
+            "name": "tokenBase",
             "type": "publicKey"
           },
           {
-            "name": "tokenB",
+            "name": "tokenQuote",
             "type": "publicKey"
           },
           {
-            "name": "adminFeeTokenA",
+            "name": "adminFeeTokenBase",
             "type": "publicKey"
           },
           {
-            "name": "adminFeeTokenB",
+            "name": "adminFeeTokenQuote",
             "type": "publicKey"
           },
           {
-            "name": "mintADecimals",
+            "name": "mintBaseDecimals",
             "type": "u8"
           },
           {
-            "name": "mintBDecimals",
+            "name": "mintQuoteDecimals",
             "type": "u8"
           },
           {
-            "name": "pythPriceA",
+            "name": "pythPriceBase",
             "type": "publicKey"
           },
           {
-            "name": "pythPriceB",
+            "name": "pythPriceQuote",
             "type": "publicKey"
           },
           {

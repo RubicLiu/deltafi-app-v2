@@ -12,7 +12,7 @@ type FetchSwapsV2ThunkArg = {
 };
 
 export const fetchSwapsV2Thunk = createAsyncThunk(
-  "pool/fetchSwaps",
+  "v2/fetchSwaps",
   async (arg: FetchSwapsV2ThunkArg) => {
     const program = getDeltafiDexV2(
       arg.connection,
@@ -24,7 +24,7 @@ export const fetchSwapsV2Thunk = createAsyncThunk(
     for (const poolInfo of deployConfigV2.poolInfoList) {
       const swapKey = new PublicKey(poolInfo.swapInfo);
       const swapInfo = await program.account.swapInfo.fetch(swapKey);
-      console.info(swapInfo);
+      console.info("swap", poolInfo.name, swapInfo);
       swapKeyToSwapInfo[poolInfo.swapInfo] = swapInfo;
     }
 

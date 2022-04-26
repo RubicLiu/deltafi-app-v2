@@ -28,7 +28,8 @@ import { scheduleWithInterval } from "utils";
 import { getClusterApiUrl, deployConfigV2 } from "anchor/utils";
 import { AccountLayout } from "@solana/spl-token";
 import { web3 } from "@project-serum/anchor";
-import { fetchSwapsV2Thunk } from "states/swapV2State";
+import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
+import { fetchFarmsV2Thunk } from "states/v2/farmV2State";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -75,6 +76,7 @@ const App: React.FC = () => {
     const clustApiUrl = getClusterApiUrl(deployConfigV2.network);
     const connection = new web3.Connection(clustApiUrl, "confirmed");
     dispatch(fetchSwapsV2Thunk({ connection, walletAddress }));
+    dispatch(fetchFarmsV2Thunk({ connection, walletAddress }));
   }, [walletAddress, dispatch]);
 
   useEffect(() => {
