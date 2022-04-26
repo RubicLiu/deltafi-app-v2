@@ -12,7 +12,7 @@ import { MARKET_CONFIG_ADDRESS, SWAP_PROGRAM_ID } from "constants/index";
 import { MarketConfig } from "providers/types";
 import { UserReferrerDataLayout, USER_REFERRER_DATA_SIZE } from "lib/state";
 import { createSetReferrerInstruction } from "lib/instructions";
-import { dummyReferrerAddress } from "./swap";
+import { dummyAddress } from "./swap";
 import { TokenAccountInfo } from "states/tokenAccountState";
 
 export function createNativeSOLHandlingTransactions(
@@ -126,7 +126,7 @@ export async function checkOrCreateReferralDataTransaction(
         config.publicKey,
         walletPubkey,
         userReferrerDataPubkey,
-        referrer ? referrer : new PublicKey(dummyReferrerAddress),
+        referrer ? referrer : new PublicKey(dummyAddress),
         SWAP_PROGRAM_ID,
       ),
     );

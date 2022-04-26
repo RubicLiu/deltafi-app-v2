@@ -222,6 +222,9 @@ export const createSwapV2Instruction = (
   adminFeeDestination: PublicKey,
   pythA: PublicKey,
   pythB: PublicKey,
+  serumMarket: PublicKey,
+  serumBids: PublicKey,
+  serumAsks: PublicKey,
   swapData: SwapData,
   programId: PublicKey,
   userReferrerData: PublicKey,
@@ -250,6 +253,9 @@ export const createSwapV2Instruction = (
     { pubkey: adminFeeDestination, isSigner: false, isWritable: true },
     { pubkey: pythA, isSigner: false, isWritable: false },
     { pubkey: pythB, isSigner: false, isWritable: false },
+    { pubkey: serumMarket, isSigner: false, isWritable: false },
+    { pubkey: serumBids, isSigner: false, isWritable: false },
+    { pubkey: serumAsks, isSigner: false, isWritable: false },
     { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
   ].concat(extraReferrerAccounts);
 

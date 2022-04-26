@@ -23,7 +23,7 @@ import { AccountLayout } from "@solana/spl-token";
 import { checkOrCreateReferralDataTransaction } from "./utils";
 import { TokenAccountInfo } from "states/tokenAccountState";
 
-export const dummyReferrerAddress = "66666666666666666666666666666666666666666666";
+export const dummyAddress = "66666666666666666666666666666666666666666666";
 
 /**
  * alter normal swap and stable swap

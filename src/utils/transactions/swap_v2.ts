@@ -22,8 +22,9 @@ import { createTokenAccountTransaction, mergeTransactions, signTransaction } fro
 import { AccountLayout } from "@solana/spl-token";
 import { checkOrCreateReferralDataTransaction } from "./utils";
 import { TokenAccountInfo } from "states/tokenAccountState";
-
-export const dummyReferrerAddress = "66666666666666666666666666666666666666666666";
+import { OraclePriority } from "lib/state";
+import { getPoolConfigByPoolKey } from "constants/deployConfig";
+import { dummyAddress } from "utils/transactions/swap";
 
 /**
  * alter normal swapV2 and stable swapV2
@@ -44,6 +45,9 @@ function createSwapV2InstructionMethod(
   adminFeeDestination: PublicKey,
   pythA: PublicKey,
   pythB: PublicKey,
+  serumMarket: PublicKey,
+  serumBids: PublicKey,
+  serumAsks: PublicKey,
   swapData: SwapData,
   programId: PublicKey,
   userReferrerData: PublicKey | null,
@@ -84,6 +88,9 @@ function createSwapV2InstructionMethod(
       adminFeeDestination,
       pythA,
       pythB,
+      serumMarket,
+      serumBids,
+      serumAsks,
       swapData,
       programId,
       userReferrerData,
@@ -233,6 +240,18 @@ export async function swap_v2({
     }
   })();
 
+  let serumMarket: PublicKey, serumBids: PublicKey, serumAsks: PublicKey;
+  if (pool.oraclePriority === OraclePriority.PYTH_ONLY) {
+    serumMarket = new PublicKey(dummyAddress);
+    serumBids = new PublicKey(dummyAddress);
+    serumAsks = new PublicKey(dummyAddress);
+  } else {
+    const poolConfig = getPoolConfigByPoolKey(pool.publicKey.toBase58());
+    serumMarket = new PublicKey(poolConfig.serumMarket);
+    serumBids = new PublicKey(poolConfig.serumBids);
+    serumAsks = new PublicKey(poolConfig.serumAsks);
+  }
+
   let transaction = new Transaction();
   transaction
     .add(
@@ -260,6 +279,9 @@ export async function swap_v2({
         adminFeeDestination,
         pool.pythBase,
         pool.pythQuote,
+        serumMarket,
+        serumBids,
+        serumAsks,
         swapData,
         SWAP_PROGRAM_ID,
         userReferrerDataPubkey,

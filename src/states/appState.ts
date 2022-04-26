@@ -2,7 +2,7 @@ import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { createAction } from "@reduxjs/toolkit";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { UserReferrerDataLayout } from "lib/state";
-import { dummyReferrerAddress } from "utils/transactions/swap";
+import { dummyAddress } from "utils/transactions/swap";
 import { getReferralDataAccountPublicKey } from "utils/transactions/utils";
 
 export interface AppState {
@@ -43,7 +43,7 @@ export const fetchReferrerThunk = createAsyncThunk(
       const referralInfo = UserReferrerDataLayout.decode(referralAccountInfo.data);
       if (
         arg.walletAddress !== referralInfo.referrer &&
-        referralInfo.referrer.toBase58() !== dummyReferrerAddress
+        referralInfo.referrer.toBase58() !== dummyAddress
       ) {
         referrerPublicKey = referralInfo.referrer;
       }
