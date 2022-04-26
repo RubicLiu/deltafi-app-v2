@@ -25,7 +25,7 @@ import SettingsPanel from "components/SettingsPanel/SettingsPanel";
 import SwapCard from "./components/Card";
 import { useModal } from "providers/modal";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
-import { swap } from "utils/transactions/swap";
+import { swap_v2 } from "utils/transactions/swap_v2";
 import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS, SOLSCAN_LINK } from "constants/index";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
@@ -313,7 +313,7 @@ const Home: React.FC = (props) => {
         tokenFrom.token.symbol === pool.baseTokenInfo.symbol
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
-      let { transaction, createAccountsCost, destinationRef } = await swap({
+      let { transaction, createAccountsCost, destinationRef } = await swap_v2({
         isStable,
         connection,
         walletPubkey,
