@@ -1,6 +1,7 @@
 import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { getDeltafiDexV2, deployConfigV2 } from "anchor/utils";
+import { deployConfigV2 } from "constants/deployConfigV2";
+import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 
 const initialState = {
   swapKeyToSwapInfo: {},
@@ -15,9 +16,8 @@ export const fetchSwapsV2Thunk = createAsyncThunk(
   "v2/fetchSwaps",
   async (arg: FetchSwapsV2ThunkArg) => {
     const program = getDeltafiDexV2(
-      arg.connection,
-      arg.walletAddress,
       new PublicKey(deployConfigV2.programId),
+      makeProvider(arg.connection, arg.walletAddress),
     );
 
     const swapKeyToSwapInfo = {};

@@ -173,16 +173,6 @@
           "name": "admin",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -191,47 +181,6 @@
           "type": {
             "defined": "SwapConfig"
           }
-        }
-      ]
-    },
-    {
-      "name": "setReferrer",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "userReferrerData",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "referrerToken",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "bump",
-          "type": "u8"
         }
       ]
     },
@@ -252,16 +201,6 @@
           "name": "admin",
           "isMut": false,
           "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -335,16 +274,6 @@
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -408,16 +337,6 @@
         },
         {
           "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
           "isMut": false,
           "isSigner": false
         }
@@ -526,16 +445,6 @@
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -589,16 +498,6 @@
         },
         {
           "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
           "isMut": false,
           "isSigner": false
         }
@@ -676,16 +575,6 @@
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -751,16 +640,6 @@
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
         }
       ],
       "args": [
@@ -808,12 +687,7 @@
           "isSigner": false
         },
         {
-          "name": "userDeltafiToken",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "swapDeltafiToken",
+          "name": "deltafiUser",
           "isMut": true,
           "isSigner": false
         },
@@ -841,14 +715,84 @@
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountIn",
+          "type": "u64"
         },
         {
-          "name": "systemProgram",
+          "name": "minAmountOut",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "normalSwapWithReferrer",
+      "accounts": [
+        {
+          "name": "marketConfig",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "rent",
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -898,12 +842,7 @@
           "isSigner": false
         },
         {
-          "name": "userDeltafiToken",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "swapDeltafiToken",
+          "name": "deltafiUser",
           "isMut": true,
           "isSigner": false
         },
@@ -921,14 +860,74 @@
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountIn",
+          "type": "u64"
         },
         {
-          "name": "systemProgram",
+          "name": "minAmountOut",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "stableSwapWithReferrer",
+      "accounts": [
+        {
+          "name": "marketConfig",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "rent",
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapSourceToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminDestinationToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -1121,9 +1120,171 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "createDeltafiUser",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "createDeltafiUserWithReferrer",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "claimSwapRewards",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
+    {
+      "name": "DeltafiUser",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "referrer",
+            "type": "publicKey"
+          },
+          {
+            "name": "owedSwapRewards",
+            "type": "u64"
+          },
+          {
+            "name": "claimedSwapRewards",
+            "type": "u64"
+          },
+          {
+            "name": "owedReferralRewards",
+            "type": "u64"
+          },
+          {
+            "name": "claimedReferralRewards",
+            "type": "u64"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u64",
+                16
+              ]
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "FarmInfo",
       "type": {
@@ -1208,30 +1369,6 @@
                 32
               ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "UserReferrerData",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "configKey",
-            "type": "publicKey"
-          },
-          {
-            "name": "owner",
-            "type": "publicKey"
-          },
-          {
-            "name": "referrer",
-            "type": "publicKey"
           }
         ]
       }
@@ -1555,6 +1692,14 @@
           },
           {
             "name": "tradeRewardCap",
+            "type": "u64"
+          },
+          {
+            "name": "referralRewardNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "referralRewardDenominator",
             "type": "u64"
           },
           {
