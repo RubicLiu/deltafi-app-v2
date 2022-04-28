@@ -5,38 +5,37 @@ import BigNumber from "bignumber.js";
 
 import Page from "components/layout/Page";
 import PoolCard from "./components/Card";
-import { convertDollar } from "utils/utils";
-import { PMM } from "lib/calc";
-import { getTokenConfigBySymbol, poolConfigs } from "constants/deployConfigV2";
+import { convertDollar, getTokenTvl } from "utils/utils";
+import { getTokenConfigBySymbol, PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { useSelector } from "react-redux";
 import {
   pythSelector,
   poolSelector,
   tokenAccountSelector,
-  farmUserSelector,
-  selectMarketPriceByPool,
+  lpUserSelector,
 } from "states/v2/selectorsV2";
 import { MintToTokenAccountInfo } from "states/tokenAccountState";
-import { FarmPoolKeyToFarmUser } from "states/farmUserState";
+import { getPythMarketPrice } from "states/v2/pythV2State";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
-  farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser,
-  poolConfig,
+  swapKeyToLpUser,
+  poolConfig: PoolConfig,
 ) {
   if (mintToTokenAccountInfo == null) {
     return false;
   }
-  const tokenInfo = mintToTokenAccountInfo[poolConfig.mint];
-  if (tokenInfo && tokenInfo.amount.comparedTo(new BigNumber(0)) > 0) {
-    return true;
-  }
-
-  if (farmPoolKeyToFarmUser == null) {
+  if (swapKeyToLpUser == null) {
     return false;
   }
-  const farmUser = farmPoolKeyToFarmUser[poolConfig.farm];
-  return farmUser && farmUser.depositedAmount > 0;
+  const lpUser = swapKeyToLpUser[poolConfig.swapInfo];
+  return (
+    lpUser &&
+    (lpUser.baseShare > 0 ||
+      lpUser.quoteShare > 0 ||
+      lpUser.basePosition.depositedAmount > 0 ||
+      lpUser.quotePosition.depositedAmount > 0)
+  );
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
@@ -70,36 +69,47 @@ const Home: React.FC = () => {
   const classes = useStyles();
 
   const poolState = useSelector(poolSelector);
-  const pools = useMemo(() => {
-    return Object.values(poolState.swapKeyToSwapInfo);
-  }, [poolState.swapKeyToSwapInfo]);
-
   const mintToTokenAccountInfo = useSelector(tokenAccountSelector).mintToTokenAccountInfo;
-  const farmPoolKeyToFarmUser = useSelector(farmUserSelector).swapKeyToLp;
+  const swapKeyToLpUser = useSelector(lpUserSelector).swapKeyToLp;
 
   const pythState = useSelector(pythSelector);
   const symbolToPythData = pythState.symbolToPythData;
   const { connected: isConnectedWallet } = useWallet();
+
   const tvl = useMemo(() => {
-    //    if (pools.length > 0) {
-    //      return (pools as any).reduce((p, c) => {
-    //        const { marketPrice, basePrice, quotePrice } = getMarketPrice(
-    //          symbolToPythData,
-    //          c,
-    //        );
-    //        const pmm = new PMM(c.poolState, marketPrice);
-    //
-    //        let volumn = new BigNumber(0);
-    //        if (basePrice && quotePrice) {
-    //          const baseDecimals = getTokenConfigBySymbol(c?.baseTokenInfo.symbol).decimals;
-    //          const quoteDecimals = getTokenConfigBySymbol(c?.quoteTokenInfo.symbol).decimals;
-    //          volumn = pmm.tvl(basePrice, quotePrice, baseDecimals, quoteDecimals);
-    //        }
-    //        return p.plus(volumn);
-    //      }, new BigNumber(0)) as BigNumber;
-    //    }
+    if (poolConfigs.length > 0) {
+      return (poolConfigs as any).reduce((sum, poolConfig) => {
+        const swapInfo = poolState.swapKeyToSwapInfo[poolConfig.swapInfo];
+        const { basePrice, quotePrice } = getPythMarketPrice(symbolToPythData, poolConfig);
+
+        let volumn = new BigNumber(0);
+        if (basePrice && quotePrice && swapInfo) {
+          const baseDecimals = getTokenConfigBySymbol(poolConfig.base).decimals;
+          const quoteDecimals = getTokenConfigBySymbol(poolConfig.quote).decimals;
+          const baseTvl = getTokenTvl(
+            swapInfo.poolState.baseReserve.toNumber(),
+            baseDecimals,
+            basePrice,
+          );
+          const quoteTvl = getTokenTvl(
+            swapInfo.poolState.quoteReserve.toNumber(),
+            quoteDecimals,
+            quotePrice,
+          );
+          volumn = baseTvl.plus(quoteTvl);
+        }
+        return sum.plus(volumn);
+      }, new BigNumber(0)) as BigNumber;
+    }
     return new BigNumber(0);
-  }, [pools, symbolToPythData]);
+  }, [symbolToPythData, poolState]);
+
+  const poolConfigsWithDeposit = poolConfigs.filter((poolConfig) =>
+    hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
+  );
+  const poolConfigsWithoutDeposit = poolConfigs.filter(
+    (poolConfig) => !hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
+  );
 
   return (
     <Page>
@@ -117,13 +127,9 @@ const Home: React.FC = () => {
           <Box className={classes.listContainer}>
             <Typography>Your Pools</Typography>
             <Box mt={3.5}>
-              {poolConfigs
-                .filter((poolConfig) =>
-                  hasDeposit(mintToTokenAccountInfo, farmPoolKeyToFarmUser, poolConfig),
-                )
-                .map((poolConfig) => (
-                  <PoolCard isUserPool key={poolConfig.swapInfo} poolConfig={poolConfig} />
-                ))}
+              {poolConfigsWithDeposit.map((poolConfig) => (
+                <PoolCard isUserPool key={poolConfig.swapInfo} poolConfig={poolConfig} />
+              ))}
             </Box>
           </Box>
         )}
@@ -135,16 +141,11 @@ const Home: React.FC = () => {
           )}
           {poolConfigs.length > 0 && (
             <Box className={classes.poolCardContainer}>
-              {poolConfigs
-                .filter(
-                  (poolConfig) =>
-                    !hasDeposit(mintToTokenAccountInfo, farmPoolKeyToFarmUser, poolConfig),
-                )
-                .map((poolConfig) => (
-                  <Box key={poolConfig.swapInfo}>
-                    <PoolCard poolConfig={poolConfig} />
-                  </Box>
-                ))}
+              {poolConfigsWithoutDeposit.map((poolConfig) => (
+                <Box key={poolConfig.swapInfo}>
+                  <PoolCard poolConfig={poolConfig} />
+                </Box>
+              ))}
             </Box>
           )}
         </Box>
