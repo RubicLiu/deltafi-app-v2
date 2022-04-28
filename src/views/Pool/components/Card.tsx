@@ -87,11 +87,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const baseTvl = useMemo(() => {
     if (basePrice && pool) {
-      return getTokenTvl(
-        pool.poolState.baseReserve.toNumber(),
-        baseTokenInfo.decimals,
-        basePrice,
-      );
+      return getTokenTvl(pool.poolState.baseReserve.toNumber(), baseTokenInfo.decimals, basePrice);
     }
     return new BigNumber(0);
   }, [basePrice, pool, baseTokenInfo]);
@@ -148,9 +144,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
             className="coin-earning"
           />
           <Box ml={1.5}>
-            <Typography
-              className={classes.tokenPair}
-            >{`${baseTokenInfo.symbol} - ${quoteTokenInfo.symbol}`}</Typography>
+            <Typography className={classes.tokenPair}>{`${poolConfig.name}`}</Typography>
           </Box>
         </Box>
         <ConnectButton
