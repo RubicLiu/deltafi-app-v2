@@ -12,6 +12,7 @@ import { farmV2Reducer } from "./v2/farmV2State";
 import { liquidityProviderV2Reducer } from "./v2/liqudityProviderV2State";
 import { userV2Reducer } from "./v2/userV2State";
 import { pythV2Reducer } from "./v2/pythV2State";
+import { tokenV2Reducer } from "./v2/tokenV2State";
 
 export const store = configureStore({
   reducer: {
@@ -27,6 +28,7 @@ export const store = configureStore({
     liquidityProviderV2: liquidityProviderV2Reducer,
     userV2: userV2Reducer,
     pythV2: pythV2Reducer,
+    tokenV2: tokenV2Reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

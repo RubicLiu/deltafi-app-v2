@@ -84,6 +84,7 @@ const App: React.FC = () => {
     dispatch(fetchPythDataV2Thunk(connection));
 
     if (walletAddress != null) {
+      dispatch(fetchTokenAccountsThunk({ connection, walletAddress }));
       dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress }));
       dispatch(fetchUserV2Thunk({ connection, walletAddress }));
     }
