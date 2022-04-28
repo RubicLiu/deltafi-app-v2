@@ -1,4 +1,45 @@
 import BigNumber from "bignumber.js";
+import { WAD } from "../../constants/index";
+
+const reciprocalWAD = new BigNumber(1).dividedBy(WAD);
+
+function BigNumberWithConfig(
+  val: number | BigNumber | string,
+  object: BigNumber.Config,
+): BigNumber {
+  BigNumber.config(object);
+  return new BigNumber(val);
+}
+
+export function calculateOutAmountNormalSwapInternal(
+  marketPrice: BigNumber,
+  targetReserveA: BigNumber,
+  targetReserveB: BigNumber,
+  currentReserveA: BigNumber,
+  currentResreveB: BigNumber,
+  inputAAmount: BigNumber,
+): BigNumber {
+  // need to ceil
+  let core: BigNumber = BigNumberWithConfig(currentReserveA, {
+    ROUNDING_MODE: BigNumber.ROUND_CEIL,
+  }).dividedBy(currentReserveA.plus(inputAAmount));
+
+  let exp: BigNumber = BigNumberWithConfig(marketPrice, {
+    ROUNDING_MODE: BigNumber.ROUND_FLOOR,
+  })
+    .multipliedBy(targetReserveA)
+    .dividedBy(targetReserveB);
+
+  let coreNumber = core.toNumber();
+  let expNumber = exp.toNumber();
+  let coreExpNumber = Math.pow(coreNumber, expNumber) + 0.00000000000000006;
+
+  let coreExp: BigNumber = BigNumberWithConfig(currentResreveB.toNumber(), {
+    ROUNDING_MODE: BigNumber.ROUND_CEIL,
+  }).multipliedBy(new BigNumber(coreExpNumber));
+
+  return currentResreveB.minus(coreExp);
+}
 
 export function calculateOutAmountNormalSwap(
   marketPrice: BigNumber,
@@ -8,21 +49,20 @@ export function calculateOutAmountNormalSwap(
   currentResreveB: BigNumber,
   inputAAmount: BigNumber,
 ): number {
-  // need to ceil
-  let core: BigNumber = currentReserveA.dividedBy(currentReserveA.plus(inputAAmount));
-  let exp: BigNumber = marketPrice.multipliedBy(targetReserveA).dividedBy(targetReserveB);
-  let core_number = core.toNumber();
-  let exp_number = exp.toNumber();
-  let core_exp_number = Math.pow(core_number, exp_number);
-
-  // need to ceil
-  let core_exp: BigNumber = new BigNumber(core_exp_number);
-  let result: BigNumber = currentResreveB.minus(core_exp);
-
-  return Math.floor(result.toNumber());
+  // TODO(leqiang): add approximation result here
+  return Math.floor(
+    calculateOutAmountNormalSwapInternal(
+      marketPrice,
+      targetReserveA,
+      targetReserveB,
+      currentReserveA,
+      currentResreveB,
+      inputAAmount,
+    ).toNumber(),
+  );
 }
 
-function calculateBalancedReservesStableSwap(
+export function calculateBalancedReservesStableSwap(
   stablePrice: BigNumber,
   currentReserveA: BigNumber,
   currentResreveB: BigNumber,
@@ -52,7 +92,7 @@ function calculateBalancedReservesStableSwap(
   return { balancedReserveA, balancedReserveB };
 }
 
-function calculateOutAmountStableSwapInternal(
+export function calculateOutAmountStableSwapInternal(
   balancedReserveA: BigNumber,
   balancedReserveB: BigNumber,
   currentReserveA: BigNumber,

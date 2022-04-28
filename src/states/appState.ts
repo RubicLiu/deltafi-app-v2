@@ -21,8 +21,10 @@ const initialState: AppState = {
   isNewUser: undefined,
 };
 
-export const setReferrerAction =
-  createAction<{ referrerPublicKey: PublicKey | null; enableReferral: boolean }>("app/setReferrer");
+export const setReferrerAction = createAction<{
+  referrerPublicKey: PublicKey | null;
+  enableReferral: boolean;
+}>("app/setReferrer");
 
 type FetchReferrerThunkArg = {
   connection: Connection;
