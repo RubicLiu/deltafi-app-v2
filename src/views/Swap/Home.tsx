@@ -36,23 +36,24 @@ import { SwapType } from "lib/state";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
+import { appSelector } from "states/selectors";
 import {
-  appSelector,
   selectPoolBySymbols,
   selectMarketPriceByPool,
   selectTokenAccountInfoByMint,
-} from "states/selectors";
+} from "states/v2/selectorsV2";
 import { fetchPoolsThunk } from "states/poolState";
 import { fetchReferrerThunk } from "states/appState";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
-import {
-  getTokenConfigBySymbol,
-  marketConfig,
-  poolConfigs,
-  tokenConfigs,
-} from "constants/deployConfig";
+import { marketConfig } from "constants/deployConfig";
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
+import {
+  getPoolConfigBySymbols,
+  getTokenConfigBySymbol,
+  poolConfigs,
+  tokenConfigs,
+} from "constants/deployConfigV2";
 
 interface TransactionResult {
   status: boolean | null;
@@ -161,6 +162,9 @@ const Home: React.FC = (props) => {
   });
   const config = marketConfig;
 
+  const poolInfo = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
+  const baseTokenInfo = getTokenConfigBySymbol(poolInfo.base);
+  const quoteTokenInfo = getTokenConfigBySymbol(poolInfo.quote);
   const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
@@ -181,18 +185,26 @@ const Home: React.FC = (props) => {
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(pool));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolInfo));
 
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && pool) {
-      if (tokenFrom.token.symbol === pool?.baseTokenInfo.symbol) {
-        return Number(basePrice / quotePrice).toFixed(pool.quoteTokenInfo.decimals);
-      } else if (tokenFrom.token.symbol === pool?.quoteTokenInfo.symbol) {
-        return Number(quotePrice / basePrice).toFixed(pool.baseTokenInfo.decimals);
+      if (tokenFrom.token.symbol === poolInfo?.base) {
+        return Number(basePrice / quotePrice).toFixed(quoteTokenInfo.decimals);
+      } else if (tokenFrom.token.symbol === poolInfo?.quote) {
+        return Number(quotePrice / basePrice).toFixed(baseTokenInfo.decimals);
       }
     }
     return "-";
-  }, [basePrice, quotePrice, tokenFrom.token.symbol, pool]);
+  }, [
+    basePrice,
+    quotePrice,
+    tokenFrom.token.symbol,
+    pool,
+    poolInfo,
+    baseTokenInfo,
+    quoteTokenInfo,
+  ]);
   const [state, setState] = useState<{
     open: boolean;
     vertical: "bottom" | "top";
@@ -526,7 +538,7 @@ const Home: React.FC = (props) => {
       const isInsufficientLiquidity =
         pool &&
         exponentiatedBy(
-          tokenFrom.token.symbol === pool.baseTokenInfo.symbol
+          tokenFrom.token.symbol === poolInfo.base
             ? pool?.poolState.quoteReserve
             : pool?.poolState.baseReserve,
           tokenTo.token.decimals,
@@ -577,6 +589,7 @@ const Home: React.FC = (props) => {
     setMenu,
     sourceBalance,
     pool,
+    poolInfo,
     tokenFrom,
     tokenTo.amount,
     tokenTo.token.decimals,

@@ -7,8 +7,8 @@ import { CardProps } from "./types";
 import { exponentiatedBy } from "utils/decimal";
 import BigNumber from "bignumber.js";
 import { useSelector } from "react-redux";
-import { selectTokenAccountInfoByMint } from "states";
-import { getTokenConfigBySymbol } from "constants/deployConfig";
+import { selectTokenAccountInfoByMint } from "states/v2/selectorsV2";
+import { getTokenConfigBySymbol } from "constants/deployConfigV2";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
