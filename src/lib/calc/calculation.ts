@@ -1,7 +1,4 @@
 import BigNumber from "bignumber.js";
-import { WAD } from "../../constants/index";
-
-const reciprocalWAD = new BigNumber(1).dividedBy(WAD);
 
 function BigNumberWithConfig(
   val: number | BigNumber | string,
@@ -19,11 +16,12 @@ export function calculateOutAmountNormalSwapInternal(
   currentResreveB: BigNumber,
   inputAAmount: BigNumber,
 ): BigNumber {
-  // need to ceil
+  // need to ceil the core
   let core: BigNumber = BigNumberWithConfig(currentReserveA, {
     ROUNDING_MODE: BigNumber.ROUND_CEIL,
   }).dividedBy(currentReserveA.plus(inputAAmount));
 
+  // need to floor the exp
   let exp: BigNumber = BigNumberWithConfig(marketPrice, {
     ROUNDING_MODE: BigNumber.ROUND_FLOOR,
   })
@@ -32,6 +30,7 @@ export function calculateOutAmountNormalSwapInternal(
 
   let coreNumber = core.toNumber();
   let expNumber = exp.toNumber();
+  // round up the float value of core^exp
   let coreExpNumber = Math.pow(coreNumber, expNumber) + 0.00000000000000006;
 
   let coreExp: BigNumber = BigNumberWithConfig(currentResreveB.toNumber(), {
@@ -73,18 +72,20 @@ export function calculateBalancedReservesStableSwap(
     .minus(slope)
     .multipliedBy(currentReserveA.multipliedBy(stablePrice).plus(currentResreveB));
   let coefCNeg: BigNumber = slope.multipliedBy(currentReserveA).multipliedBy(currentResreveB);
-
   // need to ceil the sqrt
-  let core: BigNumber = coefBNeg
-    .multipliedBy(coefBNeg)
-    .plus(coefA.multipliedBy(coefCNeg))
-    .multipliedBy(coefCNeg)
-    .multipliedBy(new BigNumber(4))
-    .squareRoot();
+  let core: BigNumber = BigNumberWithConfig(
+    coefBNeg
+      .multipliedBy(coefBNeg)
+      .plus(coefA.multipliedBy(coefCNeg).multipliedBy(new BigNumber(4))),
+    {
+      ROUNDING_MODE: BigNumber.ROUND_CEIL,
+    },
+  ).squareRoot();
 
   // need to ceil the div
-  let balancedReserveA: BigNumber = coefBNeg
-    .plus(core)
+  let balancedReserveA: BigNumber = BigNumberWithConfig(coefBNeg.plus(core), {
+    ROUNDING_MODE: BigNumber.ROUND_CEIL,
+  })
     .dividedBy(coefA)
     .dividedBy(new BigNumber(2));
   let balancedReserveB: BigNumber = balancedReserveA.multipliedBy(stablePrice);
@@ -100,9 +101,10 @@ export function calculateOutAmountStableSwapInternal(
   inputAAmount: BigNumber,
   slope: BigNumber,
 ): BigNumber {
-  let multiplicand: BigNumber = balancedReserveB.multipliedBy(
-    new BigNumber(1).minus(slope).dividedBy(slope).plus(currentResreveB),
-  );
+  let multiplicand: BigNumber = balancedReserveB
+    .multipliedBy(new BigNumber(1).minus(slope))
+    .dividedBy(slope)
+    .plus(currentResreveB);
 
   let coreNumerator: BigNumber = new BigNumber(1)
     .minus(slope)
