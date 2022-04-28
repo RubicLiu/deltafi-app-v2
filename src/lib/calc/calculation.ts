@@ -64,43 +64,43 @@ function calculateOutAmountStableSwapInternal(
     new BigNumber(1).minus(slope).dividedBy(slope).plus(currentResreveB),
   );
 
-  let coreNumerator: BigNumber = (new BigNumber(1)).minus(slope).multipliedBy(balancedReserveA)
-  .plus(slope.multipliedBy(currentReserveA));
+  let coreNumerator: BigNumber = new BigNumber(1)
+    .minus(slope)
+    .multipliedBy(balancedReserveA)
+    .plus(slope.multipliedBy(currentReserveA));
 
-  let coreDenumerator: BigNumber = (new BigNumber(1)).minus(slope).multipliedBy(balancedReserveA)
-  .plus(slope.multipliedBy(currentReserveA.plus(inputAAmount)));
+  let coreDenumerator: BigNumber = new BigNumber(1)
+    .minus(slope)
+    .multipliedBy(balancedReserveA)
+    .plus(slope.multipliedBy(currentReserveA.plus(inputAAmount)));
 
-  let multiplier: BigNumber = (new BigNumber(1)).minus(coreNumerator.dividedBy(coreDenumerator));
+  let multiplier: BigNumber = new BigNumber(1).minus(coreNumerator.dividedBy(coreDenumerator));
 
-  return multiplicand.multipliedBy(multiplier)
+  return multiplicand.multipliedBy(multiplier);
 }
 
 export function calculateOutAmountStableSwap(
-    stablePrice: BigNumber,
-    currentReserveA: BigNumber,
-    currentReserveB: BigNumber,
-    inputAAmount: BigNumber,
-    slope: BigNumber
+  stablePrice: BigNumber,
+  currentReserveA: BigNumber,
+  currentReserveB: BigNumber,
+  inputAAmount: BigNumber,
+  slope: BigNumber,
 ): number {
-    let {
-        balancedReserveA,
-        balancedReserveB
-    } = calculateBalancedReservesStableSwap(
-        stablePrice,
-        currentReserveA,
-        currentReserveB,
-        slope
-    );
+  let { balancedReserveA, balancedReserveB } = calculateBalancedReservesStableSwap(
+    stablePrice,
+    currentReserveA,
+    currentReserveB,
+    slope,
+  );
 
-    let result: BigNumber = calculateOutAmountStableSwapInternal(
-        balancedReserveA,
-        balancedReserveB,
-        currentReserveA,
-        currentReserveB,
-        inputAAmount,
-        slope
-    );
+  let result: BigNumber = calculateOutAmountStableSwapInternal(
+    balancedReserveA,
+    balancedReserveB,
+    currentReserveA,
+    currentReserveB,
+    inputAAmount,
+    slope,
+  );
 
-    return Math.floor(result.toNumber());
+  return Math.floor(result.toNumber());
 }
-
