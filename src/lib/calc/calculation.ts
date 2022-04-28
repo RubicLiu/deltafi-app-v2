@@ -101,8 +101,12 @@ export function calculateOutAmountStableSwapInternal(
   inputAAmount: BigNumber,
   slope: BigNumber,
 ): BigNumber {
-  let multiplicand: BigNumber = balancedReserveB
-    .multipliedBy(new BigNumber(1).minus(slope))
+  let multiplicand: BigNumber = BigNumberWithConfig(
+    balancedReserveB.multipliedBy(new BigNumber(1).minus(slope)),
+    {
+      ROUNDING_MODE: BigNumber.ROUND_FLOOR,
+    },
+  )
     .dividedBy(slope)
     .plus(currentResreveB);
 
@@ -116,7 +120,11 @@ export function calculateOutAmountStableSwapInternal(
     .multipliedBy(balancedReserveA)
     .plus(slope.multipliedBy(currentReserveA.plus(inputAAmount)));
 
-  let multiplier: BigNumber = new BigNumber(1).minus(coreNumerator.dividedBy(coreDenumerator));
+  let multiplier: BigNumber = new BigNumber(1).minus(
+    BigNumberWithConfig(coreNumerator, {
+      ROUNDING_MODE: BigNumber.ROUND_FLOOR,
+    }).dividedBy(coreDenumerator),
+  );
 
   return multiplicand.multipliedBy(multiplier);
 }
