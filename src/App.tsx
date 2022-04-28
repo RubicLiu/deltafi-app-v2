@@ -34,6 +34,7 @@ import { fetchFarmsV2Thunk } from "states/v2/farmV2State";
 import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2State";
 import { fetchUserV2Thunk } from "states/v2/userV2State";
 import { fetchPythDataV2Thunk } from "states/v2/pythV2State";
+import { fetchTokenAccountsV2Thunk } from "states/v2/tokenV2State";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -84,7 +85,7 @@ const App: React.FC = () => {
     dispatch(fetchPythDataV2Thunk(connection));
 
     if (walletAddress != null) {
-      dispatch(fetchTokenAccountsThunk({ connection, walletAddress }));
+      dispatch(fetchTokenAccountsV2Thunk({ connection, walletAddress }));
       dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress }));
       dispatch(fetchUserV2Thunk({ connection, walletAddress }));
     }
