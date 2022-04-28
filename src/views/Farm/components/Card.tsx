@@ -11,9 +11,8 @@ import { PMM } from "lib/calc";
 import { convertDollar } from "utils/utils";
 
 import { useSelector } from "react-redux";
-import { selectMarketPriceByPool, selectFarmPoolByFarmPoolKey } from "states/selectors";
-import { selectPoolByPoolKey } from "states/selectors";
-import { getTokenPairByPoolName } from "utils";
+import { selectMarketPriceByPool, selectFarmByFarmKey, selectSwapBySwapKey } from "states/v2/selectorsV2";
+import { getTokenConfigBySymbol } from "constants/deployConfig";
 
 const deltafiTokenDecimals = 6;
 
@@ -78,53 +77,48 @@ const FarmCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const history = useHistory();
   const { poolConfig } = props;
-  const swapPool = useSelector(selectPoolByPoolKey(poolConfig?.swap));
-  const farmPool = useSelector(selectFarmPoolByFarmPoolKey(poolConfig?.farm));
+  const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
+  const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
+  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
+  const farmInfo = useSelector(selectFarmByFarmKey(poolConfig?.farmInfo));
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(swapPool));
-
-  const pmm = useMemo(() => {
-    if (swapPool) {
-      return new PMM(swapPool.poolState, marketPrice);
-    }
-    return null;
-  }, [swapPool, marketPrice]);
+  const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const tvl = useMemo(() => {
-    if (swapPool && farmPool && basePrice && quotePrice && pmm) {
-      return pmm
-        .tvl(
-          basePrice,
-          quotePrice,
-          swapPool.baseTokenInfo.decimals,
-          swapPool.quoteTokenInfo.decimals,
-        )
-        .multipliedBy(farmPool.reservedAmount.toString())
-        .dividedBy(swapPool.poolState.totalSupply);
-    }
+//    if (swapPool && farmPool && basePrice && quotePrice && pmm) {
+//      return pmm
+//        .tvl(
+//          basePrice,
+//          quotePrice,
+//          swapPool.baseTokenInfo.decimals,
+//          swapPool.quoteTokenInfo.decimals,
+//        )
+//        .multipliedBy(farmPool.reservedAmount.toString())
+//        .dividedBy(swapPool.poolState.totalSupply);
+//    }
     return 0;
-  }, [swapPool, farmPool, basePrice, quotePrice, pmm]);
+  }, [swapInfo, farmInfo, basePrice, quotePrice]);
 
   const apr = useMemo(() => {
-    if (farmPool && basePrice) {
-      const rawApr = exponentiatedBy(
-        exponentiate(
-          new BigNumber(farmPool.aprNumerator.toString()).div(
-            new BigNumber(farmPool.aprDenominator.toString()),
-          ),
-          swapPool.baseTokenInfo.decimals,
-        ),
-        deltafiTokenDecimals,
-      );
-
-      return rawApr.dividedBy(basePrice).multipliedBy(100).toFixed(2);
-    }
+//    if (farmInfo && basePrice) {
+//      const rawApr = exponentiatedBy(
+//        exponentiate(
+//          new BigNumber(farmInfo.aprNumerator.toString()).div(
+//            new BigNumber(farmInfo.aprDenominator.toString()),
+//          ),
+//          swapInfo.baseTokenInfo.decimals,
+//        ),
+//        deltafiTokenDecimals,
+//      );
+//
+//      return rawApr.dividedBy(basePrice).multipliedBy(100).toFixed(2);
+//    }
     return 0;
-  }, [farmPool, swapPool, basePrice]);
+  }, [farmInfo, swapInfo, basePrice, quoteTokenInfo]);
 
-  if (!swapPool || !farmPool) return null;
+  if (!swapInfo || !farmInfo) return null;
 
-  const [firstTokenInfo, secondTokenInfo] = getTokenPairByPoolName(swapPool);
+  const [firstTokenInfo, secondTokenInfo] = [baseTokenInfo, quoteTokenInfo];
 
   return (
     <Box className={classes.root}>
@@ -136,13 +130,13 @@ const FarmCard: React.FC<CardProps> = (props) => {
             alt={`${secondTokenInfo.symbol} coin`}
             className="coin-earning"
           />
-          <Text className={classes.tokenPair}>{`${swapPool.name}`}</Text>
+          <Text className={classes.tokenPair}>{`${poolConfig.name}`}</Text>
         </Box>
         <ConnectButton
-          onClick={() => history.push(`/stake/${poolConfig.farm}`)}
+          onClick={() => history.push(`/stake/${poolConfig.farmInfo}`)}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
-          data-amp-analytics-attrs={`page: Farms, target: Deposit(${swapPool.baseTokenInfo.symbol} - ${swapPool.quoteTokenInfo.symbol})`}
+          data-amp-analytics-attrs={`page: Farms, target: Deposit(${poolConfig.name})`}
         >
           STAKE
         </ConnectButton>

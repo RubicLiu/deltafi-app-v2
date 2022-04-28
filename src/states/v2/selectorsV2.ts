@@ -42,3 +42,9 @@ export function selectLpUserBySwapKey(swapKey: string) {
     return state.liquidityProviderV2.swapKeyToLp[swapKey];
   };
 }
+
+export function selectFarmByFarmKey(farmKey: string) {
+  return (state: RootState) => {
+    return state.farmV2.farmKeyToFarmInfo[farmKey];
+  };
+}
