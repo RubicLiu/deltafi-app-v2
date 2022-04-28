@@ -3,6 +3,7 @@ import { RootState } from "../store";
 import { getPythMarketPrice } from "./pythV2State";
 import { getPoolConfigBySymbols } from "constants/deployConfigV2";
 
+export const lpUserSelector = (state: RootState) => state.liquidityProviderV2;
 export const farmPoolSelector = (state: RootState) => state.farmV2;
 export const poolSelector = (state: RootState) => state.swapV2;
 export const pythSelector = (state: RootState) => state.pythV2;
@@ -27,5 +28,17 @@ export function selectTokenAccountInfoByMint(mint: string) {
       return null;
     }
     return state.tokenV2.mintToTokenAccountInfo[mint];
+  };
+}
+
+export function selectSwapBySwapKey(poolKey: string) {
+  return (state: RootState) => {
+    return state.swapV2.swapKeyToSwapInfo[poolKey];
+  };
+}
+
+export function selectLpUserBySwapKey(swapKey: string) {
+  return (state: RootState) => {
+    return state.liquidityProviderV2.swapKeyToLp[swapKey];
   };
 }
