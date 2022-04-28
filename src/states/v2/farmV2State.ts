@@ -20,10 +20,15 @@ export const fetchFarmsV2Thunk = createAsyncThunk(
       makeProvider(arg.connection, arg.walletAddress),
     );
 
+    const poolInfoList = deployConfigV2.poolInfoList;
+    const farmAddressList = deployConfigV2.poolInfoList.map(
+      ({ farmInfo }) => new PublicKey(farmInfo),
+    );
+    const farmInfoList = await program.account.farmInfo.fetchMultiple(farmAddressList);
     const farmKeyToFarmInfo = {};
-    for (const poolInfo of deployConfigV2.poolInfoList) {
-      const farmKey = new PublicKey(poolInfo.farmInfo);
-      const farmInfo = await program.account.farmInfo.fetch(farmKey);
+    for (let i = 0; i < poolInfoList.length; ++i) {
+      const poolInfo = poolInfoList[i];
+      const farmInfo = farmInfoList[i];
       console.info("farm", poolInfo.name, farmInfo);
       farmKeyToFarmInfo[poolInfo.farmInfo] = farmInfo;
     }

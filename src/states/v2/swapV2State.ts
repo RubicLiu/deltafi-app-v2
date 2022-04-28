@@ -20,10 +20,15 @@ export const fetchSwapsV2Thunk = createAsyncThunk(
       makeProvider(arg.connection, arg.walletAddress),
     );
 
+    const poolInfoList = deployConfigV2.poolInfoList;
+    const swapAddressList = deployConfigV2.poolInfoList.map(
+      ({ swapInfo }) => new PublicKey(swapInfo),
+    );
+    const swapInfoList = await program.account.swapInfo.fetchMultiple(swapAddressList);
     const swapKeyToSwapInfo = {};
-    for (const poolInfo of deployConfigV2.poolInfoList) {
-      const swapKey = new PublicKey(poolInfo.swapInfo);
-      const swapInfo = await program.account.swapInfo.fetch(swapKey);
+    for (let i = 0; i < poolInfoList.length; ++i) {
+      const poolInfo = poolInfoList[i];
+      const swapInfo = swapInfoList[i];
       console.info("swap", poolInfo.name, swapInfo);
       swapKeyToSwapInfo[poolInfo.swapInfo] = swapInfo;
     }

@@ -31,6 +31,8 @@ import { AccountLayout } from "@solana/spl-token";
 import { web3 } from "@project-serum/anchor";
 import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
 import { fetchFarmsV2Thunk } from "states/v2/farmV2State";
+import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2State";
+import { fetchUserV2Thunk } from "states/v2/userV2State";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -78,6 +80,10 @@ const App: React.FC = () => {
     const connection = new web3.Connection(clustApiUrl, "confirmed");
     dispatch(fetchSwapsV2Thunk({ connection, walletAddress }));
     dispatch(fetchFarmsV2Thunk({ connection, walletAddress }));
+    if (walletAddress != null) {
+      dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress }));
+      dispatch(fetchUserV2Thunk({ connection, walletAddress }));
+    }
   }, [walletAddress, dispatch]);
 
   useEffect(() => {
