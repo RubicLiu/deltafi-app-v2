@@ -1,12 +1,5 @@
 import BigNumber from "bignumber.js";
-
-function BigNumberWithConfig(
-  val: number | BigNumber | string,
-  object: BigNumber.Config,
-): BigNumber {
-  BigNumber.config(object);
-  return new BigNumber(val);
-}
+import { BigNumberWithConfig } from "./utils"
 
 const FLOAT_ROUND_UP_ESPSILON: number = 0.00000000000000006;
 
