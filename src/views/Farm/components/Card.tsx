@@ -7,13 +7,16 @@ import BigNumber from "bignumber.js";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { ConnectButton, Text } from "components";
 import { CardProps } from "./types";
-import { PMM } from "lib/calc";
-import { convertDollar } from "utils/utils";
+import { convertDollar, getTokenTvl } from "utils/utils";
 
 import { useSelector } from "react-redux";
-import { selectMarketPriceByPool, selectFarmPoolByFarmPoolKey } from "states/selectors";
-import { selectPoolByPoolKey } from "states/selectors";
-import { getTokenPairByPoolName } from "utils";
+import {
+  selectMarketPriceByPool,
+  selectFarmByFarmKey,
+  selectSwapBySwapKey,
+  selectLpUserBySwapKey,
+} from "states/v2/selectorsV2";
+import { getTokenConfigBySymbol } from "constants/deployConfigV2";
 
 const deltafiTokenDecimals = 6;
 
@@ -78,53 +81,99 @@ const FarmCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const history = useHistory();
   const { poolConfig } = props;
-  const swapPool = useSelector(selectPoolByPoolKey(poolConfig?.swap));
-  const farmPool = useSelector(selectFarmPoolByFarmPoolKey(poolConfig?.farm));
+  const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
+  const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
+  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
+  const farmInfo = useSelector(selectFarmByFarmKey(poolConfig?.farmInfo));
+  const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(swapPool));
+  const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
-  const pmm = useMemo(() => {
-    if (swapPool) {
-      return new PMM(swapPool.poolState, marketPrice);
+  const baseTvl = useMemo(() => {
+    if (basePrice && swapInfo) {
+      return getTokenTvl(
+        swapInfo.poolState.baseReserve.toNumber(),
+        baseTokenInfo.decimals,
+        basePrice,
+      );
     }
-    return null;
-  }, [swapPool, marketPrice]);
+    return new BigNumber(0);
+  }, [basePrice, swapInfo, baseTokenInfo]);
 
-  const tvl = useMemo(() => {
-    if (swapPool && farmPool && basePrice && quotePrice && pmm) {
-      return pmm
-        .tvl(
-          basePrice,
-          quotePrice,
-          swapPool.baseTokenInfo.decimals,
-          swapPool.quoteTokenInfo.decimals,
-        )
-        .multipliedBy(farmPool.reservedAmount.toString())
-        .dividedBy(swapPool.poolState.totalSupply);
+  const quoteTvl = useMemo(() => {
+    if (quotePrice && swapInfo) {
+      return getTokenTvl(
+        swapInfo.poolState.quoteReserve.toNumber(),
+        quoteTokenInfo.decimals,
+        quotePrice,
+      );
+    }
+    return new BigNumber(0);
+  }, [quotePrice, swapInfo, quoteTokenInfo]);
+
+  const tvl = baseTvl.plus(quoteTvl);
+
+  const stakedTvl = useMemo(() => {
+    if (swapInfo && farmInfo) {
+      const userBaseTvl = baseTvl
+        .multipliedBy(new BigNumber(farmInfo.stakedBaseReserve))
+        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()));
+      const userQuoteTvl = quoteTvl
+        .multipliedBy(new BigNumber(farmInfo.stakedQuoteReserve))
+        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()));
+      return userBaseTvl.plus(userQuoteTvl);
     }
     return 0;
-  }, [swapPool, farmPool, basePrice, quotePrice, pmm]);
+  }, [swapInfo, farmInfo, baseTvl, quoteTvl]);
 
-  const apr = useMemo(() => {
-    if (farmPool && basePrice) {
+  const userStakedTvl = useMemo(() => {
+    if (swapInfo && lpUser) {
+      const userBaseTvl = baseTvl
+        .multipliedBy(new BigNumber(lpUser.basePosition.depositedAmount))
+        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()));
+      const userQuoteTvl = quoteTvl
+        .multipliedBy(new BigNumber(lpUser.quotePosition.depositedAmount))
+        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()));
+      return userBaseTvl.plus(userQuoteTvl);
+    }
+    return new BigNumber(0);
+  }, [baseTvl, quoteTvl, lpUser, swapInfo]);
+
+  const baseApr = useMemo(() => {
+    if (farmInfo && basePrice && farmInfo.farmConfig.baseAprDenominator.toNumber() > 0) {
       const rawApr = exponentiatedBy(
         exponentiate(
-          new BigNumber(farmPool.aprNumerator.toString()).div(
-            new BigNumber(farmPool.aprDenominator.toString()),
+          new BigNumber(farmInfo.farmConfig.baseAprNumerator.toString()).div(
+            new BigNumber(farmInfo.farmConfig.baseAprDenominator.toString()),
           ),
-          swapPool.baseTokenInfo.decimals,
+          baseTokenInfo.decimals,
         ),
         deltafiTokenDecimals,
       );
-
       return rawApr.dividedBy(basePrice).multipliedBy(100).toFixed(2);
     }
     return 0;
-  }, [farmPool, swapPool, basePrice]);
+  }, [farmInfo, basePrice, baseTokenInfo]);
 
-  if (!swapPool || !farmPool) return null;
+  const quoteApr = useMemo(() => {
+    if (farmInfo && quotePrice && farmInfo.farmConfig.quoteAprDenominator.toNumber() > 0) {
+      const rawApr = exponentiatedBy(
+        exponentiate(
+          new BigNumber(farmInfo.farmConfig.quoteAprNumerator.toString()).div(
+            new BigNumber(farmInfo.farmConfig.quoteAprDenominator.toString()),
+          ),
+          quoteTokenInfo.decimals,
+        ),
+        deltafiTokenDecimals,
+      );
+      return rawApr.dividedBy(quotePrice).multipliedBy(100).toFixed(2);
+    }
+    return 0;
+  }, [farmInfo, quotePrice, quoteTokenInfo]);
 
-  const [firstTokenInfo, secondTokenInfo] = getTokenPairByPoolName(swapPool);
+  if (!swapInfo || !farmInfo) return null;
+
+  const [firstTokenInfo, secondTokenInfo] = [baseTokenInfo, quoteTokenInfo];
 
   return (
     <Box className={classes.root}>
@@ -136,24 +185,36 @@ const FarmCard: React.FC<CardProps> = (props) => {
             alt={`${secondTokenInfo.symbol} coin`}
             className="coin-earning"
           />
-          <Text className={classes.tokenPair}>{`${swapPool.name}`}</Text>
+          <Text className={classes.tokenPair}>{`${poolConfig.name}`}</Text>
         </Box>
         <ConnectButton
-          onClick={() => history.push(`/stake/${poolConfig.farm}`)}
+          onClick={() => history.push(`/stake/${poolConfig.farmInfo}`)}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
-          data-amp-analytics-attrs={`page: Farms, target: Deposit(${swapPool.baseTokenInfo.symbol} - ${swapPool.quoteTokenInfo.symbol})`}
+          data-amp-analytics-attrs={`page: Farms, target: Deposit(${poolConfig.name})`}
         >
           STAKE
         </ConnectButton>
       </Box>
       <Box display="flex" justifyContent="space-between">
-        <Typography className={classes.label}>Total Staked:</Typography>
+        <Typography className={classes.label}>TVL:</Typography>
         <Typography className={classes.label}>{convertDollar(tvl.toFixed(2))}</Typography>
       </Box>
+      <Box display="flex" justifyContent="space-between">
+        <Typography className={classes.label}>Total Staking:</Typography>
+        <Typography className={classes.label}>{convertDollar(stakedTvl.toFixed(2))}</Typography>
+      </Box>
+      <Box display="flex" justifyContent="space-between">
+        <Typography className={classes.label}>Your Staking:</Typography>
+        <Typography className={classes.label}>{convertDollar(userStakedTvl.toFixed(2))}</Typography>
+      </Box>
       <Box display="flex" justifyContent="space-between" mt={1.5}>
-        <Typography className={classes.label}>APR</Typography>
-        <Typography className={classes.label}>{apr}%</Typography>
+        <Typography className={classes.label}>Base APR</Typography>
+        <Typography className={classes.label}>{baseApr}%</Typography>
+      </Box>
+      <Box display="flex" justifyContent="space-between" mt={1.5}>
+        <Typography className={classes.label}>Quote APR</Typography>
+        <Typography className={classes.label}>{quoteApr}%</Typography>
       </Box>
     </Box>
   );

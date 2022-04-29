@@ -80,58 +80,62 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
   const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
-  const pool = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
+  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
   const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
 
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const baseTvl = useMemo(() => {
-    if (basePrice && pool) {
-      return getTokenTvl(pool.poolState.baseReserve.toNumber(), baseTokenInfo.decimals, basePrice);
+    if (basePrice && swapInfo) {
+      return getTokenTvl(
+        swapInfo.poolState.baseReserve.toNumber(),
+        baseTokenInfo.decimals,
+        basePrice,
+      );
     }
     return new BigNumber(0);
-  }, [basePrice, pool, baseTokenInfo]);
+  }, [basePrice, swapInfo, baseTokenInfo]);
 
   const quoteTvl = useMemo(() => {
-    if (quotePrice && pool) {
+    if (quotePrice && swapInfo) {
       return getTokenTvl(
-        pool.poolState.quoteReserve.toNumber(),
+        swapInfo.poolState.quoteReserve.toNumber(),
         quoteTokenInfo.decimals,
         quotePrice,
       );
     }
     return new BigNumber(0);
-  }, [quotePrice, pool, quoteTokenInfo]);
+  }, [quotePrice, swapInfo, quoteTokenInfo]);
 
   const tvl = baseTvl.plus(quoteTvl);
 
   const sharePrice = useMemo(() => {
-    if (pool && lpUser) {
+    if (swapInfo && lpUser) {
       const userBaseTvl = baseTvl
         .multipliedBy(new BigNumber(lpUser.baseShare))
-        .dividedBy(new BigNumber(pool.poolState.baseSupply.toString()));
+        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()));
       const userQuoteTvl = quoteTvl
         .multipliedBy(new BigNumber(lpUser.quoteShare))
-        .dividedBy(new BigNumber(pool.poolState.quoteSupply.toString()));
+        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()));
       return userBaseTvl.plus(userQuoteTvl);
     }
     return new BigNumber(0);
-  }, [baseTvl, quoteTvl, lpUser, pool]);
+  }, [baseTvl, quoteTvl, lpUser, swapInfo]);
 
   const stakingPrice = useMemo(() => {
-    if (pool && lpUser) {
+    if (swapInfo && lpUser) {
       const userBaseTvl = baseTvl
         .multipliedBy(new BigNumber(lpUser.basePosition.depositedAmount))
-        .dividedBy(new BigNumber(pool.poolState.baseSupply.toString()));
+        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()));
       const userQuoteTvl = quoteTvl
         .multipliedBy(new BigNumber(lpUser.quotePosition.depositedAmount))
-        .dividedBy(new BigNumber(pool.poolState.quoteSupply.toString()));
+        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()));
       return userBaseTvl.plus(userQuoteTvl);
     }
     return new BigNumber(0);
-  }, [baseTvl, quoteTvl, lpUser, pool]);
+  }, [baseTvl, quoteTvl, lpUser, swapInfo]);
 
-  if (!pool) return null;
+  if (!swapInfo) return null;
 
   return (
     <Box className={classes.container}>
@@ -152,7 +156,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
           variant={props.isUserPool ? "contained" : "outlined"}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
-          data-amp-analytics-attrs={`page: Pools, target: Deposit(${pool.name})`}
+          data-amp-analytics-attrs={`page: Pools, target: Deposit(${swapInfo.name})`}
         >
           {props.isUserPool ? "MANAGE" : "DEPOSIT"}
         </ConnectButton>
