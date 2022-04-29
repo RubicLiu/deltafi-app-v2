@@ -589,11 +589,11 @@ const Stake = (): ReactElement => {
         {isConnectedWallet && (
           <Box className={classes.desc}>
             <Typography variant="h6" paragraph>
-              About {farmPool.name} LP Tokens
+              About {farmPool.name} LP shares
             </Typography>
             <Typography variant="subtitle2">
-              LP tokens represents a share of the liquidity provided to a swap pool. You may obtain{" "}
-              {poolConfig.name} LP tokens by depositing {poolConfig.base} and{" "}
+              LP shares represents shares of the liquidity provided to a swap pool. You may obtain{" "}
+              {poolConfig.name} LP shares by depositing {poolConfig.base} and{" "}
               {poolConfig.quote} into the {poolConfig.name} pool.
             </Typography>
             <Box display="flex" alignItems="center" mt={3}>
