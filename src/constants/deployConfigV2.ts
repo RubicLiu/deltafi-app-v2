@@ -9,6 +9,8 @@ export type PoolConfig = {
   quote: string;
   swapInfo: string;
   farmInfo: string;
+  baseTokenInfo: TokenConfig;
+  quoteTokenInfo: TokenConfig;
 };
 
 export type PythConfig = {
@@ -25,20 +27,29 @@ export type TokenConfig = {
   decimals: number;
 };
 
+export const tokenConfigs: TokenConfig[] = deployConfigV2.tokenInfoList;
+
+export function getTokenConfigBySymbol(symbolStr: String): TokenConfig {
+  return tokenConfigs.find(({ symbol }) => symbol === symbolStr);
+}
+
+export const poolConfigs: PoolConfig[] = deployConfigV2.poolInfoList.map((poolInfo) => {
+  const baseTokenInfo = getTokenConfigBySymbol(poolInfo.base);
+  const quoteTokenInfo = getTokenConfigBySymbol(poolInfo.quote);
+  return {
+    ...poolInfo,
+    baseTokenInfo,
+    quoteTokenInfo,
+  };
+});
+
 export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String): PoolConfig {
-  return deployConfigV2.poolInfoList.find(
+  return poolConfigs.find(
     ({ base, quote }) =>
       (base === baseSymbol && quote === quoteSymbol) ||
       (base === quoteSymbol && quote === baseSymbol),
   );
 }
-
-export function getTokenConfigBySymbol(symbolStr: String): TokenConfig {
-  return deployConfigV2.tokenInfoList.find(({ symbol }) => symbol === symbolStr);
-}
-
-export const poolConfigs: PoolConfig[] = deployConfigV2.poolInfoList;
-export const tokenConfigs: TokenConfig[] = deployConfigV2.tokenInfoList;
 
 export function getPoolConfigBySwapKey(poolKey: String): PoolConfig {
   return poolConfigs.find(({ swapInfo }) => swapInfo === poolKey);

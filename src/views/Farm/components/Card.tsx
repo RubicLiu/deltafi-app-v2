@@ -16,7 +16,6 @@ import {
   selectSwapBySwapKey,
   selectLpUserBySwapKey,
 } from "states/v2/selectorsV2";
-import { getTokenConfigBySymbol } from "constants/deployConfigV2";
 
 const deltafiTokenDecimals = 6;
 
@@ -81,8 +80,8 @@ const FarmCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const history = useHistory();
   const { poolConfig } = props;
-  const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
-  const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
+  const baseTokenInfo = poolConfig.baseTokenInfo;
+  const quoteTokenInfo = poolConfig.quoteTokenInfo;
   const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
   const farmInfo = useSelector(selectFarmByFarmKey(poolConfig?.farmInfo));
   const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));

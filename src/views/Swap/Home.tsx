@@ -163,8 +163,6 @@ const Home: React.FC = (props) => {
   const config = marketConfig;
 
   const poolInfo = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
-  const baseTokenInfo = getTokenConfigBySymbol(poolInfo.base);
-  const quoteTokenInfo = getTokenConfigBySymbol(poolInfo.quote);
   const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
@@ -190,21 +188,13 @@ const Home: React.FC = (props) => {
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && pool) {
       if (tokenFrom.token.symbol === poolInfo?.base) {
-        return Number(basePrice / quotePrice).toFixed(quoteTokenInfo.decimals);
+        return Number(basePrice / quotePrice).toFixed(poolInfo.quoteTokenInfo.decimals);
       } else if (tokenFrom.token.symbol === poolInfo?.quote) {
-        return Number(quotePrice / basePrice).toFixed(baseTokenInfo.decimals);
+        return Number(quotePrice / basePrice).toFixed(poolInfo.baseTokenInfo.decimals);
       }
     }
     return "-";
-  }, [
-    basePrice,
-    quotePrice,
-    tokenFrom.token.symbol,
-    pool,
-    poolInfo,
-    baseTokenInfo,
-    quoteTokenInfo,
-  ]);
+  }, [basePrice, quotePrice, tokenFrom.token.symbol, pool, poolInfo]);
   const [state, setState] = useState<{
     open: boolean;
     vertical: "bottom" | "top";
