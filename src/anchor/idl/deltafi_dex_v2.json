@@ -1303,11 +1303,11 @@
             "type": "publicKey"
           },
           {
-            "name": "stakedBaseReserve",
+            "name": "stakedBaseShare",
             "type": "u64"
           },
           {
-            "name": "stakedQuoteReserve",
+            "name": "stakedQuoteShare",
             "type": "u64"
           },
           {
@@ -1645,6 +1645,10 @@
           {
             "name": "maxSwapPercentage",
             "type": "u8"
+          },
+          {
+            "name": "enableConfidenceInterval",
+            "type": "bool"
           },
           {
             "name": "slope",
@@ -2124,8 +2128,5 @@
       "name": "InvalidFarmConfig",
       "msg": "Invalid farm config"
     }
-  ],
-  "metadata": {
-    "address": "J4zjwmzDtbPtviP2cQh2DwdUijYu1d3J1jfBDzzXgs9D"
-  }
+  ]
 }
