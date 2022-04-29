@@ -78,8 +78,6 @@ const App: React.FC = () => {
       return;
     }
 
-    const clustApiUrl = getClusterApiUrl(deployConfigV2.network);
-    const connection = new web3.Connection(clustApiUrl, "confirmed");
     dispatch(fetchSwapsV2Thunk({ connection, walletAddress }));
     dispatch(fetchFarmsV2Thunk({ connection, walletAddress }));
     dispatch(fetchPythDataV2Thunk(connection));
@@ -89,7 +87,7 @@ const App: React.FC = () => {
       dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress }));
       dispatch(fetchUserV2Thunk({ connection, walletAddress }));
     }
-  }, [walletAddress, dispatch]);
+  }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
     if (!walletAddress) {

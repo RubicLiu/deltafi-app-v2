@@ -1,7 +1,7 @@
 import fullDeployConfigV2 from "../anchor/fullDeployConfigV2.json";
 
-// TODO(ypeng): Read deploy mode from environment variable.
-export const deployConfigV2 = fullDeployConfigV2.testnet;
+export const deployMode = process.env.REACT_APP_DEPLOYMENT_MODE || "mainnet-test";
+export const deployConfigV2 = fullDeployConfigV2[deployMode];
 
 export type PoolConfig = {
   name: string;
