@@ -50,7 +50,7 @@ export function calculateOutAmountNormalSwapInternal(
 }
 
 /**
- * get the maximum value between the approximation result and calculation using 
+ * get the maximum value between the approximation result and calculation using
  * calculate_out_amount_normal_swap_internal
  * both approximation and calculation results are guaranteed to be less or equal to
  * the theoretical value. we take max of them to get a closer value to the ideal result
