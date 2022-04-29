@@ -5,7 +5,7 @@ import Page from "components/layout/Page";
 import { LinkIcon } from "components";
 import FarmCard from "./components/Card";
 import { useDarkMode } from "providers/theme";
-import { PoolConfig, poolConfigs } from "constants/deployConfig";
+import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -156,7 +156,7 @@ const Home: React.FC = (props): ReactElement => {
             Active Farms
           </Typography>
           {poolConfigs.map((poolConfig: PoolConfig) => (
-            <FarmCard key={poolConfig.farm} poolConfig={poolConfig} />
+            <FarmCard key={poolConfig.farmInfo} poolConfig={poolConfig} />
           ))}
         </Box>
       </Box>

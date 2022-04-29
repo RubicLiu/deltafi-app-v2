@@ -1,5 +1,7 @@
+import BigNumber from "bignumber.js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
+import { exponentiatedBy } from "./decimal";
 
 export const convertDollar = (value) => {
   return "USD " + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -83,4 +85,8 @@ export function chunks<T>(array: T[], size: number): T[][] {
   return Array.apply<number, T[], T[][]>(0, new Array(Math.ceil(array.length / size))).map(
     (_, index) => array.slice(index * size, (index + 1) * size),
   );
+}
+
+export function getTokenTvl(reserve: string, decimals: number, price: BigNumber) {
+  return exponentiatedBy(new BigNumber(reserve).multipliedBy(price), decimals);
 }
