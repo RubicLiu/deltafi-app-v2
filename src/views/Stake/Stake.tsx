@@ -33,19 +33,18 @@ import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector, useDispatch } from "react-redux";
 import {
   appSelector,
-  selectFarmUserByFarmPoolKey,
-  selectFarmPoolByFarmPoolKey,
-  selectTokenAccountInfoByMint,
 } from "states/selectors";
+import {
+  selectLpUserBySwapKey,
+  selectFarmByFarmKey,
+  selectTokenAccountInfoByMint,
+} from "states/v2/selectorsV2";
 import { toFarmUserPosition, fetchFarmUsersThunk } from "states/farmUserState";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 import {
-  getPoolConfigByFarmPoolKey,
-  getTokenConfigByMint,
+  getPoolConfigByFarmKey,
   getTokenConfigBySymbol,
-  lpTokenConfigs,
-  marketConfig,
-} from "constants/deployConfig";
+} from "constants/deployConfigV2";
 
 interface TransactionResult {
   status: boolean | null;
@@ -89,20 +88,19 @@ const Stake = (): ReactElement => {
   const appState = useSelector(appSelector);
 
   const farmPoolId = location.pathname.split("/").pop();
-  const farmPool = useSelector(selectFarmPoolByFarmPoolKey(farmPoolId));
+  const farmPool = useSelector(selectFarmByFarmKey(farmPoolId));
+  const poolConfig = getPoolConfigByFarmKey(farmPoolId);
 
   const { baseTokenInfo, quoteTokenInfo } = useMemo(() => {
-    const poolConfig = getPoolConfigByFarmPoolKey(farmPoolId);
     const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
     const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
     return {
       baseTokenInfo,
       quoteTokenInfo,
     };
-  }, [farmPoolId]);
+  }, [farmPoolId, poolConfig]);
 
-  const farmUserFlat = useSelector(selectFarmUserByFarmPoolKey(farmPoolId));
-  const farmUser = toFarmUserPosition(farmUserFlat);
+  const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
 
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
@@ -124,10 +122,6 @@ const Stake = (): ReactElement => {
     horizontal: "left",
   });
 
-  const config = marketConfig;
-  const lpToken = useSelector(selectTokenAccountInfoByMint(farmPool?.poolMintKey.toBase58()));
-  const lpTokenConfig = getTokenConfigByMint(farmPool?.poolMintKey.toBase58());
-
   const rewardsAccount = useSelector(selectTokenAccountInfoByMint(DELTAFI_TOKEN_MINT.toBase58()));
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
@@ -138,20 +132,24 @@ const Stake = (): ReactElement => {
   }, [tokenAccount, token]);
 
   const totalStaked = useMemo(() => {
-    return farmPool && lpTokenConfig
-      ? exponentiatedBy(farmPool.reservedAmount.toString(), lpTokenConfig.decimals)
-      : new BigNumber(0);
-  }, [farmPool, lpTokenConfig]);
+//    return farmPool && lpTokenConfig
+//      ? exponentiatedBy(farmPool.reservedAmount.toString(), lpTokenConfig.decimals)
+//      : new BigNumber(0);
+    return new BigNumber(0);
+  }, [farmPool]);
 
-  let position = farmUser?.positions[farmPoolId];
-  const apr = new BigNumber(farmPool?.aprNumerator.toString()).div(
-    new BigNumber(farmPool?.aprDenominator.toString()),
-  );
+  const apr = new BigNumber(0);
+
+  //let position = farmUser?.positions[farmPoolId];
+//  const apr = new BigNumber(farmPool?.aprNumerator.toString()).div(
+//    new BigNumber(farmPool?.aprDenominator.toString()),
+//  );
   const depositAmount = useMemo(() => {
-    return position && lpTokenConfig
-      ? exponentiatedBy(position.depositBalance, lpTokenConfig.decimals)
-      : new BigNumber(0);
-  }, [position, lpTokenConfig]);
+    //return position && lpTokenConfig
+    //  ? exponentiatedBy(position.depositBalance, lpTokenConfig.decimals)
+    //  : new BigNumber(0);
+    return new BigNumber(0);
+  }, [lpUser]);
 
   const [staking, setStaking] = useState({
     isStake: true,
@@ -205,17 +203,17 @@ const Stake = (): ReactElement => {
   }, [staking, tokenBalance, depositAmount]);
 
   const unclaimedReward = (() => {
-    if (position) {
-      return getUnclaimedReward(
-        apr,
-        position.lastUpdateTs,
-        position.nextClaimTs,
-        position.rewardsOwed,
-        position.rewardEstimated,
-        position.depositBalance,
-        DELTAFI_TOKEN_DECIMALS,
-      );
-    }
+//    if (position) {
+//      return getUnclaimedReward(
+//        apr,
+//        position.lastUpdateTs,
+//        position.nextClaimTs,
+//        position.rewardsOwed,
+//        position.rewardEstimated,
+//        position.depositBalance,
+//        DELTAFI_TOKEN_DECIMALS,
+//      );
+//    }
     return new BigNumber(0);
   })();
 
@@ -250,212 +248,212 @@ const Stake = (): ReactElement => {
   };
 
   const handleStake = useCallback(async () => {
-    if (!connection || !farmPool || !walletPubkey || !lpTokenConfig || !lpToken) {
-      return null;
-    }
-    if (staking.isStake) {
-      if (staking.amount === "" || new BigNumber(lpToken.amount).lt(staking.amount)) {
-        return null;
-      }
-
-      setIsProcessingStake(true);
-      try {
-        const transaction = await stake({
-          connection,
-          walletPubkey,
-          config,
-          farmPool,
-          farmUser: farmUser?.publicKey,
-          poolTokenAccount: lpToken,
-          stakeData: {
-            amount: BigInt(
-              exponentiate(staking.amount, lpTokenConfig.decimals).integerValue().toString(),
-            ),
-          },
-        });
-
-        const signedTransaction = await signTransaction(transaction);
-        const hash = await sendSignedTransaction({
-          signedTransaction,
-          connection,
-        });
-
-        await connection.confirmTransaction(hash, "confirmed");
-
-        await fecthTokenAccountInfoList(
-          [farmPool?.poolMintKey.toBase58()],
-          walletPubkey,
-          connection,
-          dispatch,
-        );
-        setStaking((prevStaking) => ({
-          ...prevStaking,
-          amount: "0",
-          percentage: 0,
-        }));
-        setTransactionResult({
-          status: true,
-          action: "stake",
-          hash,
-          stake: staking,
-        });
-      } catch (e) {
-        setStaking((prevStaking) => ({
-          ...prevStaking,
-          amount: "0",
-          percentage: 0,
-        }));
-      } finally {
-        setState((state) => ({ ...state, open: true }));
-        setIsProcessingStake(false);
-        dispatch(
-          fetchFarmUsersThunk({
-            connection,
-            walletAddress: walletPubkey,
-          }),
-        );
-      }
-    } else {
-      if (staking.amount === "" || !position || depositAmount.lt(staking.amount)) {
-        return null;
-      }
-
-      setIsProcessingStake(true);
-      try {
-        const transaction = await unstake({
-          connection,
-          walletPubkey,
-          config,
-          farmPool,
-          farmUser: farmUser?.publicKey,
-          poolTokenAccount: lpToken,
-          unstakeData: {
-            amount: BigInt(
-              exponentiate(staking.amount, lpTokenConfig.decimals).integerValue().toString(),
-            ),
-          },
-        });
-
-        const signedTransaction = await signTransaction(transaction);
-        const hash = await sendSignedTransaction({
-          signedTransaction,
-          connection,
-        });
-
-        await connection.confirmTransaction(hash, "confirmed");
-        await fecthTokenAccountInfoList(
-          [farmPool?.poolMintKey.toBase58()],
-          walletPubkey,
-          connection,
-          dispatch,
-        );
-        setStaking((prevStaking) => ({
-          ...prevStaking,
-          amount: "0",
-          percentage: 0,
-        }));
-        setTransactionResult({
-          status: true,
-          action: "unstake",
-          hash,
-          stake: staking,
-        });
-      } catch (e) {
-        setStaking((prevStaking) => ({
-          ...prevStaking,
-          amount: "0",
-          percentage: 0,
-        }));
-        setTransactionResult({ status: false });
-      } finally {
-        setState((state) => ({ ...state, open: true }));
-        setIsProcessingStake(false);
-        dispatch(
-          fetchFarmUsersThunk({
-            connection,
-            walletAddress: walletPubkey,
-          }),
-        );
-      }
-    }
+//    if (!connection || !farmPool || !walletPubkey || !lpTokenConfig || !lpToken) {
+//      return null;
+//    }
+//    if (staking.isStake) {
+//      if (staking.amount === "" || new BigNumber(lpToken.amount).lt(staking.amount)) {
+//        return null;
+//      }
+//
+//      setIsProcessingStake(true);
+//      try {
+//        const transaction = await stake({
+//          connection,
+//          walletPubkey,
+//          config,
+//          farmPool,
+//          farmUser: farmUser?.publicKey,
+//          poolTokenAccount: lpToken,
+//          stakeData: {
+//            amount: BigInt(
+//              exponentiate(staking.amount, lpTokenConfig.decimals).integerValue().toString(),
+//            ),
+//          },
+//        });
+//
+//        const signedTransaction = await signTransaction(transaction);
+//        const hash = await sendSignedTransaction({
+//          signedTransaction,
+//          connection,
+//        });
+//
+//        await connection.confirmTransaction(hash, "confirmed");
+//
+//        await fecthTokenAccountInfoList(
+//          [farmPool?.poolMintKey.toBase58()],
+//          walletPubkey,
+//          connection,
+//          dispatch,
+//        );
+//        setStaking((prevStaking) => ({
+//          ...prevStaking,
+//          amount: "0",
+//          percentage: 0,
+//        }));
+//        setTransactionResult({
+//          status: true,
+//          action: "stake",
+//          hash,
+//          stake: staking,
+//        });
+//      } catch (e) {
+//        setStaking((prevStaking) => ({
+//          ...prevStaking,
+//          amount: "0",
+//          percentage: 0,
+//        }));
+//      } finally {
+//        setState((state) => ({ ...state, open: true }));
+//        setIsProcessingStake(false);
+//        dispatch(
+//          fetchFarmUsersThunk({
+//            connection,
+//            walletAddress: walletPubkey,
+//          }),
+//        );
+//      }
+//    } else {
+//      if (staking.amount === "" || !position || depositAmount.lt(staking.amount)) {
+//        return null;
+//      }
+//
+//      setIsProcessingStake(true);
+//      try {
+//        const transaction = await unstake({
+//          connection,
+//          walletPubkey,
+//          config,
+//          farmPool,
+//          farmUser: farmUser?.publicKey,
+//          poolTokenAccount: lpToken,
+//          unstakeData: {
+//            amount: BigInt(
+//              exponentiate(staking.amount, lpTokenConfig.decimals).integerValue().toString(),
+//            ),
+//          },
+//        });
+//
+//        const signedTransaction = await signTransaction(transaction);
+//        const hash = await sendSignedTransaction({
+//          signedTransaction,
+//          connection,
+//        });
+//
+//        await connection.confirmTransaction(hash, "confirmed");
+//        await fecthTokenAccountInfoList(
+//          [farmPool?.poolMintKey.toBase58()],
+//          walletPubkey,
+//          connection,
+//          dispatch,
+//        );
+//        setStaking((prevStaking) => ({
+//          ...prevStaking,
+//          amount: "0",
+//          percentage: 0,
+//        }));
+//        setTransactionResult({
+//          status: true,
+//          action: "unstake",
+//          hash,
+//          stake: staking,
+//        });
+//      } catch (e) {
+//        setStaking((prevStaking) => ({
+//          ...prevStaking,
+//          amount: "0",
+//          percentage: 0,
+//        }));
+//        setTransactionResult({ status: false });
+//      } finally {
+//        setState((state) => ({ ...state, open: true }));
+//        setIsProcessingStake(false);
+//        dispatch(
+//          fetchFarmUsersThunk({
+//            connection,
+//            walletAddress: walletPubkey,
+//          }),
+//        );
+//      }
+//    }
   }, [
-    connection,
-    walletPubkey,
-    config,
-    farmPool,
-    farmUser,
-    staking,
-    lpTokenConfig,
-    lpToken,
-    signTransaction,
-    position,
-    depositAmount,
-    dispatch,
+    //connection,
+    //walletPubkey,
+    //config,
+    //farmPool,
+    //farmUser,
+    //staking,
+    //lpTokenConfig,
+    //lpToken,
+    //signTransaction,
+    //position,
+    //depositAmount,
+    //dispatch,
   ]);
 
   const handleClaim = useCallback(async () => {
-    if (!connection || !farmPool || !walletPubkey || !lpTokenConfig || !lpToken) {
-      return null;
-    }
-
-    const referrerPubkey = appState.referrerPublicKey;
-    const enableReferral = appState.enableReferral;
-
-    setIsProcessingClaim(true);
-    try {
-      const transaction = await claim({
-        connection,
-        config,
-        walletPubkey,
-        farmPool,
-        farmUser: farmUser.publicKey,
-        claimDestination: rewardsAccount?.publicKey,
-        referrer: referrerPubkey,
-        enableReferral,
-      });
-      const signedTransaction = await signTransaction(transaction);
-
-      const hash = await sendSignedTransaction({
-        signedTransaction,
-        connection,
-      });
-
-      await connection.confirmTransaction(hash, "confirmed");
-      await fecthTokenAccountInfoList(
-        [DELTAFI_TOKEN_MINT.toBase58()],
-        walletPubkey,
-        connection,
-        dispatch,
-      );
-      setTransactionResult({
-        status: true,
-        action: "claim",
-        hash,
-      });
-    } catch (e) {
-      setTransactionResult({ status: false });
-    } finally {
-      setState((state) => ({ ...state, open: true }));
-      setIsProcessingClaim(false);
-      dispatch(
-        fetchFarmUsersThunk({
-          connection,
-          walletAddress: walletPubkey,
-        }),
-      );
-    }
+//    if (!connection || !farmPool || !walletPubkey || !lpTokenConfig || !lpToken) {
+//      return null;
+//    }
+//
+//    const referrerPubkey = appState.referrerPublicKey;
+//    const enableReferral = appState.enableReferral;
+//
+//    setIsProcessingClaim(true);
+//    try {
+//      const transaction = await claim({
+//        connection,
+//        config,
+//        walletPubkey,
+//        farmPool,
+//        farmUser: farmUser.publicKey,
+//        claimDestination: rewardsAccount?.publicKey,
+//        referrer: referrerPubkey,
+//        enableReferral,
+//      });
+//      const signedTransaction = await signTransaction(transaction);
+//
+//      const hash = await sendSignedTransaction({
+//        signedTransaction,
+//        connection,
+//      });
+//
+//      await connection.confirmTransaction(hash, "confirmed");
+//      await fecthTokenAccountInfoList(
+//        [DELTAFI_TOKEN_MINT.toBase58()],
+//        walletPubkey,
+//        connection,
+//        dispatch,
+//      );
+//      setTransactionResult({
+//        status: true,
+//        action: "claim",
+//        hash,
+//      });
+//    } catch (e) {
+//      setTransactionResult({ status: false });
+//    } finally {
+//      setState((state) => ({ ...state, open: true }));
+//      setIsProcessingClaim(false);
+//      dispatch(
+//        fetchFarmUsersThunk({
+//          connection,
+//          walletAddress: walletPubkey,
+//        }),
+//      );
+//    }
   }, [
-    config,
-    connection,
-    farmPool,
-    farmUser,
-    lpTokenConfig,
-    lpToken,
-    signTransaction,
-    walletPubkey,
-    rewardsAccount,
-    dispatch,
-    appState,
+//    config,
+//    connection,
+//    farmPool,
+//    farmUser,
+//    lpTokenConfig,
+//    lpToken,
+//    signTransaction,
+//    walletPubkey,
+//    rewardsAccount,
+//    dispatch,
+//    appState,
   ]);
 
   const handleSnackBarClose = useCallback(() => {
@@ -653,7 +651,7 @@ const Stake = (): ReactElement => {
             <StakeCard
               card={staking}
               handleChangeCard={setStakeAmount}
-              tokens={lpTokenConfigs}
+              tokens={null}
               disableDrop
               percentage={percentage < 0.02 ? 0 : percentage}
             />
