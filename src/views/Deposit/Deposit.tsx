@@ -34,7 +34,7 @@ import { useCustomConnection } from "providers/connection";
 import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector } from "react-redux";
-import { getPoolConfigBySwapKey, getTokenConfigBySymbol } from "constants/deployConfigV2";
+import { getPoolConfigBySwapKey } from "constants/deployConfigV2";
 import {
   selectLpUserBySwapKey,
   selectMarketPriceByPool,
