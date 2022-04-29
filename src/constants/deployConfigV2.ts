@@ -39,3 +39,7 @@ export function getTokenConfigBySymbol(symbolStr: String): TokenConfig {
 
 export const poolConfigs: PoolConfig[] = deployConfigV2.poolInfoList;
 export const tokenConfigs: TokenConfig[] = deployConfigV2.tokenInfoList;
+
+export function getPoolConfigByPoolKey(poolKey: String): PoolConfig {
+  return poolConfigs.find(({ swapInfo }) => swapInfo === poolKey);
+}

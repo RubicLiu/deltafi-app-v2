@@ -43,13 +43,14 @@ import loadingIcon from "components/gif/loading_white.gif";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchFarmUsersThunk, toFarmUserPosition } from "states/farmUserState";
 import { fetchPoolsThunk } from "states/poolState";
-import { getPoolConfigByPoolKey, marketConfig } from "constants/deployConfig";
+import { marketConfig } from "constants/deployConfig";
+import { getPoolConfigByPoolKey, getTokenConfigBySymbol } from "constants/deployConfigV2";
 import {
-  selectFarmUserByFarmPoolKey,
+  selectLpUserBySwapKey,
   selectMarketPriceByPool,
-  selectPoolByPoolKey,
+  selectSwapBySwapKey,
   selectTokenAccountInfoByMint,
-} from "states/selectors";
+} from "states/v2/selectorsV2";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 
 interface TransactionResult {
@@ -219,7 +220,7 @@ const Deposit: React.FC = () => {
   });
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const [method, switchMethod] = useState<string>("deposit");
-  const pool = useSelector(selectPoolByPoolKey(poolAddress));
+  const pool = useSelector(selectSwapBySwapKey(poolAddress));
 
   const [base, setBase] = useState<ISwapCard>({ token: null, amount: "", amountWithSlippage: "" });
   const [quote, setQuote] = useState<ISwapCard>({
@@ -228,21 +229,20 @@ const Deposit: React.FC = () => {
     amountWithSlippage: "",
   });
 
-  const poolTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.poolMintKey.toBase58()));
-  const baseTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.baseTokenInfo.mint));
-  const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.quoteTokenInfo.mint));
-
   const config = marketConfig;
-  const farmPoolKey = useMemo(() => {
-    const poolConfig = getPoolConfigByPoolKey(poolAddress);
-    return new PublicKey(poolConfig.farm);
-  }, [poolAddress]);
+  const poolConfig = getPoolConfigByPoolKey(poolAddress);
+  const farmPoolKey = new PublicKey(poolConfig.farmInfo);
+
+  const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
+  const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
+  const baseTokenAccount = useSelector(selectTokenAccountInfoByMint(baseTokenInfo.mint));
+  const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(quoteTokenInfo.mint));
 
   const dispatch = useDispatch();
-  const farmUserFlat = useSelector(selectFarmUserByFarmPoolKey(farmPoolKey.toBase58()));
-  const farmUser = toFarmUserPosition(farmUserFlat);
+  const lpUser = useSelector(selectLpUserBySwapKey(poolAddress));
+  const farmUser = toFarmUserPosition(lpUser);
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(pool));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
@@ -288,12 +288,7 @@ const Deposit: React.FC = () => {
     return null;
   }, [pmm, basePrice, quotePrice, pool]);
 
-  const share = useMemo(() => {
-    if (pool && poolTokenAccount) {
-      return rate(poolTokenAccount.amount, pool.poolState.totalSupply);
-    }
-    return 0;
-  }, [pool, poolTokenAccount]);
+  const share = new BigNumber(0);
 
   const [baseShare, quoteShare] = useMemo(() => {
     if (share && pmm) {
@@ -365,7 +360,7 @@ const Deposit: React.FC = () => {
           pool,
           baseAccount: baseTokenAccount,
           quoteAccount: quoteTokenAccount,
-          poolTokenRef: poolTokenAccount?.publicKey,
+          poolTokenRef: null,
           depositData: {
             amountTokenA: BigInt(
               exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString(),
@@ -434,7 +429,6 @@ const Deposit: React.FC = () => {
     base,
     quote,
     signTransaction,
-    poolTokenAccount?.publicKey,
     config,
     farmPoolKey,
     farmUser,
@@ -444,7 +438,7 @@ const Deposit: React.FC = () => {
   const handleWithdraw = useCallback(async () => {
     let transaction: Transaction;
 
-    if (!connection || !pool || !walletPubkey || !poolTokenAccount) {
+    if (!connection || !pool || !walletPubkey) {
       return null;
     }
 
@@ -455,7 +449,7 @@ const Deposit: React.FC = () => {
         transaction = await withdrawMethod({
           connection,
           walletPubkey,
-          poolTokenAccount,
+          poolTokenAccount: null,
           pool,
           baseTokenRef: baseTokenAccount?.publicKey,
           quteTokenRef: quoteTokenAccount?.publicKey,
@@ -465,7 +459,7 @@ const Deposit: React.FC = () => {
                 .poolTokenFromAmount(
                   exponentiate(base.amount, pool.baseTokenInfo.decimals),
                   exponentiate(quote.amount, pool.quoteTokenInfo.decimals),
-                  poolTokenAccount.amount,
+                  new BigNumber(0),
                   share,
                 )
                 // round ceil makes sure the amount of token the lp token
@@ -538,7 +532,6 @@ const Deposit: React.FC = () => {
     connection,
     pool,
     walletPubkey,
-    poolTokenAccount,
     state,
     base,
     quote,
