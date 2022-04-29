@@ -90,3 +90,10 @@ export function chunks<T>(array: T[], size: number): T[][] {
 export function getTokenTvl(reserve: string, decimals: number, price: BigNumber) {
   return exponentiatedBy(new BigNumber(reserve).multipliedBy(price), decimals);
 }
+
+export function getUserTokenTvl(tvl: BigNumber, share: BigNumber, supply: BigNumber) {
+  if (share.isZero() || share.isNaN()) {
+    return new BigNumber(0);
+  }
+  return tvl.multipliedBy(share).dividedBy(supply);
+}

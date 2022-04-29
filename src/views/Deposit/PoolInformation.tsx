@@ -4,10 +4,12 @@ import { Typography, Paper, Box, makeStyles, Theme } from "@material-ui/core";
 import { formatPubkey } from "utils/utils";
 import copyToClipboard from "copy-to-clipboard";
 import { PublicKey } from "@solana/web3.js";
-import { PoolInfo } from "providers/types";
+import { PoolConfig, getTokenConfigBySymbol } from "constants/deployConfigV2";
+import { selectSwapBySwapKey } from "states/v2/selectorsV2";
+import { useSelector } from "react-redux";
 
 interface PoolInformationProps {
-  pool: PoolInfo;
+  pool: PoolConfig;
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
@@ -105,22 +107,22 @@ export const PoolInformation: FC<PoolInformationProps> = (props) => {
   const { pool } = props;
   const classes = useStyles();
 
+  const swapInfo = useSelector(selectSwapBySwapKey(pool.swapInfo));
   const poolItems = useMemo(() => {
     return [
-      { accountName: "Swap Account", publickey: pool.publicKey },
-      { accountName: "Pool token Address", publickey: pool.poolMintKey },
+      { accountName: "Swap Account", publickey: new PublicKey(pool.swapInfo) },
       {
-        accountName: `${pool.baseTokenInfo.symbol} Address`,
-        publickey: new PublicKey(pool.baseTokenInfo.mint),
+        accountName: `${pool.base} Address`,
+        publickey: new PublicKey(getTokenConfigBySymbol(pool.base).mint),
       },
       {
-        accountName: `${pool.quoteTokenInfo.symbol} Address`,
-        publickey: new PublicKey(pool.quoteTokenInfo.mint),
+        accountName: `${pool.quote} Address`,
+        publickey: new PublicKey(getTokenConfigBySymbol(pool.quote).mint),
       },
-      { accountName: `${pool.baseTokenInfo.symbol} Reserve Address`, publickey: pool.base },
-      { accountName: `${pool.quoteTokenInfo.symbol} Reserve Address`, publickey: pool.quote },
+      { accountName: `${pool.base} Reserve Address`, publickey: swapInfo.tokenBase },
+      { accountName: `${pool.quote} Reserve Address`, publickey: swapInfo.tokenQuote },
     ];
-  }, [pool]);
+  }, [pool, swapInfo]);
 
   return (
     <Paper className={classes.root}>
