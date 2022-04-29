@@ -9,8 +9,8 @@ export type PoolConfig = {
   quote: string;
   swapInfo: string;
   farmInfo: string;
-  baseTokenInfo: TokenConfig,
-  quoteTokenInfo: TokenConfig,
+  baseTokenInfo: TokenConfig;
+  quoteTokenInfo: TokenConfig;
 };
 
 export type PythConfig = {
@@ -40,8 +40,8 @@ export const poolConfigs: PoolConfig[] = deployConfigV2.poolInfoList.map((poolIn
     ...poolInfo,
     baseTokenInfo,
     quoteTokenInfo,
-  }
-})
+  };
+});
 
 export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String): PoolConfig {
   return poolConfigs.find(

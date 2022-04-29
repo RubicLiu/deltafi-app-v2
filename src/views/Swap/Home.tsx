@@ -194,13 +194,7 @@ const Home: React.FC = (props) => {
       }
     }
     return "-";
-  }, [
-    basePrice,
-    quotePrice,
-    tokenFrom.token.symbol,
-    pool,
-    poolInfo,
-  ]);
+  }, [basePrice, quotePrice, tokenFrom.token.symbol, pool, poolInfo]);
   const [state, setState] = useState<{
     open: boolean;
     vertical: "bottom" | "top";
