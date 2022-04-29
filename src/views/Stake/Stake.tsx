@@ -593,8 +593,8 @@ const Stake = (): ReactElement => {
             </Typography>
             <Typography variant="subtitle2">
               LP shares represents shares of the liquidity provided to a swap pool. You may obtain{" "}
-              {poolConfig.name} LP shares by depositing {poolConfig.base} and{" "}
-              {poolConfig.quote} into the {poolConfig.name} pool.
+              {poolConfig.name} LP shares by depositing {poolConfig.base} and {poolConfig.quote}{" "}
+              into the {poolConfig.name} pool.
             </Typography>
             <Box display="flex" alignItems="center" mt={3}>
               <Link
