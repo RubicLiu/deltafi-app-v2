@@ -8,9 +8,11 @@ function BigNumberWithConfig(
   return new BigNumber(val);
 }
 
+const FLOAT_ROUND_UP_ESPSILON: number = 0.00000000000000006;
+
 /**
  * calculate out amount from v2 g(m) curve, with slope=1 case. the formula is:
- * - token_b_output = b * (1 - (a / (a + m))^(P * A / B))
+ * - token_b_output = b - b * ((a / (a + m))^(P * A / B))
  * - a = current_reserve_a, b = current_reserve_b (current token reserves in the pool)
  * - m is the amount of token a trader want to sell to us
  * - A = target_reserve_a, B = target_reserve_b (A/B is the token ratio we want to maintain)
@@ -39,7 +41,7 @@ export function calculateOutAmountNormalSwapInternal(
   let coreNumber = core.toNumber();
   let expNumber = exp.toNumber();
   // round up the float value of core^exp
-  let coreExpNumber = Math.pow(coreNumber, expNumber) + 0.00000000000000006;
+  let coreExpNumber = Math.pow(coreNumber, expNumber) + FLOAT_ROUND_UP_ESPSILON;
 
   // need to ceil the coreExp
   let coreExp: BigNumber = BigNumberWithConfig(currentResreveB.toNumber(), {
