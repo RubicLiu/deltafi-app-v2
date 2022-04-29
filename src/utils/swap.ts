@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import { PoolInfo } from "providers/types";
+import { calculateOutAmountNormalSwap,  } from "lib/curve";
 
 export function getSwapOutAmount(
   pool: PoolInfo,
