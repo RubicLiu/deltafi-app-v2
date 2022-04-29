@@ -14,7 +14,6 @@ import {
   selectSwapBySwapKey,
   selectMarketPriceByPool,
 } from "states/v2/selectorsV2";
-import { getTokenConfigBySymbol } from "constants/deployConfigV2";
 
 const Img = styled.img`
   width: 20px;
@@ -78,8 +77,8 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const classes = useStyles();
   const { poolConfig } = props;
 
-  const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
-  const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
+  const baseTokenInfo = poolConfig.baseTokenInfo;
+  const quoteTokenInfo = poolConfig.quoteTokenInfo;
   const swapInfo = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
   const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
 

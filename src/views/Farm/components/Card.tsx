@@ -7,7 +7,7 @@ import BigNumber from "bignumber.js";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { ConnectButton, Text } from "components";
 import { CardProps } from "./types";
-import { convertDollar, getTokenTvl } from "utils/utils";
+import { convertDollar, getTokenTvl, getUserTokenTvl } from "utils/utils";
 
 import { useSelector } from "react-redux";
 import {
@@ -16,7 +16,6 @@ import {
   selectSwapBySwapKey,
   selectLpUserBySwapKey,
 } from "states/v2/selectorsV2";
-import { getTokenConfigBySymbol } from "constants/deployConfigV2";
 
 const deltafiTokenDecimals = 6;
 
@@ -77,19 +76,12 @@ const Img = styled.img`
   }
 `;
 
-function getUserTokenTvl(tvl: BigNumber, share: BigNumber, supply: BigNumber) {
-  if (share.isZero() || share.isNaN()) {
-    return new BigNumber(0);
-  }
-  return tvl.multipliedBy(share).dividedBy(supply);
-}
-
 const FarmCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const history = useHistory();
   const { poolConfig } = props;
-  const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
-  const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
+  const baseTokenInfo = poolConfig.baseTokenInfo;
+  const quoteTokenInfo = poolConfig.quoteTokenInfo;
   const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
   const farmInfo = useSelector(selectFarmByFarmKey(poolConfig?.farmInfo));
   const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
