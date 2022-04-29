@@ -50,3 +50,7 @@ export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String):
       (base === quoteSymbol && quote === baseSymbol),
   );
 }
+
+export function getPoolConfigBySwapKey(poolKey: String): PoolConfig {
+  return poolConfigs.find(({ swapInfo }) => swapInfo === poolKey);
+}
