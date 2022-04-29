@@ -10,7 +10,6 @@ function BigNumberWithConfig(
 
 const FLOAT_ROUND_UP_ESPSILON: number = 0.00000000000000006;
 
-
 /**
  * calculate out amount from v2 g(m) curve, with slope=1 case. the formula is:
  * - token_b_output = b - b * ((a / (a + m))^(P * A / B))
@@ -19,7 +18,7 @@ const FLOAT_ROUND_UP_ESPSILON: number = 0.00000000000000006;
  * - A = target_reserve_a, B = target_reserve_b (A/B is the token ratio we want to maintain)
  * - P = market price, (the number of token b can be purchased by 1 token a)
  */
- export function calculateOutAmountNormalSwapInternal(
+export function calculateOutAmountNormalSwapInternal(
   marketPrice: BigNumber,
   targetReserveA: BigNumber,
   targetReserveB: BigNumber,
