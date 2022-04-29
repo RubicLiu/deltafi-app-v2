@@ -756,18 +756,18 @@ const Deposit: React.FC = () => {
         </ConnectButton>
       );
     } else {
-      //      if (base && quote && baseShare && quoteShare) {
-      //        if (
-      //          baseShare.isLessThan(new BigNumber(base.amount)) ||
-      //          quoteShare.isLessThan(new BigNumber(quote.amount))
-      //        ) {
-      //          return (
-      //            <ConnectButton size="large" fullWidth disabled>
-      //              Insufficient balance
-      //            </ConnectButton>
-      //          );
-      //        }
-      //      }
+      if (base && quote && baseShare && quoteShare) {
+        if (
+          baseShare.isLessThan(new BigNumber(base.amount)) ||
+          quoteShare.isLessThan(new BigNumber(quote.amount))
+        ) {
+          return (
+            <ConnectButton size="large" fullWidth disabled>
+              Insufficient balance
+            </ConnectButton>
+          );
+        }
+      }
       return (
         <ConnectButton
           fullWidth
@@ -787,10 +787,10 @@ const Deposit: React.FC = () => {
     isConnectedWallet,
     baseTokenAccount,
     base,
-    //baseShare,
+    baseShare,
     quoteTokenAccount,
     quote,
-    //quoteShare,
+    quoteShare,
     setMenu,
     handleDeposit,
     handleWithdraw,
