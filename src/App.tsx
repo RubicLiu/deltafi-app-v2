@@ -25,10 +25,7 @@ import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 import { PublicKey } from "@solana/web3.js";
 import { fetchTokenAccountsThunk } from "states/tokenAccountState";
 import { scheduleWithInterval } from "utils";
-import { deployConfigV2 } from "constants/deployConfigV2";
-import { getClusterApiUrl } from "anchor/anchor_utils";
 import { AccountLayout } from "@solana/spl-token";
-import { web3 } from "@project-serum/anchor";
 import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
 import { fetchFarmsV2Thunk } from "states/v2/farmV2State";
 import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2State";
@@ -78,8 +75,6 @@ const App: React.FC = () => {
       return;
     }
 
-    const clustApiUrl = getClusterApiUrl(deployConfigV2.network);
-    const connection = new web3.Connection(clustApiUrl, "confirmed");
     dispatch(fetchSwapsV2Thunk({ connection, walletAddress }));
     dispatch(fetchFarmsV2Thunk({ connection, walletAddress }));
     dispatch(fetchPythDataV2Thunk(connection));
@@ -89,7 +84,7 @@ const App: React.FC = () => {
       dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress }));
       dispatch(fetchUserV2Thunk({ connection, walletAddress }));
     }
-  }, [walletAddress, dispatch]);
+  }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
     if (!walletAddress) {
