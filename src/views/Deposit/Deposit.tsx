@@ -219,8 +219,8 @@ const Deposit: React.FC = () => {
 
   const poolConfig = getPoolConfigBySwapKey(poolAddress);
 
-  const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
-  const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
+  const baseTokenInfo = poolConfig.baseTokenInfo;
+  const quoteTokenInfo = poolConfig.quoteTokenInfo;
   const baseTokenAccount = useSelector(selectTokenAccountInfoByMint(baseTokenInfo.mint));
   const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(quoteTokenInfo.mint));
 
