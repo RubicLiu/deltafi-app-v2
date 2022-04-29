@@ -1,20 +1,20 @@
-import { ApproximateOutAmount, ApproximateUpperBoundK } from "../src/lib/calc/approximation";
+import { approximateOutAmount, approximateUpperBoundK } from "../src/lib/calc/approximation";
 import BigNumber from "bignumber.js";
 
 describe("approximation", function () {
-  it("ApproximateUpperBoundK", function () {
-    expect(ApproximateUpperBoundK(new BigNumber(100_000_000_000), new BigNumber(1000), 2))
+  it("approximateUpperBoundK", function () {
+    expect(approximateUpperBoundK(new BigNumber(100_000_000_000), new BigNumber(1000), 2))
       // 1.00000000000000030000000204 from contract's unit test
       .toEqual(new BigNumber("1.00000000000000030001"));
 
-    expect(ApproximateUpperBoundK(new BigNumber(1_000_333_000_000), new BigNumber(666666666), 3))
+    expect(approximateUpperBoundK(new BigNumber(1_000_333_000_000), new BigNumber(666666666), 3))
       // 1.00000266726725809421318062 from contract's unit test
       .toEqual(new BigNumber("1.00000266726725809425"));
   });
 
-  it("ApproximateOutAmount", function () {
+  it("approximateOutAmount", function () {
     expect(
-      ApproximateOutAmount(
+      approximateOutAmount(
         new BigNumber(1_000_000_000_000_000),
         new BigNumber(2_500_000_000_000_000),
         new BigNumber(20_000_000_000),
@@ -28,7 +28,7 @@ describe("approximation", function () {
     });
 
     expect(
-      ApproximateOutAmount(
+      approximateOutAmount(
         new BigNumber(1_000_111_000),
         new BigNumber(2_000_777_000_000),
         new BigNumber(20_000),
@@ -42,7 +42,7 @@ describe("approximation", function () {
     });
 
     expect(
-      ApproximateOutAmount(
+      approximateOutAmount(
         new BigNumber(1_000_000),
         new BigNumber(1_220_000),
         new BigNumber(20_000),
@@ -56,7 +56,7 @@ describe("approximation", function () {
     });
 
     expect(
-      ApproximateOutAmount(
+      approximateOutAmount(
         new BigNumber(1_500_000),
         new BigNumber(1_500_000),
         new BigNumber(18_000),
