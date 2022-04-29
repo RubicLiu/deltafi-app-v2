@@ -77,6 +77,13 @@ const Img = styled.img`
   }
 `;
 
+function getUserTokenTvl(tvl: BigNumber, share: BigNumber, supply: BigNumber) {
+  if (share.isZero() || share.isNaN()) {
+    return new BigNumber(0);
+  }
+  return tvl.multipliedBy(share).dividedBy(supply);
+}
+
 const FarmCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const history = useHistory();
@@ -115,12 +122,16 @@ const FarmCard: React.FC<CardProps> = (props) => {
 
   const stakedTvl = useMemo(() => {
     if (swapInfo && farmInfo) {
-      const userBaseTvl = baseTvl
-        .multipliedBy(new BigNumber(farmInfo.stakedBaseReserve))
-        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()));
-      const userQuoteTvl = quoteTvl
-        .multipliedBy(new BigNumber(farmInfo.stakedQuoteReserve))
-        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()));
+      const userBaseTvl = getUserTokenTvl(
+        baseTvl,
+        new BigNumber(farmInfo.stakedBaseShare.toString()),
+        new BigNumber(swapInfo.poolState.baseSupply.toString()),
+      );
+      const userQuoteTvl = getUserTokenTvl(
+        quoteTvl,
+        new BigNumber(farmInfo.stakedQuoteShare.toString()),
+        new BigNumber(swapInfo.poolState.quoteSupply.toString()),
+      );
       return userBaseTvl.plus(userQuoteTvl);
     }
     return 0;
@@ -128,12 +139,16 @@ const FarmCard: React.FC<CardProps> = (props) => {
 
   const userStakedTvl = useMemo(() => {
     if (swapInfo && lpUser) {
-      const userBaseTvl = baseTvl
-        .multipliedBy(new BigNumber(lpUser.basePosition.depositedAmount))
-        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()));
-      const userQuoteTvl = quoteTvl
-        .multipliedBy(new BigNumber(lpUser.quotePosition.depositedAmount))
-        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()));
+      const userBaseTvl = getUserTokenTvl(
+        baseTvl,
+        new BigNumber(lpUser.basePosition.depositedAmount.toString()),
+        new BigNumber(swapInfo.poolState.baseSupply.toString()),
+      );
+      const userQuoteTvl = getUserTokenTvl(
+        quoteTvl,
+        new BigNumber(lpUser.quotePosition.depositedAmount.toString()),
+        new BigNumber(swapInfo.poolState.quoteSupply.toString()),
+      );
       return userBaseTvl.plus(userQuoteTvl);
     }
     return new BigNumber(0);
