@@ -8,59 +8,6 @@ function BigNumberWithConfig(
   return new BigNumber(val);
 }
 
-export function calculateOutAmountNormalSwapInternal(
-  marketPrice: BigNumber,
-  targetReserveA: BigNumber,
-  targetReserveB: BigNumber,
-  currentReserveA: BigNumber,
-  currentResreveB: BigNumber,
-  inputAAmount: BigNumber,
-): BigNumber {
-  // need to ceil the core
-  let core: BigNumber = BigNumberWithConfig(currentReserveA, {
-    ROUNDING_MODE: BigNumber.ROUND_CEIL,
-  }).dividedBy(currentReserveA.plus(inputAAmount));
-
-  // need to floor the exp
-  let exp: BigNumber = BigNumberWithConfig(marketPrice, {
-    ROUNDING_MODE: BigNumber.ROUND_FLOOR,
-  })
-    .multipliedBy(targetReserveA)
-    .dividedBy(targetReserveB);
-
-  let coreNumber = core.toNumber();
-  let expNumber = exp.toNumber();
-  // round up the float value of core^exp
-  let coreExpNumber = Math.pow(coreNumber, expNumber) + 0.00000000000000006;
-
-  let coreExp: BigNumber = BigNumberWithConfig(currentResreveB.toNumber(), {
-    ROUNDING_MODE: BigNumber.ROUND_CEIL,
-  }).multipliedBy(new BigNumber(coreExpNumber));
-
-  return currentResreveB.minus(coreExp);
-}
-
-export function calculateOutAmountNormalSwap(
-  marketPrice: BigNumber,
-  targetReserveA: BigNumber,
-  targetReserveB: BigNumber,
-  currentReserveA: BigNumber,
-  currentResreveB: BigNumber,
-  inputAAmount: BigNumber,
-): number {
-  // TODO(leqiang): add approximation result here
-  return Math.floor(
-    calculateOutAmountNormalSwapInternal(
-      marketPrice,
-      targetReserveA,
-      targetReserveB,
-      currentReserveA,
-      currentResreveB,
-      inputAAmount,
-    ).toNumber(),
-  );
-}
-
 export function calculateBalancedReservesStableSwap(
   stablePrice: BigNumber,
   currentReserveA: BigNumber,
