@@ -2,6 +2,7 @@ import {
   calculateBalancedReservesStableSwap,
   calculateOutAmountStableSwapInternal,
   calculateOutAmountNormalSwapInternal,
+  calculateOutAmountNormalSwap,
 } from "../src/lib/calc/calculation";
 import BigNumber from "bignumber.js";
 
@@ -110,6 +111,7 @@ describe("calculation", function () {
       ),
     ).toEqual(66666666);
   });
+
   it("calculateOutAmountNormalSwapInternal", function () {
     expect(
       Math.floor(
@@ -162,5 +164,40 @@ describe("calculation", function () {
         ).toNumber(),
       ),
     ).toEqual(2500);
+  });
+
+  it("calculateOutAmountNormalSwap", function () {
+    expect(
+      calculateOutAmountNormalSwap(
+        new BigNumber(0.163),
+        new BigNumber(100_000_000),
+        new BigNumber(20_000_000),
+        new BigNumber(123_001_000),
+        new BigNumber(23_321_001),
+        new BigNumber(12_550_000),
+      )
+    ).toEqual(1775380);
+
+    expect(
+      calculateOutAmountNormalSwap(
+        new BigNumber(1989.56323),
+        new BigNumber(10_000_000),
+        new BigNumber(20_000_000_000),
+        new BigNumber(10_352_634),
+        new BigNumber(20_003_000_001),
+        new BigNumber(200_000),
+      )
+    ).toEqual(377149571);
+
+    expect(
+      calculateOutAmountNormalSwap(
+        new BigNumber(3),
+        new BigNumber(20_000_000_000),
+        new BigNumber(55_000_000_000),
+        new BigNumber("1000000000000000000"),
+        new BigNumber("2500000000000000000"),
+        new BigNumber(1000),
+      )
+    ).toEqual(2727);
   });
 });
