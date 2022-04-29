@@ -2,7 +2,7 @@ import {
     calculateOutAmountNormalSwapInternal,
     calculateBalancedReservesStableSwap,
     calculateOutAmountStableSwapInternal,
-} from "./calculation";
+} from "../src/lib/calc/calculation";
 import BigNumber from "bignumber.js";
 
 describe("calculation", function () {
