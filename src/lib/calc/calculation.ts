@@ -129,7 +129,7 @@ export function calculateBalancedReservesStableSwap(
 }
 
 /**
- * calculate out amount from v2 g(m) curve, with any slope and market price P=1
+ * calculate out amount from v2 g(m) curve, with any slope and market price P is a constant
  * this function implements the formula below, for internal use in this module only, the formula is:
  * - token_b_output = (b + (1 - s)/s * B) * (1 - (s * a + (1 - s) * A)/(s * (a + m) + (1 - s) * A))
  * - a = current_reserve_a, b = current_reserve_b (current token reserves in the pool)
