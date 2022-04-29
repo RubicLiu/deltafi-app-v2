@@ -175,7 +175,7 @@ describe("calculation", function () {
         new BigNumber(123_001_000),
         new BigNumber(23_321_001),
         new BigNumber(12_550_000),
-      )
+      ),
     ).toEqual(1775380);
 
     expect(
@@ -186,7 +186,7 @@ describe("calculation", function () {
         new BigNumber(10_352_634),
         new BigNumber(20_003_000_001),
         new BigNumber(200_000),
-      )
+      ),
     ).toEqual(377149571);
 
     expect(
@@ -197,7 +197,7 @@ describe("calculation", function () {
         new BigNumber("1000000000000000000"),
         new BigNumber("2500000000000000000"),
         new BigNumber(1000),
-      )
+      ),
     ).toEqual(2727);
   });
 });
