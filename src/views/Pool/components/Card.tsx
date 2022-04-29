@@ -6,18 +6,15 @@ import BigNumber from "bignumber.js";
 import styled from "styled-components";
 
 import { ConnectButton } from "components";
-import { PMM } from "lib/calc";
-import { convertDollar } from "utils/utils";
-import { rate } from "utils/decimal";
+import { convertDollar, getTokenTvl } from "utils/utils";
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
 import {
-  selectFarmUserByFarmPoolKey,
-  selectPoolByPoolKey,
+  selectLpUserBySwapKey,
+  selectSwapBySwapKey,
   selectMarketPriceByPool,
-  selectTokenAccountInfoByMint,
-} from "states/selectors";
-import { getTokenPairByPoolName } from "utils";
+} from "states/v2/selectorsV2";
+import { getTokenConfigBySymbol } from "constants/deployConfigV2";
 
 const Img = styled.img`
   width: 20px;
@@ -75,89 +72,91 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   },
 }));
 
-function getLpTokenValue(pmm, basePrice, quotePrice, pool, lpTokenAmount) {
-  return pmm
-    .tvl(basePrice, quotePrice, pool.baseTokenInfo.decimals, pool.quoteTokenInfo.decimals)
-    .multipliedBy(rate(lpTokenAmount, pool.poolState.totalSupply))
-    .div(100);
-}
-
 const PoolCard: React.FC<CardProps> = (props) => {
   const history = useHistory();
   const { connected } = useWallet();
   const classes = useStyles();
   const { poolConfig } = props;
 
-  const pool = useSelector(selectPoolByPoolKey(poolConfig.swap));
-  const farmUser = useSelector(selectFarmUserByFarmPoolKey(poolConfig.farm));
+  const baseTokenInfo = getTokenConfigBySymbol(poolConfig.base);
+  const quoteTokenInfo = getTokenConfigBySymbol(poolConfig.quote);
+  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
+  const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(pool));
+  const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
-  const poolTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.poolMintKey.toBase58()));
-
-  const pmm = useMemo(() => {
-    if (pool) {
-      return new PMM(pool.poolState, marketPrice);
-    }
-    return null;
-  }, [pool, marketPrice]);
-
-  const tvl = useMemo(() => {
-    if (pmm && basePrice && quotePrice) {
-      return pmm.tvl(
+  const baseTvl = useMemo(() => {
+    if (basePrice && swapInfo) {
+      return getTokenTvl(
+        swapInfo.poolState.baseReserve.toNumber(),
+        baseTokenInfo.decimals,
         basePrice,
-        quotePrice,
-        pool.baseTokenInfo.decimals,
-        pool.quoteTokenInfo.decimals,
       );
     }
     return new BigNumber(0);
-  }, [pmm, basePrice, quotePrice, pool]);
+  }, [basePrice, swapInfo, baseTokenInfo]);
+
+  const quoteTvl = useMemo(() => {
+    if (quotePrice && swapInfo) {
+      return getTokenTvl(
+        swapInfo.poolState.quoteReserve.toNumber(),
+        quoteTokenInfo.decimals,
+        quotePrice,
+      );
+    }
+    return new BigNumber(0);
+  }, [quotePrice, swapInfo, quoteTokenInfo]);
+
+  const tvl = baseTvl.plus(quoteTvl);
 
   const sharePrice = useMemo(() => {
-    if (pmm && basePrice && quotePrice && poolTokenAccount) {
-      return getLpTokenValue(pmm, basePrice, quotePrice, pool, poolTokenAccount.amount);
+    if (swapInfo && lpUser) {
+      const userBaseTvl = baseTvl
+        .multipliedBy(new BigNumber(lpUser.baseShare))
+        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()));
+      const userQuoteTvl = quoteTvl
+        .multipliedBy(new BigNumber(lpUser.quoteShare))
+        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()));
+      return userBaseTvl.plus(userQuoteTvl);
     }
     return new BigNumber(0);
-  }, [pmm, basePrice, quotePrice, poolTokenAccount, pool]);
+  }, [baseTvl, quoteTvl, lpUser, swapInfo]);
 
   const stakingPrice = useMemo(() => {
-    if (pmm && basePrice && quotePrice && farmUser) {
-      return getLpTokenValue(
-        pmm,
-        basePrice,
-        quotePrice,
-        pool,
-        new BigNumber(farmUser.depositedAmount.toString()),
-      );
+    if (swapInfo && lpUser) {
+      const userBaseTvl = baseTvl
+        .multipliedBy(new BigNumber(lpUser.basePosition.depositedAmount))
+        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()));
+      const userQuoteTvl = quoteTvl
+        .multipliedBy(new BigNumber(lpUser.quotePosition.depositedAmount))
+        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()));
+      return userBaseTvl.plus(userQuoteTvl);
     }
     return new BigNumber(0);
-  }, [pmm, basePrice, quotePrice, farmUser, pool]);
+  }, [baseTvl, quoteTvl, lpUser, swapInfo]);
 
-  if (!pool) return null;
-
-  const [firstTokenInfo, secondTokenInfo] = getTokenPairByPoolName(pool);
+  if (!swapInfo) return null;
 
   return (
     <Box className={classes.container}>
       <Box className={classes.content}>
         <Box display="flex" alignItems="center">
-          <Img src={firstTokenInfo.logoURI} alt={`${firstTokenInfo.name} coin`} />
+          <Img src={baseTokenInfo.logoURI} alt={`${baseTokenInfo.name} coin`} />
           <Img
-            src={secondTokenInfo.logoURI}
-            alt={`${secondTokenInfo.name} coin`}
+            src={quoteTokenInfo.logoURI}
+            alt={`${quoteTokenInfo.name} coin`}
             className="coin-earning"
           />
           <Box ml={1.5}>
-            <Typography className={classes.tokenPair}>{`${pool.name}`}</Typography>
+            <Typography className={classes.tokenPair}>{`${poolConfig.name}`}</Typography>
           </Box>
         </Box>
         <ConnectButton
-          onClick={() => history.push(`/deposit/${pool.publicKey.toBase58()}`)}
+          onClick={() => history.push(`/deposit/${poolConfig.swapInfo}`)}
           variant={props.isUserPool ? "contained" : "outlined"}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
-          data-amp-analytics-attrs={`page: Pools, target: Deposit(${pool.baseTokenInfo.symbol} - ${pool.quoteTokenInfo.symbol})`}
+          data-amp-analytics-attrs={`page: Pools, target: Deposit(${swapInfo.name})`}
         >
           {props.isUserPool ? "MANAGE" : "DEPOSIT"}
         </ConnectButton>
