@@ -14,7 +14,7 @@ import { BigNumberWithConfig } from "./utils";
 /// the return value is a tuple with 2 number value:
 /// - impliedOutAmount: the amount in u64 using implied price
 /// - approximationResult: the amount of using this approximation
-export function ApproximateOutAmount(
+export function approximateOutAmount(
   currentReserveA: BigNumber,
   currentReserveB: BigNumber,
   targetReserveA: BigNumber,
@@ -51,7 +51,7 @@ export function ApproximateOutAmount(
     };
   }
 
-  const kProduct: BigNumber = ApproximateUpperBoundK(currentReserveA, inputAAmount, exp_ceil);
+  const kProduct: BigNumber = approximateUpperBoundK(currentReserveA, inputAAmount, exp_ceil);
   const kMultiplier: BigNumber = kProduct.minus(new BigNumber(1));
   const kMultiplicand: BigNumber = currentReserveB.minus(impliedOutAmountBigNumber);
 
@@ -81,7 +81,7 @@ export function ApproximateOutAmount(
  * - core_low = (1 - (m/a)*(P*A/B))
  * - k = core_high/core_low
  */
-export function ApproximateUpperBoundK(
+export function approximateUpperBoundK(
   currentReserveA: BigNumber,
   inputAAmount: BigNumber,
   exp_ceil: number,

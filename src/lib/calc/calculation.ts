@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { BigNumberWithConfig } from "./utils";
-import { ApproximateOutAmount } from "./approximation";
+import { approximateOutAmount } from "./approximation";
 import assert from "assert";
 
 const FLOAT_ROUND_UP_ESPSILON: number = 0.00000000000000006;
@@ -60,7 +60,7 @@ export function calculateOutAmountNormalSwap(
   currentResreveB: BigNumber,
   inputAAmount: BigNumber,
 ): number {
-  const { impliedOutAmount, approximationResult } = ApproximateOutAmount(
+  const { impliedOutAmount, approximationResult } = approximateOutAmount(
     currentReserveA,
     currentResreveB,
     targetReserveA,
