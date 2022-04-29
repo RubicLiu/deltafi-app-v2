@@ -1,2 +1,2 @@
 export * from "./pmm";
-export { calculateOutAmountNormalSwap } from "./calculation";
+export { calculateOutAmountNormalSwap, calculateOutAmountStableSwap } from "./calculation";
