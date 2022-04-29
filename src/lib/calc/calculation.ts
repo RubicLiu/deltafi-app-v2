@@ -60,15 +60,15 @@ export function calculateOutAmountNormalSwap(
   currentResreveB: BigNumber,
   inputAAmount: BigNumber,
 ): number {
-  const {impliedOutAmount, approximationResult} = ApproximateOutAmount(
+  const { impliedOutAmount, approximationResult } = ApproximateOutAmount(
     currentReserveA,
     currentResreveB,
     targetReserveA,
     targetReserveB,
     marketPrice,
-    inputAAmount
+    inputAAmount,
   );
-  
+
   const calculationResult = Math.floor(
     calculateOutAmountNormalSwapInternal(
       marketPrice,
