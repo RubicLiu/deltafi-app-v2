@@ -56,6 +56,9 @@ const getUnclaimedReward = (
   deltafiTokenDecimals: number,
 ) => {
   const currentTs: BigNumber = new BigNumber(Date.now()).div(new BigNumber(1000));
+  if (currentTs <= nextClaimTs) {
+    return new BigNumber(0);
+  }
   const unTrackedReward: BigNumber = currentTs
     .minus(lastUpdateTs)
     .div(new BigNumber(SECONDS_OF_YEAR))
@@ -590,8 +593,8 @@ const Stake = (): ReactElement => {
             </Typography>
             <Typography variant="subtitle2">
               LP tokens represents a share of the liquidity provided to a swap pool. You may obtain{" "}
-              {poolConfig.name} LP tokens by depositing {poolConfig.name.split("-")[0]} and{" "}
-              {poolConfig.name.split("-")[1]} into the {poolConfig.name} pool.
+              {poolConfig.name} LP tokens by depositing {poolConfig.base} and{" "}
+              {poolConfig.quote} into the {poolConfig.name} pool.
             </Typography>
             <Box display="flex" alignItems="center" mt={3}>
               <Link
