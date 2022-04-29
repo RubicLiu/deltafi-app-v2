@@ -105,4 +105,3 @@ export function ApproximateUpperBoundK(
     ROUNDING_MODE: BigNumber.ROUND_CEIL,
   }).dividedBy(coreLow);
 }
-
