@@ -6,7 +6,7 @@ import BigNumber from "bignumber.js";
 import Page from "components/layout/Page";
 import PoolCard from "./components/Card";
 import { convertDollar, getTokenTvl } from "utils/utils";
-import { getTokenConfigBySymbol, PoolConfig, poolConfigs } from "constants/deployConfigV2";
+import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { useSelector } from "react-redux";
 import {
   pythSelector,
@@ -84,8 +84,8 @@ const Home: React.FC = () => {
 
         let volumn = new BigNumber(0);
         if (basePrice && quotePrice && swapInfo) {
-          const baseDecimals = getTokenConfigBySymbol(poolConfig.base).decimals;
-          const quoteDecimals = getTokenConfigBySymbol(poolConfig.quote).decimals;
+          const baseDecimals = poolConfig.baseTokenInfo.decimals;
+          const quoteDecimals = poolConfig.quoteTokenInfo.decimals;
           const baseTvl = getTokenTvl(
             swapInfo.poolState.baseReserve.toNumber(),
             baseDecimals,
