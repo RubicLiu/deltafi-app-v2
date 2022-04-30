@@ -245,8 +245,8 @@ const Home: React.FC = (props) => {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           pool,
-          newTokenFrom.mint,
-          newTokenTo.mint,
+          newTokenFrom,
+          newTokenTo,
           card.amount ?? "0",
           parseFloat(priceImpact),
           marketPrice,
@@ -273,8 +273,8 @@ const Home: React.FC = (props) => {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           pool,
-          newTokenFrom.mint,
-          newTokenTo.mint,
+          newTokenFrom,
+          newTokenTo,
           tokenFrom.amount ?? "0",
           parseFloat(priceImpact),
           marketPrice,
