@@ -2,7 +2,7 @@ import {
   calculateBalancedReservesStableSwap,
   calculateOutAmountStableSwapInternal,
   calculateOutAmountNormalSwapInternal,
-} from "../src/lib/calc/calculation";
+} from "../src/lib/curve/calculation";
 import BigNumber from "bignumber.js";
 
 describe("calculation", function () {
@@ -110,6 +110,7 @@ describe("calculation", function () {
       ),
     ).toEqual(66666666);
   });
+  
   it("calculateOutAmountNormalSwapInternal", function () {
     expect(
       Math.floor(
