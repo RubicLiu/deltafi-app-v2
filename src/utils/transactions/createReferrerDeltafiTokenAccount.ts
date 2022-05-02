@@ -1,6 +1,6 @@
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import { deployConfig } from "constants/deployConfig";
-import { createTokenAccountTransaction, signTransaction } from ".";
+import { createTokenAccountTransaction, partialSignTransaction } from ".";
 
 export async function createReferrerDeltafiTokenAccount({
   connection,
@@ -17,7 +17,7 @@ export async function createReferrerDeltafiTokenAccount({
     })
   ).transaction;
 
-  return signTransaction({
+  return partialSignTransaction({
     transaction,
     feePayer: walletPubkey,
     signers: [],

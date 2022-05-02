@@ -19,8 +19,7 @@ import { useParams } from "react-router";
 import clx from "classnames";
 import BigNumber from "bignumber.js";
 
-import { Program, Provider, web3 } from "@project-serum/anchor";
-import * as token from "@solana/spl-token";
+import { BN } from "@project-serum/anchor";
 import SwapCard from "views/Swap/components/Card";
 import { ConnectButton } from "components";
 import Page from "components/layout/Page";
@@ -46,9 +45,11 @@ import {
 } from "states/v2/selectorsV2";
 import { setTokenAmount, setTokenInfo } from "states/v2/depositV2State";
 import { PublicKey, Transaction } from "@solana/web3.js";
-import { fecthTokenAccountInfoList } from "states/v2/tokenV2State";
 import { sendSignedTransaction } from "utils/transactions";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2State";
+import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
+import { createDepositTransaction } from "utils/transactions/v2/deposit";
 
 interface TransactionResult {
   status: boolean | null;
@@ -370,156 +371,103 @@ const Deposit: React.FC = () => {
   }, [swapInfo]);
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
+  const wallet = useWallet();
   const { connection } = useConnection();
 
-  const handleDeposit = useCallback(
-    async () => {
-      let transaction: Transaction;
+  const handleDeposit = useCallback(async () => {
+    let transaction: Transaction;
 
-      if (!connection || !swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount) {
+    if (!connection || !swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount) {
+      return null;
+    }
+
+    const base = depositV2.base;
+    const quote = depositV2.quote;
+
+    setIsProcessing(true);
+    try {
+      if (base.amount !== "" && quote.amount !== "") {
+        console.info(base.amount, quote.amount);
+
+        const program = getDeltafiDexV2(
+          new PublicKey(deployConfigV2.programId),
+          makeProvider(connection, wallet),
+        );
+
+        const baseAmount = new BigNumber(base.amount).multipliedBy(
+          new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
+        );
+        const quoteAmount = new BigNumber(quote.amount).multipliedBy(
+          new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
+        );
+        transaction = await createDepositTransaction(
+          program,
+          connection,
+          poolConfig,
+          swapInfo,
+          baseTokenAccount.publicKey,
+          quoteTokenAccount.publicKey,
+          walletPubkey,
+          lpUser,
+          new BN(baseAmount.toFixed(0)),
+          new BN(quoteAmount.toFixed(0)),
+        );
+      } else {
+        setIsProcessing(false);
         return null;
       }
 
-      const base = depositV2.base;
-      const quote = depositV2.quote;
+      transaction = await signTransaction(transaction);
 
-      setIsProcessing(true);
-      try {
-        if (base.amount !== "" && quote.amount !== "") {
-          console.info(base.amount, quote.amount);
+      const hash = await sendSignedTransaction({
+        signedTransaction: transaction,
+        connection,
+      });
 
-          const program = getDeltafiDexV2(
-            new PublicKey(deployConfigV2.programId),
-            makeProvider(connection, walletPubkey),
-          );
+      await connection.confirmTransaction(hash, "confirmed");
 
-          //              await program.rpc.stableSwap(new anchor.BN(100), new anchor.BN(9353), {
-          //                accounts: {
-          //                  marketConfig,
-          //                  swapInfo,
-          //                  userSourceToken: userTokenBase,
-          //                  userDestinationToken: userTokenQuote,
-          //                  swapSourceToken: tokenBase,
-          //                  swapDestinationToken: tokenQuote,
-          //                  deltafiUser,
-          //                  adminDestinationToken: adminFeeTokenB,
-          //                  userAuthority: userKeypair.publicKey,
-          //                  tokenProgram: token.TOKEN_PROGRAM_ID,
-          //                },
-          //                signers: [userKeypair],
-          //              });
-
-          const [lpPublicKey, lpBump] = await PublicKey.findProgramAddress(
-            [Buffer.from("LiquidityProvider"), swapInfo.toBuffer(), walletPubkey.toBuffer()],
-            program.programId,
-          );
-          transaction = program.transaction.createLiquidityProvider(lpBump, {
-            accounts: {
-              marketConfig: swapInfo.marketConfig,
-              swapInfo,
-              liquidityProvider: lpPublicKey,
-              owner: walletPubkey,
-              systemProgram: web3.SystemProgram.programId,
-              rent: web3.SYSVAR_RENT_PUBKEY,
-            },
-          });
-
-          //transaction = program.transaction.depositToStableSwap({
-          //    accounts: {
-          //      swapInfo,
-          //      userTokenBase: baseTokenAccount,
-          //      userTokenQuote: quoteTokenAccount,
-          //      liquidityProvider: lpPublicKey,
-          //      tokenBase: swapInfo.tokenBase,
-          //      tokenQuote: swapInfo.tokenQuote,
-          //      userAuthority: walletPubkey,
-          //      tokenProgram: token.TOKEN_PROGRAM_ID,
-          //    },
-          //  }
-          //);
-
-          //const depositMethod = pool.swapType === SwapType.Normal ? deposit : stableDeposit;
-          //transaction = await depositMethod({
-          //  connection,
-          //  walletPubkey,
-          //  pool,
-          //  baseAccount: baseTokenAccount,
-          //  quoteAccount: quoteTokenAccount,
-          //  poolTokenRef: null,
-          //  depositData: {
-          //    amountTokenA: BigInt(
-          //      exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString(),
-          //    ),
-          //    amountTokenB: BigInt(
-          //      exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString(),
-          //    ),
-          //    amountMintMin: BigInt(0),
-          //  },
-          //  config,
-          //  farmPool: farmPoolKey,
-          //  farmUser: farmUser?.publicKey,
-          //});
-        } else {
-          setIsProcessing(false);
-          return null;
-        }
-
-        transaction = await signTransaction(transaction);
-
-        const hash = await sendSignedTransaction({
-          signedTransaction: transaction,
+      dispatch(setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+      //setTransactionResult({
+      //  status: true,
+      //  action: "deposit",
+      //  hash,
+      //  base,
+      //  quote,
+      //});
+    } catch (e) {
+      console.error("error", e);
+      //setBase((prevBase) => ({ ...prevBase, amount: "" }));
+      //setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
+      //setTransactionResult({ status: false });
+    } finally {
+      setState((state) => ({ ...state, open: true }));
+      setIsProcessing(false);
+      dispatch(
+        fetchLiquidityProvidersV2Thunk({
           connection,
-        });
-
-        await connection.confirmTransaction(hash, "confirmed");
-
-        //await fecthTokenAccountInfoList(
-        //  [base.token.mint, quote.token.mint],
-        //  walletPubkey,
-        //  connection,
-        //  dispatch,
-        //);
-
-        dispatch(setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
-        //setTransactionResult({
-        //  status: true,
-        //  action: "deposit",
-        //  hash,
-        //  base,
-        //  quote,
-        //});
-      } catch (e) {
-        console.error("error", e);
-        //setBase((prevBase) => ({ ...prevBase, amount: "" }));
-        //setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
-        //setTransactionResult({ status: false });
-      } finally {
-        setState((state) => ({ ...state, open: true }));
-        setIsProcessing(false);
-        //dispatch(
-        //  fetchFarmUsersThunk({
-        //    connection,
-        //    walletAddress: walletPubkey,
-        //  }),
-        //);
-        //dispatch(fetchPoolsThunk({ connection }));
-      }
-    },
-    [
-      //    connection,
-      //    pool,
-      //    walletPubkey,
-      //    baseTokenAccount,
-      //    quoteTokenAccount,
-      //    base,
-      //    quote,
-      //    signTransaction,
-      //    config,
-      //    farmPoolKey,
-      //    farmUser,
-      //    dispatch,
-    ],
-  );
+          walletAddress: walletPubkey,
+        }),
+      );
+      dispatch(
+        fetchSwapsV2Thunk({
+          connection,
+          walletAddress: walletPubkey,
+        }),
+      );
+    }
+  }, [
+    wallet,
+    connection,
+    poolConfig,
+    swapInfo,
+    walletPubkey,
+    baseTokenAccount,
+    quoteTokenAccount,
+    signTransaction,
+    dispatch,
+    lpUser,
+    depositV2,
+  ]);
 
   const handleWithdraw = useCallback(
     async () => {
