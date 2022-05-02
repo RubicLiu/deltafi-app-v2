@@ -150,7 +150,6 @@ export const fetchTokenAccountsV2Thunk = createAsyncThunk(
 
     const mintToTokenAccountInfo = {};
     for (const tokenAccountInfo of tokenAccountInfoList) {
-      console.info("token", tokenAccountInfo.mint.toBase58(), tokenAccountInfo);
       mintToTokenAccountInfo[tokenAccountInfo.mint.toBase58()] = tokenAccountInfo;
     }
 

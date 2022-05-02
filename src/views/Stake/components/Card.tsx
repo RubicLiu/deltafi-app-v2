@@ -106,7 +106,27 @@ const StakeCard: React.FC<CardProps> = (props) => {
     <Paper className={classes.root}>
       <Box className={classes.main}>
         <DropDown
-          value={card.token}
+          value={card.poolConfig.baseTokenInfo}
+          options={tokens}
+          inputProps={{ placeholder: "token name, symbol" }}
+          disableDrop={disableDrop}
+        />
+        <CurrencyInput
+          name="currency"
+          disabled={isDisabledInput}
+          className={classes.currencyInput}
+          autoComplete="off"
+          placeholder="0.00"
+          minLength={0}
+          maxLength={20}
+          decimalsLimit={20}
+          value={value}
+          onChange={inputHandler}
+        />
+      </Box>
+      <Box className={classes.main}>
+        <DropDown
+          value={card.poolConfig.quoteTokenInfo}
           options={tokens}
           inputProps={{ placeholder: "token name, symbol" }}
           disableDrop={disableDrop}
