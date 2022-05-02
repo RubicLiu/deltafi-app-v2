@@ -84,18 +84,18 @@ export function approximateOutAmount(
 export function approximateUpperBoundK(
   currentReserveA: BigNumber,
   inputAAmount: BigNumber,
-  exp_ceil: number,
+  expCeil: number,
 ): BigNumber {
   // we need to ceil the coreHigh which is the numerator of the result
   let coreHigh: BigNumber = BigNumberWithConfig(currentReserveA, {
     ROUNDING_MODE: BigNumber.ROUND_CEIL,
   })
     .dividedBy(currentReserveA.plus(inputAAmount))
-    .exponentiatedBy(exp_ceil);
+    .exponentiatedBy(expCeil);
 
   // we need to floor the coreLow which is the denumerator of the result
   let coreLow: BigNumber = BigNumberWithConfig(
-    currentReserveA.minus(inputAAmount.multipliedBy(exp_ceil)),
+    currentReserveA.minus(inputAAmount.multipliedBy(expCeil)),
     {
       ROUNDING_MODE: BigNumber.ROUND_FLOOR,
     },
