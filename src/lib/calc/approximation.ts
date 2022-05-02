@@ -27,12 +27,6 @@ export function approximateOutAmount(
   impliedOutAmount: number;
   approximationResult: number;
 } {
-  let expCeil: number = Math.ceil(
-    marketPrice.multipliedBy(targetReserveA).dividedBy(targetReserveB).toNumber(),
-  );
-
-  validate(expCeil < (1 << 8) - 1, "exponent is too large");
-
   // implied_amount_out = m*(b/a)*P*(A/B)
   const impliedOutAmountNumerator: BigNumber = currentReserveB
     .multipliedBy(inputAAmount)
@@ -43,7 +37,12 @@ export function approximateOutAmount(
   const impliedOutAmountBigNumber: BigNumber = impliedOutAmountNumerator.dividedBy(
     impliedOutAmountDenumerator,
   );
+  
+  let expCeil: number = Math.ceil(
+    marketPrice.multipliedBy(targetReserveA).dividedBy(targetReserveB).toNumber(),
+  );
 
+  validate(expCeil < (1 << 8) - 1, "exponent is too large");
   // if a*ceil(P*A/B) > A, this approximation is not a good approach for the result
   // and we are not able to calculate k_1 and k_2, just skip and return 0
   // the approximation works when trading amount is much smaller than reserve
@@ -58,10 +57,13 @@ export function approximateOutAmount(
     };
   }
 
+  // k_product = k_1 * k_2
   const kProduct: BigNumber = approximateUpperBoundK(currentReserveA, inputAAmount, expCeil);
+  // k_multiplier = k_product - 1
   const kMultiplier: BigNumber = kProduct.minus(new BigNumber(1));
+  // k_multiplicand = b - implied_amount
   const kMultiplicand: BigNumber = currentReserveB.minus(impliedOutAmountBigNumber);
-
+  // diffFromImpliedAmount = k_multiplier * k_multiplicand
   const diffFromImpliedAmount: BigNumber = kMultiplier.multipliedBy(kMultiplicand);
   if (impliedOutAmountBigNumber.isLessThanOrEqualTo(diffFromImpliedAmount)) {
     return {
