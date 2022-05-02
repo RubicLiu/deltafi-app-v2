@@ -427,6 +427,7 @@ const Deposit: React.FC = () => {
       await connection.confirmTransaction(hash, "confirmed");
 
       dispatch(setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+      // TODO(ypeng): fix the transaction result logic
       //setTransactionResult({
       //  status: true,
       //  action: "deposit",
