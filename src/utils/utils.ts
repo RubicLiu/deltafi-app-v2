@@ -97,3 +97,9 @@ export function getUserTokenTvl(tvl: BigNumber, share: BigNumber, supply: BigNum
   }
   return tvl.multipliedBy(share).dividedBy(supply);
 }
+
+export function validate(expression: boolean, errMsg: string) {
+  if (expression === false) {
+    throw Error(errMsg);
+  }
+}
