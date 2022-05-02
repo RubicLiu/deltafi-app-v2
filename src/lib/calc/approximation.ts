@@ -25,11 +25,11 @@ export function approximateOutAmount(
   impliedOutAmount: number;
   approximationResult: number;
 } {
-  let exp_ceil: number = Math.ceil(
+  let expCeil: number = Math.ceil(
     marketPrice.multipliedBy(targetReserveA).dividedBy(targetReserveB).toNumber(),
   );
 
-  assert(exp_ceil < (1 << 8) - 1);
+  assert(expCeil < (1 << 8) - 1);
 
   const impliedOutAmountNumerator: BigNumber = currentReserveB
     .multipliedBy(inputAAmount)
@@ -42,7 +42,7 @@ export function approximateOutAmount(
   );
 
   if (
-    currentReserveA.isLessThanOrEqualTo(inputAAmount.multipliedBy(exp_ceil)) ||
+    currentReserveA.isLessThanOrEqualTo(inputAAmount.multipliedBy(expCeil)) ||
     currentReserveB.isLessThanOrEqualTo(inputAAmount)
   ) {
     return {
@@ -51,7 +51,7 @@ export function approximateOutAmount(
     };
   }
 
-  const kProduct: BigNumber = approximateUpperBoundK(currentReserveA, inputAAmount, exp_ceil);
+  const kProduct: BigNumber = approximateUpperBoundK(currentReserveA, inputAAmount, expCeil);
   const kMultiplier: BigNumber = kProduct.minus(new BigNumber(1));
   const kMultiplicand: BigNumber = currentReserveB.minus(impliedOutAmountBigNumber);
 
