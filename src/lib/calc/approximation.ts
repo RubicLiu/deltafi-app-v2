@@ -43,6 +43,10 @@ export function approximateOutAmount(
     impliedOutAmountDenumerator,
   );
 
+  // if a*ceil(P*A/B) > A, this approximation is not a good approach for the result
+  // and we are not able to calculate k_1 and k_2, just skip and return 0
+  // the approximation works when trading amount is much smaller than reserve
+  // if implied amount is larger than b, we skip and return 0
   if (
     currentReserveA.isLessThanOrEqualTo(inputAAmount.multipliedBy(expCeil)) ||
     currentReserveB.isLessThanOrEqualTo(inputAAmount)
