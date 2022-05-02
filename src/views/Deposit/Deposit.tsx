@@ -42,7 +42,8 @@ import {
   selectTokenAccountInfoByMint,
   depositSelector,
 } from "states/v2/selectorsV2";
-import { setBaseTokenInfo, setQuoteTokenInfo } from "states/v2/depositV2State";
+import { setBaseAmount, setBaseTokenInfo, setQuoteAmount, setQuoteTokenInfo } from "states/v2/depositV2State";
+import { TokenConfig } from "constants/deployConfig";
 
 interface TransactionResult {
   status: boolean | null;
@@ -193,6 +194,12 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginBottom: 4,
   },
 }));
+
+function getPairedTokenAmount(
+  amount: string,
+  srcToken: TokenConfig, dstToken: TokenConfig, srcPrice: BigNumber, dstPrice: BigNumber) {
+  return amount;
+}
 
 const Deposit: React.FC = () => {
   const classes = useStyles();
@@ -561,6 +568,10 @@ const Deposit: React.FC = () => {
   const handleBaseTokenInput = useCallback(
     (card: ISwapCard) => {
       console.info("card", card);
+      const quoteAmount = getPairedTokenAmount(card.amount, baseTokenInfo, quoteTokenInfo, basePrice, quotePrice);
+      console.info(quoteAmount);
+      dispatch(setBaseAmount({ amount: card.amount }));
+      dispatch(setQuoteAmount({ amount: quoteAmount }));
       // TODO(ypeng): Add implementation for v2.
       //      setBase(card);
       //      if (!quote.token) return;
