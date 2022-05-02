@@ -27,7 +27,7 @@ export function approximateOutAmount(
   impliedOutAmount: number;
   approximationResult: number;
 } {
-  // implied_amount_out = m*(b/a)*P*(A/B)
+  // impliedAmountOut = m*(b/a)*P*(A/B)
   const impliedOutAmountNumerator: BigNumber = currentReserveB
     .multipliedBy(inputAAmount)
     .multipliedBy(marketPrice)
@@ -44,7 +44,7 @@ export function approximateOutAmount(
 
   validate(expCeil < (1 << 8) - 1, "exponent is too large");
   // if a*ceil(P*A/B) > A, this approximation is not a good approach for the result
-  // and we are not able to calculate k_1 and k_2, just skip and return 0
+  // and we are not able to calculate k1 and k2, just skip and return 0
   // the approximation works when trading amount is much smaller than reserve
   // if implied amount is larger than b, we skip and return 0
   if (
@@ -57,13 +57,13 @@ export function approximateOutAmount(
     };
   }
 
-  // k_product = k_1 * k_2
+  // kProduct = k1 * k2
   const kProduct: BigNumber = approximateUpperBoundK(currentReserveA, inputAAmount, expCeil);
-  // k_multiplier = k_product - 1
+  // kMultiplier = kProduct - 1
   const kMultiplier: BigNumber = kProduct.minus(new BigNumber(1));
-  // k_multiplicand = b - implied_amount
+  // kMultiplicand = b - impliedAmount
   const kMultiplicand: BigNumber = currentReserveB.minus(impliedOutAmountBigNumber);
-  // diffFromImpliedAmount = k_multiplier * k_multiplicand
+  // diffFromImpliedAmount = kMultiplier * kMultiplicand
   const diffFromImpliedAmount: BigNumber = kMultiplier.multipliedBy(kMultiplicand);
   if (impliedOutAmountBigNumber.isLessThanOrEqualTo(diffFromImpliedAmount)) {
     return {
@@ -72,7 +72,7 @@ export function approximateOutAmount(
     };
   }
 
-  // approximatoinResult = impliedAmountout - (b - impliedAmountout) * (k_1*k_2 - 1) = impliedAmountout - diffFromImpliedAmount
+  // approximatoinResult = impliedAmountout - (b - impliedAmountout) * (k1*k2 - 1) = impliedAmountout - diffFromImpliedAmount
   const approximationResult: number = Math.floor(
     impliedOutAmountBigNumber.minus(diffFromImpliedAmount).toNumber(),
   );
@@ -89,10 +89,10 @@ export function approximateOutAmount(
  * Approximate an upper bound of k
  * - (a/(a + m))^(P*A/B) = k_1*(1 - m/a)^(P*A/B)
  * - (1 - m/a)^(P*A/B) = k_2*(1 - (m/a)*(P*A/B))
- * - k = k_1*k_2
- * - core_high = (a/(a + m))^(P*A/B)
- * - core_low = (1 - (m/a)*(P*A/B))
- * - k = core_high/core_low
+ * - k = k1*k2
+ * - coreHigh = (a/(a + m))^(P*A/B)
+ * - coreLow = (1 - (m/a)*(P*A/B))
+ * - k = coreHigh/coreLow
  */
 export function approximateUpperBoundK(
   currentReserveA: BigNumber,
