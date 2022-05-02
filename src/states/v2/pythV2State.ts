@@ -5,7 +5,7 @@ import BigNumber from "bignumber.js";
 
 import { getMultipleAccounts } from "utils/account";
 import { deployConfigV2 } from "constants/deployConfigV2";
-import assert from "assert";
+import { validate } from "utils/utils";
 
 type PythData = {
   symbol: string;
@@ -82,7 +82,10 @@ export function getPythPriceBySymbol(
   result.confidenceInterval = priceData.price ? priceData.confidence : priceData.previousConfidence;
 
   // if the price and confidence interval are both not undefined, price should be greater than confidence interval
-  assert(!(result.price && result.confidenceInterval) || result.price > result.confidenceInterval);
+  validate(
+    !(result.price && result.confidenceInterval) || result.price > result.confidenceInterval,
+    "confidence interval should not be larger than the price",
+  );
   return result;
 }
 
