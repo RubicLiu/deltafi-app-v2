@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { BigNumberWithConfig } from "./utils";
 import { approximateOutAmount } from "./approximation";
-import assert from "assert";
+import { validate } from "utils/utils";
 
 const FLOAT_ROUND_UP_ESPSILON: number = 0.00000000000000006;
 
@@ -81,7 +81,10 @@ export function calculateOutAmountNormalSwap(
   );
 
   const finalResult = Math.max(approximationResult, calculationResult);
-  assert(finalResult <= impliedOutAmount);
+  validate(
+    finalResult <= impliedOutAmount,
+    "final result for swap out amount should not be larger than the implied out amount",
+  );
 
   return finalResult;
 }

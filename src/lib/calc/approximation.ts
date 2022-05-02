@@ -1,4 +1,3 @@
-import assert from "assert";
 import BigNumber from "bignumber.js";
 import { validate } from "utils/utils";
 import { BigNumberWithConfig } from "./utils";
@@ -74,7 +73,10 @@ export function approximateOutAmount(
     impliedOutAmountBigNumber.minus(diffFromImpliedAmount).toNumber(),
   );
   const impliedOutAmount: number = Math.floor(impliedOutAmountBigNumber.toNumber());
-  assert(approximationResult <= impliedOutAmount);
+  validate(
+    approximationResult <= impliedOutAmount,
+    "approximation result should not be larger than the implied out amount",
+  );
 
   return { impliedOutAmount, approximationResult };
 }
