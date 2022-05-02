@@ -27,7 +27,7 @@ export function approximateOutAmount(
   impliedOutAmount: number;
   approximationResult: number;
 } {
-  // implied_amount_out = m*(b/a)*P*(A/B)
+  // impliedAmountOut = m*(b/a)*P*(A/B)
   const impliedOutAmountNumerator: BigNumber = currentReserveB
     .multipliedBy(inputAAmount)
     .multipliedBy(marketPrice)
@@ -44,7 +44,7 @@ export function approximateOutAmount(
 
   validate(expCeil < (1 << 8) - 1, "exponent is too large");
   // if a*ceil(P*A/B) > A, this approximation is not a good approach for the result
-  // and we are not able to calculate k_1 and k_2, just skip and return 0
+  // and we are not able to calculate k1 and k2, just skip and return 0
   // the approximation works when trading amount is much smaller than reserve
   // if implied amount is larger than b, we skip and return 0
   if (
@@ -89,7 +89,7 @@ export function approximateOutAmount(
  * Approximate an upper bound of k
  * - (a/(a + m))^(P*A/B) = k_1*(1 - m/a)^(P*A/B)
  * - (1 - m/a)^(P*A/B) = k_2*(1 - (m/a)*(P*A/B))
- * - k = k_1*k_2
+ * - k = k1*k2
  * - coreHigh = (a/(a + m))^(P*A/B)
  * - coreLow = (1 - (m/a)*(P*A/B))
  * - k = coreHigh/coreLow

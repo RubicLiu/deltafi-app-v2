@@ -33,14 +33,16 @@ import { SOLSCAN_LINK } from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getPoolConfigBySwapKey } from "constants/deployConfigV2";
 import {
   selectLpUserBySwapKey,
   selectMarketPriceByPool,
   selectSwapBySwapKey,
   selectTokenAccountInfoByMint,
+  depositSelector,
 } from "states/v2/selectorsV2";
+import { setTokenAmount, setTokenInfo } from "states/v2/depositV2State";
 
 interface TransactionResult {
   status: boolean | null;
@@ -192,6 +194,25 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   },
 }));
 
+function getPairedTokenAmount(
+  // TODO(ypeng): Find a way to import anchor enum type.
+  swapType: any,
+  amount: string,
+  srcPrice: BigNumber,
+  dstPrice: BigNumber,
+) {
+  const inputAmount = new BigNumber(amount);
+  if (inputAmount.isZero() || inputAmount.isNaN()) {
+    return "0";
+  }
+
+  if (swapType && swapType.stableSwap) {
+    return amount;
+  }
+
+  return inputAmount.multipliedBy(srcPrice).dividedBy(dstPrice).toString();
+}
+
 const Deposit: React.FC = () => {
   const classes = useStyles();
   const { connected: isConnectedWallet } = useWallet();
@@ -234,12 +255,17 @@ const Deposit: React.FC = () => {
   const [isProcessing] = useState(false);
   const { network } = useCustomConnection();
 
+  const depositV2 = useSelector(depositSelector);
+
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (baseTokenInfo && quoteTokenInfo) {
       setBase((base) => ({ ...base, token: baseTokenInfo }));
       setQuote((quote) => ({ ...quote, token: quoteTokenInfo }));
+      dispatch(setTokenInfo({ baseTokenInfo, quoteTokenInfo }));
     }
-  }, [baseTokenInfo, quoteTokenInfo]);
+  }, [baseTokenInfo, quoteTokenInfo, dispatch]);
 
   const baseTvl = useMemo(() => {
     if (basePrice && swapInfo) {
@@ -549,73 +575,32 @@ const Deposit: React.FC = () => {
     setState((state) => ({ ...state, open: false }));
   }, []);
 
-  const handleTokenFromInput = useCallback(
+  const handleBaseTokenInput = useCallback(
     (card: ISwapCard) => {
-      // TODO(ypeng): Add implementation for v2.
-      //      setBase(card);
-      //      if (!quote.token) return;
-      //
-      //      if (pool) {
-      //        if (method === "deposit") {
-      //          const outAmount = getOutAmount(pool, card.amount, card.token.mint, quote.token.mint, 0.0);
-      //          setQuote({
-      //            ...quote,
-      //            amount: isNaN(outAmount) ? "" : Number(outAmount).toString(),
-      //          });
-      //        } else {
-      //          if (share && card.amount) {
-      //            setWithdrawPercentage(
-      //              pmm
-      //                .baseShareRate(exponentiate(card.amount, card.token.decimals).toNumber(), share)
-      //                .toNumber() * 100,
-      //            );
-      //            setQuote({
-      //              ...quote,
-      //              amount: pmm.quoteFromBase(parseFloat(card.amount)).toString(),
-      //            });
-      //          } else if (card.amount === "") {
-      //            setWithdrawPercentage(0);
-      //            setQuote({ ...quote, amount: "" });
-      //          }
-      //        }
-      //      }
+      const baseAmount = card.amount;
+      const quoteAmount = getPairedTokenAmount(
+        swapInfo.swapType,
+        baseAmount,
+        basePrice,
+        quotePrice,
+      );
+      dispatch(setTokenAmount({ baseAmount, quoteAmount }));
     },
-    [
-      //pool, pmm, share, method, quote
-    ],
+    [basePrice, quotePrice, dispatch, swapInfo],
   );
 
-  const handleTokenToInput = useCallback(
+  const handleQuoteTokenInput = useCallback(
     (card: ISwapCard) => {
-      // TODO(ypeng): Add implementation for v2.
-      //      setQuote(card);
-      //      if (!base.token) return;
-      //
-      //      if (pool) {
-      //        if (method === "deposit") {
-      //          const outAmount = getOutAmount(pool, card.amount, card.token.mint, base.token.mint, 0.0);
-      //          setBase({
-      //            ...base,
-      //            amount: isNaN(outAmount) ? "" : Number(outAmount).toString(),
-      //          });
-      //        } else {
-      //          if (share && card.amount) {
-      //            setWithdrawPercentage(
-      //              pmm
-      //                .quoteShareRate(exponentiate(card.amount, card.token.decimals).toNumber(), share)
-      //                .toNumber() * 100,
-      //            );
-      //            setBase({ ...base, amount: pmm.baseFromQuote(parseFloat(card.amount)).toString() });
-      //          } else if (card.amount === "") {
-      //            setWithdrawPercentage(0);
-      //            setBase({ ...base, amount: "" });
-      //          }
-      //        }
-      //      }
+      const quoteAmount = card.amount;
+      const baseAmount = getPairedTokenAmount(
+        swapInfo.swapType,
+        quoteAmount,
+        quotePrice,
+        basePrice,
+      );
+      dispatch(setTokenAmount({ baseAmount, quoteAmount }));
     },
-    [
-      //pool, pmm, share, method, base
-    ],
+    [basePrice, quotePrice, dispatch, swapInfo],
   );
 
   const handleWithdrawSlider = useCallback(
@@ -872,24 +857,32 @@ const Deposit: React.FC = () => {
                 onUpdatePercentage={handleWithdrawSlider}
               />
               <WithdrawCard
-                card={base}
-                handleChangeCard={handleTokenFromInput}
+                card={depositV2.base}
+                handleChangeCard={handleBaseTokenInput}
                 withdrawal={baseShare?.toFixed(6).toString()}
                 disableDrop={true}
               />
               <Box mt={1} />
               <WithdrawCard
-                card={quote}
-                handleChangeCard={handleTokenToInput}
+                card={depositV2.quote}
+                handleChangeCard={handleQuoteTokenInput}
                 withdrawal={quoteShare?.toFixed(6).toString()}
                 disableDrop={true}
               />
             </Box>
           ) : (
             <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <SwapCard card={base} handleChangeCard={handleTokenFromInput} disableDrop={true} />
+              <SwapCard
+                card={depositV2.base}
+                handleChangeCard={handleBaseTokenInput}
+                disableDrop={true}
+              />
               <Box mt={1} />
-              <SwapCard card={quote} handleChangeCard={handleTokenToInput} disableDrop={true} />
+              <SwapCard
+                card={depositV2.quote}
+                handleChangeCard={handleQuoteTokenInput}
+                disableDrop={true}
+              />
             </Box>
           )}
           <Box mt={3} width="100%" sx={{ position: "relative", zIndex: 1 }}>

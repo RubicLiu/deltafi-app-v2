@@ -29,7 +29,6 @@ export const fetchFarmsV2Thunk = createAsyncThunk(
     for (let i = 0; i < poolInfoList.length; ++i) {
       const poolInfo = poolInfoList[i];
       const farmInfo = farmInfoList[i];
-      console.info("farm", poolInfo.name, farmInfo);
       farmKeyToFarmInfo[poolInfo.farmInfo] = farmInfo;
     }
 

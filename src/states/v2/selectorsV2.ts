@@ -8,6 +8,7 @@ export const farmPoolSelector = (state: RootState) => state.farmV2;
 export const poolSelector = (state: RootState) => state.swapV2;
 export const pythSelector = (state: RootState) => state.pythV2;
 export const tokenAccountSelector = (state: RootState) => state.tokenV2;
+export const depositSelector = (state: RootState) => state.depositV2;
 
 export function selectMarketPriceByPool(pool) {
   return (state: RootState) => {

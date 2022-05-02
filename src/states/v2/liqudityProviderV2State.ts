@@ -39,7 +39,6 @@ export const fetchLiquidityProvidersV2Thunk = createAsyncThunk(
     for (let i = 0; i < poolInfoList.length; ++i) {
       const poolInfo = poolInfoList[i];
       const lp = lpList[i];
-      console.info("lp", poolInfo.name, lp);
       swapKeyToLp[poolInfo.swapInfo] = lp;
     }
 
