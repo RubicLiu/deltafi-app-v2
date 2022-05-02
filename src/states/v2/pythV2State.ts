@@ -111,9 +111,9 @@ export function getPythMarketPrice(symbolToPythData: SymbolToPythData, poolInfo)
 
   return {
     marketPrice,
-    marketPriceHigh,
-    marketPriceLow,
     basePrice,
     quotePrice,
+    marketPriceLow,
+    marketPriceHigh,
   };
 }
