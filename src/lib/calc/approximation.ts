@@ -1,5 +1,6 @@
 import assert from "assert";
 import BigNumber from "bignumber.js";
+import { validate } from "utils/utils";
 import { BigNumberWithConfig } from "./utils";
 
 /// See "Approximation Method" in deltafi-dex-v2/contracts/programs/deltafi-dex-v2/src/curve/README.md
@@ -29,8 +30,9 @@ export function approximateOutAmount(
     marketPrice.multipliedBy(targetReserveA).dividedBy(targetReserveB).toNumber(),
   );
 
-  assert(expCeil < (1 << 8) - 1);
+  validate(expCeil < (1 << 8) - 1, "exponent is too large");
 
+  // implied_amount_out = m*(b/a)*P*(A/B)
   const impliedOutAmountNumerator: BigNumber = currentReserveB
     .multipliedBy(inputAAmount)
     .multipliedBy(marketPrice)
@@ -63,6 +65,7 @@ export function approximateOutAmount(
     };
   }
 
+  // approximatoinResult = impliedAmountout - (b - impliedAmountout) * (k_1*k_2 - 1)
   const approximationResult: number = Math.floor(
     impliedOutAmountBigNumber.minus(diffFromImpliedAmount).toNumber(),
   );
