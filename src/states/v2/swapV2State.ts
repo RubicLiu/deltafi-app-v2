@@ -29,7 +29,6 @@ export const fetchSwapsV2Thunk = createAsyncThunk(
     for (let i = 0; i < poolInfoList.length; ++i) {
       const poolInfo = poolInfoList[i];
       const swapInfo = swapInfoList[i];
-      console.info("swap", poolInfo.name, swapInfo);
       swapKeyToSwapInfo[poolInfo.swapInfo] = swapInfo;
     }
 
