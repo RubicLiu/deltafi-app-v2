@@ -195,6 +195,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }));
 
 function getPairedTokenAmount(
+  // TODO(ypeng): Find a way to import anchor enum type.
   swapType: any,
   amount: string,
   srcPrice: BigNumber,
