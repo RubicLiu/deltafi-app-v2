@@ -3,7 +3,7 @@ import { PoolInfo } from "providers/types";
 import { calculateOutAmountNormalSwap, calculateOutAmountStableSwap } from "lib/curve";
 import { TokenConfig } from "constants/deployConfig";
 import { SWAP_DIRECTION } from "lib/instructions";
-import { PoolState, SwapType } from "lib/state";
+import { Fees, PoolState, SwapType } from "lib/state";
 
 export function getSwapOutAmount(
   pool: PoolInfo,
@@ -12,8 +12,15 @@ export function getSwapOutAmount(
   amount: string,
   slippage: number,
   marketPrice: BigNumber,
+  marketPriceHigh?: BigNumber,
+  marketPriceLow?: BigNumber,
 ) {
   // TODO(leqiang): use v2 formula
+  if (!(marketPriceHigh && marketPriceLow) || pool.enableConfidenceInterval === false) {
+    marketPriceHigh = marketPrice;
+    marketPriceLow = marketPrice;
+  }
+
   const amountIn: number = parseFloat(amount);
   let swapDirection = null;
   if (fromToken.mint === pool.base.toBase58() && toToken.mint === pool.quote.toBase58()) {
@@ -85,8 +92,28 @@ export function getSwapOutAmountSellQuote(
         poolState.baseTarget,
         poolState.quoteReserve,
         poolState.baseReserve,
-        amountIn
+        amountIn,
       );
+    case SwapType.Stable:
+      return calculateOutAmountStableSwap(
+        new BigNumber(1).dividedBy(marketPrice),
+        poolState.quoteReserve,
+        poolState.baseReserve,
+        amountIn,
+        poolState.slope
+      );
+    default:
+      throw Error("Wrong swaptype: " + swapType);
   }
 }
 
+export function generateResultFromAmountOut(
+  amountOut: number,
+  slippage: number,
+  fees: Fees,
+): {
+  amountIn: number,
+  amountOut: number,
+  amountOutWithSlippage: number,
+  fee: number,
+}

@@ -40,6 +40,7 @@ export interface PoolInfo {
   swapType: SwapType;
   publicKey: PublicKey;
   nonce: number;
+  enableConfidenceInterval: boolean;
   isPaused: boolean;
   baseTokenInfo: TokenConfig;
   quoteTokenInfo: TokenConfig;
