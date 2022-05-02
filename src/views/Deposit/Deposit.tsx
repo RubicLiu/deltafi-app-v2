@@ -14,11 +14,13 @@ import {
   Avatar,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useParams } from "react-router";
 import clx from "classnames";
 import BigNumber from "bignumber.js";
 
+import { Program, Provider, web3 } from "@project-serum/anchor";
+import * as token from "@solana/spl-token";
 import SwapCard from "views/Swap/components/Card";
 import { ConnectButton } from "components";
 import Page from "components/layout/Page";
@@ -34,7 +36,7 @@ import { useCustomConnection } from "providers/connection";
 import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
-import { getPoolConfigBySwapKey } from "constants/deployConfigV2";
+import { getPoolConfigBySwapKey, deployConfigV2 } from "constants/deployConfigV2";
 import {
   selectLpUserBySwapKey,
   selectMarketPriceByPool,
@@ -43,6 +45,10 @@ import {
   depositSelector,
 } from "states/v2/selectorsV2";
 import { setTokenAmount, setTokenInfo } from "states/v2/depositV2State";
+import { PublicKey, Transaction } from "@solana/web3.js";
+import { fecthTokenAccountInfoList } from "states/v2/tokenV2State";
+import { sendSignedTransaction } from "utils/transactions";
+import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 
 interface TransactionResult {
   status: boolean | null;
@@ -252,7 +258,7 @@ const Deposit: React.FC = () => {
   const [transactionResult] = useState<TransactionResult>({
     status: null,
   });
-  const [isProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { network } = useCustomConnection();
 
   const depositV2 = useSelector(depositSelector);
@@ -363,85 +369,141 @@ const Deposit: React.FC = () => {
     return new BigNumber(0);
   }, [swapInfo]);
 
+  const { publicKey: walletPubkey, signTransaction } = useWallet();
+  const { connection } = useConnection();
+
   const handleDeposit = useCallback(
     async () => {
-      // TODO(ypeng): Add implementation for v2.
-      //    let transaction: Transaction;
-      //
-      //    if (!connection || !pool || !walletPubkey || !baseTokenAccount || !quoteTokenAccount) {
-      //      return null;
-      //    }
-      //
-      //    setIsProcessing(true);
-      //    try {
-      //      if (base.amount !== "" && quote.amount !== "") {
-      //        const depositMethod = pool.swapType === SwapType.Normal ? deposit : stableDeposit;
-      //        transaction = await depositMethod({
-      //          connection,
-      //          walletPubkey,
-      //          pool,
-      //          baseAccount: baseTokenAccount,
-      //          quoteAccount: quoteTokenAccount,
-      //          poolTokenRef: null,
-      //          depositData: {
-      //            amountTokenA: BigInt(
-      //              exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString(),
-      //            ),
-      //            amountTokenB: BigInt(
-      //              exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString(),
-      //            ),
-      //            amountMintMin: BigInt(0),
-      //          },
-      //          config,
-      //          farmPool: farmPoolKey,
-      //          farmUser: farmUser?.publicKey,
-      //        });
-      //      } else {
-      //        setIsProcessing(false);
-      //        return null;
-      //      }
-      //
-      //      transaction = await signTransaction(transaction);
-      //
-      //      const hash = await sendSignedTransaction({
-      //        signedTransaction: transaction,
-      //        connection,
-      //      });
-      //
-      //      await connection.confirmTransaction(hash, "confirmed");
-      //
-      //      await fecthTokenAccountInfoList(
-      //        [base.token.mint, quote.token.mint, pool.poolMintKey.toBase58()],
-      //        walletPubkey,
-      //        connection,
-      //        dispatch,
-      //      );
-      //
-      //      setBase((prevBase) => ({ ...prevBase, amount: "" }));
-      //      setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
-      //      setTransactionResult({
-      //        status: true,
-      //        action: "deposit",
-      //        hash,
-      //        base,
-      //        quote,
-      //      });
-      //    } catch (e) {
-      //      console.error("error", e);
-      //      setBase((prevBase) => ({ ...prevBase, amount: "" }));
-      //      setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
-      //      setTransactionResult({ status: false });
-      //    } finally {
-      //      setState((state) => ({ ...state, open: true }));
-      //      setIsProcessing(false);
-      //      dispatch(
-      //        fetchFarmUsersThunk({
-      //          connection,
-      //          walletAddress: walletPubkey,
-      //        }),
-      //      );
-      //      dispatch(fetchPoolsThunk({ connection }));
-      //    }
+      let transaction: Transaction;
+
+      if (!connection || !swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount) {
+        return null;
+      }
+
+      const base = depositV2.base;
+      const quote = depositV2.quote;
+
+      setIsProcessing(true);
+      try {
+        if (base.amount !== "" && quote.amount !== "") {
+          console.info(base.amount, quote.amount);
+
+          const program = getDeltafiDexV2(
+            new PublicKey(deployConfigV2.programId),
+            makeProvider(connection, walletPubkey),
+          );
+
+          //              await program.rpc.stableSwap(new anchor.BN(100), new anchor.BN(9353), {
+          //                accounts: {
+          //                  marketConfig,
+          //                  swapInfo,
+          //                  userSourceToken: userTokenBase,
+          //                  userDestinationToken: userTokenQuote,
+          //                  swapSourceToken: tokenBase,
+          //                  swapDestinationToken: tokenQuote,
+          //                  deltafiUser,
+          //                  adminDestinationToken: adminFeeTokenB,
+          //                  userAuthority: userKeypair.publicKey,
+          //                  tokenProgram: token.TOKEN_PROGRAM_ID,
+          //                },
+          //                signers: [userKeypair],
+          //              });
+
+          const [lpPublicKey, lpBump] = await PublicKey.findProgramAddress(
+            [Buffer.from("LiquidityProvider"), swapInfo.toBuffer(), walletPubkey.toBuffer()],
+            program.programId,
+          );
+          transaction = program.transaction.createLiquidityProvider(lpBump, {
+            accounts: {
+              marketConfig: swapInfo.marketConfig,
+              swapInfo,
+              liquidityProvider: lpPublicKey,
+              owner: walletPubkey,
+              systemProgram: web3.SystemProgram.programId,
+              rent: web3.SYSVAR_RENT_PUBKEY,
+            },
+          });
+
+          //transaction = program.transaction.depositToStableSwap({
+          //    accounts: {
+          //      swapInfo,
+          //      userTokenBase: baseTokenAccount,
+          //      userTokenQuote: quoteTokenAccount,
+          //      liquidityProvider: lpPublicKey,
+          //      tokenBase: swapInfo.tokenBase,
+          //      tokenQuote: swapInfo.tokenQuote,
+          //      userAuthority: walletPubkey,
+          //      tokenProgram: token.TOKEN_PROGRAM_ID,
+          //    },
+          //  }
+          //);
+
+          //const depositMethod = pool.swapType === SwapType.Normal ? deposit : stableDeposit;
+          //transaction = await depositMethod({
+          //  connection,
+          //  walletPubkey,
+          //  pool,
+          //  baseAccount: baseTokenAccount,
+          //  quoteAccount: quoteTokenAccount,
+          //  poolTokenRef: null,
+          //  depositData: {
+          //    amountTokenA: BigInt(
+          //      exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString(),
+          //    ),
+          //    amountTokenB: BigInt(
+          //      exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString(),
+          //    ),
+          //    amountMintMin: BigInt(0),
+          //  },
+          //  config,
+          //  farmPool: farmPoolKey,
+          //  farmUser: farmUser?.publicKey,
+          //});
+        } else {
+          setIsProcessing(false);
+          return null;
+        }
+
+        transaction = await signTransaction(transaction);
+
+        const hash = await sendSignedTransaction({
+          signedTransaction: transaction,
+          connection,
+        });
+
+        await connection.confirmTransaction(hash, "confirmed");
+
+        //await fecthTokenAccountInfoList(
+        //  [base.token.mint, quote.token.mint],
+        //  walletPubkey,
+        //  connection,
+        //  dispatch,
+        //);
+
+        dispatch(setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+        //setTransactionResult({
+        //  status: true,
+        //  action: "deposit",
+        //  hash,
+        //  base,
+        //  quote,
+        //});
+      } catch (e) {
+        console.error("error", e);
+        //setBase((prevBase) => ({ ...prevBase, amount: "" }));
+        //setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
+        //setTransactionResult({ status: false });
+      } finally {
+        setState((state) => ({ ...state, open: true }));
+        setIsProcessing(false);
+        //dispatch(
+        //  fetchFarmUsersThunk({
+        //    connection,
+        //    walletAddress: walletPubkey,
+        //  }),
+        //);
+        //dispatch(fetchPoolsThunk({ connection }));
+      }
     },
     [
       //    connection,
