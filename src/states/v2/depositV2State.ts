@@ -15,45 +15,29 @@ const initialState = {
   },
 };
 
-export const setBaseAmount = createAction<{
-  amount: string;
-}>("v2/deposit/setBaseAmount");
+export const setTokenAmount = createAction<{
+  baseAmount: string;
+  quoteAmount: string;
+}>("v2/deposit/setTokenAmount");
 
-export const setQuoteAmount = createAction<{
-  amount: string;
-}>("v2/deposit/setQuoteAmount");
-
-export const setBaseTokenInfo = createAction<{
-  token: TokenConfig;
-}>("v2/deposit/setBaseTokenInfo");
-
-export const setQuoteTokenInfo = createAction<{
-  token: TokenConfig;
-}>("v2/deposit/setQuoteTokenInfo");
+export const setTokenInfo = createAction<{
+  baseTokenInfo: TokenConfig;
+  quoteTokenInfo: TokenConfig;
+}>("v2/deposit/setTokenInfo");
 
 export const setMethod = createAction<{
   method: string;
 }>("v2/deposit/setMethod");
 
 export const depositV2Reducer = createReducer(initialState, (builder) => {
-  builder.addCase(setBaseAmount, (state, action) => {
-    state.base.amount = action.payload.amount;
-    console.info(state);
+  builder.addCase(setTokenInfo, (state, action) => {
+    state.base.token = action.payload.baseTokenInfo;
+    state.quote.token = action.payload.quoteTokenInfo;
   });
 
-  builder.addCase(setQuoteAmount, (state, action) => {
-    state.quote.amount = action.payload.amount;
-    console.info(state);
-  });
-
-  builder.addCase(setBaseTokenInfo, (state, action) => {
-    state.base.token = action.payload.token;
-    console.info(state);
-  });
-
-  builder.addCase(setQuoteTokenInfo, (state, action) => {
-    state.quote.token = action.payload.token;
-    console.info(state);
+  builder.addCase(setTokenAmount, (state, action) => {
+    state.base.amount = action.payload.baseAmount;
+    state.quote.amount = action.payload.quoteAmount;
   });
 
   builder.addCase(setMethod, (state, action) => {
