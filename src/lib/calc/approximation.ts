@@ -2,18 +2,20 @@ import BigNumber from "bignumber.js";
 import { validate } from "utils/utils";
 import { BigNumberWithConfig } from "./utils";
 
-/// See "Approximation Method" in deltafi-dex-v2/contracts/programs/deltafi-dex-v2/src/curve/README.md
-/// this function gets k = k_1*k_2 first
-/// for simpler comments, let
-/// - a = currentReserveA
-/// - b = currentReserveB
-/// - A = targetReserveA
-/// - B = targetReserveB
-/// - P = marketPrice
-/// - m = inputAAmount
-/// the return value is a tuple with 2 number value:
-/// - impliedOutAmount: the amount in u64 using implied price
-/// - approximationResult: the amount of using this approximation
+/**
+ * See "Approximation Method" in deltafi-dex-v2/contracts/programs/deltafi-dex-v2/src/curve/README.md
+ * this function gets k = k_1*k_2 first
+ * for simpler comments, let
+ * - a = currentReserveA
+ * - b = currentReserveB
+ * - A = targetReserveA
+ * - B = targetReserveB
+ * - P = marketPrice
+ * - m = inputAAmount
+ * the return value is a tuple with 2 number value:
+ * - impliedOutAmount: the amount in u64 using implied price
+ *  - approximationResult: the amount of using this approximation
+ */
 export function approximateOutAmount(
   currentReserveA: BigNumber,
   currentReserveB: BigNumber,
