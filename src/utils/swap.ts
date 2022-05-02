@@ -21,32 +21,50 @@ export function getSwapOutAmount(
     marketPriceLow = marketPrice;
   }
 
-  const amountIn: number = parseFloat(amount);
-  let swapDirection = null;
   if (fromToken.mint === pool.base.toBase58() && toToken.mint === pool.quote.toBase58()) {
-    swapDirection = SWAP_DIRECTION.SellBase;
-  } else if (fromToken.mint === pool.quote.toBase58() && toToken.mint === pool.base.toBase58()) {
-    swapDirection = SWAP_DIRECTION.SellQuote;
-  } else {
-    throw Error(
-      "Wrong to and from token mint: " +
-        toToken.mint +
-        " " +
-        fromToken.mint +
-        ", pool's base and quote tokens are: " +
-        pool.base.toBase58() +
-        " " +
-        pool.quote.toBase58(),
+    const rawAmountOut: number = getSwapOutAmountSellBase(
+      pool.poolState,
+      new BigNumber(amount),
+      marketPriceLow,
+      pool.swapType,
     );
-  }
 
-  return {
-    amountIn: parseFloat(amount),
-    amountOut: parseFloat(amount),
-    amountOutWithSlippage: parseFloat(amount),
-    fee: 0,
-    priceImpact: 0,
-  };
+    return generateResultFromAmountOut(
+      pool.poolState.baseReserve,
+      pool.poolState.quoteReserve,
+      parseFloat(amount),
+      rawAmountOut,
+      slippage,
+      pool.fees,
+    );
+  } else if (fromToken.mint === pool.quote.toBase58() && toToken.mint === pool.base.toBase58()) {
+    const rawAmountOut: number = getSwapOutAmountSellQuote(
+      pool.poolState,
+      new BigNumber(amount),
+      new BigNumber(1).dividedBy(marketPriceHigh),
+      pool.swapType,
+    );
+
+    return generateResultFromAmountOut(
+      pool.poolState.quoteReserve,
+      pool.poolState.baseReserve,
+      parseFloat(amount),
+      rawAmountOut,
+      slippage,
+      pool.fees
+    )
+  } 
+
+  throw Error(
+    "Wrong to and from token mint: " +
+      toToken.mint +
+      " " +
+      fromToken.mint +
+      ", pool's base and quote tokens are: " +
+      pool.base.toBase58() +
+      " " +
+      pool.quote.toBase58(),
+  );
 }
 
 export function getSwapOutAmountSellBase(
@@ -158,7 +176,10 @@ export function calculatePriceImpact(
     .multipliedBy(new BigNumber(fees.adminTradeFeeNumerator.toString()))
     .dividedBy(new BigNumber(fees.adminTradeFeeDenominator.toString()));
   const futureReserveA: BigNumber = currentReserveA.plus(amountIn);
-  const futureReserveB: BigNumber = currentReserveB.minus(rawAmountOut).plus(tradeFee).minus(adminFee);
+  const futureReserveB: BigNumber = currentReserveB
+    .minus(rawAmountOut)
+    .plus(tradeFee)
+    .minus(adminFee);
 
   const currentRatio: BigNumber = currentReserveA.dividedBy(currentReserveB);
   const futureRatio: BigNumber = futureReserveA.dividedBy(futureReserveB);
