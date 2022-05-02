@@ -13,7 +13,7 @@ import { FARM_USER_SIZE } from "lib/state/farm";
 import { FarmPoolInfo, MarketConfig } from "providers/types";
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { createApproveInstruction } from "lib/instructions";
-import { mergeTransactions, signTransaction } from ".";
+import { mergeTransactions, partialSignTransaction } from ".";
 import { checkOrCreateReferralDataTransaction } from "./utils";
 import { TokenAccountInfo } from "states/tokenAccountState";
 
@@ -116,7 +116,7 @@ export async function stake({
 
   transaction = mergeTransactions([createFarmUserAccountTransaction, transaction]);
 
-  return signTransaction({ transaction, feePayer: walletPubkey, signers, connection });
+  return partialSignTransaction({ transaction, feePayer: walletPubkey, signers, connection });
 }
 
 export async function unstake({
@@ -162,7 +162,7 @@ export async function unstake({
     ),
   );
 
-  return signTransaction({ transaction, feePayer: walletPubkey, connection });
+  return partialSignTransaction({ transaction, feePayer: walletPubkey, connection });
 }
 
 export async function claim({
@@ -221,5 +221,5 @@ export async function claim({
 
   const transaction = mergeTransactions([createUserReferrerAccountTransaction, claimTransaction]);
 
-  return signTransaction({ transaction, feePayer: walletPubkey, connection });
+  return partialSignTransaction({ transaction, feePayer: walletPubkey, connection });
 }

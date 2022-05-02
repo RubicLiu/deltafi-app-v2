@@ -52,7 +52,7 @@ export function mergeTransactions(transactions: (Transaction | undefined)[]) {
   return transaction;
 }
 
-export async function signTransaction({
+export async function partialSignTransaction({
   transaction,
   feePayer,
   signers = [],

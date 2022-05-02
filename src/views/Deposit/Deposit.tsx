@@ -14,11 +14,12 @@ import {
   Avatar,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useParams } from "react-router";
 import clx from "classnames";
 import BigNumber from "bignumber.js";
 
+import { BN } from "@project-serum/anchor";
 import SwapCard from "views/Swap/components/Card";
 import { ConnectButton } from "components";
 import Page from "components/layout/Page";
@@ -34,7 +35,7 @@ import { useCustomConnection } from "providers/connection";
 import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
-import { getPoolConfigBySwapKey } from "constants/deployConfigV2";
+import { getPoolConfigBySwapKey, deployConfigV2 } from "constants/deployConfigV2";
 import {
   selectLpUserBySwapKey,
   selectMarketPriceByPool,
@@ -43,6 +44,12 @@ import {
   depositSelector,
 } from "states/v2/selectorsV2";
 import { setTokenAmount, setTokenInfo } from "states/v2/depositV2State";
+import { PublicKey, Transaction } from "@solana/web3.js";
+import { sendSignedTransaction } from "utils/transactions";
+import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2State";
+import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
+import { createDepositTransaction } from "utils/transactions/v2/deposit";
 
 interface TransactionResult {
   status: boolean | null;
@@ -252,7 +259,7 @@ const Deposit: React.FC = () => {
   const [transactionResult] = useState<TransactionResult>({
     status: null,
   });
-  const [isProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { network } = useCustomConnection();
 
   const depositV2 = useSelector(depositSelector);
@@ -363,101 +370,105 @@ const Deposit: React.FC = () => {
     return new BigNumber(0);
   }, [swapInfo]);
 
-  const handleDeposit = useCallback(
-    async () => {
-      // TODO(ypeng): Add implementation for v2.
-      //    let transaction: Transaction;
-      //
-      //    if (!connection || !pool || !walletPubkey || !baseTokenAccount || !quoteTokenAccount) {
-      //      return null;
-      //    }
-      //
-      //    setIsProcessing(true);
-      //    try {
-      //      if (base.amount !== "" && quote.amount !== "") {
-      //        const depositMethod = pool.swapType === SwapType.Normal ? deposit : stableDeposit;
-      //        transaction = await depositMethod({
-      //          connection,
-      //          walletPubkey,
-      //          pool,
-      //          baseAccount: baseTokenAccount,
-      //          quoteAccount: quoteTokenAccount,
-      //          poolTokenRef: null,
-      //          depositData: {
-      //            amountTokenA: BigInt(
-      //              exponentiate(base.amount, pool.baseTokenInfo.decimals).integerValue().toString(),
-      //            ),
-      //            amountTokenB: BigInt(
-      //              exponentiate(quote.amount, pool.quoteTokenInfo.decimals).integerValue().toString(),
-      //            ),
-      //            amountMintMin: BigInt(0),
-      //          },
-      //          config,
-      //          farmPool: farmPoolKey,
-      //          farmUser: farmUser?.publicKey,
-      //        });
-      //      } else {
-      //        setIsProcessing(false);
-      //        return null;
-      //      }
-      //
-      //      transaction = await signTransaction(transaction);
-      //
-      //      const hash = await sendSignedTransaction({
-      //        signedTransaction: transaction,
-      //        connection,
-      //      });
-      //
-      //      await connection.confirmTransaction(hash, "confirmed");
-      //
-      //      await fecthTokenAccountInfoList(
-      //        [base.token.mint, quote.token.mint, pool.poolMintKey.toBase58()],
-      //        walletPubkey,
-      //        connection,
-      //        dispatch,
-      //      );
-      //
-      //      setBase((prevBase) => ({ ...prevBase, amount: "" }));
-      //      setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
-      //      setTransactionResult({
-      //        status: true,
-      //        action: "deposit",
-      //        hash,
-      //        base,
-      //        quote,
-      //      });
-      //    } catch (e) {
-      //      console.error("error", e);
-      //      setBase((prevBase) => ({ ...prevBase, amount: "" }));
-      //      setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
-      //      setTransactionResult({ status: false });
-      //    } finally {
-      //      setState((state) => ({ ...state, open: true }));
-      //      setIsProcessing(false);
-      //      dispatch(
-      //        fetchFarmUsersThunk({
-      //          connection,
-      //          walletAddress: walletPubkey,
-      //        }),
-      //      );
-      //      dispatch(fetchPoolsThunk({ connection }));
-      //    }
-    },
-    [
-      //    connection,
-      //    pool,
-      //    walletPubkey,
-      //    baseTokenAccount,
-      //    quoteTokenAccount,
-      //    base,
-      //    quote,
-      //    signTransaction,
-      //    config,
-      //    farmPoolKey,
-      //    farmUser,
-      //    dispatch,
-    ],
-  );
+  const { publicKey: walletPubkey, signTransaction } = useWallet();
+  const wallet = useWallet();
+  const { connection } = useConnection();
+
+  const handleDeposit = useCallback(async () => {
+    let transaction: Transaction;
+
+    if (!connection || !swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount) {
+      return null;
+    }
+
+    const base = depositV2.base;
+    const quote = depositV2.quote;
+
+    setIsProcessing(true);
+    try {
+      if (base.amount !== "" && quote.amount !== "") {
+        console.info(base.amount, quote.amount);
+
+        const program = getDeltafiDexV2(
+          new PublicKey(deployConfigV2.programId),
+          makeProvider(connection, wallet),
+        );
+
+        const baseAmount = new BigNumber(base.amount).multipliedBy(
+          new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
+        );
+        const quoteAmount = new BigNumber(quote.amount).multipliedBy(
+          new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
+        );
+        transaction = await createDepositTransaction(
+          program,
+          connection,
+          poolConfig,
+          swapInfo,
+          baseTokenAccount.publicKey,
+          quoteTokenAccount.publicKey,
+          walletPubkey,
+          lpUser,
+          new BN(baseAmount.toFixed(0)),
+          new BN(quoteAmount.toFixed(0)),
+        );
+      } else {
+        setIsProcessing(false);
+        return null;
+      }
+
+      transaction = await signTransaction(transaction);
+
+      const hash = await sendSignedTransaction({
+        signedTransaction: transaction,
+        connection,
+      });
+
+      await connection.confirmTransaction(hash, "confirmed");
+
+      dispatch(setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+      // TODO(ypeng): fix the transaction result logic
+      //setTransactionResult({
+      //  status: true,
+      //  action: "deposit",
+      //  hash,
+      //  base,
+      //  quote,
+      //});
+    } catch (e) {
+      console.error("error", e);
+      //setBase((prevBase) => ({ ...prevBase, amount: "" }));
+      //setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
+      //setTransactionResult({ status: false });
+    } finally {
+      setState((state) => ({ ...state, open: true }));
+      setIsProcessing(false);
+      dispatch(
+        fetchLiquidityProvidersV2Thunk({
+          connection,
+          walletAddress: walletPubkey,
+        }),
+      );
+      dispatch(
+        fetchSwapsV2Thunk({
+          connection,
+          walletAddress: walletPubkey,
+        }),
+      );
+    }
+  }, [
+    wallet,
+    connection,
+    poolConfig,
+    swapInfo,
+    walletPubkey,
+    baseTokenAccount,
+    quoteTokenAccount,
+    signTransaction,
+    dispatch,
+    lpUser,
+    depositV2,
+  ]);
 
   const handleWithdraw = useCallback(
     async () => {

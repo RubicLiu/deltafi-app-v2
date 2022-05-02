@@ -4,7 +4,7 @@ import BN from "bn.js";
 import { createNativeSOLHandlingTransactions } from "./utils";
 import { PoolInfo, MarketConfig } from "providers/types";
 import { createApproveInstruction, createDepositInstruction, DepositData } from "lib/instructions";
-import { createTokenAccountTransaction, signTransaction, mergeTransactions } from ".";
+import { createTokenAccountTransaction, partialSignTransaction, mergeTransactions } from ".";
 import { SWAP_PROGRAM_ID } from "constants/index";
 import { createFarmUser } from "./farm";
 import { AccountLayout } from "@solana/spl-token";
@@ -145,5 +145,5 @@ export async function deposit({
     signers.push(tempAccountRefKeyPair);
   }
 
-  return signTransaction({ transaction, feePayer: walletPubkey, signers, connection });
+  return partialSignTransaction({ transaction, feePayer: walletPubkey, signers, connection });
 }
