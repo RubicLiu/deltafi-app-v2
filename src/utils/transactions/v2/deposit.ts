@@ -57,7 +57,7 @@ export async function createDepositTransaction(
     });
   }
 
-  if (lpUser == null) {
+  if (lpUser === null) {
     const createLpTransaction = program.transaction.createLiquidityProvider(lpBump, {
       accounts: {
         marketConfig: swapInfo.configKey,
