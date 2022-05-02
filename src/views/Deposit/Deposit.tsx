@@ -33,14 +33,16 @@ import { SOLSCAN_LINK } from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getPoolConfigBySwapKey } from "constants/deployConfigV2";
 import {
   selectLpUserBySwapKey,
   selectMarketPriceByPool,
   selectSwapBySwapKey,
   selectTokenAccountInfoByMint,
+  depositSelector,
 } from "states/v2/selectorsV2";
+import { setBaseTokenInfo, setQuoteTokenInfo } from "states/v2/depositV2State";
 
 interface TransactionResult {
   status: boolean | null;
@@ -234,12 +236,19 @@ const Deposit: React.FC = () => {
   const [isProcessing] = useState(false);
   const { network } = useCustomConnection();
 
+  const depositV2 = useSelector(depositSelector);
+  console.info(depositV2);
+
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (baseTokenInfo && quoteTokenInfo) {
       setBase((base) => ({ ...base, token: baseTokenInfo }));
       setQuote((quote) => ({ ...quote, token: quoteTokenInfo }));
+      dispatch(setBaseTokenInfo({ token: baseTokenInfo }));
+      dispatch(setQuoteTokenInfo({ token: quoteTokenInfo }));
     }
-  }, [baseTokenInfo, quoteTokenInfo]);
+  }, [baseTokenInfo, quoteTokenInfo, dispatch]);
 
   const baseTvl = useMemo(() => {
     if (basePrice && swapInfo) {
@@ -549,8 +558,9 @@ const Deposit: React.FC = () => {
     setState((state) => ({ ...state, open: false }));
   }, []);
 
-  const handleTokenFromInput = useCallback(
+  const handleBaseTokenInput = useCallback(
     (card: ISwapCard) => {
+      console.info("card", card);
       // TODO(ypeng): Add implementation for v2.
       //      setBase(card);
       //      if (!quote.token) return;
@@ -585,7 +595,7 @@ const Deposit: React.FC = () => {
     ],
   );
 
-  const handleTokenToInput = useCallback(
+  const handleQuoteTokenInput = useCallback(
     (card: ISwapCard) => {
       // TODO(ypeng): Add implementation for v2.
       //      setQuote(card);
@@ -872,24 +882,32 @@ const Deposit: React.FC = () => {
                 onUpdatePercentage={handleWithdrawSlider}
               />
               <WithdrawCard
-                card={base}
-                handleChangeCard={handleTokenFromInput}
+                card={depositV2.base}
+                handleChangeCard={handleBaseTokenInput}
                 withdrawal={baseShare?.toFixed(6).toString()}
                 disableDrop={true}
               />
               <Box mt={1} />
               <WithdrawCard
-                card={quote}
-                handleChangeCard={handleTokenToInput}
+                card={depositV2.quote}
+                handleChangeCard={handleQuoteTokenInput}
                 withdrawal={quoteShare?.toFixed(6).toString()}
                 disableDrop={true}
               />
             </Box>
           ) : (
             <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <SwapCard card={base} handleChangeCard={handleTokenFromInput} disableDrop={true} />
+              <SwapCard
+                card={depositV2.base}
+                handleChangeCard={handleBaseTokenInput}
+                disableDrop={true}
+              />
               <Box mt={1} />
-              <SwapCard card={quote} handleChangeCard={handleTokenToInput} disableDrop={true} />
+              <SwapCard
+                card={depositV2.quote}
+                handleChangeCard={handleQuoteTokenInput}
+                disableDrop={true}
+              />
             </Box>
           )}
           <Box mt={3} width="100%" sx={{ position: "relative", zIndex: 1 }}>
