@@ -37,7 +37,7 @@ export function approximateOutAmount(
   const impliedOutAmountBigNumber: BigNumber = impliedOutAmountNumerator.dividedBy(
     impliedOutAmountDenumerator,
   );
-  
+
   let expCeil: number = Math.ceil(
     marketPrice.multipliedBy(targetReserveA).dividedBy(targetReserveB).toNumber(),
   );
@@ -72,7 +72,7 @@ export function approximateOutAmount(
     };
   }
 
-  // approximatoinResult = impliedAmountout - (b - impliedAmountout) * (k_1*k_2 - 1)
+  // approximatoinResult = impliedAmountout - (b - impliedAmountout) * (k_1*k_2 - 1) = impliedAmountout - diffFromImpliedAmount
   const approximationResult: number = Math.floor(
     impliedOutAmountBigNumber.minus(diffFromImpliedAmount).toNumber(),
   );
