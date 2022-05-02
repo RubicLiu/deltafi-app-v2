@@ -32,7 +32,11 @@ export const setMethod = createAction<{
 export const depositV2Reducer = createReducer(initialState, (builder) => {
   builder.addCase(setTokenInfo, (state, action) => {
     state.base.token = action.payload.baseTokenInfo;
+    state.base.amount = "0";
+    state.base.amountWithSlippage = "0";
     state.quote.token = action.payload.quoteTokenInfo;
+    state.quote.amount = "0";
+    state.quote.amountWithSlippage = "0";
   });
 
   builder.addCase(setTokenAmount, (state, action) => {
