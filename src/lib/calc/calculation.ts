@@ -1,12 +1,7 @@
 import BigNumber from "bignumber.js";
-
-function BigNumberWithConfig(
-  val: number | BigNumber | string,
-  object: BigNumber.Config,
-): BigNumber {
-  BigNumber.config(object);
-  return new BigNumber(val);
-}
+import { BigNumberWithConfig } from "./utils";
+import { approximateOutAmount } from "./approximation";
+import { validate } from "utils/utils";
 
 const FLOAT_ROUND_UP_ESPSILON: number = 0.00000000000000006;
 
@@ -65,8 +60,16 @@ export function calculateOutAmountNormalSwap(
   currentResreveB: BigNumber,
   inputAAmount: BigNumber,
 ): number {
-  // TODO(leqiang): add approximation result here
-  return Math.floor(
+  const { impliedOutAmount, approximationResult } = approximateOutAmount(
+    currentReserveA,
+    currentResreveB,
+    targetReserveA,
+    targetReserveB,
+    marketPrice,
+    inputAAmount,
+  );
+
+  const calculationResult = Math.floor(
     calculateOutAmountNormalSwapInternal(
       marketPrice,
       targetReserveA,
@@ -76,6 +79,14 @@ export function calculateOutAmountNormalSwap(
       inputAAmount,
     ).toNumber(),
   );
+
+  const finalResult = Math.max(approximationResult, calculationResult);
+  validate(
+    finalResult <= impliedOutAmount,
+    "final result for swap out amount should not be larger than the implied out amount",
+  );
+
+  return finalResult;
 }
 
 /**
