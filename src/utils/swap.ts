@@ -100,7 +100,7 @@ export function getSwapOutAmountSellQuote(
         poolState.quoteReserve,
         poolState.baseReserve,
         amountIn,
-        poolState.slope
+        poolState.slope,
       );
     default:
       throw Error("Wrong swaptype: " + swapType);
@@ -108,12 +108,60 @@ export function getSwapOutAmountSellQuote(
 }
 
 export function generateResultFromAmountOut(
-  amountOut: number,
+  currentReserveA: BigNumber,
+  currentReserveB: BigNumber,
+  amountIn: number,
+  rawAmountOut: number,
   slippage: number,
   fees: Fees,
 ): {
-  amountIn: number,
-  amountOut: number,
-  amountOutWithSlippage: number,
-  fee: number,
+  amountIn: number;
+  amountOut: number;
+  amountOutWithSlippage: number;
+  fee: number;
+  price_impact: number;
+} {
+  const tradeFee: BigNumber = new BigNumber(rawAmountOut)
+    .multipliedBy(new BigNumber(fees.tradeFeeNumerator.toString()))
+    .dividedBy(fees.tradeFeeDenominator.toString());
+
+  const amountOutWithTradeFee: BigNumber = new BigNumber(rawAmountOut).minus(tradeFee);
+  const amountFromSlippage: BigNumber = amountOutWithTradeFee.multipliedBy(slippage).dividedBy(100);
+  const amountOutWithTradeFeeWithSlippage: BigNumber =
+    amountOutWithTradeFee.minus(amountFromSlippage);
+
+  return {
+    amountIn,
+    amountOut: amountOutWithTradeFee.toNumber(),
+    amountOutWithSlippage: amountOutWithTradeFeeWithSlippage.toNumber(),
+    fee: tradeFee.toNumber(),
+    price_impact: calculatePriceImpact(
+      currentReserveA,
+      currentReserveB,
+      new BigNumber(amountIn),
+      new BigNumber(rawAmountOut),
+      tradeFee,
+      fees,
+    ).toNumber(),
+  };
+}
+
+export function calculatePriceImpact(
+  currentReserveA: BigNumber,
+  currentReserveB: BigNumber,
+  amountIn: BigNumber,
+  rawAmountOut: BigNumber,
+  tradeFee: BigNumber,
+  fees: Fees,
+): BigNumber {
+  const adminFee: BigNumber = tradeFee
+    .multipliedBy(new BigNumber(fees.adminTradeFeeNumerator.toString()))
+    .dividedBy(new BigNumber(fees.adminTradeFeeDenominator.toString()));
+  const futureReserveA: BigNumber = currentReserveA.plus(amountIn);
+  const futureReserveB: BigNumber = currentReserveB.minus(rawAmountOut).plus(tradeFee).minus(adminFee);
+
+  const currentRatio: BigNumber = currentReserveA.dividedBy(currentReserveB);
+  const futureRatio: BigNumber = futureReserveA.dividedBy(futureReserveB);
+
+  return futureRatio.minus(currentRatio).abs().dividedBy(currentRatio);
 }
