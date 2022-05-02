@@ -4,7 +4,7 @@ import { BigNumberWithConfig } from "./utils";
 
 /**
  * See "Approximation Method" in deltafi-dex-v2/contracts/programs/deltafi-dex-v2/src/curve/README.md
- * this function gets k = k_1*k_2 first
+ * this function gets k = k1*k2 first
  * for simpler comments, let
  * - a = currentReserveA
  * - b = currentReserveB
