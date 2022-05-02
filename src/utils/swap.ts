@@ -4,7 +4,6 @@ import { calculateOutAmountNormalSwap, calculateOutAmountStableSwap } from "lib/
 import { TokenConfig } from "constants/deployConfig";
 import { Fees, PoolState, SwapType } from "lib/state";
 
-
 /**
  * Main interface function of this module, calculate the output information
  * of a swap with the swap input information
@@ -16,7 +15,7 @@ import { Fees, PoolState, SwapType } from "lib/state";
  * @param marketPrice basePrice / quotePrice
  * @param marketPriceHigh upper bound of the market price after confidence interval adjustion
  * @param marketPriceLow lower bound of the market price after confidence interval adjustion
- * @returns 
+ * @returns amount out information
  */
 export function getSwapOutAmount(
   pool: PoolInfo,
@@ -92,7 +91,6 @@ export function getSwapOutAmount(
   );
 }
 
-
 /**
  * Calculate out amount when selling base, reserve A is base reserve, reserve B is quote reserve
  * @param poolState pool state information, includes the current reserve and target amounts of the tokens
@@ -129,7 +127,6 @@ export function getSwapOutAmountSellBase(
       throw Error("Wrong swaptype: " + swapType);
   }
 }
-
 
 /**
  * Calculates out amount when selling base, reserve A is quote reserve, reserve B is base reserve
@@ -169,16 +166,15 @@ export function getSwapOutAmountSellQuote(
   }
 }
 
-
 /**
  * Generates the actual amount out results from pool state and calculated amount out
- * @param currentReserveA Reserve before the transaction of the input token
- * @param currentReserveB Reserve before the transaction of the output token
- * @param amountIn Token input amount
- * @param rawAmountOut Token output amount without trade fees, calculated from the curve formula
- * @param slippage Max slippage limit, in percentage
- * @param fees Config of the fees
- * @returns 
+ * @param currentReserveA reserve before the transaction of the input token
+ * @param currentReserveB reserve before the transaction of the output token
+ * @param amountIn token input amount
+ * @param rawAmountOut token output amount without trade fees, calculated from the curve formula
+ * @param slippage max slippage limit, in percentage
+ * @param fees config of the fees
+ * @returns amount out information
  */
 export function generateResultFromAmountOut(
   currentReserveA: BigNumber,
@@ -219,7 +215,6 @@ export function generateResultFromAmountOut(
   };
 }
 
-
 /**
  * Price impact value that indicates the change from the implied price before and after the transaction
  * impliedPrice = marketPrice * (currentReserveA * targetReserveB) / (currentReserveB * targetReserveA)
@@ -227,13 +222,13 @@ export function generateResultFromAmountOut(
  * futureImpliedPrice / impliedPrice = (futureReserveA / futureReserveB) / (currentReserveA / currentReserveB)
  * priceImpact = abs(impliedPrice - futureImpliedPrice) / impliedPrice
  *             = (1 - (futureReserveA / futureReserveB)) / (currentReserveA / currentReserveB)
- * @param currentReserveA Reserve before the transaction of the input token
- * @param currentReserveB Reserve before the transaction of the output token
- * @param amountIn Token input amount
- * @param rawAmountOut Token output amount without trade fees, calculated from the curve formula
- * @param tradeFee Trade fee of the output amount
- * @param fees Config of the fees
- * @returns
+ * @param currentReserveA reserve before the transaction of the input token
+ * @param currentReserveB reserve before the transaction of the output token
+ * @param amountIn token input amount
+ * @param rawAmountOut token output amount without trade fees, calculated from the curve formula
+ * @param tradeFee trade fee of the output amount
+ * @param fees config of the fees
+ * @returns price impact value
  */
 export function calculatePriceImpact(
   currentReserveA: BigNumber,
