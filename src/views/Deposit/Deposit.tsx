@@ -388,8 +388,6 @@ const Deposit: React.FC = () => {
     setIsProcessing(true);
     try {
       if (base.amount !== "" && quote.amount !== "") {
-        console.info(base.amount, quote.amount);
-
         const program = getDeltafiDexV2(
           new PublicKey(deployConfigV2.programId),
           makeProvider(connection, wallet),
