@@ -52,7 +52,6 @@ async function getPythDataList(connection: Connection) {
     const priceKey = priceInfos.keys[i];
     const priceData = parsePriceData(priceInfos.array[i].data as Buffer);
     const symbol = tokenInfoList[i].symbol;
-    console.info("pyth", symbol, priceData);
     pythDataList.push({
       priceKey,
       symbol,

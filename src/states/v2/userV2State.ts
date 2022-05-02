@@ -31,7 +31,6 @@ export const fetchUserV2Thunk = createAsyncThunk(
     );
 
     const deltafiUser = await program.account.deltafiUser.fetchNullable(deltafiUserPubkey);
-    console.info("user", deltafiUser);
     return {
       user: deltafiUser,
     };
