@@ -304,7 +304,7 @@ const Deposit: React.FC = () => {
     if (lpUser && swapInfo) {
       return new BigNumber(lpUser.baseShare)
         .plus(new BigNumber(lpUser.basePosition.depositedAmount))
-        .dividedBy(new BigNumber(swapInfo.baseSupply))
+        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply))
         .multipliedBy(100);
     }
     return new BigNumber(0);
@@ -314,7 +314,8 @@ const Deposit: React.FC = () => {
     if (lpUser && swapInfo) {
       return new BigNumber(lpUser.quoteShare)
         .plus(new BigNumber(lpUser.quotePosition.depositedAmount))
-        .dividedBy(new BigNumber(swapInfo.quoteSupply))
+        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply))
+
         .multipliedBy(100);
     }
     return new BigNumber(0);
@@ -387,8 +388,6 @@ const Deposit: React.FC = () => {
     setIsProcessing(true);
     try {
       if (base.amount !== "" && quote.amount !== "") {
-        console.info(base.amount, quote.amount);
-
         const program = getDeltafiDexV2(
           new PublicKey(deployConfigV2.programId),
           makeProvider(connection, wallet),

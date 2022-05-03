@@ -244,6 +244,5 @@ async function simulateTransaction(
   return res.result;
 }
 
-export * from "./deposit";
 export * from "./withdraw";
 export * from "./farm";
