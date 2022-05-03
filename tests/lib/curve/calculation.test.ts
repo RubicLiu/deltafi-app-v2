@@ -111,7 +111,7 @@ describe("calculation", function () {
       ),
     ).toEqual(66666666);
   });
-  
+
   it("calculateOutAmountNormalSwapInternal", function () {
     expect(
       Math.floor(

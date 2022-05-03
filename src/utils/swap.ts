@@ -24,8 +24,8 @@ export function getSwapOutAmount(
   amount: string,
   slippage: number,
   marketPrice: BigNumber,
-  marketPriceHigh?: BigNumber,
   marketPriceLow?: BigNumber,
+  marketPriceHigh?: BigNumber,
 ): {
   amountIn: number;
   amountOut: number;
