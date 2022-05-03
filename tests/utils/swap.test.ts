@@ -84,7 +84,7 @@ describe("utils/swap", function () {
         new BigNumber(0.163),
         SwapType.Normal,
       ),
-    ).toEqual(325994);
+    ).toEqual(325_994);
     
     expect(
       getSwapOutAmountSellBase(
@@ -98,7 +98,7 @@ describe("utils/swap", function () {
         new BigNumber(0.163),
         SwapType.Normal,
       ),
-    ).toEqual(1775380);
+    ).toEqual(1_775_380);
 
     expect(
       getSwapOutAmountSellBase(
@@ -112,7 +112,7 @@ describe("utils/swap", function () {
         new BigNumber(0.00523),
         SwapType.Normal,
       ),
-    ).toEqual(1189852);
+    ).toEqual(1_189_852);
   });
 
   it("getSwapOutAmountSellQuote", function () {
@@ -121,27 +121,41 @@ describe("utils/swap", function () {
         {
           baseTarget: new BigNumber(100_000_000),
           quoteTarget: new BigNumber(20_000_000),
-          baseReserve: new BigNumber(100_000_000_000),
-          quoteReserve: new BigNumber(20_000_000_000),
+          baseReserve: new BigNumber(100_000_000_000 + 2_000_000),
+          quoteReserve: new BigNumber(20_000_000_000 - 325_994),
         } as PoolState,
-        new BigNumber(325994),
+        new BigNumber(325_994),
         new BigNumber(0.163),
         SwapType.Normal,
       ),
-    ).toEqual(1_999_926); // less than 2_000_000 due to the floorings
+    ).toEqual(1_999_999); // less than 2_000_000 due to the floorings
 
     expect(
       getSwapOutAmountSellQuote(
         {
           baseTarget: new BigNumber(100_000_000),
           quoteTarget: new BigNumber(20_000_000),
-          baseReserve: new BigNumber(123_001_000),
-          quoteReserve: new BigNumber(23_321_001),
+          baseReserve: new BigNumber(123_001_000 + 12_550_000),
+          quoteReserve: new BigNumber(23_321_001 - 1_775_380),
         } as PoolState,
         new BigNumber(1_775_380),
         new BigNumber(0.163),
         SwapType.Normal,
       ),
-    ).toEqual(10_589_221);
+    ).toEqual(12_549_997); // less than 12_550_000 due to the floorings
+    
+    expect(
+      getSwapOutAmountSellQuote(
+        {
+          baseTarget: new BigNumber(111_101_001_000),
+          quoteTarget: new BigNumber(501_000_000),
+          baseReserve: new BigNumber(234_134_100_352_634 + 200_001_000),
+          quoteReserve: new BigNumber(1_201_003_000_001 - 1_189_852),
+        } as PoolState,
+        new BigNumber(1_189_852),
+        new BigNumber(0.00523),
+        SwapType.Normal,
+      ),
+    ).toEqual(200_000_918); // less than 200_001_000 due to the floorings
   });
 });
