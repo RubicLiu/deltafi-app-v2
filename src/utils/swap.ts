@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { PoolInfo } from "providers/types";
 import { calculateOutAmountNormalSwap, calculateOutAmountStableSwap } from "lib/curve";
-import { TokenConfig } from "constants/deployConfig";
+import { TokenConfig } from "constants/deployConfigV2";
 import { Fees, PoolState, SwapType } from "lib/state";
 
 /**
@@ -11,7 +11,7 @@ import { Fees, PoolState, SwapType } from "lib/state";
  * @param fromToken info of the input token
  * @param toToken info of the output token
  * @param amount amount of the input token to be traded
- * @param slippage max slippage limit, in percentage
+ * @param maxSlippage max maxSlippage limit, in percentage
  * @param marketPrice basePrice / quotePrice
  * @param marketPriceHigh upper bound of the market price after confidence interval adjustion
  * @param marketPriceLow lower bound of the market price after confidence interval adjustion
@@ -22,7 +22,7 @@ export function getSwapOutAmount(
   fromToken: TokenConfig,
   toToken: TokenConfig,
   amount: string,
-  slippage: number,
+  maxSlippage: number,
   marketPrice: BigNumber,
   marketPriceLow?: BigNumber,
   marketPriceHigh?: BigNumber,
@@ -31,7 +31,7 @@ export function getSwapOutAmount(
   amountOut: number;
   amountOutWithSlippage: number;
   fee: number;
-  price_impact: number;
+  priceImpact: number;
 } {
   // TODO(leqiang): use v2 formula
   // if the confidence interval is not enabled, we use fair market price for both adjusted
@@ -55,7 +55,7 @@ export function getSwapOutAmount(
       pool.poolState.quoteReserve,
       parseFloat(amount),
       rawAmountOut,
-      slippage,
+      maxSlippage,
       pool.fees,
     );
   } else if (fromToken.mint === pool.quote.toBase58() && toToken.mint === pool.base.toBase58()) {
@@ -72,7 +72,7 @@ export function getSwapOutAmount(
       pool.poolState.baseReserve,
       parseFloat(amount),
       rawAmountOut,
-      slippage,
+      maxSlippage,
       pool.fees,
     );
   }
@@ -172,7 +172,7 @@ export function getSwapOutAmountSellQuote(
  * @param currentReserveB reserve before the transaction of the output token
  * @param amountIn token input amount
  * @param rawAmountOut token output amount without trade fees, calculated from the curve formula
- * @param slippage max slippage limit, in percentage
+ * @param maxSlippage max slippage limit, in percentage
  * @param fees config of the fees
  * @returns amount out information
  */
@@ -181,21 +181,23 @@ export function generateResultFromAmountOut(
   currentReserveB: BigNumber,
   amountIn: number,
   rawAmountOut: number,
-  slippage: number,
+  maxSlippage: number,
   fees: Fees,
 ): {
   amountIn: number;
   amountOut: number;
   amountOutWithSlippage: number;
   fee: number;
-  price_impact: number;
+  priceImpact: number;
 } {
   const tradeFee: BigNumber = new BigNumber(rawAmountOut)
     .multipliedBy(new BigNumber(fees.tradeFeeNumerator.toString()))
     .dividedBy(fees.tradeFeeDenominator.toString());
 
   const amountOutWithTradeFee: BigNumber = new BigNumber(rawAmountOut).minus(tradeFee);
-  const amountFromSlippage: BigNumber = amountOutWithTradeFee.multipliedBy(slippage).dividedBy(100);
+  const amountFromSlippage: BigNumber = amountOutWithTradeFee
+    .multipliedBy(maxSlippage)
+    .dividedBy(100);
   const amountOutWithTradeFeeWithSlippage: BigNumber =
     amountOutWithTradeFee.minus(amountFromSlippage);
 
@@ -204,7 +206,7 @@ export function generateResultFromAmountOut(
     amountOut: amountOutWithTradeFee.toNumber(),
     amountOutWithSlippage: amountOutWithTradeFeeWithSlippage.toNumber(),
     fee: tradeFee.toNumber(),
-    price_impact: calculatePriceImpact(
+    priceImpact: calculatePriceImpact(
       currentReserveA,
       currentReserveB,
       new BigNumber(amountIn),
