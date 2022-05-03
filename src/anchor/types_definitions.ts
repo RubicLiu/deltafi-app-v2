@@ -7,6 +7,7 @@ export interface PoolState {
 	baseSupply: BigInt;
 	quoteSupply: BigInt;
 }
+
 export interface FarmPosition {
 	depositedAmount: BigInt;
 	rewardsOwed: BigInt;
@@ -15,6 +16,7 @@ export interface FarmPosition {
 	nextClaimTs: BigInt;
 	latestDepositSlot: BigInt;
 }
+
 export interface FarmConfig {
 	baseAprNumerator: BigInt;
 	baseAprDenominator: BigInt;
@@ -22,6 +24,7 @@ export interface FarmConfig {
 	quoteAprDenominator: BigInt;
 	minClaimPeriod: number;
 }
+
 export interface SwapConfig {
 	isPaused: boolean;
 	maxSwapPercentage: number;
@@ -41,33 +44,40 @@ export interface SwapConfig {
 	referralRewardNumerator: BigInt;
 	referralRewardDenominator: BigInt;
 }
+
 export enum SwapDirection {
 	SellBase,
 	SellQuote,
 }
+
 export enum AccountType {
 	Unknown,
 	Mapping,
 	Product,
 	Price,
 }
+
 export enum PriceStatus {
 	Unknown,
 	Trading,
 	Halted,
 	Auction,
 }
+
 export enum CorpAction {
 	NoCorpAct,
 }
+
 export enum PriceType {
 	Unknown,
 	Price,
 }
+
 export enum SwapType {
 	NormalSwap,
 	StableSwap,
 }
+
 export interface DeltafiUser {
 	bump: number;
 	owedSwapRewards: BigInt;
@@ -75,16 +85,19 @@ export interface DeltafiUser {
 	owedReferralRewards: BigInt;
 	claimedReferralRewards: BigInt;
 }
+
 export interface FarmInfo {
 	bump: number;
 	stakedBaseShare: BigInt;
 	stakedQuoteShare: BigInt;
 	farmConfig: FarmConfig;
 }
+
 export interface MarketConfig {
 	version: number;
 	bump: number;
 }
+
 export interface SwapInfo {
 	isInitialized: boolean;
 	bump: number;
@@ -94,6 +107,7 @@ export interface SwapInfo {
 	poolState: PoolState;
 	swapConfig: SwapConfig;
 }
+
 export interface LiquidityProvider {
 	bump: number;
 	baseShare: BigInt;
@@ -101,4 +115,3 @@ export interface LiquidityProvider {
 	basePosition: FarmPosition;
 	quotePosition: FarmPosition;
 }
-

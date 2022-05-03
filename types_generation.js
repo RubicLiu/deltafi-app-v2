@@ -42,7 +42,7 @@ const generateStructDefinition = (structName, structFields) => {
     }
     strList.push("\t" + field.name + ": " + fieldType + ";");
   })
-  strList.push("}\n");
+  strList.push("}");
   return strList.join("\n");
 }
 
@@ -51,7 +51,7 @@ const generateEnumDefinition = (enumName, enumVariants) => {
   enumVariants.forEach((variant) => {
     strList.push("\t" + variant.name + ",");
   })
-  strList.push("}\n");
+  strList.push("}");
   return strList.join("\n");
 }
 
@@ -62,7 +62,7 @@ const main = () => {
     definitionList.push(getTypeDefinition(type));
   })
 
-  console.info(definitionList.join(""));
+  console.info(definitionList.join("\n\n"));
 }
 
 main();
