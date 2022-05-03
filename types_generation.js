@@ -40,7 +40,7 @@ const generateStructDefinition = (structName, structFields) => {
     if (!fieldType) {
       return;
     }
-    strList.push("\t" + field.name + ": " + fieldType + ";");
+    strList.push("  " + field.name + ": " + fieldType + ";");
   })
   strList.push("}");
   return strList.join("\n");
@@ -49,7 +49,7 @@ const generateStructDefinition = (structName, structFields) => {
 const generateEnumDefinition = (enumName, enumVariants) => {
   const strList = ["export enum " + enumName + " {"];
   enumVariants.forEach((variant) => {
-    strList.push("\t" + variant.name + ",");
+    strList.push("  " + variant.name + ",");
   })
   strList.push("}");
   return strList.join("\n");
