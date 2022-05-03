@@ -43,21 +43,18 @@ import {
   selectTokenAccountInfoByMint,
   depositSelector,
 } from "states/v2/selectorsV2";
-import { setTokenAmount, setTokenInfo } from "states/v2/depositV2State";
+import {
+  setIsProcessing,
+  setTokenAmount,
+  setTokenInfo,
+  setTransactionResult,
+} from "states/v2/depositV2State";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { sendSignedTransaction } from "utils/transactions";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2State";
 import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
 import { createDepositTransaction } from "utils/transactions/v2/deposit";
-
-interface TransactionResult {
-  status: boolean | null;
-  action?: "deposit" | "withdraw";
-  hash?: string;
-  base?: ISwapCard;
-  quote?: ISwapCard;
-}
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -238,38 +235,20 @@ const Deposit: React.FC = () => {
   const [method, switchMethod] = useState<string>("deposit");
   const swapInfo = useSelector(selectSwapBySwapKey(poolAddress));
 
-  const [base, setBase] = useState<ISwapCard>({ token: null, amount: "", amountWithSlippage: "" });
-  const [quote, setQuote] = useState<ISwapCard>({
-    token: null,
-    amount: "",
-    amountWithSlippage: "",
-  });
-
   const poolConfig = getPoolConfigBySwapKey(poolAddress);
-
   const baseTokenInfo = poolConfig.baseTokenInfo;
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
   const baseTokenAccount = useSelector(selectTokenAccountInfoByMint(baseTokenInfo.mint));
   const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(quoteTokenInfo.mint));
 
   const lpUser = useSelector(selectLpUserBySwapKey(poolAddress));
-
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
-
-  const [transactionResult] = useState<TransactionResult>({
-    status: null,
-  });
-  const [isProcessing, setIsProcessing] = useState(false);
   const { network } = useCustomConnection();
-
   const depositV2 = useSelector(depositSelector);
-
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (baseTokenInfo && quoteTokenInfo) {
-      setBase((base) => ({ ...base, token: baseTokenInfo }));
-      setQuote((quote) => ({ ...quote, token: quoteTokenInfo }));
       dispatch(setTokenInfo({ baseTokenInfo, quoteTokenInfo }));
     }
   }, [baseTokenInfo, quoteTokenInfo, dispatch]);
@@ -385,7 +364,7 @@ const Deposit: React.FC = () => {
     const base = depositV2.base;
     const quote = depositV2.quote;
 
-    setIsProcessing(true);
+    dispatch(setIsProcessing({ isProcessing: true }));
     try {
       if (base.amount !== "" && quote.amount !== "") {
         const program = getDeltafiDexV2(
@@ -412,12 +391,11 @@ const Deposit: React.FC = () => {
           new BN(quoteAmount.toFixed(0)),
         );
       } else {
-        setIsProcessing(false);
+        dispatch(setIsProcessing({ isProcessing: false }));
         return null;
       }
 
       transaction = await signTransaction(transaction);
-
       const hash = await sendSignedTransaction({
         signedTransaction: transaction,
         connection,
@@ -426,22 +404,29 @@ const Deposit: React.FC = () => {
       await connection.confirmTransaction(hash, "confirmed");
 
       dispatch(setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
-      // TODO(ypeng): fix the transaction result logic
-      //setTransactionResult({
-      //  status: true,
-      //  action: "deposit",
-      //  hash,
-      //  base,
-      //  quote,
-      //});
+      dispatch(
+        setTransactionResult({
+          transactionResult: {
+            status: true,
+            action: "deposit",
+            hash,
+            base,
+            quote,
+          },
+        }),
+      );
     } catch (e) {
       console.error("error", e);
-      //setBase((prevBase) => ({ ...prevBase, amount: "" }));
-      //setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
-      //setTransactionResult({ status: false });
+      dispatch(
+        setTransactionResult({
+          transactionResult: {
+            status: false,
+          },
+        }),
+      );
     } finally {
       setState((state) => ({ ...state, open: true }));
-      setIsProcessing(false);
+      dispatch(setIsProcessing({ isProcessing: false }));
       dispatch(
         fetchLiquidityProvidersV2Thunk({
           connection,
@@ -588,6 +573,14 @@ const Deposit: React.FC = () => {
   const handleBaseTokenInput = useCallback(
     (card: ISwapCard) => {
       const baseAmount = card.amount;
+      if (baseAmount === "") {
+        dispatch(setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+        return;
+      }
+      if (new BigNumber(baseAmount).isNaN()) {
+        return;
+      }
+
       const quoteAmount = getPairedTokenAmount(
         swapInfo.swapType,
         baseAmount,
@@ -602,6 +595,14 @@ const Deposit: React.FC = () => {
   const handleQuoteTokenInput = useCallback(
     (card: ISwapCard) => {
       const quoteAmount = card.amount;
+      if (quoteAmount === "") {
+        dispatch(setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+        return;
+      }
+      if (new BigNumber(quoteAmount).isNaN()) {
+        return;
+      }
+
       const baseAmount = getPairedTokenAmount(
         swapInfo.swapType,
         quoteAmount,
@@ -634,13 +635,15 @@ const Deposit: React.FC = () => {
 
   const handleSwitchMethod = (method: string) => {
     switchMethod(method);
-    setBase({ ...base, amount: "" });
-    setQuote({ ...quote, amount: "" });
     setWithdrawPercentage(0);
   };
 
   const snackMessasge = useMemo(() => {
-    if (!transactionResult.status) {
+    if (!depositV2 || !depositV2.transactionResult) {
+      return "";
+    }
+
+    if (!depositV2.transactionResult.status) {
       return (
         <Box display="flex" alignItems="center">
           <img
@@ -662,7 +665,7 @@ const Deposit: React.FC = () => {
       );
     }
 
-    const { base, quote, hash, action } = transactionResult;
+    const { base, quote, hash, action } = depositV2.transactionResult;
 
     return (
       <Box display="flex" alignItems="center">
@@ -677,7 +680,7 @@ const Deposit: React.FC = () => {
               6,
             )} ${base.token.symbol} and ${Number(quote.amount).toFixed(6)} ${
               quote.token.symbol
-            } for ${base.token.symbol}-${quote.token.symbol} LP`}
+            } to ${base.token.symbol}-${quote.token.symbol} pool`}
           </Typography>
           <Box display="flex" alignItems="center">
             <Typography variant="subtitle2" color="primary">
@@ -694,7 +697,7 @@ const Deposit: React.FC = () => {
         </Box>
       </Box>
     );
-  }, [transactionResult, classes, network]);
+  }, [depositV2, classes, network]);
 
   const snackAction = useMemo(() => {
     return (
@@ -713,13 +716,15 @@ const Deposit: React.FC = () => {
       );
     }
 
-    if (isProcessing) {
+    if (depositV2.isProcessing) {
       return (
         <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
           <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
         </ConnectButton>
       );
     }
+    const base = depositV2.base;
+    const quote = depositV2.quote;
     if (method === "deposit") {
       if (base.token && quote.token && baseTokenAccount && quoteTokenAccount) {
         const isInsufficient =
@@ -778,13 +783,11 @@ const Deposit: React.FC = () => {
       );
     }
   }, [
-    isProcessing,
+    depositV2,
     isConnectedWallet,
     baseTokenAccount,
-    base,
     baseShare,
     quoteTokenAccount,
-    quote,
     quoteShare,
     setMenu,
     handleDeposit,

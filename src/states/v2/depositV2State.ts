@@ -1,5 +1,14 @@
 import { createReducer, createAction } from "@reduxjs/toolkit";
 import { TokenConfig } from "constants/deployConfigV2";
+import { SwapCard } from "views/Swap/components/types";
+
+interface TransactionResult {
+  status: boolean | null;
+  action?: "deposit" | "withdraw";
+  hash?: string;
+  base?: SwapCard;
+  quote?: SwapCard;
+}
 
 const initialState = {
   method: "deposit",
@@ -13,6 +22,8 @@ const initialState = {
     amount: "0",
     amountWithSlippage: "0",
   },
+  transactionResult: null,
+  isProcessing: false,
 };
 
 export const setTokenAmount = createAction<{
@@ -28,6 +39,14 @@ export const setTokenInfo = createAction<{
 export const setMethod = createAction<{
   method: string;
 }>("v2/deposit/setMethod");
+
+export const setTransactionResult = createAction<{
+  transactionResult: TransactionResult;
+}>("v2/deposit/setTransactionResult");
+
+export const setIsProcessing = createAction<{
+  isProcessing: boolean;
+}>("v2/deposit/setIsProcessing");
 
 export const depositV2Reducer = createReducer(initialState, (builder) => {
   builder.addCase(setTokenInfo, (state, action) => {
@@ -46,5 +65,13 @@ export const depositV2Reducer = createReducer(initialState, (builder) => {
 
   builder.addCase(setMethod, (state, action) => {
     state.method = action.payload.method;
+  });
+
+  builder.addCase(setTransactionResult, (state, action) => {
+    state.transactionResult = action.payload.transactionResult;
+  });
+
+  builder.addCase(setIsProcessing, (state, action) => {
+    state.isProcessing = action.payload.isProcessing;
   });
 });
