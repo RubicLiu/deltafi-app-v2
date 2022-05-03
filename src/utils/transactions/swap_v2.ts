@@ -18,7 +18,7 @@ import {
 import { MarketConfig, PoolInfo } from "providers/types";
 
 import { SWAP_PROGRAM_ID } from "constants/index";
-import { createTokenAccountTransaction, mergeTransactions, signTransaction } from ".";
+import { createTokenAccountTransaction, mergeTransactions, partialSignTransaction } from ".";
 import { AccountLayout } from "@solana/spl-token";
 import { checkOrCreateReferralDataTransaction } from "./utils";
 import { TokenAccountInfo } from "states/tokenAccountState";
@@ -301,13 +301,13 @@ export async function swap_v2({
 
   const resultTransaction =
     buySol || sellSol
-      ? await signTransaction({
+      ? await partialSignTransaction({
           transaction,
           feePayer: walletPubkey,
           signers: [userTransferAuthority, tempAccountRefKeyPair],
           connection,
         })
-      : await signTransaction({
+      : await partialSignTransaction({
           transaction,
           feePayer: walletPubkey,
           signers: [userTransferAuthority],
