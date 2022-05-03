@@ -1,3 +1,7 @@
+/**
+ * Code in this file is for generating typescript type definitions of the anchor types
+ * defined in src/anchor/idl/deltafi_dex_v2.json
+ */
 const idl = require("./src/anchor/idl/deltafi_dex_v2.json");
 const datatypes = idl.types;
 const accountTypes = idl.accounts;
