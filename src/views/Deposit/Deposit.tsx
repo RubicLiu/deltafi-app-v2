@@ -256,7 +256,7 @@ const Deposit: React.FC = () => {
 
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
-  const [transactionResult] = useState<TransactionResult>({
+  const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
   });
   const [isProcessing, setIsProcessing] = useState(false);
@@ -417,7 +417,6 @@ const Deposit: React.FC = () => {
       }
 
       transaction = await signTransaction(transaction);
-
       const hash = await sendSignedTransaction({
         signedTransaction: transaction,
         connection,
@@ -426,19 +425,16 @@ const Deposit: React.FC = () => {
       await connection.confirmTransaction(hash, "confirmed");
 
       dispatch(setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
-      // TODO(ypeng): fix the transaction result logic
-      //setTransactionResult({
-      //  status: true,
-      //  action: "deposit",
-      //  hash,
-      //  base,
-      //  quote,
-      //});
+      setTransactionResult({
+        status: true,
+        action: "deposit",
+        hash,
+        base,
+        quote,
+      });
     } catch (e) {
       console.error("error", e);
-      //setBase((prevBase) => ({ ...prevBase, amount: "" }));
-      //setQuote((prevQuote) => ({ ...prevQuote, amount: "" }));
-      //setTransactionResult({ status: false });
+      setTransactionResult({ status: false });
     } finally {
       setState((state) => ({ ...state, open: true }));
       setIsProcessing(false);
@@ -677,7 +673,7 @@ const Deposit: React.FC = () => {
               6,
             )} ${base.token.symbol} and ${Number(quote.amount).toFixed(6)} ${
               quote.token.symbol
-            } for ${base.token.symbol}-${quote.token.symbol} LP`}
+            } to ${base.token.symbol}-${quote.token.symbol} pool`}
           </Typography>
           <Box display="flex" alignItems="center">
             <Typography variant="subtitle2" color="primary">
