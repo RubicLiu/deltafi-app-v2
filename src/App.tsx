@@ -12,7 +12,6 @@ import { FilterCountry } from "utils/checkJurisdiction";
 // import awsconfig from './aws-exports'
 import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS } from "./constants";
 import { useCustomConnection } from "providers/connection";
-import { deployConfig, deployMode } from "constants/deployConfig";
 
 import { useDispatch } from "react-redux";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
@@ -26,6 +25,7 @@ import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2Stat
 import { fetchUserV2Thunk } from "states/v2/userV2State";
 import { fetchPythDataV2Thunk } from "states/v2/pythV2State";
 import { fetchTokenAccountsV2Thunk } from "states/v2/tokenV2State";
+import { deployConfigV2 } from "constants/deployConfigV2";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -142,7 +142,7 @@ const App: React.FC = () => {
   }, [dispatch, walletAddress, connection]);
 
   useEffect(() => {
-    setNetwork(deployConfig.network);
+    setNetwork(deployConfigV2.network);
   }, [setNetwork]);
 
   return (
