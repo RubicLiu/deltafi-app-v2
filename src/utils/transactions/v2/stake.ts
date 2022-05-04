@@ -22,7 +22,7 @@ export async function createStakeTransaction(
 
   let transaction = new Transaction();
   transaction.add(
-    program.rpc.depositToFarm(baseAmount, qouteAmount, {
+    program.transaction.depositToFarm(baseAmount, qouteAmount, {
       accounts: {
         marketConfig: new PublicKey(deployConfigV2.marketConfig),
         farmInfo: new PublicKey(poolConfig.farmInfo),

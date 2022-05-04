@@ -32,13 +32,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectLpUserBySwapKey,
   selectFarmByFarmKey,
-  selectTokenAccountInfoByMint,
   stakeSelector,
 } from "states/v2/selectorsV2";
 import {
   deployConfigV2,
   getPoolConfigByFarmKey,
-  getTokenConfigBySymbol,
 } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfig";
 import { stakeV2Actions } from "states/v2/stakeV2State";
@@ -84,8 +82,8 @@ const Stake = (): ReactElement => {
 
   const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
 
-  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const wallet = useWallet();
+  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const { network } = useCustomConnection();
   const { connection } = useConnection();
 
@@ -252,13 +250,19 @@ const Stake = (): ReactElement => {
     if (staking.isStake) {
       dispatch(stakeV2Actions.setIsProcessingStake({ isProcessingStake: true }));
       try {
+      const baseAmount = new BigNumber(staking.baseAmount).multipliedBy(
+        new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
+      );
+      const quoteAmount = new BigNumber(staking.quoteAmount).multipliedBy(
+        new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
+      );
         const transaction = await createStakeTransaction(
           program,
           connection,
           poolConfig,
           walletPubkey,
-          new BN(1),
-          new BN(1),
+          new BN(baseAmount.toFixed(0)),
+          new BN(quoteAmount.toFixed(0)),
         );
 
         const signedTransaction = await signTransaction(transaction);
@@ -266,27 +270,29 @@ const Stake = (): ReactElement => {
           signedTransaction,
           connection,
         });
+        console.info(transaction);
 
         await connection.confirmTransaction(hash, "confirmed");
 
-        dispatch(
-          stakeV2Actions.setTransactionResult({
-            transactionResult: {
-              status: true,
-              action: "stake",
-              hash,
-              stake: staking,
-            },
-          }),
-        );
+        // TODO(ypeng): Fix notification
+        //dispatch(
+        //  stakeV2Actions.setTransactionResult({
+        //    transactionResult: {
+        //      status: true,
+        //      action: "stake",
+        //      hash,
+        //      stake: staking,
+        //    },
+        //  }),
+        //);
       } catch (e) {
-        dispatch(
-          stakeV2Actions.setTransactionResult({
-            transactionResult: {
-              status: false,
-            },
-          }),
-        );
+        //dispatch(
+        //  stakeV2Actions.setTransactionResult({
+        //    transactionResult: {
+        //      status: false,
+        //    },
+        //  }),
+        //);
       } finally {
         dispatch(
           stakeV2Actions.setPercentage({

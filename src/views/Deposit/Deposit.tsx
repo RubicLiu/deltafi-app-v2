@@ -382,9 +382,9 @@ const Deposit: React.FC = () => {
         new BN(quoteAmount.toFixed(0)),
       );
 
-      transaction = await signTransaction(transaction);
+      const signedTransaction = await signTransaction(transaction);
       const hash = await sendSignedTransaction({
-        signedTransaction: transaction,
+        signedTransaction,
         connection,
       });
 
