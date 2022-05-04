@@ -8,8 +8,7 @@ import { useModal } from "providers/modal";
 import { getSwapOutAmount } from "utils/swap";
 import { fixedNumber } from "utils/utils";
 import { useSelector } from "react-redux";
-import { selectMarketPriceByPool } from "states/selectors";
-import { selectPoolBySymbols } from "states/selectors";
+import { selectPoolBySymbols, selectMarketPriceByPool } from "states/v2/selectorsV2";
 
 interface IConfirmSwapPanelProps {
   children?: ReactNode;
@@ -62,25 +61,25 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
   const classes = useStyles(props);
   const { setMenu, data } = useModal();
 
-  const pool = useSelector(
+  const poolConfig = useSelector(
     selectPoolBySymbols(data?.tokenFrom.token.symbol, data?.tokenTo.token.symbol),
   );
-  const { marketPrice } = useSelector(selectMarketPriceByPool(pool));
+  const { marketPrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const swapOut = useMemo(() => {
-    if (pool && data) {
+    if (poolConfig && data) {
       const { tokenFrom, tokenTo, slippage } = data;
       return getSwapOutAmount(
-        pool,
-        tokenFrom.token,
-        tokenTo.token,
+        poolConfig,
+        tokenFrom.token.address,
+        tokenTo.token.address,
         tokenFrom.amount,
         parseFloat(slippage),
         marketPrice,
       );
     }
     return null;
-  }, [pool, data, marketPrice]);
+  }, [poolConfig, data, marketPrice]);
 
   const handleConfirm = () => {
     data?.callback();

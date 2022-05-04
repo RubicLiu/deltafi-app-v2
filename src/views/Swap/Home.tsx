@@ -42,7 +42,6 @@ import {
   selectMarketPriceByPool,
   selectTokenAccountInfoByMint,
 } from "states/v2/selectorsV2";
-import { fetchPoolsThunk } from "states/poolState";
 import { fetchReferrerThunk } from "states/appState";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 import { marketConfig } from "constants/deployConfig";
@@ -54,6 +53,7 @@ import {
   poolConfigs,
   tokenConfigs,
 } from "constants/deployConfigV2";
+import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
 
 interface TransactionResult {
   status: boolean | null;
@@ -425,7 +425,7 @@ const Home: React.FC = (props) => {
           walletAddress: walletPubkey,
         }),
       );
-      dispatch(fetchPoolsThunk({ connection }));
+      dispatch(fetchSwapsV2Thunk({ connection }));
     }
   }, [
     pool,

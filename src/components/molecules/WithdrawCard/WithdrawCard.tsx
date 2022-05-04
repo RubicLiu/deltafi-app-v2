@@ -8,7 +8,7 @@ import clx from "classnames";
 import { DropDown } from "components";
 import useStyles from "./styles";
 import { SwapCard } from "views/Swap/components/types";
-import { getTokenConfigBySymbol, tokenConfigs } from "constants/deployConfig";
+import { tokenConfigs } from "constants/deployConfig";
 
 export interface SettingsProps {
   priceImpact: string;
@@ -27,19 +27,11 @@ export interface CardProps {
 }
 
 const WithdrawCard: React.FC<CardProps> = (props) => {
-  const { card, handleChangeCard, disableDrop, withdrawal } = props;
+  const { card, disableDrop, withdrawal } = props;
   const classes = useStyles(props);
 
-  const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.replace(/[^\d.-]/g, "");
-
-    handleChangeCard({ ...card, amount: isNaN(parseFloat(value)) ? "" : value });
-  };
-
-  const handleChangeToken = (token) => {
-    const newToken = getTokenConfigBySymbol(token.symbol);
-    handleChangeCard({ ...card, token: newToken });
-  };
+  const inputHandler = (_) => {};
+  const handleChangeToken = (_) => {};
 
   const value = useMemo(() => {
     const pointIdx = card.amount.indexOf(".");

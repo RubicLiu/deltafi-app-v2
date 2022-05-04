@@ -18,7 +18,7 @@ import { Fees, PoolState, SwapType } from "lib/state";
  * @returns amount out information
  */
 export function getSwapOutAmount(
-  pool: PoolInfo,
+  poolConfig: any,
   fromToken: TokenConfig,
   toToken: TokenConfig,
   amount: string,
@@ -36,7 +36,7 @@ export function getSwapOutAmount(
   // TODO(leqiang): use v2 formula
   // if the confidence interval is not enabled, we use fair market price for both adjusted
   // market price
-  if (!(marketPriceHigh && marketPriceLow) || pool.enableConfidenceInterval === false) {
+  if (!(marketPriceHigh && marketPriceLow) || poolConfig.enableConfidenceInterval === false) {
     marketPriceHigh = marketPrice;
     marketPriceLow = marketPrice;
   }
