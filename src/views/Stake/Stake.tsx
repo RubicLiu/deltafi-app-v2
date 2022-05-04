@@ -90,7 +90,8 @@ const Stake = (): ReactElement => {
   const { network } = useCustomConnection();
   const { connection } = useConnection();
 
-  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(DELTAFI_TOKEN_MINT.toBase58()));
+  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
+
   const { setMenu } = useModal();
   const dispatch = useDispatch();
   const stakeV2 = useSelector(stakeSelector);
@@ -375,7 +376,7 @@ const Stake = (): ReactElement => {
   }, [connection, walletPubkey, staking, signTransaction, dispatch, wallet, poolConfig, lpUser]);
 
   const handleClaim = useCallback(async () => {
-    if (!connection || !walletPubkey || !lpUser) {
+    if (!connection || !walletPubkey || !lpUser || !rewardsAccount) {
       return null;
     }
 

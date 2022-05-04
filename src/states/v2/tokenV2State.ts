@@ -141,7 +141,10 @@ async function getTokenAcountInfoList(
 export const fetchTokenAccountsV2Thunk = createAsyncThunk(
   "v2/fetchTokenAccounts",
   async (arg: fetchTokenAccountsThunkArgs) => {
-    const mintAddressList = deployConfigV2.tokenInfoList.map(({ mint }) => mint);
+    const mintAddressList = deployConfigV2.tokenInfoList
+      .map(({ mint }) => mint)
+      .concat([deployConfigV2.deltafiMint]);
+
     const tokenAccountInfoList = await getTokenAcountInfoList(
       mintAddressList,
       arg.connection,
