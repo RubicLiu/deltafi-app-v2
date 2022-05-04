@@ -78,20 +78,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }));
 
 const StakeCard: React.FC<CardProps> = (props) => {
-  const { card, handleChangeCard, disabled, tokens, disableDrop } = props;
+  const { card, tokens, disableDrop } = props;
   const classes = useStyles(props);
   const tokenBalance = card.balance;
 
-  const isDisabledInput = useMemo(() => {
-    return disabled || card.token === null;
-  }, [disabled, card.token]);
-
-  const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.replace(/[^\d.-]/g, "");
-    if (isNaN(parseFloat(value)) && value !== "") {
-      return;
-    }
-    handleChangeCard(value);
+  const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {
   };
 
   const value = useMemo(() => {
@@ -113,7 +104,7 @@ const StakeCard: React.FC<CardProps> = (props) => {
         />
         <CurrencyInput
           name="currency"
-          disabled={isDisabledInput}
+          disabled={true}
           className={classes.currencyInput}
           autoComplete="off"
           placeholder="0.00"
@@ -133,7 +124,7 @@ const StakeCard: React.FC<CardProps> = (props) => {
         />
         <CurrencyInput
           name="currency"
-          disabled={isDisabledInput}
+          disabled={true}
           className={classes.currencyInput}
           autoComplete="off"
           placeholder="0.00"
