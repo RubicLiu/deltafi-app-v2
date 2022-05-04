@@ -85,10 +85,6 @@ const Stake = (): ReactElement => {
   const vertical = "bottom";
   const horizontal = "left";
 
-  const tokenBalance = useMemo(() => {
-    return tokenAccount ? exponentiatedBy(tokenAccount.amount, token.decimals) : new BigNumber(0);
-  }, [tokenAccount, token]);
-
   const baseTotalStaked = useMemo(() => {
     return farmPool
       ? exponentiatedBy(farmPool.stakedBaseShare.toString(), poolConfig.baseTokenInfo.decimals)
@@ -114,16 +110,18 @@ const Stake = (): ReactElement => {
   const userBaseStaked = lpUser ? lpUser.basePosition.depositedAmount.toString() : "0";
   const userQuoteStaked = lpUser ? lpUser.quotePosition.depositedAmount.toString() : "0";
 
-  // TODO(ypeng): Use staked base quote amounts.
-  const depositAmount = useMemo(() => {
-    return new BigNumber(0);
-  }, []);
-
   useEffect(() => {
     if (poolConfig) {
       dispatch(stakeV2Actions.setPoolConfig({ poolConfig }));
+      dispatch(
+        stakeV2Actions.setIsStake({
+          isStake: true,
+          baseBalance: new BigNumber(userBaseShare),
+          quoteBalance: new BigNumber(userQuoteShare),
+        }),
+      );
     }
-  }, [baseTokenInfo, quoteTokenInfo, dispatch, poolConfig]);
+  }, [dispatch, poolConfig, userBaseShare, userQuoteShare]);
 
   const staking = stakeV2.stake;
 
@@ -147,34 +145,7 @@ const Stake = (): ReactElement => {
     [dispatch, staking],
   );
 
-  const setStakeAmount = useCallback(
-    (value: string) => {
-      let percentage = new BigNumber(0);
-      let amount = value !== "" ? value : "0";
-      if (staking.balance) {
-        percentage = new BigNumber(amount).multipliedBy(100).dividedBy(staking.balance);
-        if (percentage === new BigNumber(NaN)) {
-          percentage = new BigNumber(0);
-        } else if (percentage.comparedTo(new BigNumber(100)) > 0) {
-          percentage = new BigNumber(100);
-          amount = staking.balance.toString();
-        }
-      }
-      dispatch(stakeV2Actions.setPercentage({ percentage: Number(percentage.toFixed(2)), amount }));
-    },
-    [dispatch, staking],
-  );
-
-  useEffect(() => {
-    const isStake = staking.isStake;
-    dispatch(
-      stakeV2Actions.setIsStake({
-        isStake,
-        baseBalance: new BigNumber(isStake ? userBaseShare : userBaseStaked),
-        quoteBalance: new BigNumber(isStake ? userQuoteShare : userQuoteStaked),
-      }),
-    );
-  }, [dispatch, staking, userBaseShare, userQuoteShare, userBaseStaked, userQuoteStaked]);
+  const setStakeAmount = useCallback((value: string) => {}, [dispatch, staking]);
 
   const unclaimedReward = (() => {
     if (lpUser) {
