@@ -1,27 +1,30 @@
+import * as anchor from "@project-serum/anchor";
+import { PublicKey } from "@solana/web3.js";
+
 export interface PoolState {
-  marketPrice: BigInt;
-  baseReserve: BigInt;
-  quoteReserve: BigInt;
-  targetBaseReserve: BigInt;
-  targetQuoteReserve: BigInt;
-  baseSupply: BigInt;
-  quoteSupply: BigInt;
+  marketPrice: anchor.BN;
+  baseReserve: anchor.BN;
+  quoteReserve: anchor.BN;
+  targetBaseReserve: anchor.BN;
+  targetQuoteReserve: anchor.BN;
+  baseSupply: anchor.BN;
+  quoteSupply: anchor.BN;
 }
 
 export interface FarmPosition {
-  depositedAmount: BigInt;
-  rewardsOwed: BigInt;
-  cumulativeInterest: BigInt;
-  lastUpdateTs: BigInt;
-  nextClaimTs: BigInt;
-  latestDepositSlot: BigInt;
+  depositedAmount: anchor.BN;
+  rewardsOwed: anchor.BN;
+  cumulativeInterest: anchor.BN;
+  lastUpdateTs: anchor.BN;
+  nextClaimTs: anchor.BN;
+  latestDepositSlot: anchor.BN;
 }
 
 export interface FarmConfig {
-  baseAprNumerator: BigInt;
-  baseAprDenominator: BigInt;
-  quoteAprNumerator: BigInt;
-  quoteAprDenominator: BigInt;
+  baseAprNumerator: anchor.BN;
+  baseAprDenominator: anchor.BN;
+  quoteAprNumerator: anchor.BN;
+  quoteAprDenominator: anchor.BN;
   minClaimPeriod: number;
 }
 
@@ -29,89 +32,103 @@ export interface SwapConfig {
   isPaused: boolean;
   maxSwapPercentage: number;
   enableConfidenceInterval: boolean;
-  slope: BigInt;
-  adminTradeFeeNumerator: BigInt;
-  adminTradeFeeDenominator: BigInt;
-  adminWithdrawFeeNumerator: BigInt;
-  adminWithdrawFeeDenominator: BigInt;
-  tradeFeeNumerator: BigInt;
-  tradeFeeDenominator: BigInt;
-  withdrawFeeNumerator: BigInt;
-  withdrawFeeDenominator: BigInt;
-  tradeRewardNumerator: BigInt;
-  tradeRewardDenominator: BigInt;
-  tradeRewardCap: BigInt;
-  referralRewardNumerator: BigInt;
-  referralRewardDenominator: BigInt;
+  slope: anchor.BN;
+  adminTradeFeeNumerator: anchor.BN;
+  adminTradeFeeDenominator: anchor.BN;
+  adminWithdrawFeeNumerator: anchor.BN;
+  adminWithdrawFeeDenominator: anchor.BN;
+  tradeFeeNumerator: anchor.BN;
+  tradeFeeDenominator: anchor.BN;
+  withdrawFeeNumerator: anchor.BN;
+  withdrawFeeDenominator: anchor.BN;
+  tradeRewardNumerator: anchor.BN;
+  tradeRewardDenominator: anchor.BN;
+  tradeRewardCap: anchor.BN;
+  referralRewardNumerator: anchor.BN;
+  referralRewardDenominator: anchor.BN;
 }
 
-export enum SwapDirection {
-  SellBase,
-  SellQuote,
-}
+export type SwapDirection =
+  | { sellBase?: any; sellQuote?: never }
+  | { sellBase?: never; sellQuote?: any };
 
-export enum AccountType {
-  Unknown,
-  Mapping,
-  Product,
-  Price,
-}
+export type AccountType =
+  | { unknown?: any; mapping?: never; product?: never; price?: never }
+  | { unknown?: never; mapping?: any; product?: never; price?: never }
+  | { unknown?: never; mapping?: never; product?: any; price?: never }
+  | { unknown?: never; mapping?: never; product?: never; price?: any };
 
-export enum PriceStatus {
-  Unknown,
-  Trading,
-  Halted,
-  Auction,
-}
+export type PriceStatus =
+  | { unknown?: any; trading?: never; halted?: never; auction?: never }
+  | { unknown?: never; trading?: any; halted?: never; auction?: never }
+  | { unknown?: never; trading?: never; halted?: any; auction?: never }
+  | { unknown?: never; trading?: never; halted?: never; auction?: any };
 
-export enum CorpAction {
-  NoCorpAct,
-}
+export type CorpAction = { noCorpAct?: any };
 
-export enum PriceType {
-  Unknown,
-  Price,
-}
+export type PriceType = { unknown?: any; price?: never } | { unknown?: never; price?: any };
 
-export enum SwapType {
-  NormalSwap,
-  StableSwap,
-}
+export type SwapType =
+  | { normalSwap?: any; stableSwap?: never }
+  | { normalSwap?: never; stableSwap?: any };
 
 export interface DeltafiUser {
   bump: number;
-  owedSwapRewards: BigInt;
-  claimedSwapRewards: BigInt;
-  owedReferralRewards: BigInt;
-  claimedReferralRewards: BigInt;
+  configKey: PublicKey;
+  owner: PublicKey;
+  referrer: PublicKey;
+  owedSwapRewards: anchor.BN;
+  claimedSwapRewards: anchor.BN;
+  owedReferralRewards: anchor.BN;
+  claimedReferralRewards: anchor.BN;
 }
 
 export interface FarmInfo {
   bump: number;
-  stakedBaseShare: BigInt;
-  stakedQuoteShare: BigInt;
+  configKey: PublicKey;
+  swapKey: PublicKey;
+  stakedBaseShare: anchor.BN;
+  stakedQuoteShare: anchor.BN;
   farmConfig: FarmConfig;
 }
 
 export interface MarketConfig {
   version: number;
   bump: number;
+  seed: PublicKey;
+  adminKey: PublicKey;
+  deltafiMint: PublicKey;
+  deltafiToken: PublicKey;
+  pythProgramId: PublicKey;
 }
 
 export interface SwapInfo {
   isInitialized: boolean;
   bump: number;
+  seed: PublicKey;
   swapType: SwapType;
+  configKey: PublicKey;
+  mintBase: PublicKey;
+  mintQuote: PublicKey;
+  tokenBase: PublicKey;
+  tokenQuote: PublicKey;
+  adminFeeTokenBase: PublicKey;
+  adminFeeTokenQuote: PublicKey;
   mintBaseDecimals: number;
   mintQuoteDecimals: number;
+  pythPriceBase: PublicKey;
+  pythPriceQuote: PublicKey;
   poolState: PoolState;
   swapConfig: SwapConfig;
 }
 
 export interface LiquidityProvider {
   bump: number;
-  baseShare: BigInt;
-  quoteShare: BigInt;
+  configKey: PublicKey;
+  swapKey: PublicKey;
+  owner: PublicKey;
+  baseShare: anchor.BN;
+  quoteShare: anchor.BN;
   basePosition: FarmPosition;
   quotePosition: FarmPosition;
 }
