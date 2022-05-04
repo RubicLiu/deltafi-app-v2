@@ -16,6 +16,8 @@ export interface StakeCard {
   isStake: boolean;
   balance: BigNumber;
   amount: string;
+  baseAmount: string;
+  quoteAmount: string;
 }
 
 export interface CardProps {

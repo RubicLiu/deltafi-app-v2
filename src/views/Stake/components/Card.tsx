@@ -84,14 +84,6 @@ const StakeCard: React.FC<CardProps> = (props) => {
 
   const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {};
 
-  const value = useMemo(() => {
-    const pointIdx = card.amount.indexOf(".");
-    if (pointIdx > 0) {
-      return card.amount.slice(0, pointIdx) + card.amount.slice(pointIdx, pointIdx + 7);
-    }
-    return card.amount;
-  }, [card.amount]);
-
   return (
     <Paper className={classes.root}>
       <Box className={classes.main}>
@@ -110,7 +102,7 @@ const StakeCard: React.FC<CardProps> = (props) => {
           minLength={0}
           maxLength={20}
           decimalsLimit={20}
-          value={value}
+          value={card.baseAmount}
           onChange={inputHandler}
         />
       </Box>
@@ -130,7 +122,7 @@ const StakeCard: React.FC<CardProps> = (props) => {
           minLength={0}
           maxLength={20}
           decimalsLimit={20}
-          value={value}
+          value={card.quoteAmount}
           onChange={inputHandler}
         />
       </Box>

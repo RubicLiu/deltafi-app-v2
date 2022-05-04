@@ -23,8 +23,8 @@ const initialState = {
     baseBalance: new BigNumber("0"),
     quoteBalance: new BigNumber("0"),
     amount: "0",
-        baseAmount: "0",
-        quoteAmount: "0",
+    baseAmount: "0",
+    quoteAmount: "0",
     percentage: 0,
   },
 };
@@ -47,20 +47,31 @@ const stakeV2Slice = createSlice({
       };
     },
 
-    setPercentage(state, action: PayloadAction<{ percentage: number; amount: string }>) {
+    setPercentage(
+      state,
+      action: PayloadAction<{
+        percentage: number;
+        baseAmount: string;
+        quoteAmount: string;
+      }>,
+    ) {
       state.stake.percentage = action.payload.percentage;
-      state.stake.amount = action.payload.amount;
+      state.stake.baseAmount = action.payload.baseAmount;
+      state.stake.quoteAmount = action.payload.quoteAmount;
     },
 
     setBalance(state, action: PayloadAction<{ balance: BigNumber }>) {
       state.stake.balance = action.payload.balance;
     },
 
-    setIsStake(state, action: PayloadAction<{
-        isStake: boolean,
-        baseBalance: BigNumber,
-        quoteBalance: BigNumber,
-    }>) {
+    setIsStake(
+      state,
+      action: PayloadAction<{
+        isStake: boolean;
+        baseBalance: BigNumber;
+        quoteBalance: BigNumber;
+      }>,
+    ) {
       state.stake.isStake = action.payload.isStake;
       state.stake.baseBalance = action.payload.baseBalance;
       state.stake.quoteBalance = action.payload.quoteBalance;
