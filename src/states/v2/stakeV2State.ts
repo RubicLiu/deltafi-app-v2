@@ -14,7 +14,6 @@ const initialState = {
   isProcessingClaim: false,
   transactionResult: null,
   openSnackbar: false,
-  // TODO(ypeng): Update stake card content to match v2
   stake: {
     isStake: true,
     baseBalance: new BigNumber("0"),
