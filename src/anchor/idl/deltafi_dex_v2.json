@@ -2128,5 +2128,8 @@
       "name": "InvalidFarmConfig",
       "msg": "Invalid farm config"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "J4zjwmzDtbPtviP2cQh2DwdUijYu1d3J1jfBDzzXgs9D"
+  }
 }
