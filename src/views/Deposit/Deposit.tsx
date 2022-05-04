@@ -440,7 +440,6 @@ const Deposit: React.FC = () => {
       dispatch(
         fetchSwapsV2Thunk({
           connection,
-          walletAddress: walletPubkey,
         }),
       );
     }
@@ -538,7 +537,6 @@ const Deposit: React.FC = () => {
       dispatch(
         fetchSwapsV2Thunk({
           connection,
-          walletAddress: walletPubkey,
         }),
       );
     }

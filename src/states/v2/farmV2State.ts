@@ -9,7 +9,6 @@ const initialState = {
 
 type FetchFarmsV2ThunkArg = {
   connection: Connection;
-  walletAddress: PublicKey;
 };
 
 export const fetchFarmsV2Thunk = createAsyncThunk(
@@ -17,7 +16,7 @@ export const fetchFarmsV2Thunk = createAsyncThunk(
   async (arg: FetchFarmsV2ThunkArg) => {
     const program = getDeltafiDexV2(
       new PublicKey(deployConfigV2.programId),
-      makeProvider(arg.connection, arg.walletAddress),
+      makeProvider(arg.connection, {}),
     );
 
     const poolInfoList = deployConfigV2.poolInfoList;

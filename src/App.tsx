@@ -15,15 +15,9 @@ import { useCustomConnection } from "providers/connection";
 import { deployConfig, deployMode } from "constants/deployConfig";
 
 import { useDispatch } from "react-redux";
-import { fetchFarmPoolsThunk } from "states/farmPoolState";
-import { fetchFarmUsersThunk } from "states/farmUserState";
-import { fetchPoolsThunk } from "states/poolState";
-import { fetchPythDataThunk } from "states/pythState";
-import { fetchSerumDataThunk } from "states/serumState";
 import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { PublicKey } from "@solana/web3.js";
-import { fetchTokenAccountsThunk } from "states/tokenAccountState";
 import { scheduleWithInterval } from "utils";
 import { AccountLayout } from "@solana/spl-token";
 import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
@@ -70,58 +64,37 @@ const App: React.FC = () => {
   const { connection } = useConnection();
 
   useEffect(() => {
-    // Only enable it for mainnet-test
-    if (deployMode !== "mainnet-test") {
-      return;
-    }
-
-    dispatch(fetchSwapsV2Thunk({ connection, walletAddress }));
-    dispatch(fetchFarmsV2Thunk({ connection, walletAddress }));
-    dispatch(fetchPythDataV2Thunk(connection));
-
-    if (walletAddress != null) {
-      dispatch(fetchTokenAccountsV2Thunk({ connection, walletAddress }));
-      dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress }));
-      dispatch(fetchUserV2Thunk({ connection, walletAddress }));
-    }
-  }, [connection, walletAddress, dispatch]);
-
-  useEffect(() => {
     if (!walletAddress) {
       return;
     }
 
     // refresh every 1 minute
     return scheduleWithInterval(
-      () => dispatch(fetchTokenAccountsThunk({ connection, walletAddress })),
+      () => dispatch(fetchTokenAccountsV2Thunk({ connection, walletAddress })),
       60 * 1000,
     );
   }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
     // Refresh the pyth data every 2 seconds.
-    return scheduleWithInterval(() => dispatch(fetchPythDataThunk(connection)), 2 * 1000);
-  }, [connection, dispatch]);
-
-  useEffect(() => {
-    // Refresh the serum data every 2 seconds.
-    return scheduleWithInterval(() => dispatch(fetchSerumDataThunk(connection)), 2 * 1000);
+    return scheduleWithInterval(() => dispatch(fetchPythDataV2Thunk(connection)), 2 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {
     if (walletAddress) {
-      dispatch(fetchFarmUsersThunk({ connection, walletAddress }));
+      dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress }));
+      dispatch(fetchUserV2Thunk({ connection, walletAddress }));
     }
   }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
     // Refresh the farm pool every 1 minute.
-    return scheduleWithInterval(() => dispatch(fetchFarmPoolsThunk({ connection })), 60 * 1000);
+    return scheduleWithInterval(() => dispatch(fetchFarmsV2Thunk({ connection })), 60 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {
     // Refresh the farm pool every 1 minute.
-    return scheduleWithInterval(() => dispatch(fetchPoolsThunk({ connection })), 60 * 1000);
+    return scheduleWithInterval(() => dispatch(fetchSwapsV2Thunk({ connection })), 60 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {
