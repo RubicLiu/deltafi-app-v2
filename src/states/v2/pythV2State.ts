@@ -4,7 +4,7 @@ import { PriceData, ProductData, parsePriceData } from "@pythnetwork/client";
 import BigNumber from "bignumber.js";
 
 import { getMultipleAccounts } from "utils/account";
-import { deployConfigV2 } from "constants/deployConfigV2";
+import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { validate } from "utils/utils";
 
 type PythData = {
@@ -52,7 +52,6 @@ async function getPythDataList(connection: Connection) {
     const priceKey = priceInfos.keys[i];
     const priceData = parsePriceData(priceInfos.array[i].data as Buffer);
     const symbol = tokenInfoList[i].symbol;
-    console.info("pyth", symbol, priceData);
     pythDataList.push({
       priceKey,
       symbol,
@@ -89,14 +88,14 @@ export function getPythPriceBySymbol(
   return result;
 }
 
-export function getPythMarketPrice(symbolToPythData: SymbolToPythData, poolInfo) {
+export function getPythMarketPrice(symbolToPythData: SymbolToPythData, poolConfig: PoolConfig) {
   const { price: basePrice, confidenceInterval: baseConfidenceInterval } = getPythPriceBySymbol(
     symbolToPythData,
-    poolInfo.base,
+    poolConfig.base,
   );
   const { price: quotePrice, confidenceInterval: quoteConfidenceInterval } = getPythPriceBySymbol(
     symbolToPythData,
-    poolInfo.quote,
+    poolConfig.quote,
   );
   const marketPrice =
     basePrice && quotePrice ? new BigNumber(basePrice / quotePrice) : new BigNumber(NaN);

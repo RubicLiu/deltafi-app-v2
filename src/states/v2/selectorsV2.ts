@@ -1,17 +1,18 @@
 import { RootState } from "../store";
 
 import { getPythMarketPrice } from "./pythV2State";
-import { getPoolConfigBySymbols } from "constants/deployConfigV2";
+import { getPoolConfigBySymbols, PoolConfig } from "constants/deployConfigV2";
 
 export const lpUserSelector = (state: RootState) => state.liquidityProviderV2;
 export const farmPoolSelector = (state: RootState) => state.farmV2;
 export const poolSelector = (state: RootState) => state.swapV2;
 export const pythSelector = (state: RootState) => state.pythV2;
 export const tokenAccountSelector = (state: RootState) => state.tokenV2;
+export const depositSelector = (state: RootState) => state.depositV2;
 
-export function selectMarketPriceByPool(pool) {
+export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {
-    return getPythMarketPrice(state.pythV2.symbolToPythData, pool);
+    return getPythMarketPrice(state.pythV2.symbolToPythData, poolConfig);
   };
 }
 

@@ -1,11 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { appReducer } from "./appState";
-import { farmUserReducer } from "./farmUserState";
-import { farmPoolReducer } from "./farmPoolState";
-import { poolReducer } from "./poolState";
-import { pythReducer } from "./pythState";
 import { serumReducer } from "./serumState";
-import { tokenAccountReducer } from "./tokenAccountState";
 
 import { swapV2Reducer } from "./v2/swapV2State";
 import { farmV2Reducer } from "./v2/farmV2State";
@@ -13,15 +8,11 @@ import { liquidityProviderV2Reducer } from "./v2/liqudityProviderV2State";
 import { userV2Reducer } from "./v2/userV2State";
 import { pythV2Reducer } from "./v2/pythV2State";
 import { tokenV2Reducer } from "./v2/tokenV2State";
+import { depositV2Reducer } from "./v2/depositV2State";
 
 export const store = configureStore({
   reducer: {
     app: appReducer,
-    farmUser: farmUserReducer,
-    farmPool: farmPoolReducer,
-    pool: poolReducer,
-    pyth: pythReducer,
-    tokenAccount: tokenAccountReducer,
     serum: serumReducer,
     swapV2: swapV2Reducer,
     farmV2: farmV2Reducer,
@@ -29,6 +20,7 @@ export const store = configureStore({
     userV2: userV2Reducer,
     pythV2: pythV2Reducer,
     tokenV2: tokenV2Reducer,
+    depositV2: depositV2Reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
