@@ -201,14 +201,14 @@ const Stake = (): ReactElement => {
     if (lpUser && baseApr && quoteApr) {
       const baseRate = exponentiatedBy(
         exponentiate(
-          new BigNumber(userBaseStaked).multipliedBy(baseApr).dividedBy(365),
+          new BigNumber(userBaseStaked).dividedBy(10 ** baseTokenInfo.decimals).multipliedBy(baseApr).dividedBy(365),
           baseTokenInfo.decimals,
         ),
         DELTAFI_TOKEN_DECIMALS,
       );
       const quoteRate = exponentiatedBy(
         exponentiate(
-          new BigNumber(userQuoteStaked).multipliedBy(quoteApr).dividedBy(365),
+          new BigNumber(userQuoteStaked).dividedBy(10 ** quoteTokenInfo.decimals).multipliedBy(quoteApr).dividedBy(365),
           quoteTokenInfo.decimals,
         ),
         DELTAFI_TOKEN_DECIMALS,
@@ -572,11 +572,14 @@ const Stake = (): ReactElement => {
         <Box className={classes.liquidityStaked}>
           <Typography className={classes.title}>Your Liquidity Staked</Typography>
           <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>{userBaseStaked}</Typography>
+            <Typography className={classes.amount}>{
+            new BigNumber(userBaseStaked).dividedBy(10 ** baseTokenInfo.decimals).toFixed(baseTokenInfo.decimals)}</Typography>
             <Typography className={classes.amount}>{baseTokenInfo.symbol}</Typography>
           </Box>
           <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>{userQuoteStaked}</Typography>
+            <Typography className={classes.amount}>{
+            new BigNumber(userQuoteStaked).dividedBy(10 ** quoteTokenInfo.decimals).toFixed(quoteTokenInfo.decimals)}
+            </Typography>
             <Typography className={classes.amount}>{quoteTokenInfo.symbol}</Typography>
           </Box>
           <Box className={classes.cardBottom}>
