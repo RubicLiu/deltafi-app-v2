@@ -33,7 +33,7 @@ import { selectLpUserBySwapKey, selectFarmByFarmKey, stakeSelector } from "state
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfig";
 import { stakeV2Actions } from "states/v2/stakeV2State";
-import { createStakeTransaction } from "utils/transactions/v2/stake";
+import { createStakeTransaction, createUnstakeTransaction } from "utils/transactions/v2/stake";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { PublicKey } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
@@ -201,14 +201,20 @@ const Stake = (): ReactElement => {
     if (lpUser && baseApr && quoteApr) {
       const baseRate = exponentiatedBy(
         exponentiate(
-          new BigNumber(userBaseStaked).multipliedBy(baseApr).dividedBy(365),
+          new BigNumber(userBaseStaked)
+            .dividedBy(10 ** baseTokenInfo.decimals)
+            .multipliedBy(baseApr)
+            .dividedBy(365),
           baseTokenInfo.decimals,
         ),
         DELTAFI_TOKEN_DECIMALS,
       );
       const quoteRate = exponentiatedBy(
         exponentiate(
-          new BigNumber(userQuoteStaked).multipliedBy(quoteApr).dividedBy(365),
+          new BigNumber(userQuoteStaked)
+            .dividedBy(10 ** quoteTokenInfo.decimals)
+            .multipliedBy(quoteApr)
+            .dividedBy(365),
           quoteTokenInfo.decimals,
         ),
         DELTAFI_TOKEN_DECIMALS,
@@ -265,29 +271,27 @@ const Stake = (): ReactElement => {
           signedTransaction,
           connection,
         });
-        console.info(transaction);
 
         await connection.confirmTransaction(hash, "confirmed");
 
-        // TODO(ypeng): Fix notification
-        //dispatch(
-        //  stakeV2Actions.setTransactionResult({
-        //    transactionResult: {
-        //      status: true,
-        //      action: "stake",
-        //      hash,
-        //      stake: staking,
-        //    },
-        //  }),
-        //);
+        dispatch(
+          stakeV2Actions.setTransactionResult({
+            transactionResult: {
+              status: true,
+              action: "stake",
+              hash,
+              stake: staking,
+            },
+          }),
+        );
       } catch (e) {
-        //dispatch(
-        //  stakeV2Actions.setTransactionResult({
-        //    transactionResult: {
-        //      status: false,
-        //    },
-        //  }),
-        //);
+        dispatch(
+          stakeV2Actions.setTransactionResult({
+            transactionResult: {
+              status: false,
+            },
+          }),
+        );
       } finally {
         dispatch(
           stakeV2Actions.setPercentage({
@@ -296,74 +300,67 @@ const Stake = (): ReactElement => {
             quoteAmount: "0",
           }),
         );
-        // dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: true }));
+        dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: true }));
+        dispatch(stakeV2Actions.setIsProcessingStake({ isProcessingStake: false }));
+        dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
+      }
+    } else {
+      dispatch(stakeV2Actions.setIsProcessingStake({ isProcessingStake: true }));
+      try {
+        const baseAmount = new BigNumber(staking.baseAmount).multipliedBy(
+          new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
+        );
+        const quoteAmount = new BigNumber(staking.quoteAmount).multipliedBy(
+          new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
+        );
+        const transaction = await createUnstakeTransaction(
+          program,
+          connection,
+          poolConfig,
+          walletPubkey,
+          new BN(baseAmount.toFixed(0)),
+          new BN(quoteAmount.toFixed(0)),
+        );
+
+        const signedTransaction = await signTransaction(transaction);
+        const hash = await sendSignedTransaction({
+          signedTransaction,
+          connection,
+        });
+
+        await connection.confirmTransaction(hash, "confirmed");
+
+        dispatch(
+          stakeV2Actions.setTransactionResult({
+            transactionResult: {
+              status: true,
+              action: "unstake",
+              hash,
+              stake: staking,
+            },
+          }),
+        );
+      } catch (e) {
+        dispatch(
+          stakeV2Actions.setTransactionResult({
+            transactionResult: {
+              status: false,
+            },
+          }),
+        );
+      } finally {
+        dispatch(
+          stakeV2Actions.setPercentage({
+            percentage: 0,
+            baseAmount: "0",
+            quoteAmount: "0",
+          }),
+        );
+        dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: true }));
         dispatch(stakeV2Actions.setIsProcessingStake({ isProcessingStake: false }));
         dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
       }
     }
-    //    } else {
-    //      if (staking.amount === "" || !position || depositAmount.lt(staking.amount)) {
-    //        return null;
-    //      }
-    //
-    //      setIsProcessingStake(true);
-    //      try {
-    //        const transaction = await unstake({
-    //          connection,
-    //          walletPubkey,
-    //          config,
-    //          farmPool,
-    //          farmUser: farmUser?.publicKey,
-    //          poolTokenAccount: lpToken,
-    //          unstakeData: {
-    //            amount: BigInt(
-    //              exponentiate(staking.amount, lpTokenConfig.decimals).integerValue().toString(),
-    //            ),
-    //          },
-    //        });
-    //
-    //        const signedTransaction = await signTransaction(transaction);
-    //        const hash = await sendSignedTransaction({
-    //          signedTransaction,
-    //          connection,
-    //        });
-    //
-    //        await connection.confirmTransaction(hash, "confirmed");
-    //        await fecthTokenAccountInfoList(
-    //          [farmPool?.poolMintKey.toBase58()],
-    //          walletPubkey,
-    //          connection,
-    //          dispatch,
-    //        );
-    //        setStaking((prevStaking) => ({
-    //          ...prevStaking,
-    //          amount: "0",
-    //          percentage: 0,
-    //        }));
-    //        setTransactionResult({
-    //          status: true,
-    //          action: "unstake",
-    //          hash,
-    //          stake: staking,
-    //        });
-    //      } catch (e) {
-    //        setStaking((prevStaking) => ({
-    //          ...prevStaking,
-    //          amount: "0",
-    //          percentage: 0,
-    //        }));
-    //        setTransactionResult({ status: false });
-    //      } finally {
-    //        setState((state) => ({ ...state, open: true }));
-    //        setIsProcessingStake(false);
-    //        dispatch(
-    //          fetchFarmUsersThunk({
-    //            connection,
-    //            walletAddress: walletPubkey,
-    //          }),
-    //        );
-    //      }
-    //    }
   }, [connection, walletPubkey, staking, signTransaction, dispatch, wallet, poolConfig, lpUser]);
 
   const handleClaim = useCallback(
@@ -482,9 +479,10 @@ const Stake = (): ReactElement => {
         <Box>
           {stake && (
             <Typography variant="body1" color="primary">
-              {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(stake?.amount).toFixed(
-                6,
-              )} ${stake.token.symbol} LP`}
+              {`${action.charAt(0).toUpperCase() + action.slice(1)}
+              ${Number(stake?.baseAmount).toFixed(baseTokenInfo.decimals)} ${baseTokenInfo.symbol}
+              share and ${Number(stake?.quoteAmount).toFixed(quoteTokenInfo.decimals)}
+              ${quoteTokenInfo.symbol} share`}
             </Typography>
           )}
           <Box display="flex" alignItems="center">
@@ -502,7 +500,7 @@ const Stake = (): ReactElement => {
         </Box>
       </Box>
     );
-  }, [stakeV2, classes, network]);
+  }, [stakeV2, classes, network, baseTokenInfo, quoteTokenInfo]);
 
   if (!farmPool) return null;
 
@@ -572,11 +570,19 @@ const Stake = (): ReactElement => {
         <Box className={classes.liquidityStaked}>
           <Typography className={classes.title}>Your Liquidity Staked</Typography>
           <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>{userBaseStaked}</Typography>
+            <Typography className={classes.amount}>
+              {new BigNumber(userBaseStaked)
+                .dividedBy(10 ** baseTokenInfo.decimals)
+                .toFixed(baseTokenInfo.decimals)}
+            </Typography>
             <Typography className={classes.amount}>{baseTokenInfo.symbol}</Typography>
           </Box>
           <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>{userQuoteStaked}</Typography>
+            <Typography className={classes.amount}>
+              {new BigNumber(userQuoteStaked)
+                .dividedBy(10 ** quoteTokenInfo.decimals)
+                .toFixed(quoteTokenInfo.decimals)}
+            </Typography>
             <Typography className={classes.amount}>{quoteTokenInfo.symbol}</Typography>
           </Box>
           <Box className={classes.cardBottom}>
