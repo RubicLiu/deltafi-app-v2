@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { appReducer } from "./appState";
+import { serumReducer } from "./serumState";
 
 import { swapV2Reducer } from "./v2/swapV2State";
 import { farmV2Reducer } from "./v2/farmV2State";
@@ -12,6 +13,7 @@ import { depositV2Reducer } from "./v2/depositV2State";
 export const store = configureStore({
   reducer: {
     app: appReducer,
+    serum: serumReducer,
     swapV2: swapV2Reducer,
     farmV2: farmV2Reducer,
     liquidityProviderV2: liquidityProviderV2Reducer,

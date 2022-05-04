@@ -26,6 +26,7 @@ import { fetchUserV2Thunk } from "states/v2/userV2State";
 import { fetchPythDataV2Thunk } from "states/v2/pythV2State";
 import { fetchTokenAccountsV2Thunk } from "states/v2/tokenV2State";
 import { deployConfigV2 } from "constants/deployConfigV2";
+import { fetchSerumDataThunk } from "states/serumState";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -78,6 +79,11 @@ const App: React.FC = () => {
   useEffect(() => {
     // Refresh the pyth data every 2 seconds.
     return scheduleWithInterval(() => dispatch(fetchPythDataV2Thunk(connection)), 2 * 1000);
+  }, [connection, dispatch]);
+
+  useEffect(() => {
+    // Refresh the serum data every 2 seconds.
+    return scheduleWithInterval(() => dispatch(fetchSerumDataThunk(connection)), 2 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {
