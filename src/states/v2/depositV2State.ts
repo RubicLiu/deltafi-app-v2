@@ -24,6 +24,7 @@ const initialState = {
   },
   transactionResult: null,
   isProcessing: false,
+  withdrawPercentage: 0,
 };
 
 export const setTokenAmount = createAction<{
@@ -48,6 +49,10 @@ export const setIsProcessing = createAction<{
   isProcessing: boolean;
 }>("v2/deposit/setIsProcessing");
 
+export const setWithdrawPercentage = createAction<{
+  withdrawPercentage: number,
+}>("v2/deposit/setWithdrawPercentage");
+
 export const depositV2Reducer = createReducer(initialState, (builder) => {
   builder.addCase(setTokenInfo, (state, action) => {
     state.base.token = action.payload.baseTokenInfo;
@@ -65,6 +70,7 @@ export const depositV2Reducer = createReducer(initialState, (builder) => {
 
   builder.addCase(setMethod, (state, action) => {
     state.method = action.payload.method;
+    state.withdrawPercentage = 0;
   });
 
   builder.addCase(setTransactionResult, (state, action) => {
@@ -73,5 +79,9 @@ export const depositV2Reducer = createReducer(initialState, (builder) => {
 
   builder.addCase(setIsProcessing, (state, action) => {
     state.isProcessing = action.payload.isProcessing;
+  });
+
+  builder.addCase(setWithdrawPercentage, (state, action) => {
+    state.withdrawPercentage = action.payload.withdrawPercentage;
   });
 });

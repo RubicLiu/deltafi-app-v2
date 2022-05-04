@@ -49,6 +49,7 @@ import {
   setTokenAmount,
   setTokenInfo,
   setTransactionResult,
+  setWithdrawPercentage,
 } from "states/v2/depositV2State";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { sendSignedTransaction } from "utils/transactions";
@@ -222,7 +223,6 @@ const Deposit: React.FC = () => {
   const classes = useStyles();
   const { connected: isConnectedWallet } = useWallet();
   const { setMenu } = useModal();
-  const [withdrawPercentage, setWithdrawPercentage] = useState(0);
   const [state, setState] = useState<{
     open: boolean;
     vertical: "bottom" | "top";
@@ -622,14 +622,13 @@ const Deposit: React.FC = () => {
           }),
         );
       }
-      setWithdrawPercentage(value);
+      dispatch(setWithdrawPercentage({ withdrawPercentage: value}));
     },
-    [dispatch, lpUser, setWithdrawPercentage, baseTokenInfo, quoteTokenInfo, basePrice, quotePrice],
+    [dispatch, lpUser, baseTokenInfo, quoteTokenInfo, basePrice, quotePrice],
   );
 
   const handleSwitchMethod = useCallback((method: string) => {
     dispatch(setMethod({ method }));
-    setWithdrawPercentage(0);
   }, [dispatch]);;
 
   const snackMessasge = useMemo(() => {
@@ -861,7 +860,7 @@ const Deposit: React.FC = () => {
           {method === "withdraw" ? (
             <Box display="flex" flexDirection="column" alignItems="flex-end">
               <WithdrawSelectCard
-                percentage={withdrawPercentage}
+                percentage={depositV2.withdrawPercentage}
                 onUpdatePercentage={handleWithdrawSlider}
               />
               <WithdrawCard
