@@ -230,7 +230,6 @@ const Stake = (): ReactElement => {
 
   const handleStake = useCallback(
     async () => {
-      // TODO(ypeng): Implement v2 transaction.
       //    if (!connection || !farmPool || !walletPubkey || !lpTokenConfig || !lpToken) {
       //      return null;
       //    }
