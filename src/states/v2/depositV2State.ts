@@ -25,6 +25,7 @@ const initialState = {
   transactionResult: null,
   isProcessing: false,
   withdrawPercentage: 0,
+  openSnackbar: false,
 };
 
 export const setTokenAmount = createAction<{
@@ -52,6 +53,10 @@ export const setIsProcessing = createAction<{
 export const setWithdrawPercentage = createAction<{
   withdrawPercentage: number;
 }>("v2/deposit/setWithdrawPercentage");
+
+export const setOpenSnackbar = createAction<{
+  openSnackbar: boolean;
+}>("v2/deposit/setOpenSnackbar");
 
 export const depositV2Reducer = createReducer(initialState, (builder) => {
   builder.addCase(setTokenInfo, (state, action) => {
@@ -83,5 +88,9 @@ export const depositV2Reducer = createReducer(initialState, (builder) => {
 
   builder.addCase(setWithdrawPercentage, (state, action) => {
     state.withdrawPercentage = action.payload.withdrawPercentage;
+  });
+
+  builder.addCase(setOpenSnackbar, (state, action) => {
+    state.openSnackbar = action.payload.openSnackbar;
   });
 });

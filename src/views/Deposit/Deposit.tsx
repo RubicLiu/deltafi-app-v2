@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect } from "react";
+import React, { useMemo, useCallback, useEffect } from "react";
 import {
   Typography,
   IconButton,
@@ -46,6 +46,7 @@ import {
 import {
   setIsProcessing,
   setMethod,
+  setOpenSnackbar,
   setTokenAmount,
   setTokenInfo,
   setTransactionResult,
@@ -223,15 +224,6 @@ const Deposit: React.FC = () => {
   const classes = useStyles();
   const { connected: isConnectedWallet } = useWallet();
   const { setMenu } = useModal();
-  const [state, setState] = useState<{
-    open: boolean;
-    vertical: "bottom" | "top";
-    horizontal: "left" | "center" | "right";
-  }>({
-    open: false,
-    vertical: "bottom",
-    horizontal: "left",
-  });
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const swapInfo = useSelector(selectSwapBySwapKey(poolAddress));
 
@@ -428,7 +420,7 @@ const Deposit: React.FC = () => {
         }),
       );
     } finally {
-      setState((state) => ({ ...state, open: true }));
+      dispatch(setOpenSnackbar({ openSnackbar: true }));
       dispatch(setIsProcessing({ isProcessing: false }));
       dispatch(
         fetchLiquidityProvidersV2Thunk({
@@ -526,7 +518,7 @@ const Deposit: React.FC = () => {
         }),
       );
     } finally {
-      setState((state) => ({ ...state, open: true }));
+      dispatch(setOpenSnackbar({ openSnackbar: true }));
       dispatch(setIsProcessing({ isProcessing: false }));
       dispatch(
         fetchLiquidityProvidersV2Thunk({
@@ -555,8 +547,8 @@ const Deposit: React.FC = () => {
   ]);
 
   const handleSnackBarClose = useCallback(() => {
-    setState((state) => ({ ...state, open: false }));
-  }, []);
+    dispatch(setOpenSnackbar({ openSnackbar: false }));
+  }, [dispatch]);
 
   const handleBaseTokenInput = useCallback(
     (card: ISwapCard) => {
@@ -792,7 +784,8 @@ const Deposit: React.FC = () => {
 
   if (!swapInfo) return null;
 
-  const { open, vertical, horizontal } = state;
+  const vertical = "bottom";
+  const horizontal = "left";
 
   const reserveDisplay = (reserve: BigNumber, decimals: number): string => {
     if (!reserve || !decimals) {
@@ -958,7 +951,7 @@ const Deposit: React.FC = () => {
       </Container>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
-        open={open}
+        open={depositV2.openSnackbar}
         onClose={handleSnackBarClose}
         key={vertical + horizontal}
       >
