@@ -45,6 +45,7 @@ import {
 } from "states/v2/selectorsV2";
 import {
   setIsProcessing,
+  setMethod,
   setTokenAmount,
   setTokenInfo,
   setTransactionResult,
@@ -232,7 +233,6 @@ const Deposit: React.FC = () => {
     horizontal: "left",
   });
   const { poolAddress } = useParams<{ poolAddress: string }>();
-  const [method, switchMethod] = useState<string>("deposit");
   const swapInfo = useSelector(selectSwapBySwapKey(poolAddress));
 
   const poolConfig = getPoolConfigBySwapKey(poolAddress);
@@ -627,10 +627,10 @@ const Deposit: React.FC = () => {
     [dispatch, lpUser, setWithdrawPercentage, baseTokenInfo, quoteTokenInfo, basePrice, quotePrice],
   );
 
-  const handleSwitchMethod = (method: string) => {
-    switchMethod(method);
+  const handleSwitchMethod = useCallback((method: string) => {
+    dispatch(setMethod({ method }));
     setWithdrawPercentage(0);
-  };
+  }, [dispatch]);;
 
   const snackMessasge = useMemo(() => {
     if (!depositV2 || !depositV2.transactionResult) {
@@ -719,7 +719,7 @@ const Deposit: React.FC = () => {
     }
     const base = depositV2.base;
     const quote = depositV2.quote;
-    if (method === "deposit") {
+    if (depositV2.method === "deposit") {
       if (base.token && quote.token && baseTokenAccount && quoteTokenAccount) {
         const isInsufficient =
           exponentiatedBy(baseTokenAccount.amount, base.token.decimals).isLessThan(
@@ -786,7 +786,6 @@ const Deposit: React.FC = () => {
     setMenu,
     handleDeposit,
     handleWithdraw,
-    method,
     classes.actionLoadingButton,
   ]);
 
@@ -806,6 +805,8 @@ const Deposit: React.FC = () => {
     }
     return value.toFormat(2);
   };
+
+  const method = depositV2.method;
 
   return (
     <Page>
