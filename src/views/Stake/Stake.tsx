@@ -423,7 +423,16 @@ const Stake = (): ReactElement => {
       dispatch(stakeV2Actions.setIsProcessingClaim({ isProcessingClaim: false }));
       dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
     }
-  }, [connection, walletPubkey, signTransaction, dispatch, wallet, poolConfig, lpUser, rewardsAccount]);
+  }, [
+    connection,
+    walletPubkey,
+    signTransaction,
+    dispatch,
+    wallet,
+    poolConfig,
+    lpUser,
+    rewardsAccount,
+  ]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: false }));
