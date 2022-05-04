@@ -4,7 +4,7 @@ import { StakeCard } from "views/Stake/components/types";
 
 interface TransactionResult {
   status: boolean | null;
-  action?: "stake" | "unstake";
+  action?: "stake" | "unstake" | "claim";
   hash?: string;
   stake?: StakeCard;
 }
