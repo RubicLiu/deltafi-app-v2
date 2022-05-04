@@ -1,9 +1,9 @@
-import { Connection, PublicKey, Transaction, Keypair } from "@solana/web3.js";
-import { partialSignTransaction, mergeTransactions } from "..";
+import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+import { partialSignTransaction } from "..";
 import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { BN } from "@project-serum/anchor";
 
-export async function createWithdrawTransaction(
+export async function createStakeTransaction(
   program: any,
   connection: Connection,
   poolConfig: PoolConfig,
