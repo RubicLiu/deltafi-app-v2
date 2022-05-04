@@ -1,57 +1,16 @@
-
 import { Connection, PublicKey, Transaction, Keypair } from "@solana/web3.js";
-import { AccountLayout } from "@solana/spl-token";
 import { partialSignTransaction, mergeTransactions } from "..";
-import * as token from "@solana/spl-token";
-import { PoolConfig } from "constants/deployConfigV2";
-import { web3, BN } from "@project-serum/anchor";
-
-import { createNativeSOLHandlingTransactions } from "../utils";
+import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
+import { BN } from "@project-serum/anchor";
 
 export async function createWithdrawTransaction(
   program: any,
   connection: Connection,
   poolConfig: PoolConfig,
-  swapInfo: any,
-  userTokenBase: PublicKey,
-  userTokenQuote: PublicKey,
   walletPubkey: PublicKey,
   baseAmount: BN,
   qouteAmount: BN,
 ) {
-  let baseSourceRef = userTokenBase;
-  let quoteSourceRef = userTokenQuote;
-  let createWrappedTokenAccountTransaction: Transaction | undefined;
-  let initializeWrappedTokenAccountTransaction: Transaction | undefined;
-  let closeWrappedTokenAccountTransaction: Transaction | undefined;
-
-  const baseSOL = poolConfig.baseTokenInfo.symbol === "SOL";
-  const quoteSOL = poolConfig.quoteTokenInfo.symbol === "SOL";
-  const tempAccountRefKeyPair = Keypair.generate();
-  const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
-
-  if (baseSOL || quoteSOL) {
-    const tmpAccountLamport = (baseSOL ? baseAmount.toNumber() : qouteAmount.toNumber()) + lamports;
-
-    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(
-      tempAccountRefKeyPair.publicKey,
-      tmpAccountLamport,
-      walletPubkey,
-    );
-    createWrappedTokenAccountTransaction =
-      nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
-    initializeWrappedTokenAccountTransaction =
-      nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
-    closeWrappedTokenAccountTransaction =
-      nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
-
-    if (baseSOL) {
-      baseSourceRef = tempAccountRefKeyPair.publicKey;
-    } else {
-      quoteSourceRef = tempAccountRefKeyPair.publicKey;
-    }
-  }
-
   const [lpPublicKey] = await PublicKey.findProgramAddress(
     [
       Buffer.from("LiquidityProvider"),
@@ -62,57 +21,19 @@ export async function createWithdrawTransaction(
   );
 
   let transaction = new Transaction();
-  if (swapInfo.swapType.stableSwap) {
-    transaction.add(
-      program.transaction.withdrawFromStableSwap(baseAmount, qouteAmount, {
-        accounts: {
-          swapInfo: new PublicKey(poolConfig.swapInfo),
-          userTokenBase: baseSourceRef,
-          userTokenQuote,
-          quoteSourceRef,
-          liquidityProvider: lpPublicKey,
-          tokenBase: swapInfo.tokenBase,
-          tokenQuote: swapInfo.tokenQuote,
-          adminFeeTokenBase: swapInfo.adminFeeTokenBase,
-          adminFeeTokenQuote: swapInfo.adminFeeTokenQuote,
-          userAuthority: walletPubkey,
-          tokenProgram: token.TOKEN_PROGRAM_ID,
-        },
-      }),
-    );
-  } else {
-    transaction.add(
-      program.transaction.withdrawFromNormalSwap(baseAmount, qouteAmount, {
-        accounts: {
-          swapInfo: new PublicKey(poolConfig.swapInfo),
-          userTokenBase: baseSourceRef,
-          userTokenQuote,
-          quoteSourceRef,
-          liquidityProvider: lpPublicKey,
-          tokenBase: swapInfo.tokenBase,
-          tokenQuote: swapInfo.tokenQuote,
-          adminFeeTokenBase: swapInfo.adminFeeTokenBase,
-          adminFeeTokenQuote: swapInfo.adminFeeTokenQuote,
-          pythPriceBase: swapInfo.pythPriceBase,
-          pythPriceQuote: swapInfo.pythPriceQuote,
-          userAuthority: walletPubkey,
-          tokenProgram: token.TOKEN_PROGRAM_ID,
-        },
-      }),
-    );
-  }
+  transaction.add(
+    program.rpc.depositToFarm(baseAmount, qouteAmount, {
+      accounts: {
+        marketConfig: new PublicKey(deployConfigV2.marketConfig),
+        farmInfo: new PublicKey(poolConfig.farmInfo),
+        swapInfo: new PublicKey(poolConfig.swapInfo),
+        liquidityProvider: lpPublicKey,
+        owner: walletPubkey,
+      },
+    }),
+  );
 
   const signers = [];
-  if (baseSOL || quoteSOL) {
-    transaction = mergeTransactions([
-      createWrappedTokenAccountTransaction,
-      initializeWrappedTokenAccountTransaction,
-      transaction,
-      closeWrappedTokenAccountTransaction,
-    ]);
-    signers.push(tempAccountRefKeyPair);
-  }
-
   return partialSignTransaction({
     transaction,
     feePayer: walletPubkey,
