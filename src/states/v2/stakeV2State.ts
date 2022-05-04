@@ -1,30 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SwapCard } from "views/Swap/components/types";
-import { TokenConfig } from "constants/deployConfigV2";
+import { StakeCard } from "views/Stake/components/types";
 
 interface TransactionResult {
   status: boolean | null;
   action?: "deposit" | "withdraw";
   hash?: string;
-  base?: SwapCard;
-  quote?: SwapCard;
+  stake?: StakeCard;
 }
 
 const initialState = {
-  method: "deposit",
-  base: {
-    token: null,
-    amount: "0",
-    amountWithSlippage: "0",
-  },
-  quote: {
-    token: null,
-    amount: "0",
-    amountWithSlippage: "0",
-  },
+  isProcessingStake: false,
+  isProcessingClaim: false,
   transactionResult: null,
-  isProcessing: false,
-  withdrawPercentage: 0,
   openSnackbar: false,
 };
 
@@ -32,75 +19,19 @@ const stakeV2Slice = createSlice({
   name: "stakeV2",
   initialState,
   reducers: {
-    setTokenInfo(
-      state,
-      action: PayloadAction<{
-        baseTokenInfo: TokenConfig;
-        quoteTokenInfo: TokenConfig;
-      }>,
-    ) {
-      state.base.token = action.payload.baseTokenInfo;
-      state.base.amount = "0";
-      state.base.amountWithSlippage = "0";
-      state.quote.token = action.payload.quoteTokenInfo;
-      state.quote.amount = "0";
-      state.quote.amountWithSlippage = "0";
-    },
-
-    setTokenAmount(
-      state,
-      action: PayloadAction<{
-        baseAmount: string;
-        quoteAmount: string;
-      }>,
-    ) {
-      state.base.amount = action.payload.baseAmount;
-      state.quote.amount = action.payload.quoteAmount;
-    },
-
-    setMethod(
-      state,
-      action: PayloadAction<{
-        method: string;
-      }>,
-    ) {
-      state.method = action.payload.method;
-      state.withdrawPercentage = 0;
-    },
-
-    setTransactionResult(
-      state,
-      action: PayloadAction<{
-        transactionResult: TransactionResult;
-      }>,
-    ) {
+    setTransactionResult(state, action: PayloadAction<{ transactionResult: TransactionResult }>) {
       state.transactionResult = action.payload.transactionResult;
     },
 
-    setIsProcessing(
-      state,
-      action: PayloadAction<{
-        isProcessing: boolean;
-      }>,
-    ) {
-      state.isProcessing = action.payload.isProcessing;
+    setIsProcessingStake(state, action: PayloadAction<{ isProcessingStake: boolean }>) {
+      state.isProcessingStake = action.payload.isProcessingStake;
     },
 
-    setWithdrawPercentage(
-      state,
-      action: PayloadAction<{
-        withdrawPercentage: number;
-      }>,
-    ) {
-      state.withdrawPercentage = action.payload.withdrawPercentage;
+    setIsProcessingClaim(state, action: PayloadAction<{ isProcessingClaim: boolean }>) {
+      state.isProcessingStake = action.payload.isProcessingClaim;
     },
 
-    setOpenSnackbar(
-      state,
-      action: PayloadAction<{
-        openSnackbar: boolean;
-      }>,
-    ) {
+    setOpenSnackbar(state, action: PayloadAction<{ openSnackbar: boolean }>) {
       state.openSnackbar = action.payload.openSnackbar;
     },
   },
