@@ -82,8 +82,7 @@ const StakeCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const tokenBalance = card.balance;
 
-  const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {
-  };
+  const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {};
 
   const value = useMemo(() => {
     const pointIdx = card.amount.indexOf(".");

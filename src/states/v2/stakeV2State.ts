@@ -19,7 +19,6 @@ const initialState = {
   stake: {
     poolConfig: null,
     isStake: true,
-    token: null,
     balance: new BigNumber("0"),
     amount: "0",
     percentage: 0,
@@ -34,7 +33,6 @@ const stakeV2Slice = createSlice({
       state.stake = {
         poolConfig: action.payload.poolConfig,
         isStake: true,
-        token: null,
         balance: new BigNumber("0"),
         amount: "0",
         percentage: 0,
