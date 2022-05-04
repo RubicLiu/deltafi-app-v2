@@ -1,6 +1,6 @@
-import { createReducer, createAction } from "@reduxjs/toolkit";
-import { TokenConfig } from "constants/deployConfigV2";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SwapCard } from "views/Swap/components/types";
+import { TokenConfig } from "constants/deployConfigV2";
 
 interface TransactionResult {
   status: boolean | null;
@@ -24,54 +24,87 @@ const initialState = {
   },
   transactionResult: null,
   isProcessing: false,
+  withdrawPercentage: 0,
+  openSnackbar: false,
 };
 
-export const setTokenAmount = createAction<{
-  baseAmount: string;
-  quoteAmount: string;
-}>("v2/deposit/setTokenAmount");
+const depositV2Slice = createSlice({
+  name: "depositV2",
+  initialState,
+  reducers: {
+    setTokenInfo(
+      state,
+      action: PayloadAction<{
+        baseTokenInfo: TokenConfig;
+        quoteTokenInfo: TokenConfig;
+      }>,
+    ) {
+      state.base.token = action.payload.baseTokenInfo;
+      state.base.amount = "0";
+      state.base.amountWithSlippage = "0";
+      state.quote.token = action.payload.quoteTokenInfo;
+      state.quote.amount = "0";
+      state.quote.amountWithSlippage = "0";
+    },
 
-export const setTokenInfo = createAction<{
-  baseTokenInfo: TokenConfig;
-  quoteTokenInfo: TokenConfig;
-}>("v2/deposit/setTokenInfo");
+    setTokenAmount(
+      state,
+      action: PayloadAction<{
+        baseAmount: string;
+        quoteAmount: string;
+      }>,
+    ) {
+      state.base.amount = action.payload.baseAmount;
+      state.quote.amount = action.payload.quoteAmount;
+    },
 
-export const setMethod = createAction<{
-  method: string;
-}>("v2/deposit/setMethod");
+    setMethod(
+      state,
+      action: PayloadAction<{
+        method: string;
+      }>,
+    ) {
+      state.method = action.payload.method;
+      state.withdrawPercentage = 0;
+    },
 
-export const setTransactionResult = createAction<{
-  transactionResult: TransactionResult;
-}>("v2/deposit/setTransactionResult");
+    setTransactionResult(
+      state,
+      action: PayloadAction<{
+        transactionResult: TransactionResult;
+      }>,
+    ) {
+      state.transactionResult = action.payload.transactionResult;
+    },
 
-export const setIsProcessing = createAction<{
-  isProcessing: boolean;
-}>("v2/deposit/setIsProcessing");
+    setIsProcessing(
+      state,
+      action: PayloadAction<{
+        isProcessing: boolean;
+      }>,
+    ) {
+      state.isProcessing = action.payload.isProcessing;
+    },
 
-export const depositV2Reducer = createReducer(initialState, (builder) => {
-  builder.addCase(setTokenInfo, (state, action) => {
-    state.base.token = action.payload.baseTokenInfo;
-    state.base.amount = "0";
-    state.base.amountWithSlippage = "0";
-    state.quote.token = action.payload.quoteTokenInfo;
-    state.quote.amount = "0";
-    state.quote.amountWithSlippage = "0";
-  });
+    setWithdrawPercentage(
+      state,
+      action: PayloadAction<{
+        withdrawPercentage: number;
+      }>,
+    ) {
+      state.withdrawPercentage = action.payload.withdrawPercentage;
+    },
 
-  builder.addCase(setTokenAmount, (state, action) => {
-    state.base.amount = action.payload.baseAmount;
-    state.quote.amount = action.payload.quoteAmount;
-  });
-
-  builder.addCase(setMethod, (state, action) => {
-    state.method = action.payload.method;
-  });
-
-  builder.addCase(setTransactionResult, (state, action) => {
-    state.transactionResult = action.payload.transactionResult;
-  });
-
-  builder.addCase(setIsProcessing, (state, action) => {
-    state.isProcessing = action.payload.isProcessing;
-  });
+    setOpenSnackbar(
+      state,
+      action: PayloadAction<{
+        openSnackbar: boolean;
+      }>,
+    ) {
+      state.openSnackbar = action.payload.openSnackbar;
+    },
+  },
 });
+
+export const depositV2Reducer = depositV2Slice.reducer;
+export const depositV2Actions = depositV2Slice.actions;
