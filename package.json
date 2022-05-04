@@ -79,8 +79,7 @@
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",
     "lint:ci": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "eslint": "eslint",
-    "format": "prettier --write ./src ./tests",
-    "generate-types": "node types_generation.js > ./src/anchor/types_definitions.ts && prettier --write ./src/anchor/types_definitions.ts"
+    "format": "prettier --write ./src ./tests"
   },
   "browserslist": {
     "production": [
