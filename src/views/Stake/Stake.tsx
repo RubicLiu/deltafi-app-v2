@@ -1,4 +1,4 @@
-import { ReactElement, useState, useMemo, useCallback, useEffect } from "react";
+import { ReactElement, useMemo, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import clx from "classnames";
@@ -18,7 +18,6 @@ import { Close as CloseIcon } from "@material-ui/icons";
 import BigNumber from "bignumber.js";
 
 import StakeCard from "views/Stake/components/Card";
-import { StakeCard as IStakeCard } from "views/Stake/components/types";
 import Page from "components/layout/Page";
 import { ConnectButton, LinkIcon } from "components";
 
@@ -29,21 +28,16 @@ import { SOLSCAN_LINK, DELTAFI_TOKEN_DECIMALS } from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   selectLpUserBySwapKey,
   selectFarmByFarmKey,
   selectTokenAccountInfoByMint,
+  stakeSelector,
 } from "states/v2/selectorsV2";
 import { getPoolConfigByFarmKey, getTokenConfigBySymbol } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfig";
-
-interface TransactionResult {
-  status: boolean | null;
-  action?: "stake" | "unstake" | "claim";
-  hash?: string;
-  stake?: IStakeCard;
-}
+import { stakeV2Actions } from "states/v2/stakeV2State";
 
 const SECONDS_OF_YEAR = 31556926;
 
@@ -85,23 +79,11 @@ const Stake = (): ReactElement => {
   const token = getTokenConfigBySymbol(farmPool?.name);
   const tokenAccount = useSelector(selectTokenAccountInfoByMint(token?.mint));
 
-  const [isProcessingStake] = useState(false);
-  const [isProcessingClaim] = useState(false);
-
   const { setMenu } = useModal();
-  const [state, setState] = useState<{
-    open: boolean;
-    vertical: "bottom" | "top";
-    horizontal: "left" | "center" | "right";
-  }>({
-    open: false,
-    vertical: "bottom",
-    horizontal: "left",
-  });
-
-  const [transactionResult] = useState<TransactionResult>({
-    status: null,
-  });
+  const dispatch = useDispatch();
+  const stakeV2 = useSelector(stakeSelector);
+  const vertical = "bottom";
+  const horizontal = "left";
 
   const tokenBalance = useMemo(() => {
     return tokenAccount ? exponentiatedBy(tokenAccount.amount, token.decimals) : new BigNumber(0);
@@ -135,14 +117,13 @@ const Stake = (): ReactElement => {
     return new BigNumber(0);
   }, []);
 
-  const [staking, setStaking] = useState({
-    poolConfig,
-    isStake: true,
-    token: token,
-    balance: tokenBalance,
-    amount: "",
-    percentage: 0,
-  });
+  useEffect(() => {
+    if (poolConfig) {
+      dispatch(stakeV2Actions.setPoolConfig({ poolConfig }));
+    }
+  }, [baseTokenInfo, quoteTokenInfo, dispatch, poolConfig]);
+
+  const staking = stakeV2.stake;
 
   const percentage = staking.percentage;
   const setStakePercentage = useCallback(
@@ -151,9 +132,9 @@ const Stake = (): ReactElement => {
         .multipliedBy(new BigNumber(percentage))
         .dividedBy(new BigNumber(100));
       const amount = realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString();
-      setStaking({ ...staking, percentage, amount });
+      dispatch(stakeV2Actions.setPercentage({ percentage, amount }));
     },
-    [setStaking, staking],
+    [dispatch, staking],
   );
 
   const setStakeAmount = useCallback(
@@ -169,23 +150,23 @@ const Stake = (): ReactElement => {
           amount = staking.balance.toString();
         }
       }
-      setStaking({ ...staking, percentage: Number(percentage.toFixed(2)), amount });
+      dispatch(stakeV2Actions.setPercentage({ percentage: Number(percentage.toFixed(2)), amount }));
     },
-    [setStaking, staking],
+    [dispatch, staking],
   );
 
   useEffect(() => {
     const balance = staking.balance;
     if (staking.isStake) {
       if (balance === null || balance.toString() !== tokenBalance.toString()) {
-        setStaking({ ...staking, balance: tokenBalance });
+        dispatch(stakeV2Actions.setBalance({ balance: tokenBalance }));
       }
     } else {
       if (balance == null || balance.toString() !== depositAmount.toString()) {
-        setStaking({ ...staking, balance: depositAmount });
+        dispatch(stakeV2Actions.setBalance({ balance: depositAmount }));
       }
     }
-  }, [staking, tokenBalance, depositAmount]);
+  }, [dispatch, staking, tokenBalance, depositAmount]);
 
   const unclaimedReward = (() => {
     if (lpUser) {
@@ -236,12 +217,15 @@ const Stake = (): ReactElement => {
   const rewardRateByDay = useMemo(() => {
     if (lpUser && baseApr && quoteApr) {
       const baseRate = exponentiatedBy(
-        exponentiate(userBaseStaked.multipliedBy(baseApr).dividedBy(365), baseTokenInfo.decimals),
+        exponentiate(
+          new BigNumber(userBaseStaked).multipliedBy(baseApr).dividedBy(365),
+          baseTokenInfo.decimals,
+        ),
         DELTAFI_TOKEN_DECIMALS,
       );
       const quoteRate = exponentiatedBy(
         exponentiate(
-          userQuoteStaked.multipliedBy(quoteApr).dividedBy(365),
+          new BigNumber(userQuoteStaked).multipliedBy(quoteApr).dividedBy(365),
           quoteTokenInfo.decimals,
         ),
         DELTAFI_TOKEN_DECIMALS,
@@ -252,13 +236,10 @@ const Stake = (): ReactElement => {
   }, [userBaseStaked, userQuoteStaked, baseApr, quoteApr, lpUser, baseTokenInfo, quoteTokenInfo]);
 
   const handleSwitchMethod = (method: "stake" | "unstake") => {
-    setStaking((staking) => ({
-      ...staking,
-      isStake: method === "stake" ? true : false,
-      balance: method === "stake" ? tokenBalance : depositAmount,
-      amount: "0",
-      percentage: 0,
-    }));
+    dispatch(stakeV2Actions.setIsStake({ isStake: method === "stake" ? true : false }));
+    dispatch(
+      stakeV2Actions.setBalance({ balance: method === "stake" ? tokenBalance : depositAmount }),
+    );
   };
 
   const handleStake = useCallback(
@@ -479,8 +460,8 @@ const Stake = (): ReactElement => {
   );
 
   const handleSnackBarClose = useCallback(() => {
-    setState((state) => ({ ...state, open: false }));
-  }, []);
+    dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: false }));
+  }, [dispatch]);
 
   const snackAction = useMemo(() => {
     return (
@@ -491,7 +472,7 @@ const Stake = (): ReactElement => {
   }, [handleSnackBarClose, classes]);
 
   const snackMessasge = useMemo(() => {
-    if (!transactionResult.status) {
+    if (!stakeV2.transactionResult || !stakeV2.transactionResult.status) {
       return (
         <Box display="flex" alignItems="center">
           <img
@@ -513,7 +494,7 @@ const Stake = (): ReactElement => {
       );
     }
 
-    const { hash, action, stake } = transactionResult;
+    const { hash, action, stake } = stakeV2.transactionResult;
 
     return (
       <Box display="flex" alignItems="center">
@@ -545,11 +526,9 @@ const Stake = (): ReactElement => {
         </Box>
       </Box>
     );
-  }, [transactionResult, classes, network]);
+  }, [stakeV2, classes, network]);
 
   if (!farmPool) return null;
-
-  const { vertical, horizontal, open } = state;
 
   return (
     <Page>
@@ -632,7 +611,7 @@ const Stake = (): ReactElement => {
         <Box className={classes.unclaimedToken}>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography className={classes.title}>Your Unclaimed Token</Typography>
-            {isProcessingClaim ? (
+            {stakeV2.isProcessingClaim ? (
               <ConnectButton variant="contained" disabled={true}>
                 <Avatar className={classes.claimLoadingButton} src={loadingIcon} />
               </ConnectButton>
@@ -695,7 +674,7 @@ const Stake = (): ReactElement => {
             </Box>
           }
           <Box marginTop={2} width="100%">
-            {isProcessingStake ? (
+            {stakeV2.isProcessingStake ? (
               <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
                 <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
               </ConnectButton>
@@ -721,7 +700,7 @@ const Stake = (): ReactElement => {
       </Container>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
-        open={open}
+        open={stakeV2.openSnackbar}
         onClose={handleSnackBarClose}
         key={vertical + horizontal}
       >
