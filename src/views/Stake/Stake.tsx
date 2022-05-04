@@ -1,4 +1,4 @@
-import { ReactElement, useState, useMemo, useCallback, useEffect } from "react";
+import { ReactElement, useMemo, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import clx from "classnames";
@@ -117,14 +117,13 @@ const Stake = (): ReactElement => {
     return new BigNumber(0);
   }, []);
 
-  const [staking, setStaking] = useState({
-    poolConfig,
-    isStake: true,
-    token: token,
-    balance: tokenBalance,
-    amount: "",
-    percentage: 0,
-  });
+  useEffect(() => {
+    if (poolConfig) {
+      dispatch(stakeV2Actions.setPoolConfig({ poolConfig }));
+    }
+  }, [baseTokenInfo, quoteTokenInfo, dispatch, poolConfig]);
+
+  const staking = stakeV2.stake;
 
   const percentage = staking.percentage;
   const setStakePercentage = useCallback(
@@ -133,9 +132,9 @@ const Stake = (): ReactElement => {
         .multipliedBy(new BigNumber(percentage))
         .dividedBy(new BigNumber(100));
       const amount = realAmount.toNumber() < 1e-6 ? "0.000000" : realAmount.toString();
-      setStaking({ ...staking, percentage, amount });
+      dispatch(stakeV2Actions.setPercentage({ percentage, amount }));
     },
-    [setStaking, staking],
+    [dispatch, staking],
   );
 
   const setStakeAmount = useCallback(
@@ -151,23 +150,23 @@ const Stake = (): ReactElement => {
           amount = staking.balance.toString();
         }
       }
-      setStaking({ ...staking, percentage: Number(percentage.toFixed(2)), amount });
+      dispatch(stakeV2Actions.setPercentage({ percentage: Number(percentage.toFixed(2)), amount }));
     },
-    [setStaking, staking],
+    [dispatch, staking],
   );
 
   useEffect(() => {
     const balance = staking.balance;
     if (staking.isStake) {
       if (balance === null || balance.toString() !== tokenBalance.toString()) {
-        setStaking({ ...staking, balance: tokenBalance });
+        dispatch(stakeV2Actions.setBalance({ balance: tokenBalance }));
       }
     } else {
       if (balance == null || balance.toString() !== depositAmount.toString()) {
-        setStaking({ ...staking, balance: depositAmount });
+        dispatch(stakeV2Actions.setBalance({ balance: depositAmount }));
       }
     }
-  }, [staking, tokenBalance, depositAmount]);
+  }, [dispatch, staking, tokenBalance, depositAmount]);
 
   const unclaimedReward = (() => {
     if (lpUser) {
@@ -237,13 +236,10 @@ const Stake = (): ReactElement => {
   }, [userBaseStaked, userQuoteStaked, baseApr, quoteApr, lpUser, baseTokenInfo, quoteTokenInfo]);
 
   const handleSwitchMethod = (method: "stake" | "unstake") => {
-    setStaking((staking) => ({
-      ...staking,
-      isStake: method === "stake" ? true : false,
-      balance: method === "stake" ? tokenBalance : depositAmount,
-      amount: "0",
-      percentage: 0,
-    }));
+    dispatch(stakeV2Actions.setIsStake({ isStake: method === "stake" ? true : false }));
+    dispatch(
+      stakeV2Actions.setBalance({ balance: method === "stake" ? tokenBalance : depositAmount }),
+    );
   };
 
   const handleStake = useCallback(
