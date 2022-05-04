@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import CurrencyInput from "react-currency-input-field";
 import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
 

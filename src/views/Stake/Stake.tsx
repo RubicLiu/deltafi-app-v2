@@ -29,15 +29,8 @@ import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectLpUserBySwapKey,
-  selectFarmByFarmKey,
-  stakeSelector,
-} from "states/v2/selectorsV2";
-import {
-  deployConfigV2,
-  getPoolConfigByFarmKey,
-} from "constants/deployConfigV2";
+import { selectLpUserBySwapKey, selectFarmByFarmKey, stakeSelector } from "states/v2/selectorsV2";
+import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfig";
 import { stakeV2Actions } from "states/v2/stakeV2State";
 import { createStakeTransaction } from "utils/transactions/v2/stake";
@@ -138,16 +131,18 @@ const Stake = (): ReactElement => {
       const baseAmount = staking.baseBalance
         .multipliedBy(new BigNumber(percentage))
         .dividedBy(new BigNumber(100))
-        .dividedBy(10 ** poolConfig.baseTokenInfo.decimals);
+        .dividedBy(10 ** poolConfig.baseTokenInfo.decimals)
+        .toFixed(poolConfig.baseTokenInfo.decimals);
       const quoteAmount = staking.quoteBalance
         .multipliedBy(new BigNumber(percentage))
         .dividedBy(new BigNumber(100))
-        .dividedBy(10 ** poolConfig.quoteTokenInfo.decimals);
+        .dividedBy(10 ** poolConfig.quoteTokenInfo.decimals)
+        .toFixed(poolConfig.quoteTokenInfo.decimals);
       dispatch(
         stakeV2Actions.setPercentage({
           percentage,
-          baseAmount: baseAmount.toString(),
-          quoteAmount: quoteAmount.toString(),
+          baseAmount,
+          quoteAmount,
         }),
       );
     },
@@ -238,7 +233,7 @@ const Stake = (): ReactElement => {
   );
 
   const handleStake = useCallback(async () => {
-    if (!connection || !farmPool || !walletPubkey || !lpUser) {
+    if (!connection || !walletPubkey || !lpUser) {
       return null;
     }
 
@@ -250,12 +245,12 @@ const Stake = (): ReactElement => {
     if (staking.isStake) {
       dispatch(stakeV2Actions.setIsProcessingStake({ isProcessingStake: true }));
       try {
-      const baseAmount = new BigNumber(staking.baseAmount).multipliedBy(
-        new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
-      );
-      const quoteAmount = new BigNumber(staking.quoteAmount).multipliedBy(
-        new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
-      );
+        const baseAmount = new BigNumber(staking.baseAmount).multipliedBy(
+          new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
+        );
+        const quoteAmount = new BigNumber(staking.quoteAmount).multipliedBy(
+          new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
+        );
         const transaction = await createStakeTransaction(
           program,
           connection,
@@ -301,7 +296,7 @@ const Stake = (): ReactElement => {
             quoteAmount: "0",
           }),
         );
-        dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: true }));
+        // dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: true }));
         dispatch(stakeV2Actions.setIsProcessingStake({ isProcessingStake: false }));
         dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
       }
@@ -369,7 +364,7 @@ const Stake = (): ReactElement => {
     //        );
     //      }
     //    }
-  }, [connection, walletPubkey, staking, signTransaction, dispatch]);
+  }, [connection, walletPubkey, staking, signTransaction, dispatch, wallet, poolConfig, lpUser]);
 
   const handleClaim = useCallback(
     async () => {
