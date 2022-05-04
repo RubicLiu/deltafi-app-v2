@@ -20,6 +20,8 @@ const initialState = {
     poolConfig: null,
     isStake: true,
     balance: new BigNumber("0"),
+    baseBalance: new BigNumber("0"),
+    quoteBalance: new BigNumber("0"),
     amount: "0",
     percentage: 0,
   },
@@ -34,6 +36,8 @@ const stakeV2Slice = createSlice({
         poolConfig: action.payload.poolConfig,
         isStake: true,
         balance: new BigNumber("0"),
+        baseBalance: new BigNumber("0"),
+        quoteBalance: new BigNumber("0"),
         amount: "0",
         percentage: 0,
       };
@@ -48,8 +52,14 @@ const stakeV2Slice = createSlice({
       state.stake.balance = action.payload.balance;
     },
 
-    setIsStake(state, action: PayloadAction<{ isStake: boolean }>) {
+    setIsStake(state, action: PayloadAction<{
+        isStake: boolean,
+        baseBalance: BigNumber,
+        quoteBalance: BigNumber,
+    }>) {
       state.stake.isStake = action.payload.isStake;
+      state.stake.baseBalance = action.payload.baseBalance;
+      state.stake.quoteBalance = action.payload.quoteBalance;
     },
 
     setTransactionResult(state, action: PayloadAction<{ transactionResult: TransactionResult }>) {

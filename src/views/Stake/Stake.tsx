@@ -109,6 +109,8 @@ const Stake = (): ReactElement => {
     new BigNumber(farmPool?.farmConfig.quoteAprDenominator.toString()),
   );
 
+  const userBaseShare = lpUser ? lpUser.baseShare.toString() : "0";
+  const userQuoteShare = lpUser ? lpUser.quoteShare.toString() : "0";
   const userBaseStaked = lpUser ? lpUser.basePosition.depositedAmount.toString() : "0";
   const userQuoteStaked = lpUser ? lpUser.quotePosition.depositedAmount.toString() : "0";
 
@@ -156,17 +158,13 @@ const Stake = (): ReactElement => {
   );
 
   useEffect(() => {
-    const balance = staking.balance;
-    if (staking.isStake) {
-      if (balance === null || balance.toString() !== tokenBalance.toString()) {
-        dispatch(stakeV2Actions.setBalance({ balance: tokenBalance }));
-      }
-    } else {
-      if (balance == null || balance.toString() !== depositAmount.toString()) {
-        dispatch(stakeV2Actions.setBalance({ balance: depositAmount }));
-      }
-    }
-  }, [dispatch, staking, tokenBalance, depositAmount]);
+    const isStake = staking.isStake;
+    dispatch(stakeV2Actions.setIsStake({
+      isStake,
+      baseBalance: new BigNumber(isStake ? userBaseShare : userBaseStaked ),
+      quoteBalance: new BigNumber(isStake ? userQuoteShare : userQuoteStaked)
+    }));
+  }, [dispatch, staking, userBaseShare, userQuoteShare, userBaseStaked, userQuoteStaked]);
 
   const unclaimedReward = (() => {
     if (lpUser) {
@@ -235,12 +233,14 @@ const Stake = (): ReactElement => {
     return "0";
   }, [userBaseStaked, userQuoteStaked, baseApr, quoteApr, lpUser, baseTokenInfo, quoteTokenInfo]);
 
-  const handleSwitchMethod = (method: "stake" | "unstake") => {
-    dispatch(stakeV2Actions.setIsStake({ isStake: method === "stake" ? true : false }));
-    dispatch(
-      stakeV2Actions.setBalance({ balance: method === "stake" ? tokenBalance : depositAmount }),
-    );
-  };
+  const handleSwitchMethod = useCallback((method: "stake" | "unstake") => {
+    const isStake = method === "stake";
+    dispatch(stakeV2Actions.setIsStake({
+      isStake,
+      baseBalance: new BigNumber(isStake ? userBaseShare : userBaseStaked ),
+      quoteBalance: new BigNumber(isStake ? userQuoteShare : userQuoteStaked)
+    }));
+  }, [dispatch, staking, userBaseShare, userQuoteShare, userBaseStaked, userQuoteStaked]);
 
   const handleStake = useCallback(
     async () => {
