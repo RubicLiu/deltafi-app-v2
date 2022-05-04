@@ -77,7 +77,6 @@ const Stake = (): ReactElement => {
   const { connected: isConnectedWallet } = useWallet();
   const { network } = useCustomConnection();
   const token = getTokenConfigBySymbol(farmPool?.name);
-  const tokenAccount = useSelector(selectTokenAccountInfoByMint(token?.mint));
 
   const { setMenu } = useModal();
   const dispatch = useDispatch();
@@ -112,7 +111,6 @@ const Stake = (): ReactElement => {
 
   useEffect(() => {
     if (poolConfig) {
-      dispatch(stakeV2Actions.setPoolConfig({ poolConfig }));
       dispatch(
         stakeV2Actions.setIsStake({
           isStake: true,
@@ -130,10 +128,12 @@ const Stake = (): ReactElement => {
     (percentage: number) => {
       const baseAmount = staking.baseBalance
         .multipliedBy(new BigNumber(percentage))
-        .dividedBy(new BigNumber(100));
+        .dividedBy(new BigNumber(100))
+        .dividedBy(10 ** poolConfig.baseTokenInfo.decimals);
       const quoteAmount = staking.quoteBalance
         .multipliedBy(new BigNumber(percentage))
-        .dividedBy(new BigNumber(100));
+        .dividedBy(new BigNumber(100))
+        .dividedBy(10 ** poolConfig.quoteTokenInfo.decimals);
       dispatch(
         stakeV2Actions.setPercentage({
           percentage,
@@ -142,10 +142,10 @@ const Stake = (): ReactElement => {
         }),
       );
     },
-    [dispatch, staking],
+    [dispatch, staking, poolConfig],
   );
 
-  const setStakeAmount = useCallback((value: string) => {}, [dispatch, staking]);
+  const setStakeAmount = useCallback((value: string) => {}, []);
 
   const unclaimedReward = (() => {
     if (lpUser) {
@@ -225,7 +225,7 @@ const Stake = (): ReactElement => {
         }),
       );
     },
-    [dispatch, staking, userBaseShare, userQuoteShare, userBaseStaked, userQuoteStaked],
+    [dispatch, userBaseShare, userQuoteShare, userBaseStaked, userQuoteStaked],
   );
 
   const handleStake = useCallback(
@@ -651,6 +651,7 @@ const Stake = (): ReactElement => {
           {
             <Box display="flex" flexDirection="column" alignItems="flex-end">
               <StakeCard
+                poolConfig={poolConfig}
                 card={staking}
                 handleChangeCard={setStakeAmount}
                 tokens={tokenConfigs}

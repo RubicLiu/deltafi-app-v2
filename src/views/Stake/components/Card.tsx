@@ -78,16 +78,20 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }));
 
 const StakeCard: React.FC<CardProps> = (props) => {
-  const { card, tokens, disableDrop } = props;
+  const { poolConfig, card, tokens, disableDrop } = props;
   const classes = useStyles(props);
 
   const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {};
+  const baseDecimals = poolConfig.baseTokenInfo.decimals;
+  const baseBalance = card.baseBalance.dividedBy(10 ** baseDecimals).toFixed(baseDecimals);
+  const quoteDecimals = poolConfig.quoteTokenInfo.decimals;
+  const quoteBalance = card.quoteBalance.dividedBy(10 ** quoteDecimals).toFixed(quoteDecimals);
 
   return (
     <Paper className={classes.root}>
       <Box className={classes.main}>
         <DropDown
-          value={card.poolConfig.baseTokenInfo}
+          value={poolConfig.baseTokenInfo}
           options={tokens}
           inputProps={{ placeholder: "token name, symbol" }}
           disableDrop={disableDrop}
@@ -107,7 +111,7 @@ const StakeCard: React.FC<CardProps> = (props) => {
       </Box>
       <Box className={classes.main}>
         <DropDown
-          value={card.poolConfig.quoteTokenInfo}
+          value={poolConfig.quoteTokenInfo}
           options={tokens}
           inputProps={{ placeholder: "token name, symbol" }}
           disableDrop={disableDrop}
@@ -126,12 +130,12 @@ const StakeCard: React.FC<CardProps> = (props) => {
         />
       </Box>
       <Box display="flex" justifyContent="space-between">
-        <Typography className={classes.tokenBalance}>{`Available base share: ${
-          card.baseBalance?.toString() ?? "--"
-        }`}</Typography>
-        <Typography className={classes.tokenBalance}>{`Available quote share: ${
-          card.quoteBalance?.toString() ?? "--"
-        }`}</Typography>
+        <Typography
+          className={classes.tokenBalance}
+        >{`Available base share: ${baseBalance}`}</Typography>
+        <Typography
+          className={classes.tokenBalance}
+        >{`Available quote share: ${quoteBalance}`}</Typography>
       </Box>
     </Paper>
   );

@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import BigNumber from "bignumber.js";
-import { PoolConfig } from "constants/deployConfigV2";
 import { StakeCard } from "views/Stake/components/types";
 
 interface TransactionResult {
@@ -17,7 +16,6 @@ const initialState = {
   openSnackbar: false,
   // TODO(ypeng): Update stake card content to match v2
   stake: {
-    poolConfig: null,
     isStake: true,
     baseBalance: new BigNumber("0"),
     quoteBalance: new BigNumber("0"),
@@ -31,18 +29,6 @@ const stakeV2Slice = createSlice({
   name: "stakeV2",
   initialState,
   reducers: {
-    setPoolConfig(state, action: PayloadAction<{ poolConfig: PoolConfig }>) {
-      state.stake = {
-        poolConfig: action.payload.poolConfig,
-        isStake: true,
-        baseBalance: new BigNumber("0"),
-        quoteBalance: new BigNumber("0"),
-        baseAmount: "0",
-        quoteAmount: "0",
-        percentage: 0,
-      };
-    },
-
     setPercentage(
       state,
       action: PayloadAction<{

@@ -12,7 +12,6 @@ export interface SettingsProps {
 }
 
 export interface StakeCard {
-  poolConfig: PoolConfig;
   isStake: boolean;
   baseBalance: BigNumber;
   quoteBalance: BigNumber;
@@ -21,6 +20,7 @@ export interface StakeCard {
 }
 
 export interface CardProps {
+  poolConfig: PoolConfig;
   card: StakeCard;
   handleChangeCard: any;
   disabled?: boolean;
