@@ -380,13 +380,13 @@ const Stake = (): ReactElement => {
       return null;
     }
 
-    dispatch(stakeV2Actions.setIsProcessingClaim({ isProcessingClaim: true }));
     const program = getDeltafiDexV2(
       new PublicKey(deployConfigV2.programId),
       makeProvider(connection, wallet),
     );
 
     try {
+      dispatch(stakeV2Actions.setIsProcessingClaim({ isProcessingClaim: true }));
       const transaction = await createClaimFarmRewardsTransaction(
         program,
         connection,
