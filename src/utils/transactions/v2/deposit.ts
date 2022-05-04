@@ -151,3 +151,116 @@ export async function createDepositTransaction(
     connection,
   });
 }
+
+export async function createWithdrawTransaction(
+  program: any,
+  connection: Connection,
+  poolConfig: PoolConfig,
+  swapInfo: any,
+  userTokenBase: PublicKey,
+  userTokenQuote: PublicKey,
+  walletPubkey: PublicKey,
+  baseAmount: BN,
+  qouteAmount: BN,
+) {
+  let baseSourceRef = userTokenBase;
+  let quoteSourceRef = userTokenQuote;
+  let createWrappedTokenAccountTransaction: Transaction | undefined;
+  let initializeWrappedTokenAccountTransaction: Transaction | undefined;
+  let closeWrappedTokenAccountTransaction: Transaction | undefined;
+
+  const baseSOL = poolConfig.baseTokenInfo.symbol === "SOL";
+  const quoteSOL = poolConfig.quoteTokenInfo.symbol === "SOL";
+  const tempAccountRefKeyPair = Keypair.generate();
+  const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
+
+  if (baseSOL || quoteSOL) {
+    const tmpAccountLamport = (baseSOL ? baseAmount.toNumber() : qouteAmount.toNumber()) + lamports;
+
+    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(
+      tempAccountRefKeyPair.publicKey,
+      tmpAccountLamport,
+      walletPubkey,
+    );
+    createWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
+    initializeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
+    closeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
+
+    if (baseSOL) {
+      baseSourceRef = tempAccountRefKeyPair.publicKey;
+    } else {
+      quoteSourceRef = tempAccountRefKeyPair.publicKey;
+    }
+  }
+
+  const [lpPublicKey] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from("LiquidityProvider"),
+      new PublicKey(poolConfig.swapInfo).toBuffer(),
+      walletPubkey.toBuffer(),
+    ],
+    program.programId,
+  );
+
+  let transaction = new Transaction();
+  if (swapInfo.swapType.stableSwap) {
+    transaction.add(
+      program.transaction.withdrawFromStableSwap(baseAmount, qouteAmount, {
+        accounts: {
+          swapInfo: new PublicKey(poolConfig.swapInfo),
+          userTokenBase: baseSourceRef,
+          userTokenQuote,
+          quoteSourceRef,
+          liquidityProvider: lpPublicKey,
+          tokenBase: swapInfo.tokenBase,
+          tokenQuote: swapInfo.tokenQuote,
+          adminFeeTokenBase: swapInfo.adminFeeTokenBase,
+          adminFeeTokenQuote: swapInfo.adminFeeTokenQuote,
+          userAuthority: walletPubkey,
+          tokenProgram: token.TOKEN_PROGRAM_ID,
+        },
+      }),
+    );
+  } else {
+    transaction.add(
+      program.transaction.withdrawFromNormalSwap(baseAmount, qouteAmount, {
+        accounts: {
+          swapInfo: new PublicKey(poolConfig.swapInfo),
+          userTokenBase: baseSourceRef,
+          userTokenQuote,
+          quoteSourceRef,
+          liquidityProvider: lpPublicKey,
+          tokenBase: swapInfo.tokenBase,
+          tokenQuote: swapInfo.tokenQuote,
+          adminFeeTokenBase: swapInfo.adminFeeTokenBase,
+          adminFeeTokenQuote: swapInfo.adminFeeTokenQuote,
+          pythPriceBase: swapInfo.pythPriceBase,
+          pythPriceQuote: swapInfo.pythPriceQuote,
+          userAuthority: walletPubkey,
+          tokenProgram: token.TOKEN_PROGRAM_ID,
+        },
+      }),
+    );
+  }
+
+  const signers = [];
+  if (baseSOL || quoteSOL) {
+    transaction = mergeTransactions([
+      createWrappedTokenAccountTransaction,
+      initializeWrappedTokenAccountTransaction,
+      transaction,
+      closeWrappedTokenAccountTransaction,
+    ]);
+    signers.push(tempAccountRefKeyPair);
+  }
+
+  return partialSignTransaction({
+    transaction,
+    feePayer: walletPubkey,
+    signers,
+    connection,
+  });
+}
