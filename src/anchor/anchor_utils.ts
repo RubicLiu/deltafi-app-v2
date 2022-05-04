@@ -1,8 +1,9 @@
 import { DeltafiDexV2 } from "./types/deltafi_dex_v2";
 import deltafiDexV2Idl from "./idl/deltafi_dex_v2.json";
-import { PublicKey } from "@solana/web3.js";
+import { Keypair, PublicKey } from "@solana/web3.js";
 import { Program, Provider, web3 } from "@project-serum/anchor";
 import * as token from "@solana/spl-token";
+import { MarketConfig, SwapConfig, SwapType } from "./type_definitions";
 
 export function getClusterApiUrl(network: string) {
   if (network === "localhost") {
@@ -52,14 +53,14 @@ export async function createMarketConfig(program, pythProgramId, deltafiMint, ad
 
 export async function createSwap(
   program,
-  marketConfig,
-  mintBase,
-  mintQuote,
-  adminFeeTokenBase,
-  adminFeeTokenQuote,
-  swapType,
-  swapConfig,
-  adminKeypair,
+  marketConfig: MarketConfig,
+  mintBase: PublicKey,
+  mintQuote: PublicKey,
+  adminFeeTokenBase: PublicKey,
+  adminFeeTokenQuote: PublicKey,
+  swapType: SwapType,
+  swapConfig: SwapConfig,
+  adminKeypair: Keypair,
 ) {
   const seedKeypair = web3.Keypair.generate();
   const [swapInfo, swapBump] = await web3.PublicKey.findProgramAddress(
