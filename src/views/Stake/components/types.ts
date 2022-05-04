@@ -12,14 +12,15 @@ export interface SettingsProps {
 }
 
 export interface StakeCard {
-  poolConfig: PoolConfig;
   isStake: boolean;
-  token: TokenConfig | null | undefined;
-  balance: BigNumber;
-  amount: string;
+  baseBalance: BigNumber;
+  quoteBalance: BigNumber;
+  baseAmount: string;
+  quoteAmount: string;
 }
 
 export interface CardProps {
+  poolConfig: PoolConfig;
   card: StakeCard;
   handleChangeCard: any;
   disabled?: boolean;

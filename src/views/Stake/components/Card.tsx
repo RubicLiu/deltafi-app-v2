@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import CurrencyInput from "react-currency-input-field";
 import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
 
@@ -78,76 +78,64 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }));
 
 const StakeCard: React.FC<CardProps> = (props) => {
-  const { card, handleChangeCard, disabled, tokens, disableDrop } = props;
+  const { poolConfig, card, tokens, disableDrop } = props;
   const classes = useStyles(props);
-  const tokenBalance = card.balance;
 
-  const isDisabledInput = useMemo(() => {
-    return disabled || card.token === null;
-  }, [disabled, card.token]);
-
-  const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.replace(/[^\d.-]/g, "");
-    if (isNaN(parseFloat(value)) && value !== "") {
-      return;
-    }
-    handleChangeCard(value);
-  };
-
-  const value = useMemo(() => {
-    const pointIdx = card.amount.indexOf(".");
-    if (pointIdx > 0) {
-      return card.amount.slice(0, pointIdx) + card.amount.slice(pointIdx, pointIdx + 7);
-    }
-    return card.amount;
-  }, [card.amount]);
+  const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {};
+  const baseDecimals = poolConfig.baseTokenInfo.decimals;
+  const baseBalance = card.baseBalance.dividedBy(10 ** baseDecimals).toFixed(baseDecimals);
+  const quoteDecimals = poolConfig.quoteTokenInfo.decimals;
+  const quoteBalance = card.quoteBalance.dividedBy(10 ** quoteDecimals).toFixed(quoteDecimals);
 
   return (
     <Paper className={classes.root}>
       <Box className={classes.main}>
         <DropDown
-          value={card.poolConfig.baseTokenInfo}
+          value={poolConfig.baseTokenInfo}
           options={tokens}
           inputProps={{ placeholder: "token name, symbol" }}
           disableDrop={disableDrop}
         />
         <CurrencyInput
           name="currency"
-          disabled={isDisabledInput}
+          disabled={true}
           className={classes.currencyInput}
           autoComplete="off"
           placeholder="0.00"
           minLength={0}
           maxLength={20}
           decimalsLimit={20}
-          value={value}
+          value={card.baseAmount}
           onChange={inputHandler}
         />
       </Box>
       <Box className={classes.main}>
         <DropDown
-          value={card.poolConfig.quoteTokenInfo}
+          value={poolConfig.quoteTokenInfo}
           options={tokens}
           inputProps={{ placeholder: "token name, symbol" }}
           disableDrop={disableDrop}
         />
         <CurrencyInput
           name="currency"
-          disabled={isDisabledInput}
+          disabled={true}
           className={classes.currencyInput}
           autoComplete="off"
           placeholder="0.00"
           minLength={0}
           maxLength={20}
           decimalsLimit={20}
-          value={value}
+          value={card.quoteAmount}
           onChange={inputHandler}
         />
       </Box>
       <Box display="flex" justifyContent="space-between">
-        <Typography className={classes.tokenBalance}>{`Available LP tokens: ${
-          tokenBalance?.toString() ?? "--"
-        }`}</Typography>
+        <Typography
+          className={classes.tokenBalance}
+        >{`Available base share: ${baseBalance}`}</Typography>
+        <Typography
+          className={classes.tokenBalance}
+        >{`Available quote share: ${quoteBalance}`}</Typography>
       </Box>
     </Paper>
   );
