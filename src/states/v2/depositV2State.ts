@@ -50,7 +50,7 @@ export const setIsProcessing = createAction<{
 }>("v2/deposit/setIsProcessing");
 
 export const setWithdrawPercentage = createAction<{
-  withdrawPercentage: number,
+  withdrawPercentage: number;
 }>("v2/deposit/setWithdrawPercentage");
 
 export const depositV2Reducer = createReducer(initialState, (builder) => {

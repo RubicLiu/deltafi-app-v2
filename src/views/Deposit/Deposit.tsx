@@ -621,14 +621,17 @@ const Deposit: React.FC = () => {
           }),
         );
       }
-      dispatch(setWithdrawPercentage({ withdrawPercentage: value}));
+      dispatch(setWithdrawPercentage({ withdrawPercentage: value }));
     },
     [dispatch, lpUser, baseTokenInfo, quoteTokenInfo, basePrice, quotePrice],
   );
 
-  const handleSwitchMethod = useCallback((method: string) => {
-    dispatch(setMethod({ method }));
-  }, [dispatch]);;
+  const handleSwitchMethod = useCallback(
+    (method: string) => {
+      dispatch(setMethod({ method }));
+    },
+    [dispatch],
+  );
 
   const snackMessasge = useMemo(() => {
     if (!depositV2 || !depositV2.transactionResult) {
