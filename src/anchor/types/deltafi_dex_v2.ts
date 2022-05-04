@@ -1643,16 +1643,28 @@ export type DeltafiDexV2 = {
             "type": "bool"
           },
           {
-            "name": "maxSwapPercentage",
-            "type": "u8"
-          },
-          {
             "name": "enableConfidenceInterval",
             "type": "bool"
           },
           {
+            "name": "maxSwapPercentage",
+            "type": "u8"
+          },
+          {
+            "name": "minReserveLimitPercentage",
+            "type": "u8"
+          },
+          {
             "name": "slope",
             "type": "u128"
+          },
+          {
+            "name": "baseVirtualReserve",
+            "type": "u64"
+          },
+          {
+            "name": "quoteVirtualReserve",
+            "type": "u64"
           },
           {
             "name": "adminTradeFeeNumerator",
@@ -3776,16 +3788,28 @@ export const IDL: DeltafiDexV2 = {
             "type": "bool"
           },
           {
-            "name": "maxSwapPercentage",
-            "type": "u8"
-          },
-          {
             "name": "enableConfidenceInterval",
             "type": "bool"
           },
           {
+            "name": "maxSwapPercentage",
+            "type": "u8"
+          },
+          {
+            "name": "minReserveLimitPercentage",
+            "type": "u8"
+          },
+          {
             "name": "slope",
             "type": "u128"
+          },
+          {
+            "name": "baseVirtualReserve",
+            "type": "u64"
+          },
+          {
+            "name": "quoteVirtualReserve",
+            "type": "u64"
           },
           {
             "name": "adminTradeFeeNumerator",
