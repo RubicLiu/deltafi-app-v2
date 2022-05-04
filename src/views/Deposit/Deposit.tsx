@@ -368,36 +368,35 @@ const Deposit: React.FC = () => {
     const base = depositV2.base;
     const quote = depositV2.quote;
 
-    dispatch(setIsProcessing({ isProcessing: true }));
     try {
-      if (base.amount !== "" && quote.amount !== "") {
-        const program = getDeltafiDexV2(
-          new PublicKey(deployConfigV2.programId),
-          makeProvider(connection, wallet),
-        );
-
-        const baseAmount = new BigNumber(base.amount).multipliedBy(
-          new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
-        );
-        const quoteAmount = new BigNumber(quote.amount).multipliedBy(
-          new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
-        );
-        transaction = await createDepositTransaction(
-          program,
-          connection,
-          poolConfig,
-          swapInfo,
-          baseTokenAccount.publicKey,
-          quoteTokenAccount.publicKey,
-          walletPubkey,
-          lpUser,
-          new BN(baseAmount.toFixed(0)),
-          new BN(quoteAmount.toFixed(0)),
-        );
-      } else {
-        dispatch(setIsProcessing({ isProcessing: false }));
-        return null;
+      if (base.amount === "" || quote.amount === "") {
+        return;
       }
+
+      dispatch(setIsProcessing({ isProcessing: true }));
+      const program = getDeltafiDexV2(
+        new PublicKey(deployConfigV2.programId),
+        makeProvider(connection, wallet),
+      );
+
+      const baseAmount = new BigNumber(base.amount).multipliedBy(
+        new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
+      );
+      const quoteAmount = new BigNumber(quote.amount).multipliedBy(
+        new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
+      );
+      transaction = await createDepositTransaction(
+        program,
+        connection,
+        poolConfig,
+        swapInfo,
+        baseTokenAccount.publicKey,
+        quoteTokenAccount.publicKey,
+        walletPubkey,
+        lpUser,
+        new BN(baseAmount.toFixed(0)),
+        new BN(quoteAmount.toFixed(0)),
+      );
 
       transaction = await signTransaction(transaction);
       const hash = await sendSignedTransaction({
