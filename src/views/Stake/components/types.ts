@@ -15,6 +15,8 @@ export interface StakeCard {
   poolConfig: PoolConfig;
   isStake: boolean;
   balance: BigNumber;
+  baseBalance: BigNumber;
+  quoteBalance: BigNumber;
   amount: string;
 }
 
