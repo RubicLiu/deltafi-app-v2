@@ -9,6 +9,7 @@ export interface PoolState {
   targetQuoteReserve: anchor.BN;
   baseSupply: anchor.BN;
   quoteSupply: anchor.BN;
+  reservedU64: Array<any>;
 }
 
 export interface FarmPosition {
@@ -26,6 +27,7 @@ export interface FarmConfig {
   quoteAprNumerator: anchor.BN;
   quoteAprDenominator: anchor.BN;
   minClaimPeriod: number;
+  reservedU64: Array<any>;
 }
 
 export interface SwapConfig {
@@ -46,6 +48,7 @@ export interface SwapConfig {
   tradeRewardCap: anchor.BN;
   referralRewardNumerator: anchor.BN;
   referralRewardDenominator: anchor.BN;
+  reservedU64: Array<any>;
 }
 
 export type SwapDirection =
@@ -81,6 +84,7 @@ export interface DeltafiUser {
   claimedSwapRewards: anchor.BN;
   owedReferralRewards: anchor.BN;
   claimedReferralRewards: anchor.BN;
+  reserved: Array<any>;
 }
 
 export interface FarmInfo {
@@ -90,6 +94,7 @@ export interface FarmInfo {
   stakedBaseShare: anchor.BN;
   stakedQuoteShare: anchor.BN;
   farmConfig: FarmConfig;
+  reserved: Array<any>;
 }
 
 export interface MarketConfig {
@@ -100,6 +105,7 @@ export interface MarketConfig {
   deltafiMint: PublicKey;
   deltafiToken: PublicKey;
   pythProgramId: PublicKey;
+  reservedU64: Array<any>;
 }
 
 export interface SwapInfo {
@@ -120,6 +126,7 @@ export interface SwapInfo {
   pythPriceQuote: PublicKey;
   poolState: PoolState;
   swapConfig: SwapConfig;
+  reservedU64: Array<any>;
 }
 
 export interface LiquidityProvider {
@@ -131,4 +138,5 @@ export interface LiquidityProvider {
   quoteShare: anchor.BN;
   basePosition: FarmPosition;
   quotePosition: FarmPosition;
+  reserved: Array<any>;
 }
