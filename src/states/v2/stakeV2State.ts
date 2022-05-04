@@ -23,6 +23,8 @@ const initialState = {
     baseBalance: new BigNumber("0"),
     quoteBalance: new BigNumber("0"),
     amount: "0",
+        baseAmount: "0",
+        quoteAmount: "0",
     percentage: 0,
   },
 };
@@ -39,6 +41,8 @@ const stakeV2Slice = createSlice({
         baseBalance: new BigNumber("0"),
         quoteBalance: new BigNumber("0"),
         amount: "0",
+        baseAmount: "0",
+        quoteAmount: "0",
         percentage: 0,
       };
     },
@@ -60,6 +64,9 @@ const stakeV2Slice = createSlice({
       state.stake.isStake = action.payload.isStake;
       state.stake.baseBalance = action.payload.baseBalance;
       state.stake.quoteBalance = action.payload.quoteBalance;
+      state.stake.percentage = 0;
+      state.stake.baseAmount = "0";
+      state.stake.quoteAmount = "0";
     },
 
     setTransactionResult(state, action: PayloadAction<{ transactionResult: TransactionResult }>) {

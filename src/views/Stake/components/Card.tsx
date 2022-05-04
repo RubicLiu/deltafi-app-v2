@@ -82,8 +82,6 @@ const StakeCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
   const tokenBalance = card.balance;
 
-  console.info(card.baseBalance.toString(), card.quoteBalance.toString());
-
   const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {};
 
   const value = useMemo(() => {
