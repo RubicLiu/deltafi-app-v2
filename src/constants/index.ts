@@ -2,7 +2,7 @@ import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { deployConfigV2 } from "./deployConfigV2";
 
-export { DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_SYMBOL } from "./deployConfig";
+export { DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_SYMBOL } from "./deployConfigV2";
 
 export const SWAP_PROGRAM_ID = new PublicKey(deployConfigV2.programId);
 export const MARKET_CONFIG_ADDRESS = new PublicKey(deployConfigV2.marketConfig);
