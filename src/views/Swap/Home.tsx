@@ -180,7 +180,6 @@ const Home: React.FC = (props) => {
 
   const rewardsAccount = useSelector(selectTokenAccountInfoByMint(DELTAFI_TOKEN_MINT.toBase58()));
 
-  const [priceImpact, setPriceImpact] = useState("2.0");
   const { setMenu } = useModal();
 
   const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolInfo));
@@ -218,7 +217,7 @@ const Home: React.FC = (props) => {
   };
 
   const handleChangeImpact = (value) => {
-    setPriceImpact(value);
+    dispatch(swapViewActions.setPriceImpact({ priceImpact: value }));
   };
 
   const handleOpenSettings = () => {
@@ -237,14 +236,14 @@ const Home: React.FC = (props) => {
     if (tokenTo.token.mint === newTokenFrom.mint) {
       newTokenTo = Object.assign({}, tokenFrom.token);
     }
-    if (pool && priceImpact) {
+    if (pool && swapView.priceImpact) {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           pool,
           newTokenFrom.mint,
           newTokenTo.mint,
           card.amount ?? "0",
-          parseFloat(priceImpact),
+          parseFloat(swapView.priceImpact),
           marketPrice,
         );
 
@@ -265,14 +264,14 @@ const Home: React.FC = (props) => {
     if (tokenFrom.token.mint === newTokenTo.mint) {
       newTokenFrom = Object.assign({}, tokenTo.token);
     }
-    if (pool && priceImpact) {
+    if (pool && swapView.priceImpact) {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           pool,
           newTokenFrom.mint,
           newTokenTo.mint,
           tokenFrom.amount ?? "0",
-          parseFloat(priceImpact),
+          parseFloat(swapView.priceImpact),
           marketPrice,
         );
 
@@ -445,11 +444,11 @@ const Home: React.FC = (props) => {
       setMenu(true, "confirm-swap", undefined, {
         tokenFrom,
         tokenTo,
-        slippage: parseFloat(priceImpact),
+        slippage: parseFloat(swapView.priceImpact),
         callback: swapCallback,
       });
     }
-  }, [tokenFrom, tokenTo, priceImpact, swapCallback, setMenu]);
+  }, [tokenFrom, tokenTo, swapView, swapCallback, setMenu]);
 
   const snackMessasge = useMemo(() => {
     if (!transactionResult.status) {
@@ -634,7 +633,7 @@ const Home: React.FC = (props) => {
             </Box>
             <SettingsPanel
               isOpen={swapView.openSettings}
-              priceImpact={priceImpact}
+              priceImpact={swapView.priceImpact}
               handleChangeImpact={handleChangeImpact}
               handleClose={handleOpenSettings}
             />
