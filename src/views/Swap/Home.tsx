@@ -25,7 +25,7 @@ import SettingsPanel from "components/SettingsPanel/SettingsPanel";
 import SwapCard from "./components/Card";
 import { useModal } from "providers/modal";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
-import { MARKET_CONFIG_ADDRESS, SOLSCAN_LINK } from "constants/index";
+import { SOLSCAN_LINK } from "constants/index";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
 import { getSwapOutAmount } from "utils/swap";
@@ -41,8 +41,6 @@ import {
   selectSwapBySwapKey,
   deltafiUserSelector,
 } from "states/v2/selectorsV2";
-import { fetchReferrerThunk } from "states/appState";
-import { marketConfig } from "constants/deployConfig";
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
@@ -52,7 +50,6 @@ import {
   poolConfigs,
   tokenConfigs,
 } from "constants/deployConfigV2";
-import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
 import { swapViewActions } from "states/views/swapView";
 import { fecthTokenAccountInfoList } from "states/v2/tokenV2State";
 import { createSwapTransaction } from "utils/transactions/v2/swap";
@@ -147,7 +144,6 @@ const Home: React.FC = (props) => {
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const { connection } = useConnection();
-  const config = marketConfig;
 
   const swapView = useSelector(swapViewSelector);
   const tokenFrom = swapView.tokenFrom;
@@ -275,7 +271,7 @@ const Home: React.FC = (props) => {
   };
 
   const swapCallback = useCallback(async () => {
-    if (!swapInfo || !config || !sourceAccount || !walletPubkey) {
+    if (!swapInfo || !sourceAccount || !walletPubkey) {
       return null;
     }
 
@@ -405,18 +401,9 @@ const Home: React.FC = (props) => {
     } finally {
       dispatch(swapViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(swapViewActions.setIsProcessing({ isProcessing: false }));
-      dispatch(
-        fetchReferrerThunk({
-          connection,
-          config: MARKET_CONFIG_ADDRESS,
-          walletAddress: walletPubkey,
-        }),
-      );
-      dispatch(fetchSwapsV2Thunk({ connection }));
     }
   }, [
     swapInfo,
-    config,
     deltafiUser,
     poolConfig,
     wallet,
