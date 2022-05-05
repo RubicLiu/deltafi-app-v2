@@ -8,10 +8,12 @@ import {
 
 import { PoolInfo } from "../../src/providers/types";
 import { TokenConfig } from "../../src/constants/deployConfig";
-import { Fees, PoolState, SwapType } from "../../src/lib/state";
+import { PoolState, SwapConfig, SwapInfo, SwapType } from "../../src/anchor/type_definitions"
 
 import BigNumber from "bignumber.js";
 import { Keypair, PublicKey } from "@solana/web3.js";
+
+import * as anchor from "@project-serum/anchor";
 
 describe("utils/swap", function () {
   it("calculatePriceImpact", function () {
@@ -23,9 +25,9 @@ describe("utils/swap", function () {
         new BigNumber(2003),
         new BigNumber(6),
         {
-          adminTradeFeeNumerator: BigInt(1),
-          adminTradeFeeDenominator: BigInt(2),
-        } as Fees,
+          adminTradeFeeNumerator: new anchor.BN(1),
+          adminTradeFeeDenominator:new anchor.BN(2),
+        } as SwapConfig,
       ),
     ).toEqual(new BigNumber("0.02020202020202020202"));
 
@@ -37,9 +39,9 @@ describe("utils/swap", function () {
         new BigNumber(2006),
         new BigNumber(9),
         {
-          adminTradeFeeNumerator: BigInt(1),
-          adminTradeFeeDenominator: BigInt(3),
-        } as Fees,
+          adminTradeFeeNumerator: new anchor.BN(1),
+          adminTradeFeeDenominator: new anchor.BN(3),
+        } as SwapConfig,
       ),
     ).toEqual(new BigNumber("0.0408163265306122449"));
   });
@@ -53,18 +55,18 @@ describe("utils/swap", function () {
         2003,
         0.5, // 0.5%
         {
-          adminTradeFeeNumerator: BigInt(1),
-          adminTradeFeeDenominator: BigInt(2),
-          tradeFeeNumerator: BigInt(6),
-          tradeFeeDenominator: BigInt(2003),
-        } as Fees,
+          adminTradeFeeNumerator: new anchor.BN(1),
+          adminTradeFeeDenominator: new anchor.BN(2),
+          tradeFeeNumerator: new anchor.BN(6),
+          tradeFeeDenominator: new anchor.BN(2003),
+        } as SwapConfig,
       ),
     ).toEqual({
       amountIn: 1000,
       amountOut: 1997,
       amountOutWithSlippage: 1987.015,
       fee: 6,
-      price_impact: 0.02020202020202020202,
+      priceImpact: 0.02020202020202020202,
     });
 
     expect(
@@ -75,18 +77,18 @@ describe("utils/swap", function () {
         2006,
         1, // 1%
         {
-          adminTradeFeeNumerator: BigInt(1),
-          adminTradeFeeDenominator: BigInt(3),
-          tradeFeeNumerator: BigInt(9),
-          tradeFeeDenominator: BigInt(2006),
-        } as Fees,
+          adminTradeFeeNumerator: new anchor.BN(1),
+          adminTradeFeeDenominator: new anchor.BN(3),
+          tradeFeeNumerator: new anchor.BN(9),
+          tradeFeeDenominator: new anchor.BN(2006),
+        } as SwapConfig,
       ),
     ).toEqual({
       amountIn: 4000,
       amountOut: 1997,
       amountOutWithSlippage: 1977.03,
       fee: 9,
-      price_impact: 0.0408163265306122449,
+      priceImpact: 0.0408163265306122449,
     });
   });
 
@@ -94,57 +96,66 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellBase(
         {
-          baseTarget: new BigNumber(100_000_000),
-          quoteTarget: new BigNumber(20_000_000),
-          baseReserve: new BigNumber(100_000_000_000),
-          quoteReserve: new BigNumber(20_000_000_000),
-        } as PoolState,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(20_000_000),
+            baseReserve: new anchor.BN(100_000_000_000),
+            quoteReserve: new anchor.BN(20_000_000_000),
+          } as PoolState
+        } as SwapInfo,
         new BigNumber(2_000_000),
         new BigNumber(0.163),
-        SwapType.Normal,
+        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(325_994);
 
     expect(
       getSwapOutAmountSellBase(
         {
-          baseTarget: new BigNumber(100_000_000),
-          quoteTarget: new BigNumber(20_000_000),
-          baseReserve: new BigNumber(123_001_000),
-          quoteReserve: new BigNumber(23_321_001),
-        } as PoolState,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(20_000_000),
+            baseReserve: new anchor.BN(123_001_000),
+            quoteReserve: new anchor.BN(23_321_001),
+          } as PoolState,
+        } as SwapInfo,
         new BigNumber(12_550_000),
         new BigNumber(0.163),
-        SwapType.Normal,
+        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(1_775_380);
 
     expect(
       getSwapOutAmountSellBase(
         {
-          baseTarget: new BigNumber(111_101_001_000),
-          quoteTarget: new BigNumber(501_000_000),
-          baseReserve: new BigNumber(234_134_100_352_634),
-          quoteReserve: new BigNumber(1_201_003_000_001),
+          targetBaseReserve: new anchor.BN(111_101_001_000),
+          targetQuoteReserve: new anchor.BN(501_000_000),
+          baseReserve: new anchor.BN(234_134_100_352_634),
+          quoteReserve: new anchor.BN(1_201_003_000_001),
         } as PoolState,
         new BigNumber(200_001_000),
         new BigNumber(0.00523),
-        SwapType.Normal,
+        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(1_189_852);
 
     expect(
       getSwapOutAmountSellBase(
         {
-          baseTarget: new BigNumber(100_000_000),
-          quoteTarget: new BigNumber(100_000_000),
-          baseReserve: new BigNumber(100_000_000),
-          quoteReserve: new BigNumber(100_000_000),
-          slope: new BigNumber(0.5),
-        } as PoolState,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(100_000_000),
+            baseReserve: new anchor.BN(100_000_000),
+            quoteReserve: new anchor.BN(100_000_000),
+          } as PoolState,
+          swapConfig: {
+            slope: new anchor.BN("500000000000000000"),
+          } as SwapConfig,
+        } as SwapInfo,
+        
         new BigNumber(200_000),
         new BigNumber(1),
-        SwapType.Stable,
+        {stableSwap: {}} as SwapType,
       ),
     ).toEqual(199_800);
   });
@@ -153,57 +164,67 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellQuote(
         {
-          baseTarget: new BigNumber(100_000_000),
-          quoteTarget: new BigNumber(20_000_000),
-          baseReserve: new BigNumber(100_000_000_000 + 2_000_000),
-          quoteReserve: new BigNumber(20_000_000_000 - 325_994),
-        } as PoolState,
+          poolState:{
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(20_000_000),
+            baseReserve: new anchor.BN(100_000_000_000 + 2_000_000),
+            quoteReserve: new anchor.BN(20_000_000_000 - 325_994),
+          } as PoolState,
+        } as SwapInfo,
         new BigNumber(325_994),
         new BigNumber(0.163),
-        SwapType.Normal,
+        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(1_999_999); // less than 2_000_000 due to the floorings
 
     expect(
       getSwapOutAmountSellQuote(
         {
-          baseTarget: new BigNumber(100_000_000),
-          quoteTarget: new BigNumber(20_000_000),
-          baseReserve: new BigNumber(123_001_000 + 12_550_000),
-          quoteReserve: new BigNumber(23_321_001 - 1_775_380),
-        } as PoolState,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(20_000_000),
+            baseReserve: new anchor.BN(123_001_000 + 12_550_000),
+            quoteReserve: new anchor.BN(23_321_001 - 1_775_380),
+          } as PoolState,
+        } as SwapInfo,
         new BigNumber(1_775_380),
         new BigNumber(0.163),
-        SwapType.Normal,
+        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(12_549_997); // less than 12_550_000 due to the floorings
 
     expect(
       getSwapOutAmountSellQuote(
         {
-          baseTarget: new BigNumber(111_101_001_000),
-          quoteTarget: new BigNumber(501_000_000),
-          baseReserve: new BigNumber(234_134_100_352_634 + 200_001_000),
-          quoteReserve: new BigNumber(1_201_003_000_001 - 1_189_852),
-        } as PoolState,
+          poolState: {
+            targetBaseReserve: new anchor.BN(111_101_001_000),
+            targetQuoteReserve: new anchor.BN(501_000_000),
+            baseReserve: new anchor.BN(234_134_100_352_634 + 200_001_000),
+            quoteReserve: new anchor.BN(1_201_003_000_001 - 1_189_852),
+          } as PoolState,
+        } as SwapInfo,
         new BigNumber(1_189_852),
         new BigNumber(0.00523),
-        SwapType.Normal,
+        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(200_000_918); // less than 200_001_000 due to the floorings
 
     expect(
       getSwapOutAmountSellQuote(
         {
-          baseTarget: new BigNumber(100_000_000),
-          quoteTarget: new BigNumber(100_000_000),
-          baseReserve: new BigNumber(100_000_000 + 200_000),
-          quoteReserve: new BigNumber(100_000_000 - 199_800),
-          slope: new BigNumber(0.5),
-        } as PoolState,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(100_000_000),
+            baseReserve: new anchor.BN(100_000_000 + 200_000),
+            quoteReserve: new anchor.BN(100_000_000 - 199_800),
+          } as PoolState,
+          swapConfig: {
+            slope: new anchor.BN("500000000000000000"),
+          } as SwapConfig
+        } as SwapInfo,
         new BigNumber(199_800),
         new BigNumber(1),
-        SwapType.Stable,
+        {stableSwap: {}} as SwapType,
       ),
     ).toEqual(199_999); // less than 200_000 due to the floorings
   });
@@ -216,23 +237,24 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmount(
         {
-          base: baseMintPublicKey,
-          quote: quoteMintPublicKey,
-          enableConfidenceInterval: false,
-          swapType: SwapType.Normal,
+          mintBase: baseMintPublicKey,
+          mintQuote: quoteMintPublicKey,
+    
+          swapType: {normalSwap: {}} as SwapType,
           poolState: {
-            baseTarget: new BigNumber(100_000_000),
-            quoteTarget: new BigNumber(20_000_000),
-            baseReserve: new BigNumber(100_000_000_000),
-            quoteReserve: new BigNumber(20_000_000_000),
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(20_000_000),
+            baseReserve: new anchor.BN(100_000_000_000),
+            quoteReserve: new anchor.BN(20_000_000_000),
           } as PoolState,
-          fees: {
-            adminTradeFeeNumerator: BigInt(1),
-            adminTradeFeeDenominator: BigInt(2),
-            tradeFeeNumerator: BigInt(1994),
-            tradeFeeDenominator: BigInt(325_994),
-          } as Fees,
-        } as PoolInfo,
+          swapConfig: {
+            enableConfidenceInterval: false,
+            adminTradeFeeNumerator: new anchor.BN(1),
+            adminTradeFeeDenominator:  new anchor.BN(2),
+            tradeFeeNumerator:  new anchor.BN(1994),
+            tradeFeeDenominator:  new anchor.BN(325_994),
+          } as SwapConfig,
+        } as SwapInfo,
         {
           mint: baseMintPublicKey.toBase58(),
         } as TokenConfig,
@@ -248,30 +270,31 @@ describe("utils/swap", function () {
       amountOut: 324000,
       amountOutWithSlippage: 322380,
       fee: 1994,
-      price_impact: 0.00003625043906419723,
+      priceImpact: 0.00003625043906419723,
     });
 
     // normal swap, sell base, enable confidence interval
     expect(
       getSwapOutAmount(
         {
-          base: baseMintPublicKey,
-          quote: quoteMintPublicKey,
-          enableConfidenceInterval: true,
-          swapType: SwapType.Normal,
+          mintBase: baseMintPublicKey,
+          mintQuote: quoteMintPublicKey,
+
+          swapType: {normalSwap: {}} as SwapType,
           poolState: {
-            baseTarget: new BigNumber(100_000_000),
-            quoteTarget: new BigNumber(20_000_000),
-            baseReserve: new BigNumber(100_000_000_000),
-            quoteReserve: new BigNumber(20_000_000_000),
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(20_000_000),
+            baseReserve: new anchor.BN(100_000_000_000),
+            quoteReserve: new anchor.BN(20_000_000_000),
           } as PoolState,
-          fees: {
-            adminTradeFeeNumerator: BigInt(1),
-            adminTradeFeeDenominator: BigInt(2),
-            tradeFeeNumerator: BigInt(1994),
-            tradeFeeDenominator: BigInt(325_994),
-          } as Fees,
-        } as PoolInfo,
+          swapConfig: {
+            enableConfidenceInterval: true,
+            adminTradeFeeNumerator: new anchor.BN(1),
+            adminTradeFeeDenominator: new anchor.BN(2),
+            tradeFeeNumerator: new anchor.BN(1994),
+            tradeFeeDenominator: new anchor.BN(325_994),
+          } as SwapConfig,
+        } as SwapInfo,
         {
           mint: baseMintPublicKey.toBase58(),
         } as TokenConfig,
@@ -289,30 +312,31 @@ describe("utils/swap", function () {
       amountOut: 324000,
       amountOutWithSlippage: 322380,
       fee: 1994,
-      price_impact: 0.00003625043906419723,
+      priceImpact: 0.00003625043906419723,
     });
 
     // normal swap, sell quote, disable confidence interval
     expect(
       getSwapOutAmount(
         {
-          base: baseMintPublicKey,
-          quote: quoteMintPublicKey,
-          enableConfidenceInterval: false,
-          swapType: SwapType.Normal,
+          mintBase: baseMintPublicKey,
+          mintQuote: quoteMintPublicKey,
+         
+          swapType: {normalSwap: {}} as SwapType,
           poolState: {
-            baseTarget: new BigNumber(100_000_000),
-            quoteTarget: new BigNumber(20_000_000),
-            baseReserve: new BigNumber(100_000_000_000 + 2000000),
-            quoteReserve: new BigNumber(20_000_000_000 - 325_994),
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(20_000_000),
+            baseReserve: new anchor.BN(100_000_000_000 + 2000000),
+            quoteReserve: new anchor.BN(20_000_000_000 - 325_994),
           } as PoolState,
-          fees: {
-            adminTradeFeeNumerator: BigInt(1),
-            adminTradeFeeDenominator: BigInt(2),
-            tradeFeeNumerator: BigInt(9999),
-            tradeFeeDenominator: BigInt(1999999),
-          } as Fees,
-        } as PoolInfo,
+          swapConfig: {
+            enableConfidenceInterval: false,
+            adminTradeFeeNumerator: new anchor.BN(1),
+            adminTradeFeeDenominator: new anchor.BN(2),
+            tradeFeeNumerator: new anchor.BN(9999),
+            tradeFeeDenominator: new anchor.BN(1999999),
+          } as SwapConfig,
+        } as SwapInfo,
         {
           mint: quoteMintPublicKey.toBase58(),
         } as TokenConfig,
@@ -328,7 +352,7 @@ describe("utils/swap", function () {
       amountOut: 1990000,
       amountOutWithSlippage: 1970100,
       fee: 9999,
-      price_impact: 0.00003625028487116887,
+      priceImpact: 0.00003625028487116887,
     });
 
     // normal swap, sell quote, disable confidence interval

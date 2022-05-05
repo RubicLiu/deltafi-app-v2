@@ -9,7 +9,7 @@ export const SWAP_PROGRAM_ID = new PublicKey(deployConfig.swapProgramId);
 export const MARKET_CONFIG_ADDRESS = new PublicKey(deployConfig.marketConfigAddress);
 export const DELTAFI_TOKEN_MINT = new PublicKey(deployConfig.deltafiTokenMint);
 
-export const WAD_LENGTH = 12;
+export const WAD_LENGTH = 18;
 
 export const WAD = new BigNumber(`1e+${WAD_LENGTH}`);
 

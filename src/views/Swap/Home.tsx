@@ -32,7 +32,6 @@ import { sendSignedTransaction } from "utils/transactions";
 import { getSwapOutAmount } from "utils/swap";
 import { SwapCard as ISwapCard } from "./components/types";
 import { useCustomConnection } from "providers/connection";
-import { SwapType } from "lib/state";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
@@ -50,10 +49,12 @@ import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
   getPoolConfigBySymbols,
   getTokenConfigBySymbol,
+  PoolConfig,
   poolConfigs,
   tokenConfigs,
 } from "constants/deployConfigV2";
 import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
+import { SwapInfo } from "anchor/type_definitions";
 
 interface TransactionResult {
   status: boolean | null;
@@ -162,8 +163,8 @@ const Home: React.FC = (props) => {
   });
   const config = marketConfig;
 
-  const poolInfo = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
-  const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
+  const poolConfig: PoolConfig = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
+  const pool: SwapInfo = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
   const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.mint));
@@ -183,18 +184,18 @@ const Home: React.FC = (props) => {
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolInfo));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && pool) {
-      if (tokenFrom.token.symbol === poolInfo?.base) {
-        return Number(basePrice / quotePrice).toFixed(poolInfo.quoteTokenInfo.decimals);
-      } else if (tokenFrom.token.symbol === poolInfo?.quote) {
-        return Number(quotePrice / basePrice).toFixed(poolInfo.baseTokenInfo.decimals);
+      if (tokenFrom.token.symbol === poolConfig?.base) {
+        return Number(basePrice / quotePrice).toFixed(poolConfig.quoteTokenInfo.decimals);
+      } else if (tokenFrom.token.symbol === poolConfig?.quote) {
+        return Number(quotePrice / basePrice).toFixed(poolConfig.baseTokenInfo.decimals);
       }
     }
     return "-";
-  }, [basePrice, quotePrice, tokenFrom.token.symbol, pool, poolInfo]);
+  }, [basePrice, quotePrice, tokenFrom.token.symbol, pool, poolConfig]);
   const [state, setState] = useState<{
     open: boolean;
     vertical: "bottom" | "top";
@@ -300,7 +301,7 @@ const Home: React.FC = (props) => {
 
     setIsProcessing(true);
     try {
-      const isStable = pool.swapType === SwapType.Stable;
+      const isStable = !!pool.swapType.stableSwap
       const referrerPubkey: PublicKey | null =
         appState.isNewUser === undefined ? null : appState.referrerPublicKey;
       const enableReferral = appState.enableReferral;
@@ -312,7 +313,7 @@ const Home: React.FC = (props) => {
         exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
       );
       const swapDirection =
-        tokenFrom.token.symbol === pool.baseTokenInfo.symbol
+        tokenFrom.token.mint === pool.mintBase.toBase58()
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
       let { transaction, createAccountsCost, destinationRef } = await swap_v2({
@@ -528,9 +529,9 @@ const Home: React.FC = (props) => {
       const isInsufficientLiquidity =
         pool &&
         exponentiatedBy(
-          tokenFrom.token.symbol === poolInfo.base
-            ? pool?.poolState.quoteReserve
-            : pool?.poolState.baseReserve,
+          tokenFrom.token.symbol === poolConfig.base
+            ? pool?.poolState.quoteReserve.toString()
+            : pool?.poolState.baseReserve.toString(),
           tokenTo.token.decimals,
         ).isLessThan(tokenTo.amount);
 
@@ -579,7 +580,7 @@ const Home: React.FC = (props) => {
     setMenu,
     sourceBalance,
     pool,
-    poolInfo,
+    poolConfig,
     tokenFrom,
     tokenTo.amount,
     tokenTo.token.decimals,

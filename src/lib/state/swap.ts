@@ -22,95 +22,95 @@ export enum OraclePriority {
   SERUM_ONLY = 1,
 }
 
-export interface SwapInfo {
-  isInitialized: boolean;
-  isPaused: boolean;
-  nonce: number;
-  swapType: SwapType;
-  configKey: PublicKey;
-  tokenA: PublicKey;
-  tokenB: PublicKey;
-  pythA: PublicKey;
-  pythB: PublicKey;
-  poolMint: PublicKey;
-  tokenMintA: PublicKey;
-  tokenMintB: PublicKey;
-  adminFeeKeyA: PublicKey;
-  adminFeeKeyB: PublicKey;
-  fees: Fees;
-  rewards: Rewards;
-  poolState: PoolState;
-  tokenADecimals: number;
-  tokenBDecimals: number;
-  swapOutLimitPercentage: number;
-  oraclePriorityFlags: number;
-  serumCombinedAddress: PublicKey;
-}
+// export interface SwapInfo {
+//   isInitialized: boolean;
+//   isPaused: boolean;
+//   nonce: number;
+//   swapType: SwapType;
+//   configKey: PublicKey;
+//   tokenA: PublicKey;
+//   tokenB: PublicKey;
+//   pythA: PublicKey;
+//   pythB: PublicKey;
+//   poolMint: PublicKey;
+//   tokenMintA: PublicKey;
+//   tokenMintB: PublicKey;
+//   adminFeeKeyA: PublicKey;
+//   adminFeeKeyB: PublicKey;
+//   fees: Fees;
+//   rewards: Rewards;
+//   poolState: PoolState;
+//   tokenADecimals: number;
+//   tokenBDecimals: number;
+//   swapOutLimitPercentage: number;
+//   oraclePriorityFlags: number;
+//   serumCombinedAddress: PublicKey;
+// }
 
-/** @internal */
-export const SwapInfoLayout = struct<SwapInfo>(
-  [
-    bool("isInitialized"),
-    bool("isPaused"),
-    u8("nonce"),
-    u8("swapType"),
-    publicKey("configKey"),
-    publicKey("tokenA"),
-    publicKey("tokenB"),
-    publicKey("pythA"),
-    publicKey("pythB"),
-    publicKey("poolMint"),
-    publicKey("tokenMintA"),
-    publicKey("tokenMintB"),
-    publicKey("adminFeeKeyA"),
-    publicKey("adminFeeKeyB"),
-    FeesLayout("fees"),
-    RewardsLayout("rewards"),
-    PoolStateLayout("poolState"),
-    u8("tokenADecimals"),
-    u8("tokenBDecimals"),
-    u8("swapOutLimitPercentage"),
-    u8("oraclePriorityFlags"),
-    publicKey("serumCombinedAddress"),
-    blob(28, "reserved"),
-  ],
-  "swapInfo",
-);
+// /** @internal */
+// export const SwapInfoLayout = struct<SwapInfo>(
+//   [
+//     bool("isInitialized"),
+//     bool("isPaused"),
+//     u8("nonce"),
+//     u8("swapType"),
+//     publicKey("configKey"),
+//     publicKey("tokenA"),
+//     publicKey("tokenB"),
+//     publicKey("pythA"),
+//     publicKey("pythB"),
+//     publicKey("poolMint"),
+//     publicKey("tokenMintA"),
+//     publicKey("tokenMintB"),
+//     publicKey("adminFeeKeyA"),
+//     publicKey("adminFeeKeyB"),
+//     FeesLayout("fees"),
+//     RewardsLayout("rewards"),
+//     PoolStateLayout("poolState"),
+//     u8("tokenADecimals"),
+//     u8("tokenBDecimals"),
+//     u8("swapOutLimitPercentage"),
+//     u8("oraclePriorityFlags"),
+//     publicKey("serumCombinedAddress"),
+//     blob(28, "reserved"),
+//   ],
+//   "swapInfo",
+// );
 
-export const SWAP_INFO_SIZE = SwapInfoLayout.span;
+// export const SWAP_INFO_SIZE = SwapInfoLayout.span;
 
-export const isSwapInfo = (info: AccountInfo<Buffer>): boolean => {
-  return info.data.length === SWAP_INFO_SIZE;
-};
+// export const isSwapInfo = (info: AccountInfo<Buffer>): boolean => {
+//   return info.data.length === SWAP_INFO_SIZE;
+// };
 
-export const parseSwapInfo: AccountParser<SwapInfo> = (info: AccountInfo<Buffer>) => {
-  if (!isSwapInfo(info)) return;
+// export const parseSwapInfo: AccountParser<SwapInfo> = (info: AccountInfo<Buffer>) => {
+//   if (!isSwapInfo(info)) return;
 
-  const buffer = Buffer.from(info.data);
-  const swapInfo = SwapInfoLayout.decode(buffer);
+//   const buffer = Buffer.from(info.data);
+//   const swapInfo = SwapInfoLayout.decode(buffer);
 
-  if (!swapInfo.isInitialized) return;
+//   if (!swapInfo.isInitialized) return;
 
-  return {
-    info,
-    data: swapInfo,
-  };
-};
+//   return {
+//     info,
+//     data: swapInfo,
+//   };
+// };
 
-export const loadSwapInfo = async (
-  connection: Connection,
-  key: string,
-  swapProgramId: PublicKey,
-): Promise<{ data: SwapInfo; key: string }> => {
-  const address = new PublicKey(key);
-  const accountInfo = await loadAccount(connection, address, swapProgramId);
+// export const loadSwapInfo = async (
+//   connection: Connection,
+//   key: string,
+//   swapProgramId: PublicKey,
+// ): Promise<{ data: SwapInfo; key: string }> => {
+//   const address = new PublicKey(key);
+//   const accountInfo = await loadAccount(connection, address, swapProgramId);
 
-  const parsed = parseSwapInfo(accountInfo);
+//   const parsed = parseSwapInfo(accountInfo);
 
-  if (!parsed) throw new Error("Failed to load configuration account");
+//   if (!parsed) throw new Error("Failed to load configuration account");
 
-  return { data: parsed.data, key };
-};
+//   return { data: parsed.data, key };
+// };
 
 export interface UserReferrerData {
   isInitialized: boolean;
