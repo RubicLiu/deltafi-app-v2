@@ -7,16 +7,17 @@ import { web3, BN } from "@project-serum/anchor";
 import { createApproveInstruction, SWAP_DIRECTION } from "lib/instructions";
 import { AccountLayout } from "@solana/spl-token";
 import { createNativeSOLHandlingTransactions } from "../utils";
+import { SwapInfo, DeltafiUser } from "anchor/type_definitions";
 
 export async function createSwapTransaction(
   program: any,
   connection: Connection,
   poolConfig: PoolConfig,
-  swapInfo: any,
+  swapInfo: SwapInfo,
   userSourceToken: PublicKey,
   userDestinationToken: PublicKey,
   walletPubkey: PublicKey,
-  deltafiUser: any,
+  deltafiUser: DeltafiUser,
   swapDirection: SWAP_DIRECTION,
   inAmount: BN,
   minOutAmount: BN,

@@ -216,8 +216,8 @@ const Home: React.FC = (props) => {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           swapInfo,
-          newTokenFrom.mint,
-          newTokenTo.mint,
+          newTokenFrom,
+          newTokenTo,
           card.amount ?? "0",
           parseFloat(swapView.priceImpact),
           marketPrice,
@@ -252,8 +252,8 @@ const Home: React.FC = (props) => {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           swapInfo,
-          newTokenFrom.mint,
-          newTokenTo.mint,
+          newTokenFrom,
+          newTokenTo,
           tokenFrom.amount ?? "0",
           parseFloat(swapView.priceImpact),
           marketPrice,
@@ -292,7 +292,7 @@ const Home: React.FC = (props) => {
       //        exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
       //      );
       const swapDirection =
-        tokenFrom.token.symbol === poolConfig.baseTokenInfo.symbol
+        tokenFrom.token.mint === pool.mintBase.toBase58()
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
 
@@ -520,8 +520,8 @@ const Home: React.FC = (props) => {
         swapInfo &&
         exponentiatedBy(
           tokenFrom.token.symbol === poolConfig.base
-            ? swapInfo?.poolState.quoteReserve
-            : swapInfo?.poolState.baseReserve,
+            ? new BigNumber(swapInfo?.poolState.quoteReserve.toString())
+            : new BigNumber(swapInfo?.poolState.baseReserve.toString()),
           tokenTo.token.decimals,
         ).isLessThan(tokenTo.amount);
 
