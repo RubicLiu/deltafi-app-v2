@@ -28,8 +28,8 @@ const initialState = {
   openSnackbar: false,
 };
 
-const depositV2Slice = createSlice({
-  name: "depositV2",
+const depositViewSlice = createSlice({
+  name: "depositView",
   initialState,
   reducers: {
     setTokenInfo(
@@ -106,5 +106,5 @@ const depositV2Slice = createSlice({
   },
 });
 
-export const depositV2Reducer = depositV2Slice.reducer;
-export const depositV2Actions = depositV2Slice.actions;
+export const depositViewReducer = depositViewSlice.reducer;
+export const depositViewActions = depositViewSlice.actions;
