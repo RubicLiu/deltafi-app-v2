@@ -13,7 +13,7 @@ import {
   selectLpUserBySwapKey,
   selectSwapBySwapKey,
   selectMarketPriceByPool,
-} from "states/v2/selectorsV2";
+} from "states/selectorsV2";
 
 const Img = styled.img`
   width: 20px;
