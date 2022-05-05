@@ -1,104 +1,104 @@
 import {
   Connection,
-  Keypair,
+  // Keypair,
   PublicKey,
-  Transaction,
-  TransactionInstruction,
+  // Transaction,
+  // TransactionInstruction,
 } from "@solana/web3.js";
-import BN from "bn.js";
+// import BN from "bn.js";
 
-import { createNativeSOLHandlingTransactions } from "./utils";
+// import { createNativeSOLHandlingTransactions } from "./utils";
 import {
-  createApproveInstruction,
+  // createApproveInstruction,
   SwapData,
-  SWAP_DIRECTION,
-  createSwapV2Instruction,
-  createStableSwapV2Instruction,
+  // SWAP_DIRECTION,
+  // createSwapV2Instruction,
+  // createStableSwapV2Instruction,
 } from "lib/instructions";
 import { MarketConfig } from "providers/types";
 
-import { SWAP_PROGRAM_ID } from "constants/index";
-import { createTokenAccountTransaction, mergeTransactions, partialSignTransaction } from ".";
-import { AccountLayout } from "@solana/spl-token";
-import { checkOrCreateReferralDataTransaction } from "./utils";
+// import { SWAP_PROGRAM_ID } from "constants/index";
+// import { createTokenAccountTransaction, mergeTransactions, partialSignTransaction } from ".";
+// import { AccountLayout } from "@solana/spl-token";
+// import { checkOrCreateReferralDataTransaction } from "./utils";
 import { TokenAccountInfo } from "states/tokenAccountState";
-import { OraclePriority } from "lib/state";
-import { getPoolConfigByPoolKey } from "constants/deployConfig";
-import { dummyAddress } from "utils/transactions/swap";
+// import { OraclePriority } from "lib/state";
+// import { getPoolConfigByPoolKey } from "constants/deployConfig";
+// import { dummyAddress } from "utils/transactions/swap";
 import { SwapInfo } from "anchor/type_definitions";
 
 /**
  * alter normal swapV2 and stable swapV2
  */
-function createSwapV2InstructionMethod(
-  isStable: boolean,
-  config: PublicKey,
-  tokenSwap: PublicKey,
-  marketAuthority: PublicKey,
-  swapAuthority: PublicKey,
-  userTransferAuthority: PublicKey,
-  source: PublicKey,
-  swapSource: PublicKey,
-  swapDestination: PublicKey,
-  destination: PublicKey,
-  rewardToken: PublicKey,
-  sourceRewardToken: PublicKey,
-  adminFeeDestination: PublicKey,
-  pythA: PublicKey,
-  pythB: PublicKey,
-  serumMarket: PublicKey,
-  serumBids: PublicKey,
-  serumAsks: PublicKey,
-  swapData: SwapData,
-  programId: PublicKey,
-  userReferrerData: PublicKey | null,
-  referrer: PublicKey | null,
-): TransactionInstruction {
-  if (isStable) {
-    return createStableSwapV2Instruction(
-      config,
-      tokenSwap,
-      marketAuthority,
-      swapAuthority,
-      userTransferAuthority,
-      source,
-      swapSource,
-      swapDestination,
-      destination,
-      rewardToken,
-      sourceRewardToken,
-      adminFeeDestination,
-      swapData,
-      programId,
-      userReferrerData,
-      referrer,
-    );
-  } else {
-    return createSwapV2Instruction(
-      config,
-      tokenSwap,
-      marketAuthority,
-      swapAuthority,
-      userTransferAuthority,
-      source,
-      swapSource,
-      swapDestination,
-      destination,
-      rewardToken,
-      sourceRewardToken,
-      adminFeeDestination,
-      pythA,
-      pythB,
-      serumMarket,
-      serumBids,
-      serumAsks,
-      swapData,
-      programId,
-      userReferrerData,
-      referrer,
-    );
-  }
-}
+// function createSwapV2InstructionMethod(
+//   isStable: boolean,
+//   config: PublicKey,
+//   tokenSwap: PublicKey,
+//   marketAuthority: PublicKey,
+//   swapAuthority: PublicKey,
+//   userTransferAuthority: PublicKey,
+//   source: PublicKey,
+//   swapSource: PublicKey,
+//   swapDestination: PublicKey,
+//   destination: PublicKey,
+//   rewardToken: PublicKey,
+//   sourceRewardToken: PublicKey,
+//   adminFeeDestination: PublicKey,
+//   pythA: PublicKey,
+//   pythB: PublicKey,
+//   serumMarket: PublicKey,
+//   serumBids: PublicKey,
+//   serumAsks: PublicKey,
+//   swapData: SwapData,
+//   programId: PublicKey,
+//   userReferrerData: PublicKey | null,
+//   referrer: PublicKey | null,
+// ): TransactionInstruction {
+//   if (isStable) {
+//     return createStableSwapV2Instruction(
+//       config,
+//       tokenSwap,
+//       marketAuthority,
+//       swapAuthority,
+//       userTransferAuthority,
+//       source,
+//       swapSource,
+//       swapDestination,
+//       destination,
+//       rewardToken,
+//       sourceRewardToken,
+//       adminFeeDestination,
+//       swapData,
+//       programId,
+//       userReferrerData,
+//       referrer,
+//     );
+//   } else {
+//     return createSwapV2Instruction(
+//       config,
+//       tokenSwap,
+//       marketAuthority,
+//       swapAuthority,
+//       userTransferAuthority,
+//       source,
+//       swapSource,
+//       swapDestination,
+//       destination,
+//       rewardToken,
+//       sourceRewardToken,
+//       adminFeeDestination,
+//       pythA,
+//       pythB,
+//       serumMarket,
+//       serumBids,
+//       serumAsks,
+//       swapData,
+//       programId,
+//       userReferrerData,
+//       referrer,
+//     );
+//   }
+// }
 
 export async function swap_v2({
   isStable,
@@ -126,7 +126,7 @@ export async function swap_v2({
   referrer: PublicKey | null;
 }) {
   //TODO: reimplement swap logic with v2 type interfaces
-  
+
   // if (!connection || !walletPubkey || !pool || !config || !source) {
   //   console.error("swap failed with null parameter");
   //   return null;

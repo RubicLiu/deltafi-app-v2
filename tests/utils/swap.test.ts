@@ -8,7 +8,7 @@ import {
 
 import { PoolInfo } from "../../src/providers/types";
 import { TokenConfig } from "../../src/constants/deployConfig";
-import { PoolState, SwapConfig, SwapInfo, SwapType } from "../../src/anchor/type_definitions"
+import { PoolState, SwapConfig, SwapInfo, SwapType } from "../../src/anchor/type_definitions";
 
 import BigNumber from "bignumber.js";
 import { Keypair, PublicKey } from "@solana/web3.js";
@@ -26,7 +26,7 @@ describe("utils/swap", function () {
         new BigNumber(6),
         {
           adminTradeFeeNumerator: new anchor.BN(1),
-          adminTradeFeeDenominator:new anchor.BN(2),
+          adminTradeFeeDenominator: new anchor.BN(2),
         } as SwapConfig,
       ),
     ).toEqual(new BigNumber("0.02020202020202020202"));
@@ -96,13 +96,13 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellBase(
         {
-          swapType: {normalSwap: {}} as SwapType,
+          swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),
             baseReserve: new anchor.BN(100_000_000_000),
             quoteReserve: new anchor.BN(20_000_000_000),
-          } as PoolState
+          } as PoolState,
         } as SwapInfo,
         new BigNumber(2_000_000),
         new BigNumber(0.163),
@@ -112,7 +112,7 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellBase(
         {
-          swapType: {normalSwap: {}} as SwapType,
+          swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),
@@ -122,14 +122,13 @@ describe("utils/swap", function () {
         } as SwapInfo,
         new BigNumber(12_550_000),
         new BigNumber(0.163),
-        
       ),
     ).toEqual(1_775_380);
 
     expect(
       getSwapOutAmountSellBase(
         {
-          swapType: {normalSwap: {}} as SwapType,
+          swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(111_101_001_000),
             targetQuoteReserve: new anchor.BN(501_000_000),
@@ -145,7 +144,7 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellBase(
         {
-          swapType: {stableSwap: {}} as SwapType,
+          swapType: { stableSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(100_000_000),
@@ -156,7 +155,7 @@ describe("utils/swap", function () {
             slope: new anchor.BN("500000000000000000"),
           } as SwapConfig,
         } as SwapInfo,
-        
+
         new BigNumber(200_000),
         new BigNumber(1),
       ),
@@ -167,8 +166,8 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellQuote(
         {
-          swapType: {normalSwap: {}} as SwapType,
-          poolState:{
+          swapType: { normalSwap: {} } as SwapType,
+          poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),
             baseReserve: new anchor.BN(100_000_000_000 + 2_000_000),
@@ -183,7 +182,7 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellQuote(
         {
-          swapType: {normalSwap: {}} as SwapType,
+          swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),
@@ -199,7 +198,7 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellQuote(
         {
-          swapType: {normalSwap: {}} as SwapType,
+          swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(111_101_001_000),
             targetQuoteReserve: new anchor.BN(501_000_000),
@@ -215,7 +214,7 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellQuote(
         {
-          swapType: {stableSwap: {}} as SwapType,
+          swapType: { stableSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(100_000_000),
@@ -224,7 +223,7 @@ describe("utils/swap", function () {
           } as PoolState,
           swapConfig: {
             slope: new anchor.BN("500000000000000000"),
-          } as SwapConfig
+          } as SwapConfig,
         } as SwapInfo,
         new BigNumber(199_800),
         new BigNumber(1),
@@ -242,8 +241,8 @@ describe("utils/swap", function () {
         {
           mintBase: baseMintPublicKey,
           mintQuote: quoteMintPublicKey,
-    
-          swapType: {normalSwap: {}} as SwapType,
+
+          swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),
@@ -253,9 +252,9 @@ describe("utils/swap", function () {
           swapConfig: {
             enableConfidenceInterval: false,
             adminTradeFeeNumerator: new anchor.BN(1),
-            adminTradeFeeDenominator:  new anchor.BN(2),
-            tradeFeeNumerator:  new anchor.BN(1994),
-            tradeFeeDenominator:  new anchor.BN(325_994),
+            adminTradeFeeDenominator: new anchor.BN(2),
+            tradeFeeNumerator: new anchor.BN(1994),
+            tradeFeeDenominator: new anchor.BN(325_994),
           } as SwapConfig,
         } as SwapInfo,
         {
@@ -283,7 +282,7 @@ describe("utils/swap", function () {
           mintBase: baseMintPublicKey,
           mintQuote: quoteMintPublicKey,
 
-          swapType: {normalSwap: {}} as SwapType,
+          swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),
@@ -324,8 +323,8 @@ describe("utils/swap", function () {
         {
           mintBase: baseMintPublicKey,
           mintQuote: quoteMintPublicKey,
-         
-          swapType: {normalSwap: {}} as SwapType,
+
+          swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),

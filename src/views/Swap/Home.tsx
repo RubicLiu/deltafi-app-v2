@@ -163,8 +163,13 @@ const Home: React.FC = (props) => {
   });
   const config = marketConfig;
 
-  const poolConfig: PoolConfig = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
-  const pool: SwapInfo = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
+  const poolConfig: PoolConfig = getPoolConfigBySymbols(
+    tokenFrom.token.symbol,
+    tokenTo.token.symbol,
+  );
+  const pool: SwapInfo = useSelector(
+    selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol),
+  );
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
   const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.mint));
@@ -301,7 +306,7 @@ const Home: React.FC = (props) => {
 
     setIsProcessing(true);
     try {
-      const isStable = !!pool.swapType.stableSwap
+      const isStable = !!pool.swapType.stableSwap;
       const referrerPubkey: PublicKey | null =
         appState.isNewUser === undefined ? null : appState.referrerPublicKey;
       const enableReferral = appState.enableReferral;
