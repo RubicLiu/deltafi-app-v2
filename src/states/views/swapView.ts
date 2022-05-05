@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { getTokenConfigBySymbol } from "constants/deployConfigV2";
 import { SwapCard } from "views/Swap/components/types";
 
 interface TransactionResult {
@@ -10,15 +11,15 @@ interface TransactionResult {
 
 const initialState = {
   method: "deposit",
-  fromToken: {
-    token: null,
-    amount: "0",
-    amountWithSlippage: "0",
+  tokenFrom: {
+    token: getTokenConfigBySymbol("SOL"),
+    amount: "",
+    amountWithSlippage: "",
   },
-  toToken: {
-    token: null,
-    amount: "0",
-    amountWithSlippage: "0",
+  tokenTo: {
+    token: getTokenConfigBySymbol("USDC"),
+    amount: "",
+    amountWithSlippage: "",
   },
   transactionResult: null,
   isProcessing: false,
@@ -32,12 +33,12 @@ const swapViewSlice = createSlice({
   name: "swapView",
   initialState,
   reducers: {
-    setFromToken(state, action: PayloadAction<{ swapCard: SwapCard }>) {
-      state.fromToken = action.payload.swapCard;
+    setTokenFrom(state, action: PayloadAction<SwapCard>) {
+      state.tokenFrom = action.payload;
     },
 
-    setToToken(state, action: PayloadAction<{ swapCard: SwapCard }>) {
-      state.toToken = action.payload.swapCard;
+    setTokenTo(state, action: PayloadAction<SwapCard>) {
+      state.tokenTo = action.payload;
     },
 
     setTransactionResult(state, action: PayloadAction<{ transactionResult: TransactionResult }>) {

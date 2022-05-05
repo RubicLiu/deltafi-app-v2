@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import ReactCardFlip from "react-card-flip";
 import {
   Typography,
@@ -56,13 +56,6 @@ import {
 } from "constants/deployConfigV2";
 import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
 import { swapViewActions } from "states/views/swapView";
-
-interface TransactionResult {
-  status: boolean | null;
-  signature?: string;
-  base?: ISwapCard;
-  quote?: ISwapCard;
-}
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -152,21 +145,14 @@ const Home: React.FC = (props) => {
   const classes = useStyles(props);
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
-  const [tokenFrom, setTokenFrom] = useState<ISwapCard>({
-    token: getTokenConfigBySymbol("SOL"),
-    amount: "",
-    amountWithSlippage: "",
-  });
-  const [tokenTo, setTokenTo] = useState<ISwapCard>({
-    token: getTokenConfigBySymbol("USDC"),
-    amount: "",
-    amountWithSlippage: "",
-  });
   const config = marketConfig;
+
+  const swapView = useSelector(swapViewSelector);
+  const tokenFrom = swapView.tokenFrom;
+  const tokenTo = swapView.tokenTo;
 
   const poolInfo = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
   const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
-  const swapView = useSelector(swapViewSelector);
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
   const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.mint));
@@ -194,20 +180,15 @@ const Home: React.FC = (props) => {
     }
     return "-";
   }, [basePrice, quotePrice, tokenFrom.token.symbol, pool, poolInfo]);
-  const vertical = "bottom";
-  const horizontal = "left";
 
-  const [transactionResult, setTransactionResult] = useState<TransactionResult>({
-    status: null,
-  });
   const { network } = useCustomConnection();
 
   const possibleTokenToConfigs = useMemo(() => getPossibleTokenToConfigs(tokenFrom), [tokenFrom]);
 
   const handleSwapDirectionChange = () => {
     const temp = Object.assign({}, tokenFrom);
-    setTokenFrom(tokenTo);
-    setTokenTo(temp);
+    dispatch(swapViewActions.setTokenFrom(tokenTo));
+    dispatch(swapViewActions.setTokenTo(temp));
   };
 
   const handleChangeImpact = (value) => {
@@ -246,8 +227,16 @@ const Home: React.FC = (props) => {
         ? ""
         : Number(quoteAmountWithSlippage).toString();
     }
-    setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: card.amount });
-    setTokenTo({ token: newTokenTo, amount: amountOut, amountWithSlippage: amountOutWithSlippage });
+    dispatch(
+      swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: card.amount }),
+    );
+    dispatch(
+      swapViewActions.setTokenTo({
+        token: newTokenTo,
+        amount: amountOut,
+        amountWithSlippage: amountOutWithSlippage,
+      }),
+    );
   };
 
   const handleTokenToInput = (card: ISwapCard) => {
@@ -274,8 +263,14 @@ const Home: React.FC = (props) => {
         ? ""
         : Number(quoteAmountWithSlippage).toString();
     }
-    setTokenFrom({ ...tokenFrom, token: newTokenFrom });
-    setTokenTo({ token: newTokenTo, amount: amountOut, amountWithSlippage: amountOutWithSlippage });
+    dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom }));
+    dispatch(
+      swapViewActions.setTokenTo({
+        token: newTokenTo,
+        amount: amountOut,
+        amountWithSlippage: amountOutWithSlippage,
+      }),
+    );
   };
 
   const swapCallback = useCallback(async () => {
@@ -350,8 +345,8 @@ const Home: React.FC = (props) => {
           ),
         );
 
-      setTokenFrom((prevTokenFrom) => ({ ...prevTokenFrom, amount: "", lastUpdate: Date.now() }));
-      setTokenTo((prevTokenTo) => ({ ...prevTokenTo, amount: "", lastUpdate: Date.now() }));
+      dispatch(swapViewActions.setTokenFrom({ ...swapView.tokenFrom, amount: "" }));
+      dispatch(swapViewActions.setTokenTo({ ...swapView.tokenTo, amount: "" }));
 
       // get the actual difference of source and base token account from the transaction record
       const { fromTokenBalanceDiff, toTokenBalanceDiff } = await getTokenBalanceDiffFromTransaction(
@@ -388,21 +383,25 @@ const Home: React.FC = (props) => {
       const actualAmountFrom = new BigNumber(-fromTokenBalanceDiff - fromProcessFee);
       const actualAmountTo = new BigNumber(toTokenBalanceDiff + toProcessFee);
 
-      setTransactionResult({
-        status: true,
-        signature,
-        base: {
-          ...tokenFrom,
-          amount: exponentiatedBy(actualAmountFrom, tokenFrom.token.decimals).toString(),
-        },
-        quote: {
-          ...tokenTo,
-          amount: exponentiatedBy(actualAmountTo, tokenTo.token.decimals).toString(),
-        },
-      });
+      dispatch(
+        swapViewActions.setTransactionResult({
+          transactionResult: {
+            status: true,
+            signature,
+            base: {
+              ...tokenFrom,
+              amount: exponentiatedBy(actualAmountFrom, tokenFrom.token.decimals).toString(),
+            },
+            quote: {
+              ...tokenTo,
+              amount: exponentiatedBy(actualAmountTo, tokenTo.token.decimals).toString(),
+            },
+          },
+        }),
+      );
     } catch (e) {
       console.error(e);
-      setTransactionResult({ status: false });
+      dispatch(swapViewActions.setTransactionResult({ transactionResult: { status: false } }));
     } finally {
       dispatch(swapViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(swapViewActions.setIsProcessing({ isProcessing: false }));
@@ -421,9 +420,9 @@ const Home: React.FC = (props) => {
     sourceAccount,
     walletPubkey,
     sourceBalance,
+    swapView,
     tokenFrom,
     tokenTo,
-    // priceImpact,
     connection,
     destinationAccount,
     rewardsAccount,
@@ -444,7 +443,7 @@ const Home: React.FC = (props) => {
   }, [tokenFrom, tokenTo, swapView, swapCallback, setMenu]);
 
   const snackMessasge = useMemo(() => {
-    if (!transactionResult.status) {
+    if (!swapView.transactionResult || !swapView.transactionResult.status) {
       return (
         <Box display="flex" alignItems="center">
           <img
@@ -466,8 +465,7 @@ const Home: React.FC = (props) => {
       );
     }
 
-    const { base, quote, signature } = transactionResult;
-
+    const { base, quote, signature } = swapView.transactionResult;
     return (
       <Box display="flex" alignItems="center">
         <img
@@ -498,7 +496,7 @@ const Home: React.FC = (props) => {
         </Box>
       </Box>
     );
-  }, [transactionResult, classes, network]);
+  }, [swapView, classes, network]);
 
   const snackAction = useMemo(() => {
     return (
@@ -574,6 +572,9 @@ const Home: React.FC = (props) => {
     swapView,
     classes.actionLoadingButton,
   ]);
+
+  const vertical = "bottom";
+  const horizontal = "left";
 
   return (
     <Page>

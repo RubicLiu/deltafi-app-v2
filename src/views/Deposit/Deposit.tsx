@@ -228,7 +228,7 @@ const Deposit: React.FC = () => {
   const lpUser = useSelector(selectLpUserBySwapKey(poolAddress));
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
   const { network } = useCustomConnection();
-  const depositV2 = useSelector(depositViewSelector);
+  const depositView = useSelector(depositViewSelector);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -349,8 +349,8 @@ const Deposit: React.FC = () => {
       return null;
     }
 
-    const base = depositV2.base;
-    const quote = depositV2.quote;
+    const base = depositView.base;
+    const quote = depositView.quote;
 
     try {
       if (base.amount === "" || quote.amount === "") {
@@ -437,7 +437,7 @@ const Deposit: React.FC = () => {
     signTransaction,
     dispatch,
     lpUser,
-    depositV2,
+    depositView,
   ]);
 
   const handleWithdraw = useCallback(async () => {
@@ -447,8 +447,8 @@ const Deposit: React.FC = () => {
       return null;
     }
 
-    const base = depositV2.base;
-    const quote = depositV2.quote;
+    const base = depositView.base;
+    const quote = depositView.quote;
     try {
       if (base.amount === "" || quote.amount === "") {
         return;
@@ -533,7 +533,7 @@ const Deposit: React.FC = () => {
     quoteTokenAccount,
     signTransaction,
     dispatch,
-    depositV2,
+    depositView,
   ]);
 
   const handleSnackBarClose = useCallback(() => {
@@ -616,11 +616,11 @@ const Deposit: React.FC = () => {
   );
 
   const snackMessasge = useMemo(() => {
-    if (!depositV2 || !depositV2.transactionResult) {
+    if (!depositView || !depositView.transactionResult) {
       return "";
     }
 
-    if (!depositV2.transactionResult.status) {
+    if (!depositView.transactionResult.status) {
       return (
         <Box display="flex" alignItems="center">
           <img
@@ -642,7 +642,7 @@ const Deposit: React.FC = () => {
       );
     }
 
-    const { base, quote, hash, action } = depositV2.transactionResult;
+    const { base, quote, hash, action } = depositView.transactionResult;
 
     return (
       <Box display="flex" alignItems="center">
@@ -674,7 +674,7 @@ const Deposit: React.FC = () => {
         </Box>
       </Box>
     );
-  }, [depositV2, classes, network]);
+  }, [depositView, classes, network]);
 
   const snackAction = useMemo(() => {
     return (
@@ -693,16 +693,16 @@ const Deposit: React.FC = () => {
       );
     }
 
-    if (depositV2.isProcessing) {
+    if (depositView.isProcessing) {
       return (
         <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
           <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
         </ConnectButton>
       );
     }
-    const base = depositV2.base;
-    const quote = depositV2.quote;
-    if (depositV2.method === "deposit") {
+    const base = depositView.base;
+    const quote = depositView.quote;
+    if (depositView.method === "deposit") {
       if (base.token && quote.token && baseTokenAccount && quoteTokenAccount) {
         const isInsufficient =
           exponentiatedBy(baseTokenAccount.amount, base.token.decimals).isLessThan(
@@ -760,7 +760,7 @@ const Deposit: React.FC = () => {
       );
     }
   }, [
-    depositV2,
+    depositView,
     isConnectedWallet,
     baseTokenAccount,
     baseShare,
@@ -790,7 +790,7 @@ const Deposit: React.FC = () => {
     return value.toFormat(2);
   };
 
-  const method = depositV2.method;
+  const method = depositView.method;
 
   return (
     <Page>
@@ -845,18 +845,18 @@ const Deposit: React.FC = () => {
           {method === "withdraw" ? (
             <Box display="flex" flexDirection="column" alignItems="flex-end">
               <WithdrawSelectCard
-                percentage={depositV2.withdrawPercentage}
+                percentage={depositView.withdrawPercentage}
                 onUpdatePercentage={handleWithdrawSlider}
               />
               <WithdrawCard
-                card={depositV2.base}
+                card={depositView.base}
                 handleChangeCard={handleBaseTokenInput}
                 withdrawal={baseShare?.toFixed(6).toString()}
                 disableDrop={true}
               />
               <Box mt={1} />
               <WithdrawCard
-                card={depositV2.quote}
+                card={depositView.quote}
                 handleChangeCard={handleQuoteTokenInput}
                 withdrawal={quoteShare?.toFixed(6).toString()}
                 disableDrop={true}
@@ -865,13 +865,13 @@ const Deposit: React.FC = () => {
           ) : (
             <Box display="flex" flexDirection="column" alignItems="flex-end">
               <SwapCard
-                card={depositV2.base}
+                card={depositView.base}
                 handleChangeCard={handleBaseTokenInput}
                 disableDrop={true}
               />
               <Box mt={1} />
               <SwapCard
-                card={depositV2.quote}
+                card={depositView.quote}
                 handleChangeCard={handleQuoteTokenInput}
                 disableDrop={true}
               />
@@ -941,7 +941,7 @@ const Deposit: React.FC = () => {
       </Container>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
-        open={depositV2.openSnackbar}
+        open={depositView.openSnackbar}
         onClose={handleSnackBarClose}
         key={vertical + horizontal}
       >

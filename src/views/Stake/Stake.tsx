@@ -94,7 +94,7 @@ const Stake = (): ReactElement => {
 
   const { setMenu } = useModal();
   const dispatch = useDispatch();
-  const stakeV2 = useSelector(stakeViewSelector);
+  const stakeView = useSelector(stakeViewSelector);
   const vertical = "bottom";
   const horizontal = "left";
 
@@ -135,7 +135,7 @@ const Stake = (): ReactElement => {
     }
   }, [dispatch, poolConfig, userBaseShare, userQuoteShare]);
 
-  const staking = stakeV2.stake;
+  const staking = stakeView.stake;
 
   const percentage = staking.percentage;
   const setStakePercentage = useCallback(
@@ -448,7 +448,7 @@ const Stake = (): ReactElement => {
   }, [handleSnackBarClose, classes]);
 
   const snackMessasge = useMemo(() => {
-    if (!stakeV2.transactionResult || !stakeV2.transactionResult.status) {
+    if (!stakeView.transactionResult || !stakeView.transactionResult.status) {
       return (
         <Box display="flex" alignItems="center">
           <img
@@ -470,7 +470,7 @@ const Stake = (): ReactElement => {
       );
     }
 
-    const { hash, action, stake } = stakeV2.transactionResult;
+    const { hash, action, stake } = stakeView.transactionResult;
 
     return (
       <Box display="flex" alignItems="center">
@@ -503,7 +503,7 @@ const Stake = (): ReactElement => {
         </Box>
       </Box>
     );
-  }, [stakeV2, classes, network, baseTokenInfo, quoteTokenInfo]);
+  }, [stakeView, classes, network, baseTokenInfo, quoteTokenInfo]);
 
   if (!farmPool) return null;
 
@@ -596,7 +596,7 @@ const Stake = (): ReactElement => {
         <Box className={classes.unclaimedToken}>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography className={classes.title}>Your Unclaimed Token</Typography>
-            {stakeV2.isProcessingClaim ? (
+            {stakeView.isProcessingClaim ? (
               <ConnectButton variant="contained" disabled={true}>
                 <Avatar className={classes.claimLoadingButton} src={loadingIcon} />
               </ConnectButton>
@@ -660,7 +660,7 @@ const Stake = (): ReactElement => {
             </Box>
           }
           <Box marginTop={2} width="100%">
-            {stakeV2.isProcessingStake ? (
+            {stakeView.isProcessingStake ? (
               <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
                 <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
               </ConnectButton>
@@ -686,7 +686,7 @@ const Stake = (): ReactElement => {
       </Container>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
-        open={stakeV2.openSnackbar}
+        open={stakeView.openSnackbar}
         onClose={handleSnackBarClose}
         key={vertical + horizontal}
       >

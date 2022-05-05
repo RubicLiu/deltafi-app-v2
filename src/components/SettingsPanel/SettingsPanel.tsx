@@ -4,7 +4,7 @@ import { Box, Divider, IconButton, makeStyles, Paper, Theme, Typography } from "
 import CloseIcon from "@material-ui/icons/Close";
 import CurrencyInput from "react-currency-input-field";
 
-import { Button, SwitchButton } from "components/Button";
+import { Button } from "components/Button";
 import { SettingsProps } from "./types";
 
 const PRICE_LIST = ["0.5", "1.0", "2.0"];
@@ -169,7 +169,6 @@ SettingsPanel.defaultProps = {
   priceImpact: "2.0%",
   isSmall: false,
   handleChangeImpact: () => {},
-  handleChangeInclude: () => {},
   handleClose: () => {},
 };
 
