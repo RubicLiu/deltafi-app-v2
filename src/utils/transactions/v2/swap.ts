@@ -5,6 +5,8 @@ import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { web3, BN } from "@project-serum/anchor";
 
 import { createApproveInstruction, SWAP_DIRECTION } from "lib/instructions";
+import { AccountLayout } from "@solana/spl-token";
+import { createNativeSOLHandlingTransactions } from "../utils";
 
 export async function createSwapTransaction(
   program: any,
@@ -19,6 +21,50 @@ export async function createSwapTransaction(
   inAmount: BN,
   minOutAmount: BN,
 ) {
+  const tempAccountRefKeyPair = Keypair.generate();
+  let createWrappedTokenAccountTransaction: Transaction | undefined;
+  let initializeWrappedTokenAccountTransaction: Transaction | undefined;
+  let closeWrappedTokenAccountTransaction: Transaction | undefined;
+
+  const buySol =
+    (poolConfig.quoteTokenInfo.symbol === "SOL" && swapDirection === SWAP_DIRECTION.SellBase) ||
+    (poolConfig.baseTokenInfo.symbol === "SOL" && swapDirection === SWAP_DIRECTION.SellQuote);
+
+  const sellSol =
+    (poolConfig.quoteTokenInfo.symbol === "SOL" && swapDirection === SWAP_DIRECTION.SellQuote) ||
+    (poolConfig.baseTokenInfo.symbol === "SOL" && swapDirection === SWAP_DIRECTION.SellBase);
+
+  let userSourceTokenRef = userSourceToken;
+  let userDestinationTokenRef = userDestinationToken;
+
+  if (buySol || sellSol) {
+    const createTokenAccountCost = await connection.getMinimumBalanceForRentExemption(
+      AccountLayout.span,
+    );
+
+    let tmpAccountLamport = buySol
+      ? createTokenAccountCost
+      : inAmount.toNumber() + createTokenAccountCost;
+
+    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(
+      tempAccountRefKeyPair.publicKey,
+      tmpAccountLamport,
+      walletPubkey,
+    );
+    createWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
+    initializeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
+    closeWrappedTokenAccountTransaction =
+      nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
+
+    if (buySol) {
+      userDestinationTokenRef = tempAccountRefKeyPair.publicKey;
+    } else {
+      userSourceTokenRef = tempAccountRefKeyPair.publicKey;
+    }
+  }
+
   const [swapSourceToken, swapDestinationToken, adminDestinationToken] =
     swapDirection === SWAP_DIRECTION.SellBase
       ? [swapInfo.tokenBase, swapInfo.tokenQuote, swapInfo.adminFeeTokenQuote]
@@ -28,7 +74,7 @@ export async function createSwapTransaction(
   let transaction = new Transaction();
   transaction.add(
     createApproveInstruction(
-      userSourceToken,
+      userSourceTokenRef,
       userTransferAuthority.publicKey,
       walletPubkey,
       BigInt(inAmount.toString()),
@@ -47,8 +93,8 @@ export async function createSwapTransaction(
         accounts: {
           marketConfig: new PublicKey(deployConfigV2.marketConfig),
           swapInfo: new PublicKey(poolConfig.swapInfo),
-          userSourceToken: userSourceToken,
-          userDestinationToken: userDestinationToken,
+          userSourceToken: userSourceTokenRef,
+          userDestinationToken: userDestinationTokenRef,
           swapSourceToken,
           swapDestinationToken,
           deltafiUser: deltafiUserPubkey,
@@ -64,8 +110,8 @@ export async function createSwapTransaction(
         accounts: {
           marketConfig: new PublicKey(deployConfigV2.marketConfig),
           swapInfo: new PublicKey(poolConfig.swapInfo),
-          userSourceToken: userSourceToken,
-          userDestinationToken: userDestinationToken,
+          userSourceToken: userSourceTokenRef,
+          userDestinationToken: userDestinationTokenRef,
           swapSourceToken,
           swapDestinationToken,
           pythPriceBase: swapInfo.pythPriceBase,
@@ -92,6 +138,16 @@ export async function createSwapTransaction(
       },
     });
     transaction = mergeTransactions([createDeltafiUserTransaction, transaction]);
+  }
+
+  if (buySol || sellSol) {
+    transaction = mergeTransactions([
+      createWrappedTokenAccountTransaction,
+      initializeWrappedTokenAccountTransaction,
+      transaction,
+      closeWrappedTokenAccountTransaction,
+    ]);
+    signers.push(tempAccountRefKeyPair);
   }
 
   return partialSignTransaction({

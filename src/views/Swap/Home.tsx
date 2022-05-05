@@ -34,7 +34,6 @@ import { useCustomConnection } from "providers/connection";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
-import { appSelector } from "states/selectors";
 import {
   selectMarketPriceByPool,
   selectTokenAccountInfoByMint,
@@ -143,7 +142,6 @@ function getPossibleTokenToConfigs(tokenFrom: ISwapCard) {
 
 const Home: React.FC = (props) => {
   const dispatch = useDispatch();
-  const appState = useSelector(appSelector);
 
   const classes = useStyles(props);
   const wallet = useWallet();
@@ -297,7 +295,10 @@ const Home: React.FC = (props) => {
         tokenFrom.token.symbol === poolConfig.baseTokenInfo.symbol
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
+
+      // TODO(ypeng): calculate createAccountCost
       const createAccountsCost = 0;
+      // TODO(ypeng): Create destination account if not exist
       const destinationRef = destinationAccount?.publicKey;
 
       const program = getDeltafiDexV2(
@@ -316,7 +317,7 @@ const Home: React.FC = (props) => {
         deltafiUser,
         swapDirection,
         new BN(amountIn.toString()),
-        // Set proper min out amount
+        // TODO(ypeng): Set proper min out amount
         new BN(0),
       );
 
