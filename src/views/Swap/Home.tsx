@@ -254,8 +254,8 @@ const Home: React.FC = (props) => {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           pool,
-          newTokenFrom.mint,
-          newTokenTo.mint,
+          newTokenFrom,
+          newTokenTo,
           tokenFrom.amount ?? "0",
           parseFloat(swapView.priceImpact),
           marketPrice,
@@ -299,7 +299,7 @@ const Home: React.FC = (props) => {
         exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
       );
       const swapDirection =
-        tokenFrom.token.symbol === pool.baseTokenInfo.symbol
+        tokenFrom.token.mint === pool.mintBase.toBase58()
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
       let { transaction, createAccountsCost, destinationRef } = await swap_v2({
@@ -518,8 +518,8 @@ const Home: React.FC = (props) => {
         pool &&
         exponentiatedBy(
           tokenFrom.token.symbol === poolInfo.base
-            ? pool?.poolState.quoteReserve
-            : pool?.poolState.baseReserve,
+            ? new BigNumber(pool?.poolState.quoteReserve.toString())
+            : new BigNumber(pool?.poolState.baseReserve.toString()),
           tokenTo.token.decimals,
         ).isLessThan(tokenTo.amount);
 
