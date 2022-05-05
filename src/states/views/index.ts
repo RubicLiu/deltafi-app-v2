@@ -1,8 +1,10 @@
-import { combineReducers } from "redux";
-import { depositV2Reducer } from "./depositV2State";
-import { stakeV2Reducer } from "./stakeV2State";
+import { combineReducers } from "@reduxjs/toolkit";
+import { depositViewReducer } from "./depositView";
+import { stakeViewReducer } from "./stakeView";
+import { swapViewReducer } from "./swapView";
 
 export const viewsReducer = combineReducers({
-  depositV2: depositV2Reducer,
-  stakeV2: stakeV2Reducer,
+  depositView: depositViewReducer,
+  stakeView: stakeViewReducer,
+  swapView: swapViewReducer,
 });

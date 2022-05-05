@@ -32,12 +32,12 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectLpUserBySwapKey,
   selectFarmByFarmKey,
-  stakeSelector,
+  stakeViewSelector,
   selectTokenAccountInfoByMint,
 } from "states/v2/selectorsV2";
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfig";
-import { stakeV2Actions } from "states/views/stakeV2State";
+import { stakeViewActions } from "states/views/stakeView";
 import {
   createClaimFarmRewardsTransaction,
   createStakeTransaction,
@@ -94,7 +94,7 @@ const Stake = (): ReactElement => {
 
   const { setMenu } = useModal();
   const dispatch = useDispatch();
-  const stakeV2 = useSelector(stakeSelector);
+  const stakeV2 = useSelector(stakeViewSelector);
   const vertical = "bottom";
   const horizontal = "left";
 
@@ -126,7 +126,7 @@ const Stake = (): ReactElement => {
   useEffect(() => {
     if (poolConfig) {
       dispatch(
-        stakeV2Actions.setIsStake({
+        stakeViewActions.setIsStake({
           isStake: true,
           baseBalance: new BigNumber(userBaseShare),
           quoteBalance: new BigNumber(userQuoteShare),
@@ -151,7 +151,7 @@ const Stake = (): ReactElement => {
         .dividedBy(10 ** poolConfig.quoteTokenInfo.decimals)
         .toFixed(poolConfig.quoteTokenInfo.decimals);
       dispatch(
-        stakeV2Actions.setPercentage({
+        stakeViewActions.setPercentage({
           percentage,
           baseAmount,
           quoteAmount,
@@ -240,7 +240,7 @@ const Stake = (): ReactElement => {
     (method: "stake" | "unstake") => {
       const isStake = method === "stake";
       dispatch(
-        stakeV2Actions.setIsStake({
+        stakeViewActions.setIsStake({
           isStake,
           baseBalance: new BigNumber(isStake ? userBaseShare : userBaseStaked),
           quoteBalance: new BigNumber(isStake ? userQuoteShare : userQuoteStaked),
@@ -261,7 +261,7 @@ const Stake = (): ReactElement => {
     );
 
     if (staking.isStake) {
-      dispatch(stakeV2Actions.setIsProcessingStake({ isProcessingStake: true }));
+      dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
       try {
         const baseAmount = new BigNumber(staking.baseAmount).multipliedBy(
           new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
@@ -287,7 +287,7 @@ const Stake = (): ReactElement => {
         await connection.confirmTransaction(hash, "confirmed");
 
         dispatch(
-          stakeV2Actions.setTransactionResult({
+          stakeViewActions.setTransactionResult({
             transactionResult: {
               status: true,
               action: "stake",
@@ -298,7 +298,7 @@ const Stake = (): ReactElement => {
         );
       } catch (e) {
         dispatch(
-          stakeV2Actions.setTransactionResult({
+          stakeViewActions.setTransactionResult({
             transactionResult: {
               status: false,
             },
@@ -306,18 +306,18 @@ const Stake = (): ReactElement => {
         );
       } finally {
         dispatch(
-          stakeV2Actions.setPercentage({
+          stakeViewActions.setPercentage({
             percentage: 0,
             baseAmount: "0",
             quoteAmount: "0",
           }),
         );
-        dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: true }));
-        dispatch(stakeV2Actions.setIsProcessingStake({ isProcessingStake: false }));
+        dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
+        dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
         dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
       }
     } else {
-      dispatch(stakeV2Actions.setIsProcessingStake({ isProcessingStake: true }));
+      dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
       try {
         const baseAmount = new BigNumber(staking.baseAmount).multipliedBy(
           new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
@@ -343,7 +343,7 @@ const Stake = (): ReactElement => {
         await connection.confirmTransaction(hash, "confirmed");
 
         dispatch(
-          stakeV2Actions.setTransactionResult({
+          stakeViewActions.setTransactionResult({
             transactionResult: {
               status: true,
               action: "unstake",
@@ -354,7 +354,7 @@ const Stake = (): ReactElement => {
         );
       } catch (e) {
         dispatch(
-          stakeV2Actions.setTransactionResult({
+          stakeViewActions.setTransactionResult({
             transactionResult: {
               status: false,
             },
@@ -362,14 +362,14 @@ const Stake = (): ReactElement => {
         );
       } finally {
         dispatch(
-          stakeV2Actions.setPercentage({
+          stakeViewActions.setPercentage({
             percentage: 0,
             baseAmount: "0",
             quoteAmount: "0",
           }),
         );
-        dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: true }));
-        dispatch(stakeV2Actions.setIsProcessingStake({ isProcessingStake: false }));
+        dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
+        dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
         dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
       }
     }
@@ -386,7 +386,7 @@ const Stake = (): ReactElement => {
     );
 
     try {
-      dispatch(stakeV2Actions.setIsProcessingClaim({ isProcessingClaim: true }));
+      dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: true }));
       const transaction = await createClaimFarmRewardsTransaction(
         program,
         connection,
@@ -409,7 +409,7 @@ const Stake = (): ReactElement => {
         dispatch,
       );
       dispatch(
-        stakeV2Actions.setTransactionResult({
+        stakeViewActions.setTransactionResult({
           transactionResult: {
             status: true,
             action: "claim",
@@ -418,10 +418,10 @@ const Stake = (): ReactElement => {
         }),
       );
     } catch (e) {
-      dispatch(stakeV2Actions.setTransactionResult({ transactionResult: { status: false } }));
+      dispatch(stakeViewActions.setTransactionResult({ transactionResult: { status: false } }));
     } finally {
-      dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(stakeV2Actions.setIsProcessingClaim({ isProcessingClaim: false }));
+      dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
+      dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: false }));
       dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
     }
   }, [
@@ -436,7 +436,7 @@ const Stake = (): ReactElement => {
   ]);
 
   const handleSnackBarClose = useCallback(() => {
-    dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: false }));
+    dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: false }));
   }, [dispatch]);
 
   const snackAction = useMemo(() => {

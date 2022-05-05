@@ -41,9 +41,9 @@ import {
   selectMarketPriceByPool,
   selectSwapBySwapKey,
   selectTokenAccountInfoByMint,
-  depositSelector,
+  depositViewSelector,
 } from "states/v2/selectorsV2";
-import { depositV2Actions } from "states/views/depositV2State";
+import { depositViewActions } from "states/views/depositView";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { sendSignedTransaction } from "utils/transactions";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
@@ -228,12 +228,12 @@ const Deposit: React.FC = () => {
   const lpUser = useSelector(selectLpUserBySwapKey(poolAddress));
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
   const { network } = useCustomConnection();
-  const depositV2 = useSelector(depositSelector);
+  const depositV2 = useSelector(depositViewSelector);
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (baseTokenInfo && quoteTokenInfo) {
-      dispatch(depositV2Actions.setTokenInfo({ baseTokenInfo, quoteTokenInfo }));
+      dispatch(depositViewActions.setTokenInfo({ baseTokenInfo, quoteTokenInfo }));
     }
   }, [baseTokenInfo, quoteTokenInfo, dispatch]);
 
@@ -357,7 +357,7 @@ const Deposit: React.FC = () => {
         return;
       }
 
-      dispatch(depositV2Actions.setIsProcessing({ isProcessing: true }));
+      dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
       const program = getDeltafiDexV2(
         new PublicKey(deployConfigV2.programId),
         makeProvider(connection, wallet),
@@ -390,9 +390,9 @@ const Deposit: React.FC = () => {
 
       await connection.confirmTransaction(hash, "confirmed");
 
-      dispatch(depositV2Actions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+      dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
       dispatch(
-        depositV2Actions.setTransactionResult({
+        depositViewActions.setTransactionResult({
           transactionResult: {
             status: true,
             action: "deposit",
@@ -405,15 +405,15 @@ const Deposit: React.FC = () => {
     } catch (e) {
       console.error("error", e);
       dispatch(
-        depositV2Actions.setTransactionResult({
+        depositViewActions.setTransactionResult({
           transactionResult: {
             status: false,
           },
         }),
       );
     } finally {
-      dispatch(depositV2Actions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(depositV2Actions.setIsProcessing({ isProcessing: false }));
+      dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: true }));
+      dispatch(depositViewActions.setIsProcessing({ isProcessing: false }));
       dispatch(
         fetchLiquidityProvidersV2Thunk({
           connection,
@@ -453,7 +453,7 @@ const Deposit: React.FC = () => {
       if (base.amount === "" || quote.amount === "") {
         return;
       }
-      dispatch(depositV2Actions.setIsProcessing({ isProcessing: true }));
+      dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
 
       const baseAmount = new BigNumber(base.amount).multipliedBy(
         new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
@@ -487,9 +487,9 @@ const Deposit: React.FC = () => {
 
       await connection.confirmTransaction(hash, "confirmed");
 
-      dispatch(depositV2Actions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+      dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
       dispatch(
-        depositV2Actions.setTransactionResult({
+        depositViewActions.setTransactionResult({
           transactionResult: {
             status: true,
             action: "withdraw",
@@ -502,15 +502,15 @@ const Deposit: React.FC = () => {
     } catch (e) {
       console.error("error", e);
       dispatch(
-        depositV2Actions.setTransactionResult({
+        depositViewActions.setTransactionResult({
           transactionResult: {
             status: false,
           },
         }),
       );
     } finally {
-      dispatch(depositV2Actions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(depositV2Actions.setIsProcessing({ isProcessing: false }));
+      dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: true }));
+      dispatch(depositViewActions.setIsProcessing({ isProcessing: false }));
       dispatch(
         fetchLiquidityProvidersV2Thunk({
           connection,
@@ -537,14 +537,14 @@ const Deposit: React.FC = () => {
   ]);
 
   const handleSnackBarClose = useCallback(() => {
-    dispatch(depositV2Actions.setOpenSnackbar({ openSnackbar: false }));
+    dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: false }));
   }, [dispatch]);
 
   const handleBaseTokenInput = useCallback(
     (card: ISwapCard) => {
       const baseAmount = card.amount;
       if (baseAmount === "") {
-        dispatch(depositV2Actions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+        dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
         return;
       }
       if (new BigNumber(baseAmount).isNaN()) {
@@ -557,7 +557,7 @@ const Deposit: React.FC = () => {
         basePrice,
         quotePrice,
       );
-      dispatch(depositV2Actions.setTokenAmount({ baseAmount, quoteAmount }));
+      dispatch(depositViewActions.setTokenAmount({ baseAmount, quoteAmount }));
     },
     [basePrice, quotePrice, dispatch, swapInfo],
   );
@@ -566,7 +566,7 @@ const Deposit: React.FC = () => {
     (card: ISwapCard) => {
       const quoteAmount = card.amount;
       if (quoteAmount === "") {
-        dispatch(depositV2Actions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+        dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
         return;
       }
       if (new BigNumber(quoteAmount).isNaN()) {
@@ -579,7 +579,7 @@ const Deposit: React.FC = () => {
         quotePrice,
         basePrice,
       );
-      dispatch(depositV2Actions.setTokenAmount({ baseAmount, quoteAmount }));
+      dispatch(depositViewActions.setTokenAmount({ baseAmount, quoteAmount }));
     },
     [basePrice, quotePrice, dispatch, swapInfo],
   );
@@ -597,20 +597,20 @@ const Deposit: React.FC = () => {
           .dividedBy(100)
           .dividedBy(10 ** quoteTokenInfo.decimals);
         dispatch(
-          depositV2Actions.setTokenAmount({
+          depositViewActions.setTokenAmount({
             baseAmount: baseAmount.toString(),
             quoteAmount: quoteAmount.toString(),
           }),
         );
       }
-      dispatch(depositV2Actions.setWithdrawPercentage({ withdrawPercentage: value }));
+      dispatch(depositViewActions.setWithdrawPercentage({ withdrawPercentage: value }));
     },
     [dispatch, lpUser, baseTokenInfo, quoteTokenInfo, basePrice, quotePrice],
   );
 
   const handleSwitchMethod = useCallback(
     (method: string) => {
-      dispatch(depositV2Actions.setMethod({ method }));
+      dispatch(depositViewActions.setMethod({ method }));
     },
     [dispatch],
   );
