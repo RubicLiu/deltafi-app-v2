@@ -292,7 +292,7 @@ const Home: React.FC = (props) => {
       //        exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
       //      );
       const swapDirection =
-        tokenFrom.token.mint === pool.mintBase.toBase58()
+        tokenFrom.token.mint === swapInfo.mintBase.toBase58()
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
 
