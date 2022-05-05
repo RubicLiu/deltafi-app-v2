@@ -24,8 +24,8 @@ const initialState = {
   },
 };
 
-const stakeV2Slice = createSlice({
-  name: "stakeV2",
+const stakeViewSlice = createSlice({
+  name: "stakeView",
   initialState,
   reducers: {
     setPercentage(
@@ -75,5 +75,5 @@ const stakeV2Slice = createSlice({
   },
 });
 
-export const stakeV2Reducer = stakeV2Slice.reducer;
-export const stakeV2Actions = stakeV2Slice.actions;
+export const stakeViewReducer = stakeViewSlice.reducer;
+export const stakeViewActions = stakeViewSlice.actions;
