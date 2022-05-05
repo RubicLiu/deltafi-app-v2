@@ -81,6 +81,20 @@
     "eslint": "eslint",
     "format": "prettier --write ./src ./tests"
   },
+  "jest": {
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "roots": [
+      "tests"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
