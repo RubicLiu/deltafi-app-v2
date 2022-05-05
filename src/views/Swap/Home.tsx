@@ -194,15 +194,9 @@ const Home: React.FC = (props) => {
     }
     return "-";
   }, [basePrice, quotePrice, tokenFrom.token.symbol, pool, poolInfo]);
-  const [state, setState] = useState<{
-    open: boolean;
-    vertical: "bottom" | "top";
-    horizontal: "left" | "center" | "right";
-  }>({
-    open: false,
-    vertical: "bottom",
-    horizontal: "left",
-  });
+  const vertical = "bottom";
+  const horizontal = "left";
+
   const [transactionResult, setTransactionResult] = useState<TransactionResult>({
     status: null,
   });
@@ -225,8 +219,8 @@ const Home: React.FC = (props) => {
   };
 
   const handleSnackBarClose = useCallback(() => {
-    setState((_state) => ({ ..._state, open: false }));
-  }, []);
+    dispatch(swapViewActions.setOpenSnackbar({ openSnackbar: false }));
+  }, [dispatch]);
 
   const handleTokenFromInput = (card: ISwapCard) => {
     let newTokenFrom = card.token;
@@ -406,12 +400,11 @@ const Home: React.FC = (props) => {
           amount: exponentiatedBy(actualAmountTo, tokenTo.token.decimals).toString(),
         },
       });
-      setState((_state) => ({ ..._state, open: true }));
     } catch (e) {
       console.error(e);
       setTransactionResult({ status: false });
-      setState((_state) => ({ ..._state, open: true }));
     } finally {
+      dispatch(swapViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(swapViewActions.setIsProcessing({ isProcessing: false }));
       dispatch(
         fetchReferrerThunk({
@@ -582,8 +575,6 @@ const Home: React.FC = (props) => {
     classes.actionLoadingButton,
   ]);
 
-  const { open, vertical, horizontal } = state;
-
   return (
     <Page>
       <Container className={classes.container}>
@@ -645,7 +636,7 @@ const Home: React.FC = (props) => {
       </Container>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
-        open={open}
+        open={swapView.openSnackbar}
         onClose={handleSnackBarClose}
         key={vertical + horizontal}
       >
