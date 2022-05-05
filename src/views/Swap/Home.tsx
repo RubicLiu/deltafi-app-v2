@@ -296,30 +296,26 @@ const Home: React.FC = (props) => {
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
 
-      // TODO(ypeng): calculate createAccountCost
-      const createAccountsCost = 0;
-      // TODO(ypeng): Create destination account if not exist
-      const destinationRef = destinationAccount?.publicKey;
-
       const program = getDeltafiDexV2(
         new PublicKey(deployConfigV2.programId),
         makeProvider(connection, wallet),
       );
 
-      let transaction = await createSwapTransaction(
-        program,
-        connection,
-        poolConfig,
-        swapInfo,
-        sourceAccount?.publicKey,
-        destinationAccount?.publicKey,
-        walletPubkey,
-        deltafiUser,
-        swapDirection,
-        new BN(amountIn.toString()),
-        // TODO(ypeng): Set proper min out amount
-        new BN(0),
-      );
+      let { transaction, createAccountsCost, userDestinationTokenRef } =
+        await createSwapTransaction(
+          program,
+          connection,
+          poolConfig,
+          swapInfo,
+          sourceAccount?.publicKey,
+          destinationAccount?.publicKey,
+          walletPubkey,
+          deltafiUser,
+          swapDirection,
+          new BN(amountIn.toString()),
+          // TODO(ypeng): Set proper min out amount
+          new BN(0),
+        );
 
       transaction = await signTransaction(transaction);
       const signature = await sendSignedTransaction({ signedTransaction: transaction, connection });
@@ -360,7 +356,7 @@ const Home: React.FC = (props) => {
         destinationAccount
           ? destinationAccount
           : {
-              publicKey: destinationRef,
+              publicKey: userDestinationTokenRef,
               amount: undefined,
               mint: new PublicKey(tokenTo.token.mint),
             },

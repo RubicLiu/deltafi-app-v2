@@ -1,5 +1,5 @@
 import { Connection, PublicKey, Transaction, Keypair } from "@solana/web3.js";
-import { partialSignTransaction, mergeTransactions } from "..";
+import { partialSignTransaction, mergeTransactions, createTokenAccountTransaction } from "..";
 import * as token from "@solana/spl-token";
 import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { web3, BN } from "@project-serum/anchor";
@@ -38,11 +38,11 @@ export async function createSwapTransaction(
   let userSourceTokenRef = userSourceToken;
   let userDestinationTokenRef = userDestinationToken;
 
+  let createAccountsCost = 0;
+  const createTokenAccountCost = await connection.getMinimumBalanceForRentExemption(
+    AccountLayout.span,
+  );
   if (buySol || sellSol) {
-    const createTokenAccountCost = await connection.getMinimumBalanceForRentExemption(
-      AccountLayout.span,
-    );
-
     let tmpAccountLamport = buySol
       ? createTokenAccountCost
       : inAmount.toNumber() + createTokenAccountCost;
@@ -81,6 +81,19 @@ export async function createSwapTransaction(
       BigInt(inAmount.toString()),
     ),
   );
+
+  let createDestinationAccountTransaction: Transaction | undefined;
+  if (!userDestinationTokenRef) {
+    const result = await createTokenAccountTransaction({
+      walletPubkey,
+      mintPublicKey: new PublicKey(
+        swapDirection === SWAP_DIRECTION.SellBase ? swapInfo.mintQuote : swapInfo.mintBase,
+      ),
+    });
+    userDestinationTokenRef = result?.newAccountPubkey;
+    createDestinationAccountTransaction = result?.transaction;
+    createAccountsCost += createTokenAccountCost;
+  }
 
   const marketConfig = new PublicKey(deployConfigV2.marketConfig);
   const [deltafiUserPubkey, deltafiUserBump] = await PublicKey.findProgramAddress(
@@ -145,16 +158,21 @@ export async function createSwapTransaction(
     transaction = mergeTransactions([
       createWrappedTokenAccountTransaction,
       initializeWrappedTokenAccountTransaction,
+      createDestinationAccountTransaction,
       transaction,
       closeWrappedTokenAccountTransaction,
     ]);
     signers.push(tempAccountRefKeyPair);
   }
 
-  return partialSignTransaction({
-    transaction,
-    feePayer: walletPubkey,
-    signers,
-    connection,
-  });
+  return {
+    transaction: await partialSignTransaction({
+      transaction,
+      feePayer: walletPubkey,
+      signers,
+      connection,
+    }),
+    createAccountsCost,
+    userDestinationTokenRef,
+  };
 }
