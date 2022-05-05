@@ -43,7 +43,7 @@ import {
   selectTokenAccountInfoByMint,
   depositSelector,
 } from "states/v2/selectorsV2";
-import { depositV2Actions } from "states/v2/depositV2State";
+import { depositV2Actions } from "states/views/depositV2State";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { sendSignedTransaction } from "utils/transactions";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";

@@ -37,7 +37,7 @@ import {
 } from "states/v2/selectorsV2";
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfig";
-import { stakeV2Actions } from "states/v2/stakeV2State";
+import { stakeV2Actions } from "states/views/stakeV2State";
 import {
   createClaimFarmRewardsTransaction,
   createStakeTransaction,

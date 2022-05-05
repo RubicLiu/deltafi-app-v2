@@ -8,8 +8,7 @@ import { liquidityProviderV2Reducer } from "./v2/liqudityProviderV2State";
 import { userV2Reducer } from "./v2/userV2State";
 import { pythV2Reducer } from "./v2/pythV2State";
 import { tokenV2Reducer } from "./v2/tokenV2State";
-import { depositV2Reducer } from "./v2/depositV2State";
-import { stakeV2Reducer } from "./v2/stakeV2State";
+import { viewsReducer } from "./views";
 
 export const store = configureStore({
   reducer: {
@@ -21,8 +20,7 @@ export const store = configureStore({
     userV2: userV2Reducer,
     pythV2: pythV2Reducer,
     tokenV2: tokenV2Reducer,
-    depositV2: depositV2Reducer,
-    stakeV2: stakeV2Reducer,
+    views: viewsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
