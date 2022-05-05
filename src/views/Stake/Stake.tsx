@@ -24,21 +24,31 @@ import { ConnectButton, LinkIcon } from "components";
 import useStyles from "./styles";
 import { useModal } from "providers/modal";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
-import { SOLSCAN_LINK, DELTAFI_TOKEN_DECIMALS } from "constants/index";
+import { SOLSCAN_LINK, DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_MINT } from "constants/index";
 import { useCustomConnection } from "providers/connection";
 import Slider from "./components/Slider";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
-import { selectLpUserBySwapKey, selectFarmByFarmKey, stakeSelector } from "states/v2/selectorsV2";
+import {
+  selectLpUserBySwapKey,
+  selectFarmByFarmKey,
+  stakeSelector,
+  selectTokenAccountInfoByMint,
+} from "states/v2/selectorsV2";
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfig";
 import { stakeV2Actions } from "states/v2/stakeV2State";
-import { createStakeTransaction, createUnstakeTransaction } from "utils/transactions/v2/stake";
+import {
+  createClaimFarmRewardsTransaction,
+  createStakeTransaction,
+  createUnstakeTransaction,
+} from "utils/transactions/v2/stake";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { PublicKey } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2State";
+import { fecthTokenAccountInfoList } from "states/v2/tokenV2State";
 
 const SECONDS_OF_YEAR = 31556926;
 
@@ -79,6 +89,8 @@ const Stake = (): ReactElement => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const { network } = useCustomConnection();
   const { connection } = useConnection();
+
+  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
   const { setMenu } = useModal();
   const dispatch = useDispatch();
@@ -363,74 +375,65 @@ const Stake = (): ReactElement => {
     }
   }, [connection, walletPubkey, staking, signTransaction, dispatch, wallet, poolConfig, lpUser]);
 
-  const handleClaim = useCallback(
-    async () => {
-      // TODO(ypeng): Implement v2 transaction.
-      //    if (!connection || !farmPool || !walletPubkey || !lpTokenConfig || !lpToken) {
-      //      return null;
-      //    }
-      //
-      //    const referrerPubkey = appState.referrerPublicKey;
-      //    const enableReferral = appState.enableReferral;
-      //
-      //    setIsProcessingClaim(true);
-      //    try {
-      //      const transaction = await claim({
-      //        connection,
-      //        config,
-      //        walletPubkey,
-      //        farmPool,
-      //        farmUser: farmUser.publicKey,
-      //        claimDestination: rewardsAccount?.publicKey,
-      //        referrer: referrerPubkey,
-      //        enableReferral,
-      //      });
-      //      const signedTransaction = await signTransaction(transaction);
-      //
-      //      const hash = await sendSignedTransaction({
-      //        signedTransaction,
-      //        connection,
-      //      });
-      //
-      //      await connection.confirmTransaction(hash, "confirmed");
-      //      await fecthTokenAccountInfoList(
-      //        [DELTAFI_TOKEN_MINT.toBase58()],
-      //        walletPubkey,
-      //        connection,
-      //        dispatch,
-      //      );
-      //      setTransactionResult({
-      //        status: true,
-      //        action: "claim",
-      //        hash,
-      //      });
-      //    } catch (e) {
-      //      setTransactionResult({ status: false });
-      //    } finally {
-      //      setState((state) => ({ ...state, open: true }));
-      //      setIsProcessingClaim(false);
-      //      dispatch(
-      //        fetchFarmUsersThunk({
-      //          connection,
-      //          walletAddress: walletPubkey,
-      //        }),
-      //      );
-      //    }
-    },
-    [
-      //    config,
-      //    connection,
-      //    farmPool,
-      //    farmUser,
-      //    lpTokenConfig,
-      //    lpToken,
-      //    signTransaction,
-      //    walletPubkey,
-      //    rewardsAccount,
-      //    dispatch,
-      //    appState,
-    ],
-  );
+  const handleClaim = useCallback(async () => {
+    if (!connection || !walletPubkey || !lpUser || !rewardsAccount) {
+      return null;
+    }
+
+    const program = getDeltafiDexV2(
+      new PublicKey(deployConfigV2.programId),
+      makeProvider(connection, wallet),
+    );
+
+    try {
+      dispatch(stakeV2Actions.setIsProcessingClaim({ isProcessingClaim: true }));
+      const transaction = await createClaimFarmRewardsTransaction(
+        program,
+        connection,
+        poolConfig,
+        walletPubkey,
+        rewardsAccount.publicKey,
+      );
+      const signedTransaction = await signTransaction(transaction);
+
+      const hash = await sendSignedTransaction({
+        signedTransaction,
+        connection,
+      });
+
+      await connection.confirmTransaction(hash, "confirmed");
+      await fecthTokenAccountInfoList(
+        [DELTAFI_TOKEN_MINT.toBase58()],
+        walletPubkey,
+        connection,
+        dispatch,
+      );
+      dispatch(
+        stakeV2Actions.setTransactionResult({
+          transactionResult: {
+            status: true,
+            action: "claim",
+            hash,
+          },
+        }),
+      );
+    } catch (e) {
+      dispatch(stakeV2Actions.setTransactionResult({ transactionResult: { status: false } }));
+    } finally {
+      dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: true }));
+      dispatch(stakeV2Actions.setIsProcessingClaim({ isProcessingClaim: false }));
+      dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
+    }
+  }, [
+    connection,
+    walletPubkey,
+    signTransaction,
+    dispatch,
+    wallet,
+    poolConfig,
+    lpUser,
+    rewardsAccount,
+  ]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(stakeV2Actions.setOpenSnackbar({ openSnackbar: false }));

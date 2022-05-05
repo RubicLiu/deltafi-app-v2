@@ -1,13 +1,12 @@
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
+import { deployConfigV2 } from "./deployConfigV2";
 
-import { deployConfig } from "./deployConfig";
+export { DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_SYMBOL } from "./deployConfigV2";
 
-export { DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_SYMBOL } from "./deployConfig";
-
-export const SWAP_PROGRAM_ID = new PublicKey(deployConfig.swapProgramId);
-export const MARKET_CONFIG_ADDRESS = new PublicKey(deployConfig.marketConfigAddress);
-export const DELTAFI_TOKEN_MINT = new PublicKey(deployConfig.deltafiTokenMint);
+export const SWAP_PROGRAM_ID = new PublicKey(deployConfigV2.programId);
+export const MARKET_CONFIG_ADDRESS = new PublicKey(deployConfigV2.marketConfig);
+export const DELTAFI_TOKEN_MINT = new PublicKey(deployConfigV2.deltafiMint);
 
 export const WAD_LENGTH = 12;
 
