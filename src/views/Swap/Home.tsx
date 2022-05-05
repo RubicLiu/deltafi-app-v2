@@ -32,6 +32,7 @@ import { sendSignedTransaction } from "utils/transactions";
 import { getSwapOutAmount } from "utils/swap";
 import { SwapCard as ISwapCard } from "./components/types";
 import { useCustomConnection } from "providers/connection";
+import { SwapType } from "lib/state";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
@@ -50,7 +51,6 @@ import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
   getPoolConfigBySymbols,
   getTokenConfigBySymbol,
-  PoolConfig,
   poolConfigs,
   tokenConfigs,
 } from "constants/deployConfigV2";
@@ -168,14 +168,14 @@ const Home: React.FC = (props) => {
 
   const { setMenu } = useModal();
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolInfo));
 
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && pool) {
-      if (tokenFrom.token.symbol === poolConfig?.base) {
-        return Number(basePrice / quotePrice).toFixed(poolConfig.quoteTokenInfo.decimals);
-      } else if (tokenFrom.token.symbol === poolConfig?.quote) {
-        return Number(quotePrice / basePrice).toFixed(poolConfig.baseTokenInfo.decimals);
+      if (tokenFrom.token.symbol === poolInfo?.base) {
+        return Number(basePrice / quotePrice).toFixed(poolInfo.quoteTokenInfo.decimals);
+      } else if (tokenFrom.token.symbol === poolInfo?.quote) {
+        return Number(quotePrice / basePrice).toFixed(poolInfo.baseTokenInfo.decimals);
       }
     }
     return "-";
@@ -215,8 +215,8 @@ const Home: React.FC = (props) => {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           pool,
-          newTokenFrom,
-          newTokenTo,
+          newTokenFrom.mint,
+          newTokenTo.mint,
           card.amount ?? "0",
           parseFloat(swapView.priceImpact),
           marketPrice,
@@ -251,8 +251,8 @@ const Home: React.FC = (props) => {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           pool,
-          newTokenFrom,
-          newTokenTo,
+          newTokenFrom.mint,
+          newTokenTo.mint,
           tokenFrom.amount ?? "0",
           parseFloat(swapView.priceImpact),
           marketPrice,
@@ -284,7 +284,7 @@ const Home: React.FC = (props) => {
 
     dispatch(swapViewActions.setIsProcessing({ isProcessing: true }));
     try {
-      const isStable = !!pool.swapType.stableSwap;
+      const isStable = pool.swapType === SwapType.Stable;
       const referrerPubkey: PublicKey | null =
         appState.isNewUser === undefined ? null : appState.referrerPublicKey;
       const enableReferral = appState.enableReferral;
@@ -296,7 +296,7 @@ const Home: React.FC = (props) => {
         exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
       );
       const swapDirection =
-        tokenFrom.token.mint === pool.mintBase.toBase58()
+        tokenFrom.token.symbol === pool.baseTokenInfo.symbol
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
       let { transaction, createAccountsCost, destinationRef } = await swap_v2({
@@ -514,9 +514,9 @@ const Home: React.FC = (props) => {
       const isInsufficientLiquidity =
         pool &&
         exponentiatedBy(
-          tokenFrom.token.symbol === poolConfig.base
-            ? pool?.poolState.quoteReserve.toString()
-            : pool?.poolState.baseReserve.toString(),
+          tokenFrom.token.symbol === poolInfo.base
+            ? pool?.poolState.quoteReserve
+            : pool?.poolState.baseReserve,
           tokenTo.token.decimals,
         ).isLessThan(tokenTo.amount);
 
@@ -565,7 +565,7 @@ const Home: React.FC = (props) => {
     setMenu,
     sourceBalance,
     pool,
-    poolConfig,
+    poolInfo,
     tokenFrom,
     tokenTo.amount,
     tokenTo.token.decimals,
