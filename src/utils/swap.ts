@@ -46,7 +46,11 @@ export function getSwapOutAmount(
     const rawAmountOut: number = getSwapOutAmountSellBase(
       pool,
       new BigNumber(amount),
-      marketPriceLow,
+      normalizeMarketPriceWithDecimals(
+        marketPriceLow,
+        pool.mintBaseDecimals,
+        pool.mintQuoteDecimals,
+      ),
     );
 
     return generateResultFromAmountOut(
@@ -65,7 +69,11 @@ export function getSwapOutAmount(
     const rawAmountOut: number = getSwapOutAmountSellQuote(
       pool,
       new BigNumber(amount),
-      marketPriceHigh,
+      normalizeMarketPriceWithDecimals(
+        marketPriceHigh,
+        pool.mintBaseDecimals,
+        pool.mintQuoteDecimals,
+      ),
     );
 
     return generateResultFromAmountOut(
@@ -250,4 +258,28 @@ export function calculatePriceImpact(
   const futureRatio: BigNumber = futureReserveA.dividedBy(futureReserveB);
 
   return futureRatio.minus(currentRatio).abs().dividedBy(currentRatio);
+}
+
+/**
+ * Market price is the price of actual base and quote token values
+ * We represent token amounts in integer which is realValue * 10^decimalPlaces
+ * When calculating with market price with our integer representations,
+ * we need to normalize the market price with decimal places
+ * @param marketPrice basePrice / quotePrice
+ * @param mintBaseDecimals decimal places of base token
+ * @param mintQuoteDecimals decimal places of quote token
+ * @returns
+ */
+export function normalizeMarketPriceWithDecimals(
+  marketPrice: BigNumber,
+  mintBaseDecimals: number,
+  mintQuoteDecimals: number,
+): BigNumber {
+  if (mintBaseDecimals > mintQuoteDecimals) {
+    return marketPrice.dividedBy(new BigNumber(10).pow(mintBaseDecimals - mintQuoteDecimals));
+  } else if (mintBaseDecimals < mintQuoteDecimals) {
+    return marketPrice.multipliedBy(new BigNumber(10).pow(mintQuoteDecimals - mintBaseDecimals));
+  } else {
+    return marketPrice;
+  }
 }

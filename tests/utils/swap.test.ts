@@ -376,4 +376,6 @@ describe("utils/swap", function () {
       ),
     ).toThrow();
   });
+
+  it("normalizeMarketPriceWithDecimals", function () {});
 });
