@@ -3,7 +3,7 @@ import {
   calculateOutAmountStableSwapInternal,
   calculateOutAmountNormalSwapInternal,
   calculateOutAmountNormalSwap,
-} from "../src/lib/curve/calculation";
+} from "../../..//src/lib/curve/calculation";
 import BigNumber from "bignumber.js";
 
 describe("calculation", function () {

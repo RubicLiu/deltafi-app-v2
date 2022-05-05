@@ -1,4 +1,4 @@
-import { approximateOutAmount, approximateUpperBoundK } from "../src/lib/curve/approximation";
+import { approximateOutAmount, approximateUpperBoundK } from "../../../src/lib/curve/approximation";
 import BigNumber from "bignumber.js";
 
 describe("approximation", function () {
