@@ -96,6 +96,7 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellBase(
         {
+          swapType: {normalSwap: {}} as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),
@@ -105,13 +106,13 @@ describe("utils/swap", function () {
         } as SwapInfo,
         new BigNumber(2_000_000),
         new BigNumber(0.163),
-        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(325_994);
 
     expect(
       getSwapOutAmountSellBase(
         {
+          swapType: {normalSwap: {}} as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),
@@ -121,27 +122,30 @@ describe("utils/swap", function () {
         } as SwapInfo,
         new BigNumber(12_550_000),
         new BigNumber(0.163),
-        {normalSwap: {}} as SwapType,
+        
       ),
     ).toEqual(1_775_380);
 
     expect(
       getSwapOutAmountSellBase(
         {
-          targetBaseReserve: new anchor.BN(111_101_001_000),
-          targetQuoteReserve: new anchor.BN(501_000_000),
-          baseReserve: new anchor.BN(234_134_100_352_634),
-          quoteReserve: new anchor.BN(1_201_003_000_001),
-        } as PoolState,
+          swapType: {normalSwap: {}} as SwapType,
+          poolState: {
+            targetBaseReserve: new anchor.BN(111_101_001_000),
+            targetQuoteReserve: new anchor.BN(501_000_000),
+            baseReserve: new anchor.BN(234_134_100_352_634),
+            quoteReserve: new anchor.BN(1_201_003_000_001),
+          } as PoolState,
+        } as SwapInfo,
         new BigNumber(200_001_000),
         new BigNumber(0.00523),
-        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(1_189_852);
 
     expect(
       getSwapOutAmountSellBase(
         {
+          swapType: {stableSwap: {}} as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(100_000_000),
@@ -155,7 +159,6 @@ describe("utils/swap", function () {
         
         new BigNumber(200_000),
         new BigNumber(1),
-        {stableSwap: {}} as SwapType,
       ),
     ).toEqual(199_800);
   });
@@ -164,6 +167,7 @@ describe("utils/swap", function () {
     expect(
       getSwapOutAmountSellQuote(
         {
+          swapType: {normalSwap: {}} as SwapType,
           poolState:{
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),
@@ -173,13 +177,13 @@ describe("utils/swap", function () {
         } as SwapInfo,
         new BigNumber(325_994),
         new BigNumber(0.163),
-        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(1_999_999); // less than 2_000_000 due to the floorings
 
     expect(
       getSwapOutAmountSellQuote(
         {
+          swapType: {normalSwap: {}} as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(20_000_000),
@@ -189,13 +193,13 @@ describe("utils/swap", function () {
         } as SwapInfo,
         new BigNumber(1_775_380),
         new BigNumber(0.163),
-        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(12_549_997); // less than 12_550_000 due to the floorings
 
     expect(
       getSwapOutAmountSellQuote(
         {
+          swapType: {normalSwap: {}} as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(111_101_001_000),
             targetQuoteReserve: new anchor.BN(501_000_000),
@@ -205,13 +209,13 @@ describe("utils/swap", function () {
         } as SwapInfo,
         new BigNumber(1_189_852),
         new BigNumber(0.00523),
-        {normalSwap: {}} as SwapType,
       ),
     ).toEqual(200_000_918); // less than 200_001_000 due to the floorings
 
     expect(
       getSwapOutAmountSellQuote(
         {
+          swapType: {stableSwap: {}} as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(100_000_000),
@@ -224,7 +228,6 @@ describe("utils/swap", function () {
         } as SwapInfo,
         new BigNumber(199_800),
         new BigNumber(1),
-        {stableSwap: {}} as SwapType,
       ),
     ).toEqual(199_999); // less than 200_000 due to the floorings
   });

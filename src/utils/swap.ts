@@ -47,7 +47,6 @@ export function getSwapOutAmount(
       pool,
       new BigNumber(amount),
       marketPriceLow,
-      pool.swapType,
     );
 
     return generateResultFromAmountOut(
@@ -64,7 +63,6 @@ export function getSwapOutAmount(
       pool,
       new BigNumber(amount),
       marketPriceHigh,
-      pool.swapType,
     );
 
     return generateResultFromAmountOut(
@@ -93,7 +91,7 @@ export function getSwapOutAmount(
 
 /**
  * Calculate out amount when selling base, reserve A is base reserve, reserve B is quote reserve
- * @param poolState pool state information, includes the current reserve and target amounts of the tokens
+ * @param pool full swap pool information, includes the current reserve and target amounts of the tokens
  * @param amountIn base token input amount
  * @param marketPrice baseTokenPrice / quoteTokenPrice
  * @param swapType normal swap or stable swap
@@ -103,9 +101,8 @@ export function getSwapOutAmountSellBase(
   pool: SwapInfo,
   amountIn: BigNumber,
   marketPrice: BigNumber,
-  swapType: SwapType,
 ): number {
-    if (swapType.normalSwap) {
+    if (pool.swapType.normalSwap) {
       return calculateOutAmountNormalSwap(
         marketPrice,
         new BigNumber(pool.poolState.targetBaseReserve.toString()),
@@ -115,7 +112,7 @@ export function getSwapOutAmountSellBase(
         amountIn,
       );
     }
-    else if (swapType.stableSwap) {
+    else if (pool.swapType.stableSwap) {
       return calculateOutAmountStableSwap(
         marketPrice,
         new BigNumber(pool.poolState.targetBaseReserve.toString()),
@@ -125,13 +122,13 @@ export function getSwapOutAmountSellBase(
       );
     }
     else {
-      throw Error("Wrong swaptype: " + swapType);
+      throw Error("Wrong swaptype: " + pool.swapType);
     } 
 }
 
 /**
  * Calculates out amount when selling base, reserve A is quote reserve, reserve B is base reserve
- * @param poolState pool state information, includes the current reserve and target amounts of the tokens
+ * @param pool full swap pool information, includes the current reserve and target amounts of the tokens
  * @param amountIn quote token input amount
  * @param marketPrice baseTokenPrice / quoteTokenPrice
  * @param swapType normal swap or stable swap
@@ -141,10 +138,9 @@ export function getSwapOutAmountSellQuote(
   pool: SwapInfo,
   amountIn: BigNumber,
   marketPrice: BigNumber,
-  swapType: SwapType,
 ): number {
 
-  if (swapType.normalSwap) {
+  if (pool.swapType.normalSwap) {
     return calculateOutAmountNormalSwap(
       // the market price for calculation is the reciprocal of the market price input
       new BigNumber(1).dividedBy(marketPrice),
@@ -155,7 +151,7 @@ export function getSwapOutAmountSellQuote(
       amountIn,
     );
   }
-  else if (swapType.stableSwap) {
+  else if (pool.swapType.stableSwap) {
     return calculateOutAmountStableSwap(
       new BigNumber(1).dividedBy(marketPrice),
       new BigNumber(pool.poolState.quoteReserve.toString()),
@@ -165,7 +161,7 @@ export function getSwapOutAmountSellQuote(
     );
   }
   else {
-    throw Error("Wrong swaptype: " + swapType);
+    throw Error("Wrong swaptype: " + pool.swapType);
   } 
 }
 
