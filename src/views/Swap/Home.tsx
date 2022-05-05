@@ -44,7 +44,6 @@ import {
   swapViewSelector,
 } from "states/v2/selectorsV2";
 import { fetchReferrerThunk } from "states/appState";
-import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 import { marketConfig } from "constants/deployConfig";
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
@@ -56,6 +55,7 @@ import {
 } from "constants/deployConfigV2";
 import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
 import { swapViewActions } from "states/views/swapView";
+import { fecthTokenAccountInfoList } from "states/v2/tokenV2State";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
