@@ -1,8 +1,7 @@
 import BigNumber from "bignumber.js";
-import { PoolInfo } from "providers/types";
 import { calculateOutAmountNormalSwap, calculateOutAmountStableSwap } from "lib/curve";
 import { TokenConfig } from "constants/deployConfigV2";
-import { PoolState, SwapConfig, SwapInfo, SwapType } from "anchor/type_definitions";
+import { SwapConfig, SwapInfo, SwapType } from "anchor/type_definitions";
 import { WAD } from "../constants";
 
 /**
