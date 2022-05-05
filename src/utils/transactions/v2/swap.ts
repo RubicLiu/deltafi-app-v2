@@ -1,98 +1,58 @@
 import { Connection, PublicKey, Transaction, Keypair } from "@solana/web3.js";
-import { AccountLayout } from "@solana/spl-token";
 import { partialSignTransaction, mergeTransactions } from "..";
 import * as token from "@solana/spl-token";
-import { PoolConfig } from "constants/deployConfigV2";
+import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { web3, BN } from "@project-serum/anchor";
 
-import { createNativeSOLHandlingTransactions } from "../utils";
-import { createApproveInstruction } from "lib/instructions";
+import { createApproveInstruction, SWAP_DIRECTION } from "lib/instructions";
 
-export async function createDepositTransaction(
+export async function createSwapTransaction(
   program: any,
   connection: Connection,
   poolConfig: PoolConfig,
   swapInfo: any,
-  userTokenBase: PublicKey,
-  userTokenQuote: PublicKey,
+  userSourceToken: PublicKey,
+  userDestinationToken: PublicKey,
   walletPubkey: PublicKey,
-  lpUser: any,
-  baseAmount: BN,
-  qouteAmount: BN,
+  deltafiUser: any,
+  swapDirection: SWAP_DIRECTION,
+  inAmount: BN,
+  minOutAmount: BN,
 ) {
-  let baseSourceRef = userTokenBase;
-  let quoteSourceRef = userTokenQuote;
-  let createWrappedTokenAccountTransaction: Transaction | undefined;
-  let initializeWrappedTokenAccountTransaction: Transaction | undefined;
-  let closeWrappedTokenAccountTransaction: Transaction | undefined;
-
-  const baseSOL = poolConfig.baseTokenInfo.symbol === "SOL";
-  const quoteSOL = poolConfig.quoteTokenInfo.symbol === "SOL";
-  const tempAccountRefKeyPair = Keypair.generate();
-  const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
-
-  if (baseSOL || quoteSOL) {
-    const tmpAccountLamport = (baseSOL ? baseAmount.toNumber() : qouteAmount.toNumber()) + lamports;
-
-    const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(
-      tempAccountRefKeyPair.publicKey,
-      tmpAccountLamport,
-      walletPubkey,
-    );
-    createWrappedTokenAccountTransaction =
-      nativeSOLHandlingTransactions.createWrappedTokenAccountTransaction;
-    initializeWrappedTokenAccountTransaction =
-      nativeSOLHandlingTransactions.initializeWrappedTokenAccountTransaction;
-    closeWrappedTokenAccountTransaction =
-      nativeSOLHandlingTransactions.closeWrappedTokenAccountTransaction;
-
-    if (baseSOL) {
-      baseSourceRef = tempAccountRefKeyPair.publicKey;
-    } else {
-      quoteSourceRef = tempAccountRefKeyPair.publicKey;
-    }
-  }
-
-  const [lpPublicKey, lpBump] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from("LiquidityProvider"),
-      new PublicKey(poolConfig.swapInfo).toBuffer(),
-      walletPubkey.toBuffer(),
-    ],
-    program.programId,
-  );
+  const [swapSourceToken, swapDestinationToken, adminDestinationToken] =
+    swapDirection === SWAP_DIRECTION.SellBase
+      ? [swapInfo.tokenBase, swapInfo.tokenQuote, swapInfo.adminFeeTokenQuote]
+      : [swapInfo.tokenQuote, swapInfo.tokenBase, swapInfo.adminFeeTokenBase];
 
   const userTransferAuthority = Keypair.generate();
   let transaction = new Transaction();
-  transaction
-    .add(
-      createApproveInstruction(
-        baseSourceRef,
-        userTransferAuthority.publicKey,
-        walletPubkey,
-        BigInt(baseAmount.toString()),
-      ),
-    )
-    .add(
-      createApproveInstruction(
-        quoteSourceRef,
-        userTransferAuthority.publicKey,
-        walletPubkey,
-        BigInt(qouteAmount.toString()),
-      ),
-    );
+  transaction.add(
+    createApproveInstruction(
+      userSourceToken,
+      userTransferAuthority.publicKey,
+      walletPubkey,
+      BigInt(inAmount.toString()),
+    ),
+  );
+
+  const marketConfig = new PublicKey(deployConfigV2.marketConfig);
+  const [deltafiUserPubkey, deltafiUserBump] = await PublicKey.findProgramAddress(
+    [Buffer.from("User"), marketConfig.toBuffer(), walletPubkey.toBuffer()],
+    program.programId,
+  );
 
   if (swapInfo.swapType.stableSwap) {
     transaction.add(
-      program.transaction.depositToStableSwap(baseAmount, qouteAmount, {
+      program.transaction.stableSwap(inAmount, minOutAmount, {
         accounts: {
+          marketConfig: new PublicKey(deployConfigV2.marketConfig),
           swapInfo: new PublicKey(poolConfig.swapInfo),
-          userTokenBase: baseSourceRef,
-          userTokenQuote,
-          quoteSourceRef,
-          liquidityProvider: lpPublicKey,
-          tokenBase: swapInfo.tokenBase,
-          tokenQuote: swapInfo.tokenQuote,
+          userSourceToken: userSourceToken,
+          userDestinationToken: userDestinationToken,
+          swapSourceToken,
+          swapDestinationToken,
+          deltafiUser: deltafiUserPubkey,
+          adminDestinationToken,
           userAuthority: userTransferAuthority.publicKey,
           tokenProgram: token.TOKEN_PROGRAM_ID,
         },
@@ -100,17 +60,18 @@ export async function createDepositTransaction(
     );
   } else {
     transaction.add(
-      program.transaction.depositToNormalSwap(baseAmount, qouteAmount, {
+      program.transaction.normalSwap(inAmount, minOutAmount, {
         accounts: {
+          marketConfig: new PublicKey(deployConfigV2.marketConfig),
           swapInfo: new PublicKey(poolConfig.swapInfo),
-          userTokenBase: baseSourceRef,
-          userTokenQuote,
-          quoteSourceRef,
-          liquidityProvider: lpPublicKey,
-          tokenBase: swapInfo.tokenBase,
-          tokenQuote: swapInfo.tokenQuote,
+          userSourceToken: userSourceToken,
+          userDestinationToken: userDestinationToken,
+          swapSourceToken,
+          swapDestinationToken,
           pythPriceBase: swapInfo.pythPriceBase,
           pythPriceQuote: swapInfo.pythPriceQuote,
+          deltafiUser: deltafiUserPubkey,
+          adminDestinationToken,
           userAuthority: userTransferAuthority.publicKey,
           tokenProgram: token.TOKEN_PROGRAM_ID,
         },
@@ -120,28 +81,17 @@ export async function createDepositTransaction(
 
   const signers = [userTransferAuthority];
 
-  if (lpUser === null) {
-    const createLpTransaction = program.transaction.createLiquidityProvider(lpBump, {
+  if (!deltafiUser) {
+    const createDeltafiUserTransaction = program.transaction.createDeltafiUser(deltafiUserBump, {
       accounts: {
-        marketConfig: swapInfo.configKey,
-        swapInfo: new PublicKey(poolConfig.swapInfo),
-        liquidityProvider: lpPublicKey,
+        marketConfig: new PublicKey(deployConfigV2.marketConfig),
         owner: walletPubkey,
+        deltafiUser: deltafiUserPubkey,
         systemProgram: web3.SystemProgram.programId,
         rent: web3.SYSVAR_RENT_PUBKEY,
       },
     });
-    transaction = mergeTransactions([createLpTransaction, transaction]);
-  }
-
-  if (baseSOL || quoteSOL) {
-    transaction = mergeTransactions([
-      createWrappedTokenAccountTransaction,
-      initializeWrappedTokenAccountTransaction,
-      transaction,
-      closeWrappedTokenAccountTransaction,
-    ]);
-    signers.push(tempAccountRefKeyPair);
+    transaction = mergeTransactions([createDeltafiUserTransaction, transaction]);
   }
 
   return partialSignTransaction({

@@ -8,6 +8,7 @@ export const farmPoolSelector = (state: RootState) => state.farmV2;
 export const poolSelector = (state: RootState) => state.swapV2;
 export const pythSelector = (state: RootState) => state.pythV2;
 export const tokenAccountSelector = (state: RootState) => state.tokenV2;
+export const deltafiUserSelector = (state: RootState) => state.userV2;
 
 export const depositViewSelector = (state: RootState) => state.views.depositView;
 export const stakeViewSelector = (state: RootState) => state.views.stakeView;
