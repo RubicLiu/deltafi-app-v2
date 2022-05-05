@@ -181,7 +181,6 @@ const Home: React.FC = (props) => {
   const rewardsAccount = useSelector(selectTokenAccountInfoByMint(DELTAFI_TOKEN_MINT.toBase58()));
 
   const [priceImpact, setPriceImpact] = useState("2.0");
-  const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
 
   const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolInfo));
@@ -223,7 +222,7 @@ const Home: React.FC = (props) => {
   };
 
   const handleOpenSettings = () => {
-    setOpenSettings(!openSettings);
+    dispatch(swapViewActions.setOpenSettings({ openSettings: !swapView.openSettings }));
   };
 
   const handleSnackBarClose = useCallback(() => {
@@ -607,7 +606,7 @@ const Home: React.FC = (props) => {
             </IconButton>
           </Box>
           <ReactCardFlip
-            isFlipped={openSettings}
+            isFlipped={swapView.openSettings}
             containerStyle={{ position: "relative", zIndex: 2 }}
           >
             <Box display="flex" flexDirection="column" alignItems="flex-end">
@@ -616,7 +615,7 @@ const Home: React.FC = (props) => {
                 tokens={tokenConfigs}
                 handleChangeCard={handleTokenFromInput}
               />
-              {!openSettings && (
+              {!swapView.openSettings && (
                 <Fab
                   color="secondary"
                   size="small"
@@ -634,7 +633,7 @@ const Home: React.FC = (props) => {
               />
             </Box>
             <SettingsPanel
-              isOpen={openSettings}
+              isOpen={swapView.openSettings}
               priceImpact={priceImpact}
               handleChangeImpact={handleChangeImpact}
               handleClose={handleOpenSettings}
