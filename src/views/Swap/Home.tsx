@@ -41,6 +41,7 @@ import {
   selectPoolBySymbols,
   selectMarketPriceByPool,
   selectTokenAccountInfoByMint,
+  swapViewSelector,
 } from "states/v2/selectorsV2";
 import { fetchReferrerThunk } from "states/appState";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
@@ -54,6 +55,7 @@ import {
   tokenConfigs,
 } from "constants/deployConfigV2";
 import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
+import { swapViewActions } from "states/views/swapView";
 
 interface TransactionResult {
   status: boolean | null;
@@ -164,6 +166,7 @@ const Home: React.FC = (props) => {
 
   const poolInfo = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
   const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
+  const swapView = useSelector(swapViewSelector);
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
   const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.mint));
@@ -177,7 +180,6 @@ const Home: React.FC = (props) => {
 
   const rewardsAccount = useSelector(selectTokenAccountInfoByMint(DELTAFI_TOKEN_MINT.toBase58()));
 
-  const [isProcessing, setIsProcessing] = useState(false);
   const [priceImpact, setPriceImpact] = useState("2.0");
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
@@ -293,7 +295,7 @@ const Home: React.FC = (props) => {
       return null;
     }
 
-    setIsProcessing(true);
+    dispatch(swapViewActions.setIsProcessing({ isProcessing: true }));
     try {
       const isStable = pool.swapType === SwapType.Stable;
       const referrerPubkey: PublicKey | null =
@@ -412,7 +414,7 @@ const Home: React.FC = (props) => {
       setTransactionResult({ status: false });
       setState((_state) => ({ ..._state, open: true }));
     } finally {
-      setIsProcessing(false);
+      dispatch(swapViewActions.setIsProcessing({ isProcessing: false }));
       dispatch(
         fetchReferrerThunk({
           connection,
@@ -539,7 +541,7 @@ const Home: React.FC = (props) => {
             sourceAccountNonExist ||
             isInsufficientBalance ||
             isInsufficientLiquidity ||
-            isProcessing
+            swapView.isProcessing
           }
           onClick={handleSwap}
           data-amp-analytics-on="click"
@@ -554,7 +556,7 @@ const Home: React.FC = (props) => {
             "Insufficient Balance"
           ) : isInsufficientLiquidity ? (
             "Insufficient Liquidity"
-          ) : isProcessing ? (
+          ) : swapView.isProcessing ? (
             <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
           ) : (
             "Swap"
@@ -578,7 +580,7 @@ const Home: React.FC = (props) => {
     tokenFrom,
     tokenTo.amount,
     tokenTo.token.decimals,
-    isProcessing,
+    swapView,
     classes.actionLoadingButton,
   ]);
 

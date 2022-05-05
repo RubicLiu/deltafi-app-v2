@@ -100,12 +100,7 @@ const PriceItem = styled.li`
 `;
 
 const SettingsPanel = (props: SettingsProps): JSX.Element => {
-  const {
-    priceImpact,
-    isSmall,
-    handleChangeImpact,
-    handleClose,
-  } = props;
+  const { priceImpact, isSmall, handleChangeImpact, handleClose } = props;
   const classes = useStyles(props);
   const currencyInputRef = useRef<HTMLInputElement>();
 
