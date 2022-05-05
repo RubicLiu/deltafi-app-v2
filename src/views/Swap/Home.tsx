@@ -56,6 +56,7 @@ import {
 } from "constants/deployConfigV2";
 import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
 import { swapViewActions } from "states/views/swapView";
+import { SwapInfo } from "anchor/type_definitions";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -152,7 +153,9 @@ const Home: React.FC = (props) => {
   const tokenTo = swapView.tokenTo;
 
   const poolInfo = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
-  const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
+  const pool: SwapInfo = useSelector(
+    selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol),
+  );
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
   const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.mint));
@@ -215,8 +218,8 @@ const Home: React.FC = (props) => {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           pool,
-          newTokenFrom.mint,
-          newTokenTo.mint,
+          newTokenFrom,
+          newTokenTo,
           card.amount ?? "0",
           parseFloat(swapView.priceImpact),
           marketPrice,
