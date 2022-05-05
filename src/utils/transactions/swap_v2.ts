@@ -1,30 +1,9 @@
-import {
-  Connection,
-  // Keypair,
-  PublicKey,
-  // Transaction,
-  // TransactionInstruction,
-} from "@solana/web3.js";
-// import BN from "bn.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 
-// import { createNativeSOLHandlingTransactions } from "./utils";
-import {
-  // createApproveInstruction,
-  SwapData,
-  // SWAP_DIRECTION,
-  // createSwapV2Instruction,
-  // createStableSwapV2Instruction,
-} from "lib/instructions";
+import { SwapData } from "lib/instructions";
 import { MarketConfig } from "providers/types";
 
-// import { SWAP_PROGRAM_ID } from "constants/index";
-// import { createTokenAccountTransaction, mergeTransactions, partialSignTransaction } from ".";
-// import { AccountLayout } from "@solana/spl-token";
-// import { checkOrCreateReferralDataTransaction } from "./utils";
 import { TokenAccountInfo } from "states/tokenAccountState";
-// import { OraclePriority } from "lib/state";
-// import { getPoolConfigByPoolKey } from "constants/deployConfig";
-// import { dummyAddress } from "utils/transactions/swap";
 import { SwapInfo } from "anchor/type_definitions";
 
 /**
