@@ -25,30 +25,28 @@ import SettingsPanel from "components/SettingsPanel/SettingsPanel";
 import SwapCard from "./components/Card";
 import { useModal } from "providers/modal";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
-import { swap_v2 } from "utils/transactions/swap_v2";
-import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS, SOLSCAN_LINK } from "constants/index";
+import { MARKET_CONFIG_ADDRESS, SOLSCAN_LINK } from "constants/index";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
 import { getSwapOutAmount } from "utils/swap";
 import { SwapCard as ISwapCard } from "./components/types";
 import { useCustomConnection } from "providers/connection";
-import { SwapType } from "lib/state";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
-import { appSelector } from "states/selectors";
 import {
-  selectPoolBySymbols,
   selectMarketPriceByPool,
   selectTokenAccountInfoByMint,
   swapViewSelector,
+  selectSwapBySwapKey,
+  deltafiUserSelector,
 } from "states/v2/selectorsV2";
 import { fetchReferrerThunk } from "states/appState";
-import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 import { marketConfig } from "constants/deployConfig";
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
+  deployConfigV2,
   getPoolConfigBySymbols,
   getTokenConfigBySymbol,
   poolConfigs,
@@ -56,7 +54,10 @@ import {
 } from "constants/deployConfigV2";
 import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
 import { swapViewActions } from "states/views/swapView";
-import { SwapInfo } from "anchor/type_definitions";
+import { fecthTokenAccountInfoList } from "states/v2/tokenV2State";
+import { createSwapTransaction } from "utils/transactions/v2/swap";
+import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { BN } from "@project-serum/anchor";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -141,10 +142,10 @@ function getPossibleTokenToConfigs(tokenFrom: ISwapCard) {
 
 const Home: React.FC = (props) => {
   const dispatch = useDispatch();
-  const appState = useSelector(appSelector);
 
   const classes = useStyles(props);
-  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
+  const wallet = useWallet();
+  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const { connection } = useConnection();
   const config = marketConfig;
 
@@ -152,10 +153,9 @@ const Home: React.FC = (props) => {
   const tokenFrom = swapView.tokenFrom;
   const tokenTo = swapView.tokenTo;
 
-  const poolInfo = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
-  const pool: SwapInfo = useSelector(
-    selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol),
-  );
+  const poolConfig = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
+  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
+  const deltafiUser = useSelector(deltafiUserSelector).user;
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
   const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.mint));
@@ -167,22 +167,20 @@ const Home: React.FC = (props) => {
     return null;
   }, [sourceAccount, tokenFrom]);
 
-  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(DELTAFI_TOKEN_MINT.toBase58()));
-
   const { setMenu } = useModal();
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolInfo));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const exchangeRateLabel = useMemo(() => {
-    if (basePrice && quotePrice && pool) {
-      if (tokenFrom.token.symbol === poolInfo?.base) {
-        return Number(basePrice / quotePrice).toFixed(poolInfo.quoteTokenInfo.decimals);
-      } else if (tokenFrom.token.symbol === poolInfo?.quote) {
-        return Number(quotePrice / basePrice).toFixed(poolInfo.baseTokenInfo.decimals);
+    if (basePrice && quotePrice && swapInfo) {
+      if (tokenFrom.token.symbol === poolConfig?.base) {
+        return Number(basePrice / quotePrice).toFixed(poolConfig.quoteTokenInfo.decimals);
+      } else if (tokenFrom.token.symbol === poolConfig?.quote) {
+        return Number(quotePrice / basePrice).toFixed(poolConfig.baseTokenInfo.decimals);
       }
     }
     return "-";
-  }, [basePrice, quotePrice, tokenFrom.token.symbol, pool, poolInfo]);
+  }, [basePrice, quotePrice, tokenFrom.token.symbol, swapInfo, poolConfig]);
 
   const { network } = useCustomConnection();
 
@@ -214,10 +212,10 @@ const Home: React.FC = (props) => {
     if (tokenTo.token.mint === newTokenFrom.mint) {
       newTokenTo = Object.assign({}, tokenFrom.token);
     }
-    if (pool && swapView.priceImpact) {
+    if (swapInfo && swapView.priceImpact) {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
-          pool,
+          swapInfo,
           newTokenFrom,
           newTokenTo,
           card.amount ?? "0",
@@ -250,10 +248,10 @@ const Home: React.FC = (props) => {
     if (tokenFrom.token.mint === newTokenTo.mint) {
       newTokenFrom = Object.assign({}, tokenTo.token);
     }
-    if (pool && swapView.priceImpact) {
+    if (swapInfo && swapView.priceImpact) {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
-          pool,
+          swapInfo,
           newTokenFrom,
           newTokenTo,
           tokenFrom.amount ?? "0",
@@ -277,7 +275,7 @@ const Home: React.FC = (props) => {
   };
 
   const swapCallback = useCallback(async () => {
-    if (!pool || !config || !sourceAccount || !walletPubkey) {
+    if (!swapInfo || !config || !sourceAccount || !walletPubkey) {
       return null;
     }
 
@@ -287,38 +285,41 @@ const Home: React.FC = (props) => {
 
     dispatch(swapViewActions.setIsProcessing({ isProcessing: true }));
     try {
-      const isStable = pool.swapType === SwapType.Stable;
-      const referrerPubkey: PublicKey | null =
-        appState.isNewUser === undefined ? null : appState.referrerPublicKey;
-      const enableReferral = appState.enableReferral;
-
       const amountIn = BigInt(
         exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString(),
       );
-      const minimumAmountOut = BigInt(
-        exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
-      );
+      //      const minimumAmountOut = BigInt(
+      //        exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
+      //      );
       const swapDirection =
-        tokenFrom.token.mint === pool.mintBase.toBase58()
+        tokenFrom.token.mint === swapInfo.mintBase.toBase58()
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
-      let { transaction, createAccountsCost, destinationRef } = await swap_v2({
-        isStable,
+
+      // TODO(ypeng): calculate createAccountCost
+      const createAccountsCost = 0;
+      // TODO(ypeng): Create destination account if not exist
+      const destinationRef = destinationAccount?.publicKey;
+
+      const program = getDeltafiDexV2(
+        new PublicKey(deployConfigV2.programId),
+        makeProvider(connection, wallet),
+      );
+
+      let transaction = await createSwapTransaction(
+        program,
         connection,
+        poolConfig,
+        swapInfo,
+        sourceAccount?.publicKey,
+        destinationAccount?.publicKey,
         walletPubkey,
-        config,
-        pool,
-        source: sourceAccount,
-        destinationRef: destinationAccount?.publicKey,
-        rewardTokenRef: rewardsAccount?.publicKey,
-        swapData: {
-          amountIn,
-          minimumAmountOut,
-          swapDirection,
-        },
-        enableReferral,
-        referrer: referrerPubkey,
-      });
+        deltafiUser,
+        swapDirection,
+        new BN(amountIn.toString()),
+        // TODO(ypeng): Set proper min out amount
+        new BN(0),
+      );
 
       transaction = await signTransaction(transaction);
       const signature = await sendSignedTransaction({ signedTransaction: transaction, connection });
@@ -418,8 +419,11 @@ const Home: React.FC = (props) => {
       dispatch(fetchSwapsV2Thunk({ connection }));
     }
   }, [
-    pool,
+    swapInfo,
     config,
+    deltafiUser,
+    poolConfig,
+    wallet,
     sourceAccount,
     walletPubkey,
     sourceBalance,
@@ -428,9 +432,7 @@ const Home: React.FC = (props) => {
     tokenTo,
     connection,
     destinationAccount,
-    rewardsAccount,
     signTransaction,
-    appState,
     dispatch,
   ]);
 
@@ -511,15 +513,15 @@ const Home: React.FC = (props) => {
 
   const actionButton = useMemo(() => {
     if (isConnectedWallet) {
-      const unavailable = !pool;
+      const unavailable = !swapInfo;
       const sourceAccountNonExist = !sourceBalance;
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount);
       const isInsufficientLiquidity =
-        pool &&
+        swapInfo &&
         exponentiatedBy(
-          tokenFrom.token.symbol === poolInfo.base
-            ? new BigNumber(pool?.poolState.quoteReserve.toString())
-            : new BigNumber(pool?.poolState.baseReserve.toString()),
+          tokenFrom.token.symbol === poolConfig.base
+            ? new BigNumber(swapInfo?.poolState.quoteReserve.toString())
+            : new BigNumber(swapInfo?.poolState.baseReserve.toString()),
           tokenTo.token.decimals,
         ).isLessThan(tokenTo.amount);
 
@@ -567,8 +569,8 @@ const Home: React.FC = (props) => {
     handleSwap,
     setMenu,
     sourceBalance,
-    pool,
-    poolInfo,
+    swapInfo,
+    poolConfig,
     tokenFrom,
     tokenTo.amount,
     tokenTo.token.decimals,
