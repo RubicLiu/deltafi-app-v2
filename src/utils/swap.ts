@@ -43,46 +43,54 @@ export function getSwapOutAmount(
 
   if (fromToken.mint === pool.mintBase.toBase58() && toToken.mint === pool.mintQuote.toBase58()) {
     // sell base case
+    const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
+      marketPriceLow,
+      pool.mintBaseDecimals,
+      pool.mintQuoteDecimals,
+    );
     const rawAmountOut: number = getSwapOutAmountSellBase(
       pool,
       new BigNumber(amount),
-      normalizeMarketPriceWithDecimals(
-        marketPriceLow,
-        pool.mintBaseDecimals,
-        pool.mintQuoteDecimals,
-      ),
+      normalizedMaketPrice,
     );
 
     return generateResultFromAmountOut(
       new BigNumber(pool.poolState.baseReserve.toString()),
       new BigNumber(pool.poolState.quoteReserve.toString()),
+      new BigNumber(pool.poolState.targetBaseReserve.toString()),
+      new BigNumber(pool.poolState.targetQuoteReserve.toString()),
       parseFloat(amount),
       rawAmountOut,
       maxSlippage,
       pool.swapConfig,
+      new BigNumber(normalizedMaketPrice),
     );
   } else if (
     fromToken.mint === pool.mintQuote.toBase58() &&
     toToken.mint === pool.mintBase.toBase58()
   ) {
     // sell quote case
+    const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
+      marketPriceHigh,
+      pool.mintBaseDecimals,
+      pool.mintQuoteDecimals,
+    );
     const rawAmountOut: number = getSwapOutAmountSellQuote(
       pool,
       new BigNumber(amount),
-      normalizeMarketPriceWithDecimals(
-        marketPriceHigh,
-        pool.mintBaseDecimals,
-        pool.mintQuoteDecimals,
-      ),
+      normalizedMaketPrice,
     );
 
     return generateResultFromAmountOut(
       new BigNumber(pool.poolState.quoteReserve.toString()),
       new BigNumber(pool.poolState.baseReserve.toString()),
+      new BigNumber(pool.poolState.targetQuoteReserve.toString()),
+      new BigNumber(pool.poolState.targetBaseReserve.toString()),
       parseFloat(amount),
       rawAmountOut,
       maxSlippage,
       pool.swapConfig,
+      new BigNumber(1).dividedBy(new BigNumber(normalizedMaketPrice)),
     );
   }
 
@@ -184,10 +192,13 @@ export function getSwapOutAmountSellQuote(
 export function generateResultFromAmountOut(
   currentReserveA: BigNumber,
   currentReserveB: BigNumber,
+  targetReserveA: BigNumber,
+  targetReserveB: BigNumber,
   amountIn: number,
   rawAmountOut: number,
   maxSlippage: number,
   swapConfig: SwapConfig,
+  marketPriceInforOut: BigNumber,
 ): {
   amountIn: number;
   amountOut: number;
@@ -214,10 +225,11 @@ export function generateResultFromAmountOut(
     priceImpact: calculatePriceImpact(
       currentReserveA,
       currentReserveB,
+      targetReserveA,
+      targetReserveB,
       new BigNumber(amountIn),
       new BigNumber(rawAmountOut),
-      tradeFee,
-      swapConfig,
+      marketPriceInforOut,
     ).toNumber(),
   };
 }
@@ -231,33 +243,29 @@ export function generateResultFromAmountOut(
  *             = (1 - (futureReserveA / futureReserveB)) / (currentReserveA / currentReserveB)
  * @param currentReserveA reserve before the transaction of the input token
  * @param currentReserveB reserve before the transaction of the output token
+ * @param targetReserveA target reserve of token A
+ * @param targetReserveB target reserve of token B
  * @param amountIn token input amount
  * @param rawAmountOut token output amount without trade fees, calculated from the curve formula
- * @param tradeFee trade fee of the output amount
- * @param fees config of the fees
+ * @param marketPriceAforB amount of B from 1 A
  * @returns price impact value
  */
 export function calculatePriceImpact(
   currentReserveA: BigNumber,
   currentReserveB: BigNumber,
+  targetReserveA: BigNumber,
+  targetReserveB: BigNumber,
   amountIn: BigNumber,
   rawAmountOut: BigNumber,
-  tradeFee: BigNumber,
-  swapConfig: SwapConfig,
+  marketPriceAforB: BigNumber,
 ): BigNumber {
-  const adminFee: BigNumber = tradeFee
-    .multipliedBy(new BigNumber(swapConfig.adminTradeFeeNumerator.toString()))
-    .dividedBy(new BigNumber(swapConfig.adminTradeFeeDenominator.toString()));
-  const futureReserveA: BigNumber = currentReserveA.plus(amountIn);
-  const futureReserveB: BigNumber = currentReserveB
-    .minus(rawAmountOut)
-    .plus(tradeFee)
-    .minus(adminFee);
+  const impliedPrice = marketPriceAforB
+    .multipliedBy(targetReserveA)
+    .multipliedBy(currentReserveB)
+    .dividedBy(targetReserveB.multipliedBy(currentReserveA));
+  const actualPrice = rawAmountOut.dividedBy(amountIn);
 
-  const currentRatio: BigNumber = currentReserveA.dividedBy(currentReserveB);
-  const futureRatio: BigNumber = futureReserveA.dividedBy(futureReserveB);
-
-  return futureRatio.minus(currentRatio).abs().dividedBy(currentRatio);
+  return impliedPrice.minus(actualPrice).abs().dividedBy(impliedPrice);
 }
 
 /**

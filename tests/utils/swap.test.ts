@@ -21,34 +21,32 @@ describe("utils/swap", function () {
       calculatePriceImpact(
         new BigNumber(100_000),
         new BigNumber(200_000),
+        new BigNumber(100_000),
+        new BigNumber(200_000),
         new BigNumber(1000),
         new BigNumber(2003),
-        new BigNumber(6),
-        {
-          adminTradeFeeNumerator: new anchor.BN(1),
-          adminTradeFeeDenominator: new anchor.BN(2),
-        } as SwapConfig,
+        new BigNumber(2),
       ),
-    ).toEqual(new BigNumber("0.02020202020202020202"));
+    ).toEqual(new BigNumber(0.0015));
 
     expect(
       calculatePriceImpact(
         new BigNumber(200_000),
         new BigNumber(100_000),
+        new BigNumber(200_000),
+        new BigNumber(100_000),
         new BigNumber(4000),
         new BigNumber(2006),
-        new BigNumber(9),
-        {
-          adminTradeFeeNumerator: new anchor.BN(1),
-          adminTradeFeeDenominator: new anchor.BN(3),
-        } as SwapConfig,
+        new BigNumber(0.5),
       ),
-    ).toEqual(new BigNumber("0.0408163265306122449"));
+    ).toEqual(new BigNumber(0.003));
   });
 
   it("generateResultFromAmountOut", function () {
     expect(
       generateResultFromAmountOut(
+        new BigNumber(100_000),
+        new BigNumber(200_000),
         new BigNumber(100_000),
         new BigNumber(200_000),
         1000,
@@ -60,17 +58,20 @@ describe("utils/swap", function () {
           tradeFeeNumerator: new anchor.BN(6),
           tradeFeeDenominator: new anchor.BN(2003),
         } as SwapConfig,
+        new BigNumber(2),
       ),
     ).toEqual({
       amountIn: 1000,
       amountOut: 1997,
       amountOutWithSlippage: 1987.015,
       fee: 6,
-      priceImpact: 0.02020202020202020202,
+      priceImpact: 0.0015,
     });
 
     expect(
       generateResultFromAmountOut(
+        new BigNumber(200_000),
+        new BigNumber(100_000),
         new BigNumber(200_000),
         new BigNumber(100_000),
         4000,
@@ -82,13 +83,14 @@ describe("utils/swap", function () {
           tradeFeeNumerator: new anchor.BN(9),
           tradeFeeDenominator: new anchor.BN(2006),
         } as SwapConfig,
+        new BigNumber(0.5),
       ),
     ).toEqual({
       amountIn: 4000,
       amountOut: 1997,
       amountOutWithSlippage: 1977.03,
       fee: 9,
-      priceImpact: 0.0408163265306122449,
+      priceImpact: 0.003,
     });
   });
 
@@ -272,7 +274,7 @@ describe("utils/swap", function () {
       amountOut: 324000,
       amountOutWithSlippage: 322380,
       fee: 1994,
-      priceImpact: 0.00003625043906419723,
+      priceImpact: 0.00001840490797546012,
     });
 
     // normal swap, sell base, enable confidence interval
@@ -314,7 +316,7 @@ describe("utils/swap", function () {
       amountOut: 324000,
       amountOutWithSlippage: 322380,
       fee: 1994,
-      priceImpact: 0.00003625043906419723,
+      priceImpact: 0.00001840490797546012,
     });
 
     // normal swap, sell quote, disable confidence interval
@@ -354,7 +356,7 @@ describe("utils/swap", function () {
       amountOut: 1990000,
       amountOutWithSlippage: 1970100,
       fee: 9999,
-      priceImpact: 0.00003625028487116887,
+      priceImpact: 0.0000183943864425622,
     });
 
     // normal swap, sell quote, disable confidence interval
