@@ -1,6 +1,6 @@
 import { ReactElement, useMemo, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import clx from "classnames";
 import {
   Snackbar,
@@ -34,6 +34,7 @@ import {
   selectFarmByFarmKey,
   stakeViewSelector,
   selectTokenAccountInfoByMint,
+  programSelector,
 } from "states/selectors";
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfigV2";
@@ -43,8 +44,6 @@ import {
   createStakeTransaction,
   createUnstakeTransaction,
 } from "utils/transactions/stake";
-import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
-import { PublicKey } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
@@ -84,11 +83,11 @@ const Stake = (): ReactElement => {
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
 
   const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
+  const program = useSelector(programSelector);
 
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const { network } = useCustomConnection();
-  const { connection } = useConnection();
 
   const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
@@ -251,15 +250,11 @@ const Stake = (): ReactElement => {
   );
 
   const handleStake = useCallback(async () => {
-    if (!connection || !walletPubkey || !lpUser) {
+    if (!walletPubkey || !lpUser || !program) {
       return null;
     }
 
-    const program = getDeltafiDexV2(
-      new PublicKey(deployConfigV2.programId),
-      makeProvider(connection, wallet),
-    );
-
+    const connection = program.provider.connection;
     if (staking.isStake) {
       dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
       try {
@@ -373,18 +368,14 @@ const Stake = (): ReactElement => {
         dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
       }
     }
-  }, [connection, walletPubkey, staking, signTransaction, dispatch, wallet, poolConfig, lpUser]);
+  }, [walletPubkey, staking, signTransaction, dispatch, poolConfig, lpUser, program]);
 
   const handleClaim = useCallback(async () => {
-    if (!connection || !walletPubkey || !lpUser || !rewardsAccount) {
+    if (!walletPubkey || !lpUser || !rewardsAccount || !program) {
       return null;
     }
 
-    const program = getDeltafiDexV2(
-      new PublicKey(deployConfigV2.programId),
-      makeProvider(connection, wallet),
-    );
-
+    const connection = program.provider.connection;
     try {
       dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: true }));
       const transaction = await createClaimFarmRewardsTransaction(
@@ -424,16 +415,7 @@ const Stake = (): ReactElement => {
       dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: false }));
       dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
     }
-  }, [
-    connection,
-    walletPubkey,
-    signTransaction,
-    dispatch,
-    wallet,
-    poolConfig,
-    lpUser,
-    rewardsAccount,
-  ]);
+  }, [walletPubkey, signTransaction, dispatch, poolConfig, lpUser, rewardsAccount, program]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: false }));

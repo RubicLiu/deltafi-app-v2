@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { Box, Typography, makeStyles, Theme, Grid, Paper, Link, Avatar } from "@material-ui/core";
 import Page from "components/layout/Page";
 import { ConnectButton } from "components";
@@ -12,13 +12,11 @@ import copy from "copy-to-clipboard";
 import { sendSignedTransaction } from "utils/transactions";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
-import { deltafiUserSelector, rewardViewSelector } from "states/selectors";
+import { deltafiUserSelector, programSelector, rewardViewSelector } from "states/selectors";
 import { rewardViewActions } from "states/views/rewardView";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
-import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
-import { deployConfigV2 } from "constants/deployConfigV2";
-import { PublicKey } from "@solana/web3.js";
 import { createDeltafiUserTransaction } from "utils/transactions/deltafiUser";
+
 /*
  * mockup test data for reward page
  */
@@ -139,8 +137,8 @@ const Home: React.FC = (props) => {
   const { setMenu } = useModal();
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
-  const { connection } = useConnection();
   const dispatch = useDispatch();
+  const program = useSelector(programSelector);
 
   const rewardView = useSelector(rewardViewSelector);
   const deltafiUser = useSelector(deltafiUserSelector);
@@ -166,16 +164,17 @@ const Home: React.FC = (props) => {
 
   const handleCreateDeltafiUser = useCallback(async () => {
     try {
+      if (!program) {
+        return;
+      }
+
+      const connection = program.provider.connection;
       dispatch(
         rewardViewActions.setReferralLinkState({
           referralLinkState: "Processing",
         }),
       );
 
-      const program = getDeltafiDexV2(
-        new PublicKey(deployConfigV2.programId),
-        makeProvider(connection, wallet),
-      );
       let transaction = await createDeltafiUserTransaction(program, connection, walletPubkey);
 
       transaction = await signTransaction(transaction);
@@ -199,7 +198,7 @@ const Home: React.FC = (props) => {
         }),
       );
     }
-  }, [dispatch, walletPubkey, connection, signTransaction, wallet]);
+  }, [dispatch, walletPubkey, signTransaction, program]);
 
   return (
     <Page>

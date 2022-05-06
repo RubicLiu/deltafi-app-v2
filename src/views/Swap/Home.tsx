@@ -14,7 +14,7 @@ import {
   Link,
   Avatar,
 } from "@material-ui/core";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import SettingsIcon from "@material-ui/icons/Settings";
 import SyncAlt from "@material-ui/icons/SyncAlt";
 import CloseIcon from "@material-ui/icons/Close";
@@ -41,11 +41,11 @@ import {
   selectSwapBySwapKey,
   deltafiUserSelector,
   appSelector,
+  programSelector,
 } from "states/selectors";
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
-  deployConfigV2,
   enableReferral,
   getPoolConfigBySymbols,
   getTokenConfigBySymbol,
@@ -55,7 +55,6 @@ import {
 import { swapViewActions } from "states/views/swapView";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { createSwapTransaction } from "utils/transactions/swap";
-import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { BN } from "@project-serum/anchor";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 
@@ -146,8 +145,8 @@ const Home: React.FC = (props) => {
   const classes = useStyles(props);
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
-  const { connection } = useConnection();
   const app = useSelector(appSelector);
+  const program = useSelector(programSelector);
 
   const swapView = useSelector(swapViewSelector);
   const tokenFrom = swapView.tokenFrom;
@@ -275,7 +274,7 @@ const Home: React.FC = (props) => {
   };
 
   const swapCallback = useCallback(async () => {
-    if (!swapInfo || !sourceAccount || !walletPubkey) {
+    if (!swapInfo || !sourceAccount || !walletPubkey || !program) {
       return null;
     }
 
@@ -283,6 +282,7 @@ const Home: React.FC = (props) => {
       return null;
     }
 
+    const connection = program.provider.connection;
     dispatch(swapViewActions.setIsProcessing({ isProcessing: true }));
     try {
       const referrer = enableReferral ? deltafiUser?.referrer : app.referrer;
@@ -297,11 +297,6 @@ const Home: React.FC = (props) => {
         tokenFrom.token.mint === swapInfo.mintBase.toBase58()
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
-
-      const program = getDeltafiDexV2(
-        new PublicKey(deployConfigV2.programId),
-        makeProvider(connection, wallet),
-      );
 
       let { transaction, createAccountsCost, userDestinationTokenRef } =
         await createSwapTransaction(
@@ -413,18 +408,17 @@ const Home: React.FC = (props) => {
     swapInfo,
     deltafiUser,
     poolConfig,
-    wallet,
     sourceAccount,
     walletPubkey,
     sourceBalance,
     swapView,
     tokenFrom,
     tokenTo,
-    connection,
     destinationAccount,
     signTransaction,
     dispatch,
     app,
+    program,
   ]);
 
   const handleSwap = useCallback(async () => {

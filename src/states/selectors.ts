@@ -16,6 +16,8 @@ export const stakeViewSelector = (state: RootState) => state.views.stakeView;
 export const swapViewSelector = (state: RootState) => state.views.swapView;
 export const rewardViewSelector = (state: RootState) => state.views.rewardView;
 
+export const programSelector = (state: RootState) => state.app.program;
+
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {
     return getPythMarketPrice(state.accounts.pythAccount.symbolToPythData, poolConfig);
