@@ -49,7 +49,7 @@ import { sendSignedTransaction } from "utils/transactions";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
-import { createDepositTransaction, createWithdrawTransaction } from "utils/transactions/v2/deposit";
+import { createDepositTransaction, createWithdrawTransaction } from "utils/transactions/deposit";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {

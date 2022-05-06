@@ -1,5 +1,5 @@
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
-import { partialSignTransaction } from "..";
+import { partialSignTransaction } from ".";
 import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { BN } from "@project-serum/anchor";
 import * as token from "@solana/spl-token";

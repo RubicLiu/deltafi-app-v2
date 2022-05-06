@@ -42,7 +42,7 @@ import {
   createClaimFarmRewardsTransaction,
   createStakeTransaction,
   createUnstakeTransaction,
-} from "utils/transactions/v2/stake";
+} from "utils/transactions/stake";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { PublicKey } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";

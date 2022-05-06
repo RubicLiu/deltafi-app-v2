@@ -1,12 +1,12 @@
 import { Connection, PublicKey, Transaction, Keypair } from "@solana/web3.js";
-import { partialSignTransaction, mergeTransactions, createTokenAccountTransaction } from "..";
+import { partialSignTransaction, mergeTransactions, createTokenAccountTransaction } from ".";
 import * as token from "@solana/spl-token";
 import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { web3, BN } from "@project-serum/anchor";
 
 import { createApproveInstruction, SWAP_DIRECTION } from "lib/instructions";
 import { AccountLayout } from "@solana/spl-token";
-import { createNativeSOLHandlingTransactions } from "../utils";
+import { createNativeSOLHandlingTransactions } from "./utils";
 import { SwapInfo, DeltafiUser } from "anchor/type_definitions";
 
 const ZERO_ADDRESS = "11111111111111111111111111111111";
