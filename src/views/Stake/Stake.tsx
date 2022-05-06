@@ -34,6 +34,7 @@ import {
   selectFarmByFarmKey,
   stakeViewSelector,
   selectTokenAccountInfoByMint,
+  programSelector,
 } from "states/selectors";
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfigV2";
@@ -84,6 +85,7 @@ const Stake = (): ReactElement => {
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
 
   const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
+  const program = useSelector(programSelector);
 
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
@@ -255,11 +257,6 @@ const Stake = (): ReactElement => {
       return null;
     }
 
-    const program = getDeltafiDexV2(
-      new PublicKey(deployConfigV2.programId),
-      makeProvider(connection, wallet),
-    );
-
     if (staking.isStake) {
       dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
       try {
@@ -373,7 +370,7 @@ const Stake = (): ReactElement => {
         dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
       }
     }
-  }, [connection, walletPubkey, staking, signTransaction, dispatch, wallet, poolConfig, lpUser]);
+  }, [connection, walletPubkey, staking, signTransaction, dispatch, wallet, poolConfig, lpUser, program]);
 
   const handleClaim = useCallback(async () => {
     if (!connection || !walletPubkey || !lpUser || !rewardsAccount) {
