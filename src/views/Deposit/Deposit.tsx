@@ -347,7 +347,14 @@ const Deposit: React.FC = () => {
   const handleDeposit = useCallback(async () => {
     let transaction: Transaction;
 
-    if (!connection || !swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount || !program) {
+    if (
+      !connection ||
+      !swapInfo ||
+      !walletPubkey ||
+      !baseTokenAccount ||
+      !quoteTokenAccount ||
+      !program
+    ) {
       return null;
     }
 
@@ -441,7 +448,14 @@ const Deposit: React.FC = () => {
   const handleWithdraw = useCallback(async () => {
     let transaction: Transaction;
 
-    if (!connection || !swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount || !program) {
+    if (
+      !connection ||
+      !swapInfo ||
+      !walletPubkey ||
+      !baseTokenAccount ||
+      !quoteTokenAccount ||
+      !program
+    ) {
       return null;
     }
 

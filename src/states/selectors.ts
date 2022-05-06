@@ -19,14 +19,14 @@ export const swapViewSelector = (state: RootState) => state.views.swapView;
 export const rewardViewSelector = (state: RootState) => state.views.rewardView;
 
 export const programSelector = (state: RootState) => {
-    const program = getDeltafiDexV2(
-      new PublicKey(deployConfigV2.programId),
-      state.app.wallet
-        ? makeProvider(state.app.connection, state.app.wallet)
-        : makeProvider(state.app.connection, {}),
-    );
-    return program;
-  };
+  const program = getDeltafiDexV2(
+    new PublicKey(deployConfigV2.programId),
+    state.app.wallet
+      ? makeProvider(state.app.connection, state.app.wallet)
+      : makeProvider(state.app.connection, {}),
+  );
+  return program;
+};
 
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {

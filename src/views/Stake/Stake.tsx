@@ -370,7 +370,17 @@ const Stake = (): ReactElement => {
         dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
       }
     }
-  }, [connection, walletPubkey, staking, signTransaction, dispatch, wallet, poolConfig, lpUser, program]);
+  }, [
+    connection,
+    walletPubkey,
+    staking,
+    signTransaction,
+    dispatch,
+    wallet,
+    poolConfig,
+    lpUser,
+    program,
+  ]);
 
   const handleClaim = useCallback(async () => {
     if (!connection || !walletPubkey || !lpUser || !rewardsAccount || !program) {
