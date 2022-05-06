@@ -9,6 +9,8 @@ import { AccountLayout } from "@solana/spl-token";
 import { createNativeSOLHandlingTransactions } from "../utils";
 import { SwapInfo, DeltafiUser } from "anchor/type_definitions";
 
+const ZERO_ADDRESS = "11111111111111111111111111111111";
+
 export async function createSwapTransaction(
   program: any,
   connection: Connection,
@@ -142,16 +144,26 @@ export async function createSwapTransaction(
 
   const signers = [userTransferAuthority];
 
+  const hasReferrer = referrer != null && referrer.toBase58() !== ZERO_ADDRESS;
   if (!deltafiUser) {
-    const createDeltafiUserTransaction = program.transaction.createDeltafiUser(deltafiUserBump, {
-      accounts: {
-        marketConfig: new PublicKey(deployConfigV2.marketConfig),
-        owner: walletPubkey,
-        deltafiUser: deltafiUserPubkey,
-        systemProgram: web3.SystemProgram.programId,
-        rent: web3.SYSVAR_RENT_PUBKEY,
-      },
-    });
+    const accounts = {
+      marketConfig: new PublicKey(deployConfigV2.marketConfig),
+      owner: walletPubkey,
+      deltafiUser: deltafiUserPubkey,
+      systemProgram: web3.SystemProgram.programId,
+      rent: web3.SYSVAR_RENT_PUBKEY,
+    };
+    const createDeltafiUserTransaction = hasReferrer
+      ? program.transaction.createDeltafiUserWithReferrer(deltafiUserBump, {
+          accounts:
+            accounts +
+            {
+              referrer: referrer,
+            },
+        })
+      : program.transaction.createDeltafiUser(deltafiUserBump, {
+          accounts: accounts,
+        });
     transaction = mergeTransactions([createDeltafiUserTransaction, transaction]);
   }
 
