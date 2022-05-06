@@ -14,7 +14,7 @@ import styled from "styled-components";
 import { DropDownProps } from "./types";
 import { ArrowDown } from "components";
 import { useDarkMode } from "providers/theme";
-import { getTokenConfigBySymbol, TokenConfig } from "constants/deployConfig";
+import { getTokenConfigBySymbol, TokenConfig } from "constants/deployConfigV2";
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
