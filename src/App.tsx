@@ -137,6 +137,14 @@ const App: React.FC = () => {
     setNetwork(deployConfigV2.network);
   }, [setNetwork]);
 
+  useEffect(() => {
+    dispatch(appActions.setConnection(connection));
+  }, [connection, dispatch]);
+
+  useEffect(() => {
+    dispatch(appActions.setWallet(wallet));
+  }, [connection, wallet]);
+
   return (
     <BrowserRouter>
       <Header />
