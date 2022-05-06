@@ -14,7 +14,7 @@ import { createReferrerDeltafiTokenAccount } from "utils/transactions/createRefe
 import { sendSignedTransaction } from "utils/transactions";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
-import { fecthTokenAccountInfoList } from "states/tokenAccountState";
+import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { DELTAFI_TOKEN_MINT } from "constants/index";
 import { selectTokenAccountInfoByMint } from "states/selectorsV2";
 /*

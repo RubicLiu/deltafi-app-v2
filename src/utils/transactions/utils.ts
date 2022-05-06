@@ -12,7 +12,7 @@ import { MARKET_CONFIG_ADDRESS, SWAP_PROGRAM_ID } from "constants/index";
 import { MarketConfig } from "providers/types";
 import { UserReferrerDataLayout, USER_REFERRER_DATA_SIZE } from "lib/state";
 import { createSetReferrerInstruction } from "lib/instructions";
-import { TokenAccountInfo } from "states/tokenAccountState";
+import { TokenAccountInfo } from "states/accounts/tokenAccount";
 
 export const dummyAddress = "66666666666666666666666666666666666666666666";
 
