@@ -431,7 +431,6 @@ const Deposit: React.FC = () => {
       );
     }
   }, [
-    wallet,
     connection,
     poolConfig,
     swapInfo,

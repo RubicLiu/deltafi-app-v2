@@ -16,7 +16,7 @@ import { deltafiUserSelector, programSelector, rewardViewSelector } from "states
 import { rewardViewActions } from "states/views/rewardView";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 import { createDeltafiUserTransaction } from "utils/transactions/deltafiUser";
-import { program } from "@project-serum/anchor/dist/cjs/spl/token";
+
 /*
  * mockup test data for reward page
  */
@@ -198,7 +198,7 @@ const Home: React.FC = (props) => {
         }),
       );
     }
-  }, [dispatch, walletPubkey, connection, signTransaction, wallet, program]);
+  }, [dispatch, walletPubkey, connection, signTransaction, program]);
 
   return (
     <Page>

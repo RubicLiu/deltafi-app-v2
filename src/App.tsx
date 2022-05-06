@@ -24,7 +24,6 @@ import { fetchPythDataThunk } from "states/accounts/pythAccount";
 import { fetchTokenAccountsV2Thunk } from "states/accounts/tokenAccount";
 import { deployConfigV2, enableReferral } from "constants/deployConfigV2";
 import { fetchSerumDataThunk } from "states/serumState";
-import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { appActions } from "states/appState";
 import { programSelector } from "states";
 
@@ -141,7 +140,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     dispatch(appActions.setWallet(wallet));
-  }, [connection, wallet]);
+  }, [wallet, dispatch]);
 
   return (
     <BrowserRouter>

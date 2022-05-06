@@ -46,7 +46,6 @@ import {
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
-  deployConfigV2,
   enableReferral,
   getPoolConfigBySymbols,
   getTokenConfigBySymbol,
@@ -56,7 +55,6 @@ import {
 import { swapViewActions } from "states/views/swapView";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { createSwapTransaction } from "utils/transactions/swap";
-import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { BN } from "@project-serum/anchor";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 

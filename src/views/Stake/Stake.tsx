@@ -44,8 +44,6 @@ import {
   createStakeTransaction,
   createUnstakeTransaction,
 } from "utils/transactions/stake";
-import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
-import { PublicKey } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
@@ -370,17 +368,7 @@ const Stake = (): ReactElement => {
         dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
       }
     }
-  }, [
-    connection,
-    walletPubkey,
-    staking,
-    signTransaction,
-    dispatch,
-    wallet,
-    poolConfig,
-    lpUser,
-    program,
-  ]);
+  }, [connection, walletPubkey, staking, signTransaction, dispatch, poolConfig, lpUser, program]);
 
   const handleClaim = useCallback(async () => {
     if (!connection || !walletPubkey || !lpUser || !rewardsAccount || !program) {
@@ -431,7 +419,6 @@ const Stake = (): ReactElement => {
     walletPubkey,
     signTransaction,
     dispatch,
-    wallet,
     poolConfig,
     lpUser,
     rewardsAccount,
