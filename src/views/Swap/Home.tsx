@@ -223,10 +223,8 @@ const Home: React.FC = (props) => {
           marketPrice,
         );
 
-      amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
-      amountOutWithSlippage = isNaN(quoteAmountWithSlippage)
-        ? ""
-        : Number(quoteAmountWithSlippage).toString();
+      amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
+      amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
     }
     dispatch(
       swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: card.amount }),
@@ -259,10 +257,8 @@ const Home: React.FC = (props) => {
           marketPrice,
         );
 
-      amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
-      amountOutWithSlippage = isNaN(quoteAmountWithSlippage)
-        ? ""
-        : Number(quoteAmountWithSlippage).toString();
+      amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
+      amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
     }
     dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom }));
     dispatch(
