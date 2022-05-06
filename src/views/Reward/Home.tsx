@@ -9,14 +9,14 @@ import CopyLinkButton from "./components/CopyLinkButton";
 import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from "components";
 import copy from "copy-to-clipboard";
 
-import { deployConfig } from "constants/deployConfig";
 import { createReferrerDeltafiTokenAccount } from "utils/transactions/createReferrerDeltafiTokenAccount";
 import { sendSignedTransaction } from "utils/transactions";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 import { DELTAFI_TOKEN_MINT } from "constants/index";
-import { deltafiUserSelector, rewardViewSelector, selectTokenAccountInfoByMint } from "states/selectorsV2";
+import { deltafiUserSelector, rewardViewSelector } from "states/selectorsV2";
+import { rewardViewActions } from "states/views/rewardView";
 /*
  * mockup test data for reward page
  */
@@ -141,26 +141,25 @@ const Home: React.FC = (props) => {
 
   const rewardView = useSelector(rewardViewSelector);
   const deltafiUser = useSelector(deltafiUserSelector);
-
-  const deltafiTokenAccount = useSelector(
-    selectTokenAccountInfoByMint(deployConfig.deltafiTokenMint),
-  );
-
-  const [referralLinkState, setReferralLinkState] = useState<
-    "Unavailable" | "Ready" | "Copied" | "Processing"
-  >(deltafiTokenAccount ? "Ready" : "Unavailable");
-
-  const [referralLink, setReferralLink] = useState("");
+  const referralLinkState = rewardView.referralLinkState;
+  const referralLink = rewardView.referralLink;
 
   useEffect(() => {
-    setReferralLinkState(deltafiTokenAccount?.publicKey ? "Ready" : "Unavailable");
-    if (!deltafiTokenAccount?.publicKey) {
+    const hasDeltafiUser = deltafiUser?.user != null;
+    dispatch(
+      rewardViewActions.setReferralLinkState({
+        referralLinkState: hasDeltafiUser ? "Ready" : "Unavailable",
+      }),
+    );
+
+    if (!hasDeltafiUser) {
       return;
     }
-    setReferralLink(
-      process.env.REACT_APP_LOCAL_HOST + "?referrer=" + deltafiTokenAccount?.publicKey.toBase58(),
-    );
-  }, [isConnectedWallet, deltafiTokenAccount?.publicKey]);
+
+    const referralLink =
+      process.env.REACT_APP_LOCAL_HOST + "?referrer=" + deltafiUser?.user?.publicKey.toBase58();
+    dispatch(rewardViewActions.setReferralLink({ referralLink }));
+  }, [isConnectedWallet, deltafiUser, dispatch]);
 
   return (
     <Page>
@@ -234,7 +233,11 @@ const Home: React.FC = (props) => {
                           <CopyLinkButton
                             onClick={async () => {
                               try {
-                                setReferralLinkState("Processing");
+                                dispatch(
+                                  rewardViewActions.setReferralLinkState({
+                                    referralLinkState: "Processing",
+                                  }),
+                                );
                                 let transaction = await createReferrerDeltafiTokenAccount({
                                   connection,
                                   walletPubkey,
@@ -252,10 +255,18 @@ const Home: React.FC = (props) => {
                                   dispatch,
                                 );
 
-                                setReferralLinkState("Ready");
+                                dispatch(
+                                  rewardViewActions.setReferralLinkState({
+                                    referralLinkState: "Ready",
+                                  }),
+                                );
                               } catch (e) {
                                 console.error(e);
-                                setReferralLinkState("Unavailable");
+                                dispatch(
+                                  rewardViewActions.setReferralLinkState({
+                                    referralLinkState: "Unavailable",
+                                  }),
+                                );
                               }
                             }}
                           >
@@ -268,8 +279,20 @@ const Home: React.FC = (props) => {
                           <CopyLinkButton
                             onClick={() => {
                               copy(referralLink);
-                              setReferralLinkState("Copied");
-                              setTimeout(() => setReferralLinkState("Ready"), 5000);
+                              dispatch(
+                                rewardViewActions.setReferralLinkState({
+                                  referralLinkState: "Copied",
+                                }),
+                              );
+                              setTimeout(
+                                () =>
+                                  dispatch(
+                                    rewardViewActions.setReferralLinkState({
+                                      referralLinkState: "Ready",
+                                    }),
+                                  ),
+                                5000,
+                              );
                             }}
                           >
                             {"Copy Link"}
