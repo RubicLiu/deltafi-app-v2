@@ -199,7 +199,7 @@ const Home: React.FC = (props) => {
         }),
       );
     }
-  }, [dispatch]);
+  }, [dispatch, walletPubkey, connection, signTransaction, wallet]);
 
   return (
     <Page>
