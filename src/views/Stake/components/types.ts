@@ -1,6 +1,5 @@
 import BigNumber from "bignumber.js";
-import { TokenConfig } from "constants/deployConfig";
-import { PoolConfig } from "constants/deployConfigV2";
+import { PoolConfig, TokenConfig } from "constants/deployConfigV2";
 
 export interface SettingsProps {
   priceImpact: string;
