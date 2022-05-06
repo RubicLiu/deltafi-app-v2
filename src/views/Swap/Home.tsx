@@ -286,7 +286,6 @@ const Home: React.FC = (props) => {
     dispatch(swapViewActions.setIsProcessing({ isProcessing: true }));
     try {
       const referrer = enableReferral ? deltafiUser?.referrer : app.referrer;
-      console.info(referrer?.toBase58());
 
       const amountIn = BigInt(
         exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString(),
