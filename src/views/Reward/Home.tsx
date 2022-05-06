@@ -18,7 +18,7 @@ import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { deployConfigV2 } from "constants/deployConfigV2";
 import { PublicKey } from "@solana/web3.js";
-import { createDeltafiUserTransaction } from "utils/transactions/v2/deltafiUser";
+import { createDeltafiUserTransaction } from "utils/transactions/deltafiUser";
 /*
  * mockup test data for reward page
  */
