@@ -33,86 +33,93 @@ export function getSwapOutAmount(
   fee: number;
   priceImpact: number;
 } {
-  return {
-    amountIn: new BigNumber(amount).toNumber(),
-    amountOut: 0,
-    amountOutWithSlippage: 0,
-    fee: 0,
-    priceImpact: 0,
-  };
-  //  // TODO(leqiang): use v2 formula
-  //  // if the confidence interval is not enabled, we use fair market price for both adjusted
-  //  // market price
-  //  if (!(marketPriceHigh && marketPriceLow) || pool.swapConfig.enableConfidenceInterval === false) {
-  //    marketPriceHigh = marketPrice;
-  //    marketPriceLow = marketPrice;
-  //  }
-  //
-  //  if (fromToken.mint === pool.mintBase.toBase58() && toToken.mint === pool.mintQuote.toBase58()) {
-  //    // sell base case
-  //    const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
-  //      marketPriceLow,
-  //      pool.mintBaseDecimals,
-  //      pool.mintQuoteDecimals,
-  //    );
-  //    const rawAmountOut: number = getSwapOutAmountSellBase(
-  //      pool,
-  //      new BigNumber(amount),
-  //      normalizedMaketPrice,
-  //    );
-  //
-  //    return generateResultFromAmountOut(
-  //      new BigNumber(pool.poolState.baseReserve.toString()),
-  //      new BigNumber(pool.poolState.quoteReserve.toString()),
-  //      new BigNumber(pool.poolState.targetBaseReserve.toString()),
-  //      new BigNumber(pool.poolState.targetQuoteReserve.toString()),
-  //      parseFloat(amount),
-  //      rawAmountOut,
-  //      maxSlippage,
-  //      pool.swapConfig,
-  //      new BigNumber(normalizedMaketPrice),
-  //    );
-  //  } else if (
-  //    fromToken.mint === pool.mintQuote.toBase58() &&
-  //    toToken.mint === pool.mintBase.toBase58()
-  //  ) {
-  //    // sell quote case
-  //    const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
-  //      marketPriceHigh,
-  //      pool.mintBaseDecimals,
-  //      pool.mintQuoteDecimals,
-  //    );
-  //    const rawAmountOut: number = getSwapOutAmountSellQuote(
-  //      pool,
-  //      new BigNumber(amount),
-  //      normalizedMaketPrice,
-  //    );
-  //
-  //    return generateResultFromAmountOut(
-  //      new BigNumber(pool.poolState.quoteReserve.toString()),
-  //      new BigNumber(pool.poolState.baseReserve.toString()),
-  //      new BigNumber(pool.poolState.targetQuoteReserve.toString()),
-  //      new BigNumber(pool.poolState.targetBaseReserve.toString()),
-  //      parseFloat(amount),
-  //      rawAmountOut,
-  //      maxSlippage,
-  //      pool.swapConfig,
-  //      new BigNumber(1).dividedBy(new BigNumber(normalizedMaketPrice)),
-  //    );
-  //  }
-  //
-  //  // if the above if - else-if condition is not satisfied
-  //  // the input from/to mint addresses do not match the pool's base and quote mint address
-  //  throw Error(
-  //    "Wrong to and from token mint: " +
-  //      toToken.mint +
-  //      " " +
-  //      fromToken.mint +
-  //      ", pool's base and quote tokens are: " +
-  //      pool.mintBase.toBase58() +
-  //      " " +
-  //      pool.mintQuote.toBase58(),
-  //  );
+  if (isNaN(parseFloat(amount))) {
+    return {
+      amountIn: 0,
+      amountOut: 0,
+      amountOutWithSlippage: 0,
+      fee: 0,
+      priceImpact: 0,
+    };
+  }
+  if (parseFloat(amount) < 0) {
+    throw Error(`invalid amount input: ${amount}`);
+  }
+
+  // if the confidence interval is not enabled, we use fair market price for both adjusted
+  // market price
+  if (!(marketPriceHigh && marketPriceLow) || pool.swapConfig.enableConfidenceInterval === false) {
+    marketPriceHigh = marketPrice;
+    marketPriceLow = marketPrice;
+  }
+
+  if (fromToken.mint === pool.mintBase.toBase58() && toToken.mint === pool.mintQuote.toBase58()) {
+    // sell base case
+    const rawAmountIn: BigNumber = new BigNumber(amount).multipliedBy(
+      new BigNumber(10).pow(pool.mintBaseDecimals),
+    );
+    const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
+      marketPriceLow,
+      pool.mintBaseDecimals,
+      pool.mintQuoteDecimals,
+    );
+    const rawAmountOut: number = getSwapOutAmountSellBase(pool, rawAmountIn, normalizedMaketPrice);
+
+    return generateResultFromAmountOut(
+      new BigNumber(pool.poolState.baseReserve.toString()),
+      new BigNumber(pool.poolState.quoteReserve.toString()),
+      new BigNumber(pool.poolState.targetBaseReserve.toString()),
+      new BigNumber(pool.poolState.targetQuoteReserve.toString()),
+      parseFloat(amount),
+      new BigNumber(rawAmountOut)
+        .dividedBy(new BigNumber(10).pow(pool.mintQuoteDecimals))
+        .toNumber(),
+      maxSlippage,
+      pool.swapConfig,
+      new BigNumber(normalizedMaketPrice),
+    );
+  } else if (
+    fromToken.mint === pool.mintQuote.toBase58() &&
+    toToken.mint === pool.mintBase.toBase58()
+  ) {
+    // sell quote case
+    const rawAmountIn: BigNumber = new BigNumber(amount).multipliedBy(
+      new BigNumber(10).pow(pool.mintQuoteDecimals),
+    );
+    const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
+      marketPriceHigh,
+      pool.mintBaseDecimals,
+      pool.mintQuoteDecimals,
+    );
+    const rawAmountOut: number = getSwapOutAmountSellQuote(pool, rawAmountIn, normalizedMaketPrice);
+
+    return generateResultFromAmountOut(
+      new BigNumber(pool.poolState.quoteReserve.toString()),
+      new BigNumber(pool.poolState.baseReserve.toString()),
+      new BigNumber(pool.poolState.targetQuoteReserve.toString()),
+      new BigNumber(pool.poolState.targetBaseReserve.toString()),
+      parseFloat(amount),
+      new BigNumber(rawAmountOut)
+        .dividedBy(new BigNumber(10).pow(pool.mintBaseDecimals))
+        .toNumber(),
+      maxSlippage,
+      pool.swapConfig,
+      new BigNumber(1).dividedBy(new BigNumber(normalizedMaketPrice)),
+    );
+  }
+
+  // if the above if - else-if condition is not satisfied
+  // the input from/to mint addresses do not match the pool's base and quote mint address
+  throw Error(
+    "Wrong to and from token mint: " +
+      toToken.mint +
+      " " +
+      fromToken.mint +
+      ", pool's base and quote tokens are: " +
+      pool.mintBase.toBase58() +
+      " " +
+      pool.mintQuote.toBase58(),
+  );
 }
 
 /**
