@@ -27,7 +27,6 @@ export function getSwapOutAmount(
   marketPriceLow?: BigNumber,
   marketPriceHigh?: BigNumber,
 ): {
-  amountIn: number;
   amountOut: number;
   amountOutWithSlippage: number;
   fee: number;
@@ -35,7 +34,6 @@ export function getSwapOutAmount(
 } {
   if (isNaN(parseFloat(amount))) {
     return {
-      amountIn: 0,
       amountOut: 0,
       amountOutWithSlippage: 0,
       fee: 0,
@@ -55,56 +53,60 @@ export function getSwapOutAmount(
 
   if (fromToken.mint === pool.mintBase.toBase58() && toToken.mint === pool.mintQuote.toBase58()) {
     // sell base case
-    const rawAmountIn: BigNumber = new BigNumber(amount).multipliedBy(
-      new BigNumber(10).pow(pool.mintBaseDecimals),
+    const rawAmountIn: BigNumber = multipliedByDecimals(
+      new BigNumber(amount),
+      pool.mintBaseDecimals,
     );
     const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
       marketPriceLow,
       pool.mintBaseDecimals,
       pool.mintQuoteDecimals,
     );
-    const rawAmountOut: number = getSwapOutAmountSellBase(pool, rawAmountIn, normalizedMaketPrice);
+    const rawAmountOut: BigNumber = new BigNumber(
+      getSwapOutAmountSellBase(pool, rawAmountIn, normalizedMaketPrice),
+    );
 
     return generateResultFromAmountOut(
       new BigNumber(pool.poolState.baseReserve.toString()),
       new BigNumber(pool.poolState.quoteReserve.toString()),
       new BigNumber(pool.poolState.targetBaseReserve.toString()),
       new BigNumber(pool.poolState.targetQuoteReserve.toString()),
-      parseFloat(amount),
-      new BigNumber(rawAmountOut)
-        .dividedBy(new BigNumber(10).pow(pool.mintQuoteDecimals))
-        .toNumber(),
+      rawAmountIn,
+      rawAmountOut,
       maxSlippage,
       pool.swapConfig,
       new BigNumber(normalizedMaketPrice),
+      pool.mintQuoteDecimals,
     );
   } else if (
     fromToken.mint === pool.mintQuote.toBase58() &&
     toToken.mint === pool.mintBase.toBase58()
   ) {
     // sell quote case
-    const rawAmountIn: BigNumber = new BigNumber(amount).multipliedBy(
-      new BigNumber(10).pow(pool.mintQuoteDecimals),
+    const rawAmountIn: BigNumber = multipliedByDecimals(
+      new BigNumber(amount),
+      pool.mintQuoteDecimals,
     );
     const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
       marketPriceHigh,
       pool.mintBaseDecimals,
       pool.mintQuoteDecimals,
     );
-    const rawAmountOut: number = getSwapOutAmountSellQuote(pool, rawAmountIn, normalizedMaketPrice);
+    const rawAmountOut: BigNumber = new BigNumber(
+      getSwapOutAmountSellQuote(pool, rawAmountIn, normalizedMaketPrice),
+    );
 
     return generateResultFromAmountOut(
       new BigNumber(pool.poolState.quoteReserve.toString()),
       new BigNumber(pool.poolState.baseReserve.toString()),
       new BigNumber(pool.poolState.targetQuoteReserve.toString()),
       new BigNumber(pool.poolState.targetBaseReserve.toString()),
-      parseFloat(amount),
-      new BigNumber(rawAmountOut)
-        .dividedBy(new BigNumber(10).pow(pool.mintBaseDecimals))
-        .toNumber(),
+      rawAmountIn,
+      rawAmountOut,
       maxSlippage,
       pool.swapConfig,
       new BigNumber(1).dividedBy(new BigNumber(normalizedMaketPrice)),
+      pool.mintBaseDecimals,
     );
   }
 
@@ -208,41 +210,43 @@ export function generateResultFromAmountOut(
   currentReserveB: BigNumber,
   targetReserveA: BigNumber,
   targetReserveB: BigNumber,
-  amountIn: number,
-  rawAmountOut: number,
+  rawAmountIn: BigNumber,
+  rawGrossAmountOut: BigNumber,
   maxSlippage: number,
   swapConfig: SwapConfig,
   marketPriceInforOut: BigNumber,
+  mintDecimalsB: number,
 ): {
-  amountIn: number;
   amountOut: number;
   amountOutWithSlippage: number;
   fee: number;
   priceImpact: number;
 } {
-  const tradeFee: BigNumber = new BigNumber(rawAmountOut)
+  const rawTradeFee: BigNumber = new BigNumber(rawGrossAmountOut)
     .multipliedBy(new BigNumber(swapConfig.tradeFeeNumerator.toString()))
     .dividedBy(swapConfig.tradeFeeDenominator.toString());
 
-  const amountOutWithTradeFee: BigNumber = new BigNumber(rawAmountOut).minus(tradeFee);
-  const amountFromSlippage: BigNumber = amountOutWithTradeFee
+  const rawAmountOutWithTradeFee: BigNumber = new BigNumber(rawGrossAmountOut).minus(rawTradeFee);
+  const rawAmountFromSlippage: BigNumber = rawAmountOutWithTradeFee
     .multipliedBy(maxSlippage)
     .dividedBy(100);
-  const amountOutWithTradeFeeWithSlippage: BigNumber =
-    amountOutWithTradeFee.minus(amountFromSlippage);
+  const rawAmountOutWithTradeFeeWithSlippage: BigNumber =
+    rawAmountOutWithTradeFee.minus(rawAmountFromSlippage);
 
   return {
-    amountIn,
-    amountOut: amountOutWithTradeFee.toNumber(),
-    amountOutWithSlippage: amountOutWithTradeFeeWithSlippage.toNumber(),
-    fee: tradeFee.toNumber(),
+    amountOut: dividedByDecimals(rawAmountOutWithTradeFee, mintDecimalsB).toNumber(),
+    amountOutWithSlippage: dividedByDecimals(
+      rawAmountOutWithTradeFeeWithSlippage,
+      mintDecimalsB,
+    ).toNumber(),
+    fee: dividedByDecimals(rawTradeFee, mintDecimalsB).toNumber(),
     priceImpact: calculatePriceImpact(
       currentReserveA,
       currentReserveB,
       targetReserveA,
       targetReserveB,
-      new BigNumber(amountIn),
-      new BigNumber(rawAmountOut),
+      rawAmountIn,
+      rawGrossAmountOut,
       marketPriceInforOut,
     ).toNumber(),
   };
@@ -298,10 +302,18 @@ export function normalizeMarketPriceWithDecimals(
   mintQuoteDecimals: number,
 ): BigNumber {
   if (mintBaseDecimals > mintQuoteDecimals) {
-    return marketPrice.dividedBy(new BigNumber(10).pow(mintBaseDecimals - mintQuoteDecimals));
+    return dividedByDecimals(marketPrice, mintBaseDecimals - mintQuoteDecimals);
   } else if (mintBaseDecimals < mintQuoteDecimals) {
-    return marketPrice.multipliedBy(new BigNumber(10).pow(mintQuoteDecimals - mintBaseDecimals));
+    return multipliedByDecimals(marketPrice, mintQuoteDecimals - mintBaseDecimals);
   } else {
     return marketPrice;
   }
+}
+
+export function multipliedByDecimals(multiplicand: BigNumber, decimals: number) {
+  return multiplicand.multipliedBy(new BigNumber(10).pow(decimals));
+}
+
+export function dividedByDecimals(dividend: BigNumber, decimals: number) {
+  return dividend.dividedBy(new BigNumber(10).pow(decimals));
 }
