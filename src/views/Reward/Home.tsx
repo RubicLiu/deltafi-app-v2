@@ -16,7 +16,7 @@ import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 import { DELTAFI_TOKEN_MINT } from "constants/index";
-import { selectTokenAccountInfoByMint } from "states/v2/selectorsV2";
+import { selectTokenAccountInfoByMint } from "states/selectorsV2";
 /*
  * mockup test data for reward page
  */

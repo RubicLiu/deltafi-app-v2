@@ -19,12 +19,12 @@ import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 import { PublicKey } from "@solana/web3.js";
 import { scheduleWithInterval } from "utils";
 import { AccountLayout } from "@solana/spl-token";
-import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
-import { fetchFarmsV2Thunk } from "states/v2/farmV2State";
-import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2State";
-import { fetchUserV2Thunk } from "states/v2/userV2State";
-import { fetchPythDataV2Thunk } from "states/v2/pythV2State";
-import { fetchTokenAccountsV2Thunk } from "states/v2/tokenV2State";
+import { fetchSwapsThunk } from "states/accounts/swapAccount";
+import { fetchFarmsThunk } from "states/accounts/farmAccount";
+import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
+import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
+import { fetchPythDataThunk } from "states/accounts/pythAccount";
+import { fetchTokenAccountsV2Thunk } from "states/accounts/tokenAccount";
 import { deployConfigV2 } from "constants/deployConfigV2";
 import { fetchSerumDataThunk } from "states/serumState";
 
@@ -78,7 +78,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Refresh the pyth data every 2 seconds.
-    return scheduleWithInterval(() => dispatch(fetchPythDataV2Thunk(connection)), 2 * 1000);
+    return scheduleWithInterval(() => dispatch(fetchPythDataThunk(connection)), 2 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {
@@ -88,19 +88,19 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (walletAddress) {
-      dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress }));
-      dispatch(fetchUserV2Thunk({ connection, walletAddress }));
+      dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress }));
+      dispatch(fetchDeltafiUserThunk({ connection, walletAddress }));
     }
   }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
     // Refresh the farm pool every 1 minute.
-    return scheduleWithInterval(() => dispatch(fetchFarmsV2Thunk({ connection })), 60 * 1000);
+    return scheduleWithInterval(() => dispatch(fetchFarmsThunk({ connection })), 60 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {
     // Refresh the farm pool every 1 minute.
-    return scheduleWithInterval(() => dispatch(fetchSwapsV2Thunk({ connection })), 60 * 1000);
+    return scheduleWithInterval(() => dispatch(fetchSwapsThunk({ connection })), 60 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {

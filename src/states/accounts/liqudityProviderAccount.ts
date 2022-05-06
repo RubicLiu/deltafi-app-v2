@@ -7,14 +7,14 @@ const initialState = {
   swapKeyToLp: {},
 };
 
-type FetchLiquidityProvidersV2ThunkArg = {
+type FetchLiquidityProvidersThunkArg = {
   connection: Connection;
   walletAddress: PublicKey;
 };
 
-export const fetchLiquidityProvidersV2Thunk = createAsyncThunk(
+export const fetchLiquidityProvidersThunk = createAsyncThunk(
   "v2/fetchLiquidityProviders",
-  async (arg: FetchLiquidityProvidersV2ThunkArg) => {
+  async (arg: FetchLiquidityProvidersThunkArg) => {
     const program = getDeltafiDexV2(
       new PublicKey(deployConfigV2.programId),
       makeProvider(arg.connection, arg.walletAddress),
@@ -48,8 +48,8 @@ export const fetchLiquidityProvidersV2Thunk = createAsyncThunk(
   },
 );
 
-export const liquidityProviderV2Reducer = createReducer(initialState, (builder) => {
-  builder.addCase(fetchLiquidityProvidersV2Thunk.fulfilled, (state, action) => {
+export const liquidityProviderAccountReducer = createReducer(initialState, (builder) => {
+  builder.addCase(fetchLiquidityProvidersThunk.fulfilled, (state, action) => {
     state.swapKeyToLp = action.payload.swapKeyToLp;
   });
 });

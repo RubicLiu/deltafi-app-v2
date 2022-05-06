@@ -8,14 +8,14 @@ const initialState = {
   fetched: false,
 };
 
-type FetchUserV2ThunkArg = {
+type FetchDeltafiUserThunkArg = {
   connection: Connection;
   walletAddress: PublicKey;
 };
 
-export const fetchUserV2Thunk = createAsyncThunk(
+export const fetchDeltafiUserThunk = createAsyncThunk(
   "v2/fetchUser",
-  async (arg: FetchUserV2ThunkArg) => {
+  async (arg: FetchDeltafiUserThunkArg) => {
     const program = getDeltafiDexV2(
       new PublicKey(deployConfigV2.programId),
       makeProvider(arg.connection, arg.walletAddress),
@@ -37,8 +37,8 @@ export const fetchUserV2Thunk = createAsyncThunk(
   },
 );
 
-export const userV2Reducer = createReducer(initialState, (builder) => {
-  builder.addCase(fetchUserV2Thunk.fulfilled, (state, action) => {
+export const deltafiUserAccountReducer = createReducer(initialState, (builder) => {
+  builder.addCase(fetchDeltafiUserThunk.fulfilled, (state, action) => {
     state.user = action.payload.user;
     state.fetched = true;
   });

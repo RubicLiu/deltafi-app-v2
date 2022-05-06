@@ -2,8 +2,7 @@ import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { createAction } from "@reduxjs/toolkit";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { UserReferrerDataLayout } from "lib/state";
-import { dummyAddress } from "utils/transactions/swap";
-import { getReferralDataAccountPublicKey } from "utils/transactions/utils";
+import { dummyAddress, getReferralDataAccountPublicKey } from "utils/transactions/utils";
 
 export interface AppState {
   referrerPublicKey?: PublicKey | null;
