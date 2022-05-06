@@ -112,7 +112,6 @@ const App: React.FC = () => {
       const referrer: string = window.localStorage.getItem("referrer");
       // test is the referrer string is a valid public key
       // if the referrer string is invalid, the referrer public key is undefined
-      let referrerPublicKey: PublicKey | null = null;
       if (referrer !== null && referrer !== "") {
         try {
           const program = getDeltafiDexV2(
