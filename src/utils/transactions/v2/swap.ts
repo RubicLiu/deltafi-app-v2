@@ -98,53 +98,58 @@ export async function createSwapTransaction(
     createAccountsCost += createTokenAccountCost;
   }
 
+  const hasReferrer = referrer != null && referrer.toBase58() !== ZERO_ADDRESS;
   const marketConfig = new PublicKey(deployConfigV2.marketConfig);
   const [deltafiUserPubkey, deltafiUserBump] = await PublicKey.findProgramAddress(
     [Buffer.from("User"), marketConfig.toBuffer(), walletPubkey.toBuffer()],
     program.programId,
   );
 
+  const swapAccounts = {
+    marketConfig: new PublicKey(deployConfigV2.marketConfig),
+    swapInfo: new PublicKey(poolConfig.swapInfo),
+    userSourceToken: userSourceTokenRef,
+    userDestinationToken: userDestinationTokenRef,
+    swapSourceToken,
+    swapDestinationToken,
+    deltafiUser: deltafiUserPubkey,
+    adminDestinationToken,
+    userAuthority: userTransferAuthority.publicKey,
+    tokenProgram: token.TOKEN_PROGRAM_ID,
+  };
+
   if (swapInfo.swapType.stableSwap) {
     transaction.add(
-      program.transaction.stableSwap(inAmount, minOutAmount, {
-        accounts: {
-          marketConfig: new PublicKey(deployConfigV2.marketConfig),
-          swapInfo: new PublicKey(poolConfig.swapInfo),
-          userSourceToken: userSourceTokenRef,
-          userDestinationToken: userDestinationTokenRef,
-          swapSourceToken,
-          swapDestinationToken,
-          deltafiUser: deltafiUserPubkey,
-          adminDestinationToken,
-          userAuthority: userTransferAuthority.publicKey,
-          tokenProgram: token.TOKEN_PROGRAM_ID,
-        },
-      }),
+      hasReferrer
+        ? program.transaction.stableSwapWithReferrer(inAmount, minOutAmount, {
+            accounts: swapAccounts,
+            referrer,
+          })
+        : program.transaction.stableSwap(inAmount, minOutAmount, {
+            accounts: swapAccounts,
+          }),
     );
   } else {
     transaction.add(
-      program.transaction.normalSwap(inAmount, minOutAmount, {
-        accounts: {
-          marketConfig: new PublicKey(deployConfigV2.marketConfig),
-          swapInfo: new PublicKey(poolConfig.swapInfo),
-          userSourceToken: userSourceTokenRef,
-          userDestinationToken: userDestinationTokenRef,
-          swapSourceToken,
-          swapDestinationToken,
-          pythPriceBase: swapInfo.pythPriceBase,
-          pythPriceQuote: swapInfo.pythPriceQuote,
-          deltafiUser: deltafiUserPubkey,
-          adminDestinationToken,
-          userAuthority: userTransferAuthority.publicKey,
-          tokenProgram: token.TOKEN_PROGRAM_ID,
-        },
-      }),
+      hasReferrer
+        ? program.transaction.normalSwapWithReferrer(inAmount, minOutAmount, {
+            accounts: {
+              ...swapAccounts,
+              pythPriceBase: swapInfo.pythPriceBase,
+              pythPriceQuote: swapInfo.pythPriceQuote,
+              referrer,
+            },
+          })
+        : program.transaction.normalSwap(inAmount, minOutAmount, {
+            accounts: {
+              ...swapAccounts,
+              pythPriceBase: swapInfo.pythPriceBase,
+              pythPriceQuote: swapInfo.pythPriceQuote,
+            },
+          }),
     );
   }
 
-  const signers = [userTransferAuthority];
-
-  const hasReferrer = referrer != null && referrer.toBase58() !== ZERO_ADDRESS;
   if (!deltafiUser) {
     const accounts = {
       marketConfig: new PublicKey(deployConfigV2.marketConfig),
@@ -155,11 +160,10 @@ export async function createSwapTransaction(
     };
     const createDeltafiUserTransaction = hasReferrer
       ? program.transaction.createDeltafiUserWithReferrer(deltafiUserBump, {
-          accounts:
-            accounts +
-            {
-              referrer: referrer,
-            },
+          accounts: {
+            ...accounts,
+            referrer: referrer,
+          },
         })
       : program.transaction.createDeltafiUser(deltafiUserBump, {
           accounts: accounts,
@@ -167,6 +171,7 @@ export async function createSwapTransaction(
     transaction = mergeTransactions([createDeltafiUserTransaction, transaction]);
   }
 
+  const signers = [userTransferAuthority];
   if (buySol || sellSol) {
     transaction = mergeTransactions([
       createWrappedTokenAccountTransaction,
