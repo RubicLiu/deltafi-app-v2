@@ -86,7 +86,7 @@ const Stake = (): ReactElement => {
 
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
-  const { network } = useCustomConnection();
+  const network = deployConfigV2.network;
 
   const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
