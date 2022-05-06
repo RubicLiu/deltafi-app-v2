@@ -373,7 +373,7 @@ const Stake = (): ReactElement => {
   }, [connection, walletPubkey, staking, signTransaction, dispatch, wallet, poolConfig, lpUser, program]);
 
   const handleClaim = useCallback(async () => {
-    if (!connection || !walletPubkey || !lpUser || !rewardsAccount) {
+    if (!connection || !walletPubkey || !lpUser || !rewardsAccount || !program) {
       return null;
     }
 
