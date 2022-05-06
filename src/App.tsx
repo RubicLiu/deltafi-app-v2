@@ -26,6 +26,7 @@ import { deployConfigV2, enableReferral } from "constants/deployConfigV2";
 import { fetchSerumDataThunk } from "states/serumState";
 import { appActions } from "states/appState";
 import { programSelector } from "states";
+import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -141,6 +142,16 @@ const App: React.FC = () => {
   useEffect(() => {
     dispatch(appActions.setWallet(wallet));
   }, [wallet, dispatch]);
+
+  useEffect(() => {
+    const program = !connection
+      ? null
+      : getDeltafiDexV2(
+          new PublicKey(deployConfigV2.programId),
+          wallet ? makeProvider(connection, wallet) : makeProvider(connection, {}),
+        );
+    dispatch(appActions.setProgram(program));
+  }, [connection, wallet, dispatch]);
 
   return (
     <BrowserRouter>
