@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Box, Typography, makeStyles, Theme, Grid, Paper, Link, Avatar } from "@material-ui/core";
 import Page from "components/layout/Page";
@@ -161,6 +161,45 @@ const Home: React.FC = (props) => {
     dispatch(rewardViewActions.setReferralLink({ referralLink }));
   }, [isConnectedWallet, deltafiUser, dispatch]);
 
+  const handleCreateDeltafiUser = useCallback(async () => {
+    try {
+      dispatch(
+        rewardViewActions.setReferralLinkState({
+          referralLinkState: "Processing",
+        }),
+      );
+      let transaction = await createReferrerDeltafiTokenAccount({
+        connection,
+        walletPubkey,
+      });
+      transaction = await signTransaction(transaction);
+      const hash = await sendSignedTransaction({
+        signedTransaction: transaction,
+        connection,
+      });
+      await connection.confirmTransaction(hash, "confirmed");
+      await fecthTokenAccountInfoList(
+        [DELTAFI_TOKEN_MINT.toBase58()],
+        walletPubkey,
+        connection,
+        dispatch,
+      );
+
+      dispatch(
+        rewardViewActions.setReferralLinkState({
+          referralLinkState: "Ready",
+        }),
+      );
+    } catch (e) {
+      console.error(e);
+      dispatch(
+        rewardViewActions.setReferralLinkState({
+          referralLinkState: "Unavailable",
+        }),
+      );
+    }
+  }, [dispatch]);
+
   return (
     <Page>
       <Box className={classes.root}>
@@ -231,44 +270,7 @@ const Home: React.FC = (props) => {
                       case "Unavailable": {
                         return (
                           <CopyLinkButton
-                            onClick={async () => {
-                              try {
-                                dispatch(
-                                  rewardViewActions.setReferralLinkState({
-                                    referralLinkState: "Processing",
-                                  }),
-                                );
-                                let transaction = await createReferrerDeltafiTokenAccount({
-                                  connection,
-                                  walletPubkey,
-                                });
-                                transaction = await signTransaction(transaction);
-                                const hash = await sendSignedTransaction({
-                                  signedTransaction: transaction,
-                                  connection,
-                                });
-                                await connection.confirmTransaction(hash, "confirmed");
-                                await fecthTokenAccountInfoList(
-                                  [DELTAFI_TOKEN_MINT.toBase58()],
-                                  walletPubkey,
-                                  connection,
-                                  dispatch,
-                                );
-
-                                dispatch(
-                                  rewardViewActions.setReferralLinkState({
-                                    referralLinkState: "Ready",
-                                  }),
-                                );
-                              } catch (e) {
-                                console.error(e);
-                                dispatch(
-                                  rewardViewActions.setReferralLinkState({
-                                    referralLinkState: "Unavailable",
-                                  }),
-                                );
-                              }
-                            }}
+                            onClick={handleCreateDeltafiUser}
                           >
                             {"Wallet Set Up"}
                           </CopyLinkButton>
