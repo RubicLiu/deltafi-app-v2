@@ -71,8 +71,8 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
       const { tokenFrom, tokenTo, slippage } = data;
       return getSwapOutAmount(
         poolConfig,
-        tokenFrom.token.address,
-        tokenTo.token.address,
+        tokenFrom.token,
+        tokenTo.token,
         tokenFrom.amount,
         parseFloat(slippage),
         marketPrice,

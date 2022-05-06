@@ -285,6 +285,9 @@ const Home: React.FC = (props) => {
 
     dispatch(swapViewActions.setIsProcessing({ isProcessing: true }));
     try {
+      const referrer = !enableReferral ? null : deltafiUser ? deltafiUser.referrer : app.referrer;
+      console.info(referrer);
+
       const amountIn = BigInt(
         exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString(),
       );
@@ -300,9 +303,6 @@ const Home: React.FC = (props) => {
         new PublicKey(deployConfigV2.programId),
         makeProvider(connection, wallet),
       );
-
-      const referrer = enableReferral ?  deltafiUser?.referrer || app.referrer : null;
-      console.info(referrer);
 
       let { transaction, createAccountsCost, userDestinationTokenRef } =
         await createSwapTransaction(

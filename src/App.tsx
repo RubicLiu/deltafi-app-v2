@@ -126,6 +126,7 @@ const App: React.FC = () => {
           if (referrerData.owner.equals(walletAddress)) {
             throw Error("Referrer token account is owned by current the user");
           }
+          console.info(referrerData);
           dispatch(appActions.setReferrer(new PublicKey(referrer)));
         } catch (e) {
           console.warn(e);
