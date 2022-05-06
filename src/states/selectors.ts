@@ -1,7 +1,9 @@
 import { RootState } from "./store";
 
 import { getPythMarketPrice } from "./accounts/pythAccount";
-import { getPoolConfigBySymbols, PoolConfig } from "constants/deployConfigV2";
+import { deployConfigV2, getPoolConfigBySymbols, PoolConfig } from "constants/deployConfigV2";
+import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { PublicKey } from "@solana/web3.js";
 
 export const appSelector = (state: RootState) => state.app;
 export const lpUserSelector = (state: RootState) => state.accounts.liquidityProviderAccount;
@@ -53,5 +55,17 @@ export function selectLpUserBySwapKey(swapKey: string) {
 export function selectFarmByFarmKey(farmKey: string) {
   return (state: RootState) => {
     return state.accounts.farmAccount.farmKeyToFarmInfo[farmKey];
+  };
+}
+
+export function selectProgram() {
+  return (state: RootState) => {
+    const program = getDeltafiDexV2(
+      new PublicKey(deployConfigV2.programId),
+      state.app.wallet
+        ? makeProvider(state.app.connection, state.app.wallet)
+        : makeProvider(state.app.connection, {}),
+    );
+    return program;
   };
 }
