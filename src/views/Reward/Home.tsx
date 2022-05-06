@@ -9,14 +9,16 @@ import CopyLinkButton from "./components/CopyLinkButton";
 import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from "components";
 import copy from "copy-to-clipboard";
 
-import { createReferrerDeltafiTokenAccount } from "utils/transactions/createReferrerDeltafiTokenAccount";
 import { sendSignedTransaction } from "utils/transactions";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
-import { fecthTokenAccountInfoList } from "states/tokenAccountState";
-import { DELTAFI_TOKEN_MINT } from "constants/index";
 import { deltafiUserSelector, rewardViewSelector } from "states/selectorsV2";
 import { rewardViewActions } from "states/views/rewardView";
+import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
+import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { deployConfigV2 } from "constants/deployConfigV2";
+import { PublicKey } from "@solana/web3.js";
+import { createDeltafiUserTransaction } from "utils/transactions/v2/deltafiUser";
 /*
  * mockup test data for reward page
  */
@@ -135,7 +137,8 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
 const Home: React.FC = (props) => {
   const classes = useStyles(props);
   const { setMenu } = useModal();
-  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
+  const wallet = useWallet();
+  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const { connection } = useConnection();
   const dispatch = useDispatch();
 
@@ -168,23 +171,25 @@ const Home: React.FC = (props) => {
           referralLinkState: "Processing",
         }),
       );
-      let transaction = await createReferrerDeltafiTokenAccount({
+
+      const program = getDeltafiDexV2(
+        new PublicKey(deployConfigV2.programId),
+        makeProvider(connection, wallet),
+      );
+      let transaction = await createDeltafiUserTransaction(
+        program,
         connection,
         walletPubkey,
-      });
+      );
+
       transaction = await signTransaction(transaction);
       const hash = await sendSignedTransaction({
         signedTransaction: transaction,
         connection,
       });
       await connection.confirmTransaction(hash, "confirmed");
-      await fecthTokenAccountInfoList(
-        [DELTAFI_TOKEN_MINT.toBase58()],
-        walletPubkey,
-        connection,
-        dispatch,
-      );
 
+      dispatch(fetchDeltafiUserThunk({ connection, walletAddress: walletPubkey}));
       dispatch(
         rewardViewActions.setReferralLinkState({
           referralLinkState: "Ready",
