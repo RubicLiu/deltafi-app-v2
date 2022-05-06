@@ -42,6 +42,7 @@ import {
   selectSwapBySwapKey,
   selectTokenAccountInfoByMint,
   depositViewSelector,
+  programSelector,
 } from "states/selectors";
 import { depositViewActions } from "states/views/depositView";
 import { PublicKey, Transaction } from "@solana/web3.js";
@@ -218,6 +219,7 @@ const Deposit: React.FC = () => {
   const { setMenu } = useModal();
   const { poolAddress } = useParams<{ poolAddress: string }>();
   const swapInfo = useSelector(selectSwapBySwapKey(poolAddress));
+  const program = useSelector(programSelector);
 
   const poolConfig = getPoolConfigBySwapKey(poolAddress);
   const baseTokenInfo = poolConfig.baseTokenInfo;
@@ -345,7 +347,7 @@ const Deposit: React.FC = () => {
   const handleDeposit = useCallback(async () => {
     let transaction: Transaction;
 
-    if (!connection || !swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount) {
+    if (!connection || !swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount || !program) {
       return null;
     }
 
@@ -358,11 +360,6 @@ const Deposit: React.FC = () => {
       }
 
       dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
-      const program = getDeltafiDexV2(
-        new PublicKey(deployConfigV2.programId),
-        makeProvider(connection, wallet),
-      );
-
       const baseAmount = new BigNumber(base.amount).multipliedBy(
         new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
       );
@@ -438,12 +435,13 @@ const Deposit: React.FC = () => {
     dispatch,
     lpUser,
     depositView,
+    program,
   ]);
 
   const handleWithdraw = useCallback(async () => {
     let transaction: Transaction;
 
-    if (!connection || !swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount) {
+    if (!connection || !swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount || !program) {
       return null;
     }
 
@@ -534,6 +532,7 @@ const Deposit: React.FC = () => {
     signTransaction,
     dispatch,
     depositView,
+    program,
   ]);
 
   const handleSnackBarClose = useCallback(() => {

@@ -12,13 +12,11 @@ import copy from "copy-to-clipboard";
 import { sendSignedTransaction } from "utils/transactions";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
-import { deltafiUserSelector, rewardViewSelector } from "states/selectors";
+import { deltafiUserSelector, programSelector, rewardViewSelector } from "states/selectors";
 import { rewardViewActions } from "states/views/rewardView";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
-import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
-import { deployConfigV2 } from "constants/deployConfigV2";
-import { PublicKey } from "@solana/web3.js";
 import { createDeltafiUserTransaction } from "utils/transactions/deltafiUser";
+import { program } from "@project-serum/anchor/dist/cjs/spl/token";
 /*
  * mockup test data for reward page
  */
@@ -141,6 +139,7 @@ const Home: React.FC = (props) => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const { connection } = useConnection();
   const dispatch = useDispatch();
+  const program = useSelector(programSelector);
 
   const rewardView = useSelector(rewardViewSelector);
   const deltafiUser = useSelector(deltafiUserSelector);
@@ -166,16 +165,16 @@ const Home: React.FC = (props) => {
 
   const handleCreateDeltafiUser = useCallback(async () => {
     try {
+      if (!program) {
+        return;
+      }
+
       dispatch(
         rewardViewActions.setReferralLinkState({
           referralLinkState: "Processing",
         }),
       );
 
-      const program = getDeltafiDexV2(
-        new PublicKey(deployConfigV2.programId),
-        makeProvider(connection, wallet),
-      );
       let transaction = await createDeltafiUserTransaction(program, connection, walletPubkey);
 
       transaction = await signTransaction(transaction);
@@ -199,7 +198,7 @@ const Home: React.FC = (props) => {
         }),
       );
     }
-  }, [dispatch, walletPubkey, connection, signTransaction, wallet]);
+  }, [dispatch, walletPubkey, connection, signTransaction, wallet, program]);
 
   return (
     <Page>

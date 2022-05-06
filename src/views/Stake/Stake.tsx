@@ -253,7 +253,7 @@ const Stake = (): ReactElement => {
   );
 
   const handleStake = useCallback(async () => {
-    if (!connection || !walletPubkey || !lpUser) {
+    if (!connection || !walletPubkey || !lpUser || !program) {
       return null;
     }
 
@@ -377,11 +377,6 @@ const Stake = (): ReactElement => {
       return null;
     }
 
-    const program = getDeltafiDexV2(
-      new PublicKey(deployConfigV2.programId),
-      makeProvider(connection, wallet),
-    );
-
     try {
       dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: true }));
       const transaction = await createClaimFarmRewardsTransaction(
@@ -430,6 +425,7 @@ const Stake = (): ReactElement => {
     poolConfig,
     lpUser,
     rewardsAccount,
+    program,
   ]);
 
   const handleSnackBarClose = useCallback(() => {

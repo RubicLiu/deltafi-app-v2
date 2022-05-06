@@ -41,6 +41,7 @@ import {
   selectSwapBySwapKey,
   deltafiUserSelector,
   appSelector,
+  programSelector,
 } from "states/selectors";
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
@@ -148,6 +149,7 @@ const Home: React.FC = (props) => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const { connection } = useConnection();
   const app = useSelector(appSelector);
+  const program = useSelector(programSelector);
 
   const swapView = useSelector(swapViewSelector);
   const tokenFrom = swapView.tokenFrom;
@@ -275,7 +277,7 @@ const Home: React.FC = (props) => {
   };
 
   const swapCallback = useCallback(async () => {
-    if (!swapInfo || !sourceAccount || !walletPubkey) {
+    if (!swapInfo || !sourceAccount || !walletPubkey || !program) {
       return null;
     }
 
@@ -297,11 +299,6 @@ const Home: React.FC = (props) => {
         tokenFrom.token.mint === swapInfo.mintBase.toBase58()
           ? SWAP_DIRECTION.SellBase
           : SWAP_DIRECTION.SellQuote;
-
-      const program = getDeltafiDexV2(
-        new PublicKey(deployConfigV2.programId),
-        makeProvider(connection, wallet),
-      );
 
       let { transaction, createAccountsCost, userDestinationTokenRef } =
         await createSwapTransaction(
@@ -426,6 +423,7 @@ const Home: React.FC = (props) => {
     signTransaction,
     dispatch,
     app,
+    program,
   ]);
 
   const handleSwap = useCallback(async () => {
