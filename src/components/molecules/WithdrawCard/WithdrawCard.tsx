@@ -8,7 +8,7 @@ import clx from "classnames";
 import { DropDown } from "components";
 import useStyles from "./styles";
 import { SwapCard } from "views/Swap/components/types";
-import { tokenConfigs } from "constants/deployConfig";
+import { tokenConfigs } from "constants/deployConfigV2";
 
 export interface SettingsProps {
   priceImpact: string;

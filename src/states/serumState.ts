@@ -1,11 +1,12 @@
 import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { PublicKey, Connection } from "@solana/web3.js";
-import { deployConfig, poolConfigsWithSerum } from "constants/deployConfig";
 import { Market } from "@project-serum/serum";
 import BigNumber from "bignumber.js";
-import { PoolConfig } from "constants/deployConfigV2";
+import { PoolConfig, deployConfigV2 } from "constants/deployConfigV2";
 
-const serumProgramId = new PublicKey(deployConfig.serumProgramId);
+// TODO(zhen): Add it to v2 config
+const serumProgramId = null;
+const poolConfigsWithSerum = [];
 
 export type SerumNameToMarketPrice = Record<string, number>;
 
@@ -22,7 +23,7 @@ export const fetchSerumDataThunk = createAsyncThunk(
   async (connection: Connection) => {
     const poolNameToSerumPrice: SerumNameToMarketPrice = {};
     // Only "mainnet-beta" has serumProgramId
-    if (deployConfig.network === "mainnet-beta") {
+    if (deployConfigV2.network === "mainnet-beta") {
       const serumMarketNameAndPriceList = await getSerumMarketNameAndPriceList(connection);
       for (const marketNameAndPrice of serumMarketNameAndPriceList) {
         poolNameToSerumPrice[marketNameAndPrice.poolName] = marketNameAndPrice.marketPrice;

@@ -36,7 +36,7 @@ import {
   selectTokenAccountInfoByMint,
 } from "states/selectors";
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
-import { tokenConfigs } from "constants/deployConfig";
+import { tokenConfigs } from "constants/deployConfigV2";
 import { stakeViewActions } from "states/views/stakeView";
 import {
   createClaimFarmRewardsTransaction,

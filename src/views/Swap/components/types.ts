@@ -1,4 +1,4 @@
-import { TokenConfig } from "constants/deployConfig";
+import { TokenConfig } from "constants/deployConfigV2";
 
 export interface SettingsProps {
   priceImpact: string;
