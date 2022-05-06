@@ -5,6 +5,8 @@ export const deployConfigV2 = fullDeployConfigV2[deployMode];
 export const DELTAFI_TOKEN_DECIMALS = 6; // our token is always with 6 decimals
 export const DELTAFI_TOKEN_SYMBOL = "DELFI";
 
+export const enableReferral = true;
+
 export type PoolConfig = {
   name: string;
   base: string;
