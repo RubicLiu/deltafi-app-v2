@@ -1659,14 +1659,6 @@ export type DeltafiDexV2 = {
             "type": "u128"
           },
           {
-            "name": "baseVirtualReserve",
-            "type": "u64"
-          },
-          {
-            "name": "quoteVirtualReserve",
-            "type": "u64"
-          },
-          {
             "name": "adminTradeFeeNumerator",
             "type": "u64"
           },
@@ -2139,6 +2131,11 @@ export type DeltafiDexV2 = {
       "code": 6062,
       "name": "InvalidFarmConfig",
       "msg": "Invalid farm config"
+    },
+    {
+      "code": 6063,
+      "name": "InsufficientPoolReserve",
+      "msg": "Insufficient pool reserve"
     }
   ]
 };
@@ -3804,14 +3801,6 @@ export const IDL: DeltafiDexV2 = {
             "type": "u128"
           },
           {
-            "name": "baseVirtualReserve",
-            "type": "u64"
-          },
-          {
-            "name": "quoteVirtualReserve",
-            "type": "u64"
-          },
-          {
             "name": "adminTradeFeeNumerator",
             "type": "u64"
           },
@@ -4284,6 +4273,11 @@ export const IDL: DeltafiDexV2 = {
       "code": 6062,
       "name": "InvalidFarmConfig",
       "msg": "Invalid farm config"
+    },
+    {
+      "code": 6063,
+      "name": "InsufficientPoolReserve",
+      "msg": "Insufficient pool reserve"
     }
   ]
 };
