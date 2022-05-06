@@ -8,7 +8,7 @@ import { useModal } from "providers/modal";
 import { getSwapOutAmount } from "utils/swap";
 import { fixedNumber } from "utils/utils";
 import { useSelector } from "react-redux";
-import { selectMarketPriceByPool, selectSwapBySwapKey } from "states/selectorsV2";
+import { selectMarketPriceByPool, selectSwapBySwapKey } from "states/selectors";
 import { getPoolConfigBySymbols, PoolConfig } from "constants/deployConfigV2";
 
 interface IConfirmSwapPanelProps {
