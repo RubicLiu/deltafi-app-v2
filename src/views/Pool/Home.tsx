@@ -8,12 +8,7 @@ import PoolCard from "./components/Card";
 import { convertDollar, getTokenTvl } from "utils/utils";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { useSelector } from "react-redux";
-import {
-  pythSelector,
-  poolSelector,
-  tokenAccountSelector,
-  lpUserSelector,
-} from "states/selectorsV2";
+import { pythSelector, poolSelector, tokenAccountSelector, lpUserSelector } from "states/selectors";
 import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
 import { getPythMarketPrice } from "states/accounts/pythAccount";
 

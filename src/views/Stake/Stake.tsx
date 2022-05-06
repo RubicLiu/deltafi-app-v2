@@ -34,7 +34,7 @@ import {
   selectFarmByFarmKey,
   stakeViewSelector,
   selectTokenAccountInfoByMint,
-} from "states/selectorsV2";
+} from "states/selectors";
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfig";
 import { stakeViewActions } from "states/views/stakeView";

@@ -15,7 +15,7 @@ import {
   selectFarmByFarmKey,
   selectSwapBySwapKey,
   selectLpUserBySwapKey,
-} from "states/selectorsV2";
+} from "states/selectors";
 
 const deltafiTokenDecimals = 6;
 

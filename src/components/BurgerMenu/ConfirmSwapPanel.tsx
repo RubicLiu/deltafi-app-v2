@@ -70,7 +70,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
   const { marketPrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const swapOut = useMemo(() => {
-    if (poolConfig && data) {
+    if (swapInfo && data) {
       const { tokenFrom, tokenTo, slippage } = data;
       return getSwapOutAmount(
         swapInfo,
@@ -82,7 +82,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
       );
     }
     return null;
-  }, [poolConfig, data, marketPrice]);
+  }, [data, marketPrice, swapInfo]);
 
   const handleConfirm = () => {
     data?.callback();
