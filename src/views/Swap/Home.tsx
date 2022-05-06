@@ -150,7 +150,7 @@ const Home: React.FC = (props) => {
   const tokenTo = swapView.tokenTo;
 
   const poolConfig = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
-  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
+  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
   const deltafiUser = useSelector(deltafiUserSelector).user;
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
