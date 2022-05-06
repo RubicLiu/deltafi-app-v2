@@ -36,8 +36,6 @@ export interface SwapConfig {
   maxSwapPercentage: number;
   minReserveLimitPercentage: number;
   slope: anchor.BN;
-  baseVirtualReserve: anchor.BN;
-  quoteVirtualReserve: anchor.BN;
   adminTradeFeeNumerator: anchor.BN;
   adminTradeFeeDenominator: anchor.BN;
   adminWithdrawFeeNumerator: anchor.BN;
