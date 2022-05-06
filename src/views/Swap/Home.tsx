@@ -40,7 +40,7 @@ import {
   swapViewSelector,
   selectSwapBySwapKey,
   deltafiUserSelector,
-} from "states/v2/selectorsV2";
+} from "states/selectorsV2";
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
@@ -51,7 +51,7 @@ import {
   tokenConfigs,
 } from "constants/deployConfigV2";
 import { swapViewActions } from "states/views/swapView";
-import { fecthTokenAccountInfoList } from "states/v2/tokenV2State";
+import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { createSwapTransaction } from "utils/transactions/v2/swap";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { BN } from "@project-serum/anchor";

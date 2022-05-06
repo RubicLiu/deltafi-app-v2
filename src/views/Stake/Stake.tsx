@@ -34,7 +34,7 @@ import {
   selectFarmByFarmKey,
   stakeViewSelector,
   selectTokenAccountInfoByMint,
-} from "states/v2/selectorsV2";
+} from "states/selectorsV2";
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfig";
 import { stakeViewActions } from "states/views/stakeView";
@@ -47,8 +47,8 @@ import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { PublicKey } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
 import { sendSignedTransaction } from "utils/transactions";
-import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2State";
-import { fecthTokenAccountInfoList } from "states/v2/tokenV2State";
+import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
+import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 
 const SECONDS_OF_YEAR = 31556926;
 
@@ -314,7 +314,7 @@ const Stake = (): ReactElement => {
         );
         dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
         dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
-        dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
+        dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
       }
     } else {
       dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
@@ -370,7 +370,7 @@ const Stake = (): ReactElement => {
         );
         dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
         dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
-        dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
+        dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
       }
     }
   }, [connection, walletPubkey, staking, signTransaction, dispatch, wallet, poolConfig, lpUser]);
@@ -422,7 +422,7 @@ const Stake = (): ReactElement => {
     } finally {
       dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: false }));
-      dispatch(fetchLiquidityProvidersV2Thunk({ connection, walletAddress: walletPubkey }));
+      dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
     }
   }, [
     connection,

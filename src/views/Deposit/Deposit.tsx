@@ -42,13 +42,13 @@ import {
   selectSwapBySwapKey,
   selectTokenAccountInfoByMint,
   depositViewSelector,
-} from "states/v2/selectorsV2";
+} from "states/selectorsV2";
 import { depositViewActions } from "states/views/depositView";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { sendSignedTransaction } from "utils/transactions";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
-import { fetchLiquidityProvidersV2Thunk } from "states/v2/liqudityProviderV2State";
-import { fetchSwapsV2Thunk } from "states/v2/swapV2State";
+import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
+import { fetchSwapsThunk } from "states/accounts/swapAccount";
 import { createDepositTransaction, createWithdrawTransaction } from "utils/transactions/v2/deposit";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
@@ -415,13 +415,13 @@ const Deposit: React.FC = () => {
       dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(depositViewActions.setIsProcessing({ isProcessing: false }));
       dispatch(
-        fetchLiquidityProvidersV2Thunk({
+        fetchLiquidityProvidersThunk({
           connection,
           walletAddress: walletPubkey,
         }),
       );
       dispatch(
-        fetchSwapsV2Thunk({
+        fetchSwapsThunk({
           connection,
         }),
       );
@@ -512,13 +512,13 @@ const Deposit: React.FC = () => {
       dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(depositViewActions.setIsProcessing({ isProcessing: false }));
       dispatch(
-        fetchLiquidityProvidersV2Thunk({
+        fetchLiquidityProvidersThunk({
           connection,
           walletAddress: walletPubkey,
         }),
       );
       dispatch(
-        fetchSwapsV2Thunk({
+        fetchSwapsThunk({
           connection,
         }),
       );

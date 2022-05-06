@@ -28,7 +28,7 @@ type fetchTokenAccountsThunkArgs = {
   walletAddress: PublicKey;
 };
 
-export const setTokenAccountV2Action = createAction<{
+export const setTokenAccountAction = createAction<{
   mint: string;
   tokenAccountInfo: TokenAccountInfo;
 }>("v2/setTokenAccount");
@@ -81,7 +81,7 @@ export async function fecthTokenAccountInfoList(
     commitment,
   );
   for (const tokenAccountInfo of tokenAccountInfoList) {
-    dispatch(setTokenAccountV2Action({ mint: tokenAccountInfo.mint.toBase58(), tokenAccountInfo }));
+    dispatch(setTokenAccountAction({ mint: tokenAccountInfo.mint.toBase58(), tokenAccountInfo }));
   }
 
   return tokenAccountInfoList;
@@ -162,12 +162,12 @@ export const fetchTokenAccountsV2Thunk = createAsyncThunk(
   },
 );
 
-export const tokenV2Reducer = createReducer(initialState, (builder) => {
+export const tokenAccountReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(fetchTokenAccountsV2Thunk.fulfilled, (state, action) => {
       state.mintToTokenAccountInfo = action.payload.mintToTokenAccountInfo;
     })
-    .addCase(setTokenAccountV2Action, (state, action) => {
+    .addCase(setTokenAccountAction, (state, action) => {
       if (!state.mintToTokenAccountInfo) {
         state.mintToTokenAccountInfo = {};
       }

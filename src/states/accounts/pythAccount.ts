@@ -23,7 +23,7 @@ const initialState: PythState = {
   symbolToPythData: {},
 };
 
-export const fetchPythDataV2Thunk = createAsyncThunk(
+export const fetchPythDataThunk = createAsyncThunk(
   "v2/fetchPythData",
   async (connection: Connection) => {
     const symbolToPythData: SymbolToPythData = {};
@@ -37,8 +37,8 @@ export const fetchPythDataV2Thunk = createAsyncThunk(
   },
 );
 
-export const pythV2Reducer = createReducer(initialState, (builder) => {
-  builder.addCase(fetchPythDataV2Thunk.fulfilled, (state, action) => {
+export const pythAccountReducer = createReducer(initialState, (builder) => {
+  builder.addCase(fetchPythDataThunk.fulfilled, (state, action) => {
     state.symbolToPythData = action.payload.symbolToPythData;
   });
 });
