@@ -10,11 +10,10 @@ import Footer from "components/Footer";
 import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
-import { DELTAFI_TOKEN_MINT, MARKET_CONFIG_ADDRESS } from "./constants";
+import { DELTAFI_TOKEN_MINT } from "./constants";
 import { useCustomConnection } from "providers/connection";
 
 import { useDispatch } from "react-redux";
-import { setReferrerAction, fetchReferrerThunk } from "states/appState";
 
 import { PublicKey } from "@solana/web3.js";
 import { scheduleWithInterval } from "utils";
@@ -141,9 +140,6 @@ const App: React.FC = () => {
           window.localStorage.removeItem("referrer");
         }
       }
-
-      dispatch(setReferrerAction({ referrerPublicKey, enableReferral }));
-      dispatch(fetchReferrerThunk({ connection, config: MARKET_CONFIG_ADDRESS, walletAddress }));
     })();
   }, [dispatch, walletAddress, connection]);
 

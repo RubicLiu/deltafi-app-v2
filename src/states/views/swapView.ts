@@ -10,7 +10,6 @@ interface TransactionResult {
 }
 
 const initialState = {
-  method: "deposit",
   tokenFrom: {
     token: getTokenConfigBySymbol("SOL"),
     amount: "",

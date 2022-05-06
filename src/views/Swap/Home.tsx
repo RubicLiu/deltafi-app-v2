@@ -55,6 +55,7 @@ import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { createSwapTransaction } from "utils/transactions/v2/swap";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { BN } from "@project-serum/anchor";
+import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -395,6 +396,7 @@ const Home: React.FC = (props) => {
           },
         }),
       );
+      dispatch(fetchDeltafiUserThunk({ connection, walletAddress: walletPubkey }));
     } catch (e) {
       console.error(e);
       dispatch(swapViewActions.setTransactionResult({ transactionResult: { status: false } }));

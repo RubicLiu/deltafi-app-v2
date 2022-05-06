@@ -5,6 +5,7 @@ import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 
 const initialState = {
   user: null,
+  publicKey: null,
   fetched: false,
 };
 
@@ -33,6 +34,7 @@ export const fetchDeltafiUserThunk = createAsyncThunk(
     const deltafiUser = await program.account.deltafiUser.fetchNullable(deltafiUserPubkey);
     return {
       user: deltafiUser,
+      publicKey: deltafiUserPubkey,
     };
   },
 );
@@ -40,6 +42,7 @@ export const fetchDeltafiUserThunk = createAsyncThunk(
 export const deltafiUserAccountReducer = createReducer(initialState, (builder) => {
   builder.addCase(fetchDeltafiUserThunk.fulfilled, (state, action) => {
     state.user = action.payload.user;
+    state.publicKey = action.payload.publicKey;
     state.fetched = true;
   });
 });
