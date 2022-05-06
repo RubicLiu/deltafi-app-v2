@@ -3,12 +3,14 @@ import { serumReducer } from "./serumState";
 
 import { viewsReducer } from "./views";
 import { accountsReducer } from "./accounts";
+import { appReducer } from "./appState";
 
 export const store = configureStore({
   reducer: {
     serum: serumReducer,
     accounts: accountsReducer,
     views: viewsReducer,
+    app: appReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

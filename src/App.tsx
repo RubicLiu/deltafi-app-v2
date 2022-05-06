@@ -10,22 +10,22 @@ import Footer from "components/Footer";
 import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
-import { DELTAFI_TOKEN_MINT } from "./constants";
 import { useCustomConnection } from "providers/connection";
 
 import { useDispatch } from "react-redux";
 
 import { PublicKey } from "@solana/web3.js";
 import { scheduleWithInterval } from "utils";
-import { AccountLayout } from "@solana/spl-token";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
 import { fetchFarmsThunk } from "states/accounts/farmAccount";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 import { fetchPythDataThunk } from "states/accounts/pythAccount";
 import { fetchTokenAccountsV2Thunk } from "states/accounts/tokenAccount";
-import { deployConfigV2 } from "constants/deployConfigV2";
+import { deployConfigV2, enableReferral } from "constants/deployConfigV2";
 import { fetchSerumDataThunk } from "states/serumState";
+import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { appActions } from "states/appState";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -60,7 +60,8 @@ const App: React.FC = () => {
   const { setNetwork } = useCustomConnection();
   const validCountry =
     disableIpBlocker || window.location.origin.includes("localhost") || FilterCountry();
-  const { publicKey: walletAddress } = useWallet();
+  const wallet = useWallet();
+  const { publicKey: walletAddress } = wallet;
   const { connection } = useConnection();
 
   useEffect(() => {
@@ -103,8 +104,6 @@ const App: React.FC = () => {
   }, [connection, dispatch]);
 
   useEffect(() => {
-    // Enable referral feature explicitly
-    const enableReferral: boolean = true;
     // wrap the logic with an async function because we have to to await async function here
     (async () => {
       if (!enableReferral || !walletAddress) {
@@ -113,35 +112,26 @@ const App: React.FC = () => {
       const referrer: string = window.localStorage.getItem("referrer");
       // test is the referrer string is a valid public key
       // if the referrer string is invalid, the referrer public key is undefined
-      let referrerPublicKey: PublicKey | null = null;
       if (referrer !== null && referrer !== "") {
         try {
-          // creating public key will fail and throw and execption
-          // if the referrer address is not a valid public key
-          referrerPublicKey = new PublicKey(referrer);
-          const referrerAccountInfo = await connection.getAccountInfo(referrerPublicKey);
-          // the referrer must be a valid spl token account
-          const { mint, owner } = AccountLayout.decode(referrerAccountInfo.data);
-          const mintPublicKey = new PublicKey(mint);
-          const ownerPublicKey = new PublicKey(owner);
+          const program = getDeltafiDexV2(
+            new PublicKey(deployConfigV2.programId),
+            makeProvider(connection, wallet),
+          );
+          const referrerData = await program.account.deltafiUser.fetch(new PublicKey(referrer));
           // the referrer account cannot be owned by the user's wallet
-          if (ownerPublicKey.equals(walletAddress)) {
+          if (referrerData.owner.equals(walletAddress)) {
             throw Error("Referrer token account is owned by current the user");
           }
-          // the referrer's mint must be the DELFI
-          if (!mintPublicKey.equals(DELTAFI_TOKEN_MINT)) {
-            throw Error("Referrer token account has wrong mint");
-          }
+          dispatch(appActions.setReferrer(new PublicKey(referrer)));
         } catch (e) {
           console.warn(e);
-          // if the referrer address is invalid, the referrer public key is set to null
-          referrerPublicKey = null;
           // also clear the referrer data in the local storage because it is invalid
           window.localStorage.removeItem("referrer");
         }
       }
     })();
-  }, [dispatch, walletAddress, connection]);
+  }, [dispatch, walletAddress, connection, wallet]);
 
   useEffect(() => {
     setNetwork(deployConfigV2.network);

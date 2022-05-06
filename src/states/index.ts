@@ -1,2 +1,2 @@
 export * from "./store";
-export * from "./selectorsV2";
+export * from "./selectors";

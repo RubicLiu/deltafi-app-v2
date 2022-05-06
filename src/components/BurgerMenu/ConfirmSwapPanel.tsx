@@ -8,7 +8,7 @@ import { useModal } from "providers/modal";
 import { getSwapOutAmount } from "utils/swap";
 import { fixedNumber } from "utils/utils";
 import { useSelector } from "react-redux";
-import { selectPoolBySymbols, selectMarketPriceByPool } from "states/selectorsV2";
+import { selectPoolBySymbols, selectMarketPriceByPool } from "states/selectors";
 
 interface IConfirmSwapPanelProps {
   children?: ReactNode;
@@ -71,8 +71,8 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
       const { tokenFrom, tokenTo, slippage } = data;
       return getSwapOutAmount(
         poolConfig,
-        tokenFrom.token.address,
-        tokenTo.token.address,
+        tokenFrom.token,
+        tokenTo.token,
         tokenFrom.amount,
         parseFloat(slippage),
         marketPrice,

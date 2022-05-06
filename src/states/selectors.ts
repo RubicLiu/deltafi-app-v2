@@ -3,6 +3,7 @@ import { RootState } from "./store";
 import { getPythMarketPrice } from "./accounts/pythAccount";
 import { getPoolConfigBySymbols, PoolConfig } from "constants/deployConfigV2";
 
+export const appSelector = (state: RootState) => state.app;
 export const lpUserSelector = (state: RootState) => state.accounts.liquidityProviderAccount;
 export const farmPoolSelector = (state: RootState) => state.accounts.farmAccount;
 export const poolSelector = (state: RootState) => state.accounts.swapAccount;
