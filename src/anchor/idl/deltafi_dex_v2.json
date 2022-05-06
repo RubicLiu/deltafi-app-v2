@@ -2137,8 +2137,5 @@
       "name": "InsufficientPoolReserve",
       "msg": "Insufficient pool reserve"
     }
-  ],
-  "metadata": {
-    "address": "HcWvS1XyweYMrCvY8TEeDxXgbWJagizUZXxCSLC2E89N"
-  }
+  ]
 }
