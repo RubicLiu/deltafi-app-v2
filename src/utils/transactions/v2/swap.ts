@@ -18,6 +18,7 @@ export async function createSwapTransaction(
   userDestinationToken: PublicKey,
   walletPubkey: PublicKey,
   deltafiUser: DeltafiUser,
+  referrer: PublicKey,
   swapDirection: SWAP_DIRECTION,
   inAmount: BN,
   minOutAmount: BN,

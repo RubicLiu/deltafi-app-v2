@@ -40,11 +40,13 @@ import {
   swapViewSelector,
   selectSwapBySwapKey,
   deltafiUserSelector,
+  appSelector,
 } from "states/selectors";
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
   deployConfigV2,
+  enableReferral,
   getPoolConfigBySymbols,
   getTokenConfigBySymbol,
   poolConfigs,
@@ -145,6 +147,7 @@ const Home: React.FC = (props) => {
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const { connection } = useConnection();
+  const app = useSelector(appSelector);
 
   const swapView = useSelector(swapViewSelector);
   const tokenFrom = swapView.tokenFrom;
@@ -298,6 +301,9 @@ const Home: React.FC = (props) => {
         makeProvider(connection, wallet),
       );
 
+      const referrer = enableReferral ?  deltafiUser?.referrer || app.referrer : null;
+      console.info(referrer);
+
       let { transaction, createAccountsCost, userDestinationTokenRef } =
         await createSwapTransaction(
           program,
@@ -308,6 +314,7 @@ const Home: React.FC = (props) => {
           destinationAccount?.publicKey,
           walletPubkey,
           deltafiUser,
+          referrer,
           swapDirection,
           new BN(amountIn.toString()),
           // TODO(ypeng): Set proper min out amount
