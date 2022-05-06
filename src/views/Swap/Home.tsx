@@ -40,7 +40,7 @@ import {
   swapViewSelector,
   selectSwapBySwapKey,
   deltafiUserSelector,
-} from "states/selectors";
+} from "states/selectorsV2";
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {

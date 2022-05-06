@@ -42,7 +42,7 @@ import {
   selectSwapBySwapKey,
   selectTokenAccountInfoByMint,
   depositViewSelector,
-} from "states/selectors";
+} from "states/selectorsV2";
 import { depositViewActions } from "states/views/depositView";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { sendSignedTransaction } from "utils/transactions";
