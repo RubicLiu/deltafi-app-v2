@@ -426,6 +426,7 @@ const Home: React.FC = (props) => {
     destinationAccount,
     signTransaction,
     dispatch,
+    app,
   ]);
 
   const handleSwap = useCallback(async () => {

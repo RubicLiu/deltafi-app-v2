@@ -10,14 +10,12 @@ import Footer from "components/Footer";
 import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
-import { DELTAFI_TOKEN_MINT } from "./constants";
 import { useCustomConnection } from "providers/connection";
 
 import { useDispatch } from "react-redux";
 
 import { PublicKey } from "@solana/web3.js";
 import { scheduleWithInterval } from "utils";
-import { AccountLayout } from "@solana/spl-token";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
 import { fetchFarmsThunk } from "states/accounts/farmAccount";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
@@ -130,14 +128,12 @@ const App: React.FC = () => {
           dispatch(appActions.setReferrer(new PublicKey(referrer)));
         } catch (e) {
           console.warn(e);
-          // if the referrer address is invalid, the referrer public key is set to null
-          referrerPublicKey = null;
           // also clear the referrer data in the local storage because it is invalid
           window.localStorage.removeItem("referrer");
         }
       }
     })();
-  }, [dispatch, walletAddress, connection]);
+  }, [dispatch, walletAddress, connection, wallet]);
 
   useEffect(() => {
     setNetwork(deployConfigV2.network);
