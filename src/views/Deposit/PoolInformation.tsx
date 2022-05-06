@@ -5,7 +5,7 @@ import { formatPubkey } from "utils/utils";
 import copyToClipboard from "copy-to-clipboard";
 import { PublicKey } from "@solana/web3.js";
 import { PoolConfig, getTokenConfigBySymbol } from "constants/deployConfigV2";
-import { selectSwapBySwapKey } from "states/selectorsV2";
+import { selectSwapBySwapKey } from "states/selectors";
 import { useSelector } from "react-redux";
 
 interface PoolInformationProps {
