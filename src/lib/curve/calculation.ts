@@ -198,10 +198,6 @@ export function calculateOutAmountStableSwap(
   inputAAmount: BigNumber,
   slope: BigNumber,
 ): number {
-  console.log("stablePrice", stablePrice.toString());
-  console.log("currentReserveA", currentReserveA.toString());
-  console.log("currentReserveB", currentReserveB.toString());
-  console.log("slope", slope.toString());
   let { balancedReserveA, balancedReserveB } = calculateBalancedReservesStableSwap(
     stablePrice,
     currentReserveA,
