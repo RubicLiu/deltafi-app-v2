@@ -47,60 +47,29 @@ const depositViewSlice = createSlice({
       state.quote.amountWithSlippage = "0";
     },
 
-    setTokenAmount(
-      state,
-      action: PayloadAction<{
-        baseAmount: string;
-        quoteAmount: string;
-      }>,
-    ) {
+    setTokenAmount(state, action: PayloadAction<{ baseAmount: string; quoteAmount: string }>) {
       state.base.amount = action.payload.baseAmount;
       state.quote.amount = action.payload.quoteAmount;
     },
 
-    setMethod(
-      state,
-      action: PayloadAction<{
-        method: string;
-      }>,
-    ) {
+    setMethod(state, action: PayloadAction<{ method: string }>) {
       state.method = action.payload.method;
       state.withdrawPercentage = 0;
     },
 
-    setTransactionResult(
-      state,
-      action: PayloadAction<{
-        transactionResult: TransactionResult;
-      }>,
-    ) {
+    setTransactionResult(state, action: PayloadAction<{ transactionResult: TransactionResult }>) {
       state.transactionResult = action.payload.transactionResult;
     },
 
-    setIsProcessing(
-      state,
-      action: PayloadAction<{
-        isProcessing: boolean;
-      }>,
-    ) {
+    setIsProcessing(state, action: PayloadAction<{ isProcessing: boolean }>) {
       state.isProcessing = action.payload.isProcessing;
     },
 
-    setWithdrawPercentage(
-      state,
-      action: PayloadAction<{
-        withdrawPercentage: number;
-      }>,
-    ) {
+    setWithdrawPercentage(state, action: PayloadAction<{ withdrawPercentage: number }>) {
       state.withdrawPercentage = action.payload.withdrawPercentage;
     },
 
-    setOpenSnackbar(
-      state,
-      action: PayloadAction<{
-        openSnackbar: boolean;
-      }>,
-    ) {
+    setOpenSnackbar(state, action: PayloadAction<{ openSnackbar: boolean }>) {
       state.openSnackbar = action.payload.openSnackbar;
     },
   },

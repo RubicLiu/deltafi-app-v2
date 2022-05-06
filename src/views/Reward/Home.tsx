@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Box, Typography, makeStyles, Theme, Grid, Paper, Link, Avatar } from "@material-ui/core";
 import Page from "components/layout/Page";
@@ -176,11 +176,7 @@ const Home: React.FC = (props) => {
         new PublicKey(deployConfigV2.programId),
         makeProvider(connection, wallet),
       );
-      let transaction = await createDeltafiUserTransaction(
-        program,
-        connection,
-        walletPubkey,
-      );
+      let transaction = await createDeltafiUserTransaction(program, connection, walletPubkey);
 
       transaction = await signTransaction(transaction);
       const hash = await sendSignedTransaction({
@@ -189,7 +185,7 @@ const Home: React.FC = (props) => {
       });
       await connection.confirmTransaction(hash, "confirmed");
 
-      dispatch(fetchDeltafiUserThunk({ connection, walletAddress: walletPubkey}));
+      dispatch(fetchDeltafiUserThunk({ connection, walletAddress: walletPubkey }));
       dispatch(
         rewardViewActions.setReferralLinkState({
           referralLinkState: "Ready",
@@ -274,9 +270,7 @@ const Home: React.FC = (props) => {
                     switch (referralLinkState) {
                       case "Unavailable": {
                         return (
-                          <CopyLinkButton
-                            onClick={handleCreateDeltafiUser}
-                          >
+                          <CopyLinkButton onClick={handleCreateDeltafiUser}>
                             {"Wallet Set Up"}
                           </CopyLinkButton>
                         );
