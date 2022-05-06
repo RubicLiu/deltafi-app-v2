@@ -7,13 +7,13 @@ const initialState = {
   farmKeyToFarmInfo: {},
 };
 
-type FetchFarmsV2ThunkArg = {
+type FetchFarmsThunkArg = {
   connection: Connection;
 };
 
-export const fetchFarmsV2Thunk = createAsyncThunk(
+export const fetchFarmsThunk = createAsyncThunk(
   "v2/fetchFarms",
-  async (arg: FetchFarmsV2ThunkArg) => {
+  async (arg: FetchFarmsThunkArg) => {
     const program = getDeltafiDexV2(
       new PublicKey(deployConfigV2.programId),
       makeProvider(arg.connection, {}),
@@ -37,8 +37,8 @@ export const fetchFarmsV2Thunk = createAsyncThunk(
   },
 );
 
-export const farmV2Reducer = createReducer(initialState, (builder) => {
-  builder.addCase(fetchFarmsV2Thunk.fulfilled, (state, action) => {
+export const farmAccountReducer = createReducer(initialState, (builder) => {
+  builder.addCase(fetchFarmsThunk.fulfilled, (state, action) => {
     state.farmKeyToFarmInfo = action.payload.farmKeyToFarmInfo;
   });
 });

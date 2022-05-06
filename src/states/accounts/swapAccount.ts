@@ -7,13 +7,13 @@ const initialState = {
   swapKeyToSwapInfo: {},
 };
 
-type FetchSwapsV2ThunkArg = {
+type FetchSwapsThunkArg = {
   connection: Connection;
 };
 
-export const fetchSwapsV2Thunk = createAsyncThunk(
+export const fetchSwapsThunk = createAsyncThunk(
   "v2/fetchSwaps",
-  async (arg: FetchSwapsV2ThunkArg) => {
+  async (arg: FetchSwapsThunkArg) => {
     const program = getDeltafiDexV2(
       new PublicKey(deployConfigV2.programId),
       makeProvider(arg.connection, {}),
@@ -37,8 +37,8 @@ export const fetchSwapsV2Thunk = createAsyncThunk(
   },
 );
 
-export const swapV2Reducer = createReducer(initialState, (builder) => {
-  builder.addCase(fetchSwapsV2Thunk.fulfilled, (state, action) => {
+export const swapAccountReducer = createReducer(initialState, (builder) => {
+  builder.addCase(fetchSwapsThunk.fulfilled, (state, action) => {
     state.swapKeyToSwapInfo = action.payload.swapKeyToSwapInfo;
   });
 });

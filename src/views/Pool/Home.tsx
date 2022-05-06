@@ -13,9 +13,9 @@ import {
   poolSelector,
   tokenAccountSelector,
   lpUserSelector,
-} from "states/v2/selectorsV2";
+} from "states/selectorsV2";
 import { MintToTokenAccountInfo } from "states/tokenAccountState";
-import { getPythMarketPrice } from "states/v2/pythV2State";
+import { getPythMarketPrice } from "states/accounts/pythAccount";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
