@@ -3,7 +3,7 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import { deployConfig, poolConfigsWithSerum } from "constants/deployConfig";
 import { Market } from "@project-serum/serum";
 import BigNumber from "bignumber.js";
-import { PoolInfo } from "providers/types";
+import { PoolConfig } from "constants/deployConfigV2";
 
 const serumProgramId = new PublicKey(deployConfig.serumProgramId);
 
@@ -79,7 +79,7 @@ export function getSerumMarketPriceByPoolName(
 
 export function getserumMarketPrice(
   serumNameToMarketPrice: SerumNameToMarketPrice,
-  pool: PoolInfo,
+  pool: PoolConfig,
   quotePrice: any,
 ) {
   const price = getSerumMarketPriceByPoolName(serumNameToMarketPrice, pool?.name);

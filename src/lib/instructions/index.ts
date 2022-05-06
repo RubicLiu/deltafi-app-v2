@@ -2,9 +2,10 @@ import { Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { toBufferLE } from "bigint-buffer";
 
-export * from "./swap";
-export * from "./stableSwap";
-export * from "./dataLayout";
+export enum SWAP_DIRECTION {
+  SellBase = 0,
+  SellQuote,
+}
 
 export const createApproveInstruction = (
   account: PublicKey,
