@@ -16,7 +16,7 @@ import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
 import { fecthTokenAccountInfoList } from "states/tokenAccountState";
 import { DELTAFI_TOKEN_MINT } from "constants/index";
-import { selectTokenAccountInfoByMint } from "states/selectorsV2";
+import { deltafiUserSelector, rewardViewSelector, selectTokenAccountInfoByMint } from "states/selectorsV2";
 /*
  * mockup test data for reward page
  */
@@ -138,6 +138,9 @@ const Home: React.FC = (props) => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
   const { connection } = useConnection();
   const dispatch = useDispatch();
+
+  const rewardView = useSelector(rewardViewSelector);
+  const deltafiUser = useSelector(deltafiUserSelector);
 
   const deltafiTokenAccount = useSelector(
     selectTokenAccountInfoByMint(deployConfig.deltafiTokenMint),
