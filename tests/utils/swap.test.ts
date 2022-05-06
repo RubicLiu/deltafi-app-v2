@@ -49,8 +49,8 @@ describe("utils/swap", function () {
         new BigNumber(200_000),
         new BigNumber(100_000),
         new BigNumber(200_000),
-        1000,
-        2003,
+        new BigNumber(1000),
+        new BigNumber(2003),
         0.5, // 0.5%
         {
           adminTradeFeeNumerator: new anchor.BN(1),
@@ -59,12 +59,12 @@ describe("utils/swap", function () {
           tradeFeeDenominator: new anchor.BN(2003),
         } as SwapConfig,
         new BigNumber(2),
+        2,
       ),
     ).toEqual({
-      amountIn: 1000,
-      amountOut: 1997,
-      amountOutWithSlippage: 1987.015,
-      fee: 6,
+      amountOut: 19.97,
+      amountOutWithSlippage: 19.87015,
+      fee: 0.06,
       priceImpact: 0.0015,
     });
 
@@ -74,8 +74,8 @@ describe("utils/swap", function () {
         new BigNumber(100_000),
         new BigNumber(200_000),
         new BigNumber(100_000),
-        4000,
-        2006,
+        new BigNumber(4000),
+        new BigNumber(2006),
         1, // 1%
         {
           adminTradeFeeNumerator: new anchor.BN(1),
@@ -84,12 +84,12 @@ describe("utils/swap", function () {
           tradeFeeDenominator: new anchor.BN(2006),
         } as SwapConfig,
         new BigNumber(0.5),
+        1,
       ),
     ).toEqual({
-      amountIn: 4000,
-      amountOut: 1997,
-      amountOutWithSlippage: 1977.03,
-      fee: 9,
+      amountOut: 199.7,
+      amountOutWithSlippage: 197.703,
+      fee: 0.9,
       priceImpact: 0.003,
     });
   });
@@ -243,7 +243,8 @@ describe("utils/swap", function () {
         {
           mintBase: baseMintPublicKey,
           mintQuote: quoteMintPublicKey,
-
+          mintBaseDecimals: 6,
+          mintQuoteDecimals: 6,
           swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
@@ -265,15 +266,14 @@ describe("utils/swap", function () {
         {
           mint: quoteMintPublicKey.toBase58(),
         } as TokenConfig,
-        "2000000",
+        "2.000000",
         0.5,
         new BigNumber(0.163),
       ),
     ).toEqual({
-      amountIn: 2000000,
-      amountOut: 324000,
-      amountOutWithSlippage: 322380,
-      fee: 1994,
+      amountOut: 0.324,
+      amountOutWithSlippage: 0.32238,
+      fee: 0.001994,
       priceImpact: 0.00001840490797546012,
     });
 
@@ -283,7 +283,8 @@ describe("utils/swap", function () {
         {
           mintBase: baseMintPublicKey,
           mintQuote: quoteMintPublicKey,
-
+          mintBaseDecimals: 9,
+          mintQuoteDecimals: 6,
           swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
@@ -305,17 +306,16 @@ describe("utils/swap", function () {
         {
           mint: quoteMintPublicKey.toBase58(),
         } as TokenConfig,
-        "2000000",
+        "0.002000000",
         0.5,
-        new BigNumber(0.164),
-        new BigNumber(0.163),
-        new BigNumber(0.165),
+        new BigNumber(164),
+        new BigNumber(163),
+        new BigNumber(165),
       ),
     ).toEqual({
-      amountIn: 2000000,
-      amountOut: 324000,
-      amountOutWithSlippage: 322380,
-      fee: 1994,
+      amountOut: 0.324,
+      amountOutWithSlippage: 0.32238,
+      fee: 0.001994,
       priceImpact: 0.00001840490797546012,
     });
 
@@ -325,7 +325,8 @@ describe("utils/swap", function () {
         {
           mintBase: baseMintPublicKey,
           mintQuote: quoteMintPublicKey,
-
+          mintBaseDecimals: 6,
+          mintQuoteDecimals: 6,
           swapType: { normalSwap: {} } as SwapType,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
@@ -347,15 +348,14 @@ describe("utils/swap", function () {
         {
           mint: baseMintPublicKey.toBase58(),
         } as TokenConfig,
-        "325994",
+        "0.325994",
         1,
         new BigNumber(0.163),
       ),
     ).toEqual({
-      amountIn: 325_994,
-      amountOut: 1990000,
-      amountOutWithSlippage: 1970100,
-      fee: 9999,
+      amountOut: 1.99,
+      amountOutWithSlippage: 1.9701,
+      fee: 0.009999,
       priceImpact: 0.0000183943864425622,
     });
 
