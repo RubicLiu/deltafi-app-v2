@@ -303,7 +303,6 @@ const Home: React.FC = (props) => {
         makeProvider(connection, wallet),
       );
 
-      console.info(amountIn.toString(), minimumAmountOut.toString());
       let { transaction, createAccountsCost, userDestinationTokenRef } =
         await createSwapTransaction(
           program,
