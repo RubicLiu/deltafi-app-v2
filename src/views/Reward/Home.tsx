@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { Box, Typography, makeStyles, Theme, Grid, Paper, Link, Avatar } from "@material-ui/core";
 import Page from "components/layout/Page";
 import { ConnectButton } from "components";
@@ -137,7 +137,6 @@ const Home: React.FC = (props) => {
   const { setMenu } = useModal();
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
-  const { connection } = useConnection();
   const dispatch = useDispatch();
   const program = useSelector(programSelector);
 
@@ -169,6 +168,7 @@ const Home: React.FC = (props) => {
         return;
       }
 
+      const connection = program.provider.connection;
       dispatch(
         rewardViewActions.setReferralLinkState({
           referralLinkState: "Processing",
@@ -198,7 +198,7 @@ const Home: React.FC = (props) => {
         }),
       );
     }
-  }, [dispatch, walletPubkey, connection, signTransaction, program]);
+  }, [dispatch, walletPubkey, signTransaction, program]);
 
   return (
     <Page>

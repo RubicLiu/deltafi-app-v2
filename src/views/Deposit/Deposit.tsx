@@ -14,7 +14,7 @@ import {
   Avatar,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useParams } from "react-router";
 import clx from "classnames";
 import BigNumber from "bignumber.js";
@@ -342,22 +342,15 @@ const Deposit: React.FC = () => {
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
   const wallet = useWallet();
-  const { connection } = useConnection();
 
   const handleDeposit = useCallback(async () => {
     let transaction: Transaction;
 
-    if (
-      !connection ||
-      !swapInfo ||
-      !walletPubkey ||
-      !baseTokenAccount ||
-      !quoteTokenAccount ||
-      !program
-    ) {
+    if (!swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount || !program) {
       return null;
     }
 
+    const connection = program.provider.connection;
     const base = depositView.base;
     const quote = depositView.quote;
 
@@ -431,7 +424,6 @@ const Deposit: React.FC = () => {
       );
     }
   }, [
-    connection,
     poolConfig,
     swapInfo,
     walletPubkey,
@@ -447,17 +439,11 @@ const Deposit: React.FC = () => {
   const handleWithdraw = useCallback(async () => {
     let transaction: Transaction;
 
-    if (
-      !connection ||
-      !swapInfo ||
-      !walletPubkey ||
-      !baseTokenAccount ||
-      !quoteTokenAccount ||
-      !program
-    ) {
+    if (!swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount || !program) {
       return null;
     }
 
+    const connection = program.provider.connection;
     const base = depositView.base;
     const quote = depositView.quote;
     try {
@@ -536,7 +522,6 @@ const Deposit: React.FC = () => {
     }
   }, [
     wallet,
-    connection,
     poolConfig,
     swapInfo,
     walletPubkey,

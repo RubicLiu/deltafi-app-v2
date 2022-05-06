@@ -14,7 +14,7 @@ import {
   Link,
   Avatar,
 } from "@material-ui/core";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import SettingsIcon from "@material-ui/icons/Settings";
 import SyncAlt from "@material-ui/icons/SyncAlt";
 import CloseIcon from "@material-ui/icons/Close";
@@ -145,7 +145,6 @@ const Home: React.FC = (props) => {
   const classes = useStyles(props);
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
-  const { connection } = useConnection();
   const app = useSelector(appSelector);
   const program = useSelector(programSelector);
 
@@ -283,6 +282,7 @@ const Home: React.FC = (props) => {
       return null;
     }
 
+    const connection = program.provider.connection;
     dispatch(swapViewActions.setIsProcessing({ isProcessing: true }));
     try {
       const referrer = enableReferral ? deltafiUser?.referrer : app.referrer;
@@ -415,7 +415,6 @@ const Home: React.FC = (props) => {
     swapView,
     tokenFrom,
     tokenTo,
-    connection,
     destinationAccount,
     signTransaction,
     dispatch,

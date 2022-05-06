@@ -1,6 +1,6 @@
 import { ReactElement, useMemo, useCallback, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import clx from "classnames";
 import {
   Snackbar,
@@ -88,7 +88,6 @@ const Stake = (): ReactElement => {
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const { network } = useCustomConnection();
-  const { connection } = useConnection();
 
   const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
@@ -251,10 +250,11 @@ const Stake = (): ReactElement => {
   );
 
   const handleStake = useCallback(async () => {
-    if (!connection || !walletPubkey || !lpUser || !program) {
+    if (!walletPubkey || !lpUser || !program) {
       return null;
     }
 
+    const connection = program.provider.connection;
     if (staking.isStake) {
       dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
       try {
@@ -368,13 +368,14 @@ const Stake = (): ReactElement => {
         dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
       }
     }
-  }, [connection, walletPubkey, staking, signTransaction, dispatch, poolConfig, lpUser, program]);
+  }, [walletPubkey, staking, signTransaction, dispatch, poolConfig, lpUser, program]);
 
   const handleClaim = useCallback(async () => {
-    if (!connection || !walletPubkey || !lpUser || !rewardsAccount || !program) {
+    if (!walletPubkey || !lpUser || !rewardsAccount || !program) {
       return null;
     }
 
+    const connection = program.provider.connection;
     try {
       dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: true }));
       const transaction = await createClaimFarmRewardsTransaction(
@@ -414,16 +415,7 @@ const Stake = (): ReactElement => {
       dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: false }));
       dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
     }
-  }, [
-    connection,
-    walletPubkey,
-    signTransaction,
-    dispatch,
-    poolConfig,
-    lpUser,
-    rewardsAccount,
-    program,
-  ]);
+  }, [walletPubkey, signTransaction, dispatch, poolConfig, lpUser, rewardsAccount, program]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: false }));
