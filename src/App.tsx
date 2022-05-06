@@ -10,8 +10,6 @@ import Footer from "components/Footer";
 import { FilterCountry } from "utils/checkJurisdiction";
 
 // import awsconfig from './aws-exports'
-import { useCustomConnection } from "providers/connection";
-
 import { useDispatch, useSelector } from "react-redux";
 
 import { PublicKey } from "@solana/web3.js";
@@ -58,7 +56,6 @@ BigInt.prototype["toJSON"] = function () {
 const disableIpBlocker = true;
 const App: React.FC = () => {
   const dispatch = useDispatch();
-  const { setNetwork } = useCustomConnection();
   const validCountry =
     disableIpBlocker || window.location.origin.includes("localhost") || FilterCountry();
   const wallet = useWallet();
@@ -130,10 +127,6 @@ const App: React.FC = () => {
       }
     })();
   }, [dispatch, walletAddress, connection, wallet, program]);
-
-  useEffect(() => {
-    setNetwork(deployConfigV2.network);
-  }, [setNetwork]);
 
   useEffect(() => {
     dispatch(appActions.setConnection(connection));

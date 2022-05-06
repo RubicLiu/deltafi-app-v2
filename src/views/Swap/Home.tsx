@@ -30,7 +30,6 @@ import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
 import { getSwapOutAmount } from "utils/swap";
 import { SwapCard as ISwapCard } from "./components/types";
-import { useCustomConnection } from "providers/connection";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
@@ -46,6 +45,7 @@ import {
 import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
+  deployConfigV2,
   enableReferral,
   getPoolConfigBySymbols,
   getTokenConfigBySymbol,
@@ -181,8 +181,7 @@ const Home: React.FC = (props) => {
     return "-";
   }, [basePrice, quotePrice, tokenFrom.token.symbol, swapInfo, poolConfig]);
 
-  const { network } = useCustomConnection();
-
+  const network = deployConfigV2.network;
   const possibleTokenToConfigs = useMemo(() => getPossibleTokenToConfigs(tokenFrom), [tokenFrom]);
 
   const handleSwapDirectionChange = () => {
