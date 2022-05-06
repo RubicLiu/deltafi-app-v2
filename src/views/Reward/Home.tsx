@@ -12,7 +12,7 @@ import copy from "copy-to-clipboard";
 import { sendSignedTransaction } from "utils/transactions";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
-import { deltafiUserSelector, rewardViewSelector } from "states/selectorsV2";
+import { deltafiUserSelector, rewardViewSelector } from "states/selectors";
 import { rewardViewActions } from "states/views/rewardView";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";

@@ -13,7 +13,7 @@ import {
   poolSelector,
   tokenAccountSelector,
   lpUserSelector,
-} from "states/selectorsV2";
+} from "states/selectors";
 import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
 import { getPythMarketPrice } from "states/accounts/pythAccount";
 
