@@ -256,7 +256,7 @@ const Home: React.FC = (props) => {
                   {referralLinkState === "Unavailable" ? (
                     <input
                       disabled={true}
-                      placeholder={"Please Create A DELFI Token Account Before Referring Others!"}
+                      placeholder={"Please Create A DELFI User Before Referring Others!"}
                       className={classes.inputLink}
                     />
                   ) : (
