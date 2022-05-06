@@ -32,7 +32,7 @@ export function getSwapOutAmount(
   fee: string;
   priceImpact: string;
 } {
-  if (isNaN(parseFloat(amount))) {
+  if (new BigNumber(amount).isNaN()) {
     return {
       amountOut: "",
       amountOutWithSlippage: "",
