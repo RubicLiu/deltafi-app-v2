@@ -1,9 +1,7 @@
 import { RootState } from "./store";
 
 import { getPythMarketPrice } from "./accounts/pythAccount";
-import { deployConfigV2, getPoolConfigBySymbols, PoolConfig } from "constants/deployConfigV2";
-import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
-import { PublicKey } from "@solana/web3.js";
+import { getPoolConfigBySymbols, PoolConfig } from "constants/deployConfigV2";
 
 export const appSelector = (state: RootState) => state.app;
 export const lpUserSelector = (state: RootState) => state.accounts.liquidityProviderAccount;
@@ -18,20 +16,7 @@ export const stakeViewSelector = (state: RootState) => state.views.stakeView;
 export const swapViewSelector = (state: RootState) => state.views.swapView;
 export const rewardViewSelector = (state: RootState) => state.views.rewardView;
 
-export const programSelector = (state: RootState) => {
-  const connection = state.app.connection;
-  const wallet = state.app.wallet;
-
-  if (!connection) {
-    return null;
-  }
-
-  const program = getDeltafiDexV2(
-    new PublicKey(deployConfigV2.programId),
-    wallet ? makeProvider(connection, state.app.wallet) : makeProvider(connection, {}),
-  );
-  return program;
-};
+export const programSelector = (state: RootState) => state.app.program;
 
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {
