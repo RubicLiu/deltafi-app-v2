@@ -409,7 +409,6 @@ const Home: React.FC = (props) => {
     swapInfo,
     deltafiUser,
     poolConfig,
-    wallet,
     sourceAccount,
     walletPubkey,
     sourceBalance,
