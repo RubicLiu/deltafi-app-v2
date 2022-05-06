@@ -19,11 +19,16 @@ export const swapViewSelector = (state: RootState) => state.views.swapView;
 export const rewardViewSelector = (state: RootState) => state.views.rewardView;
 
 export const programSelector = (state: RootState) => {
+  const connection = state.app.connection;
+  const wallet = state.app.wallet;
+
+  if (!connection) {
+    return null;
+  }
+
   const program = getDeltafiDexV2(
     new PublicKey(deployConfigV2.programId),
-    state.app.wallet
-      ? makeProvider(state.app.connection, state.app.wallet)
-      : makeProvider(state.app.connection, {}),
+    wallet ? makeProvider(connection, state.app.wallet) : makeProvider(connection, {}),
   );
   return program;
 };
