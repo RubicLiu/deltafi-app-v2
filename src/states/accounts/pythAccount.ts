@@ -91,11 +91,11 @@ export function getPythPriceBySymbol(
 export function getPythMarketPrice(symbolToPythData: SymbolToPythData, poolConfig: PoolConfig) {
   const { price: basePrice, confidenceInterval: baseConfidenceInterval } = getPythPriceBySymbol(
     symbolToPythData,
-    poolConfig.base,
+    poolConfig?.base,
   );
   const { price: quotePrice, confidenceInterval: quoteConfidenceInterval } = getPythPriceBySymbol(
     symbolToPythData,
-    poolConfig.quote,
+    poolConfig?.quote,
   );
   const marketPrice =
     basePrice && quotePrice ? new BigNumber(basePrice / quotePrice) : new BigNumber(NaN);
