@@ -144,12 +144,12 @@ const App: React.FC = () => {
   }, [wallet, dispatch]);
 
   useEffect(() => {
-    const program = !connection
-      ? null
-      : getDeltafiDexV2(
+    const program = connection
+      ? getDeltafiDexV2(
           new PublicKey(deployConfigV2.programId),
           wallet ? makeProvider(connection, wallet) : makeProvider(connection, {}),
-        );
+        )
+      : null;
     dispatch(appActions.setProgram(program));
   }, [connection, wallet, dispatch]);
 
