@@ -31,7 +31,6 @@ import { useModal } from "providers/modal";
 import { exponentiatedBy } from "utils/decimal";
 import { convertDollar, getTokenTvl } from "utils/utils";
 import { SOLSCAN_LINK } from "constants/index";
-import { useCustomConnection } from "providers/connection";
 import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
@@ -229,9 +228,9 @@ const Deposit: React.FC = () => {
 
   const lpUser = useSelector(selectLpUserBySwapKey(poolAddress));
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
-  const { network } = useCustomConnection();
   const depositView = useSelector(depositViewSelector);
   const dispatch = useDispatch();
+  const network = deployConfigV2.network;
 
   useEffect(() => {
     if (baseTokenInfo && quoteTokenInfo) {
