@@ -290,9 +290,9 @@ const Home: React.FC = (props) => {
       const amountIn = BigInt(
         exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString(),
       );
-      //      const minimumAmountOut = BigInt(
-      //        exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
-      //      );
+      const minimumAmountOut = BigInt(
+        exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
+      );
       const swapDirection =
         tokenFrom.token.mint === swapInfo.mintBase.toBase58()
           ? SWAP_DIRECTION.SellBase
@@ -303,6 +303,7 @@ const Home: React.FC = (props) => {
         makeProvider(connection, wallet),
       );
 
+      console.info(amountIn.toString(), minimumAmountOut.toString());
       let { transaction, createAccountsCost, userDestinationTokenRef } =
         await createSwapTransaction(
           program,
@@ -316,8 +317,7 @@ const Home: React.FC = (props) => {
           referrer,
           swapDirection,
           new BN(amountIn.toString()),
-          // TODO(ypeng): Set proper min out amount
-          new BN(0),
+          new BN(minimumAmountOut.toString()),
         );
 
       transaction = await signTransaction(transaction);
