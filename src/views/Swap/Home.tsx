@@ -205,29 +205,31 @@ const Home: React.FC = (props) => {
   const handleTokenFromInput = (card: ISwapCard) => {
     let newTokenFrom = card.token;
     let newTokenTo = tokenTo.token;
-    let amountOut = "";
-    let amountOutWithSlippage = "";
     if (tokenTo.token.mint === newTokenFrom.mint) {
       newTokenTo = Object.assign({}, tokenFrom.token);
     }
-    if (swapInfo && swapView.priceImpact) {
+
+    const useOldInput: boolean = new BigNumber(card.amount).isNaN();
+    const tokenFromAmount = useOldInput ? tokenFrom.amount : card.amount;
+    let amountOut = useOldInput ? tokenTo.amount : "";
+    let amountOutWithSlippage = useOldInput ? tokenTo.amountWithSlippage : "";
+
+    if (!useOldInput && swapInfo && swapView.priceImpact) {
       const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
         getSwapOutAmount(
           swapInfo,
           newTokenFrom,
           newTokenTo,
-          card.amount ?? "0",
+          tokenFromAmount ?? "0",
           parseFloat(swapView.priceImpact),
           marketPrice,
         );
 
-      amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
-      amountOutWithSlippage = isNaN(quoteAmountWithSlippage)
-        ? ""
-        : Number(quoteAmountWithSlippage).toString();
+      amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
+      amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
     }
     dispatch(
-      swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: card.amount }),
+      swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: tokenFromAmount }),
     );
     dispatch(
       swapViewActions.setTokenTo({
@@ -239,37 +241,37 @@ const Home: React.FC = (props) => {
   };
 
   const handleTokenToInput = (card: ISwapCard) => {
-    let newTokenFrom = tokenFrom.token;
-    let newTokenTo = card.token;
-    let amountOut = "";
-    let amountOutWithSlippage = "";
-    if (tokenFrom.token.mint === newTokenTo.mint) {
-      newTokenFrom = Object.assign({}, tokenTo.token);
-    }
-    if (swapInfo && swapView.priceImpact) {
-      const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
-        getSwapOutAmount(
-          swapInfo,
-          newTokenFrom,
-          newTokenTo,
-          tokenFrom.amount ?? "0",
-          parseFloat(swapView.priceImpact),
-          marketPrice,
-        );
-
-      amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
-      amountOutWithSlippage = isNaN(quoteAmountWithSlippage)
-        ? ""
-        : Number(quoteAmountWithSlippage).toString();
-    }
-    dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom }));
-    dispatch(
-      swapViewActions.setTokenTo({
-        token: newTokenTo,
-        amount: amountOut,
-        amountWithSlippage: amountOutWithSlippage,
-      }),
-    );
+    // TODO(leqiang): add calculate input amount from output amount and enable this
+    // let newTokenFrom = tokenFrom.token;
+    // let newTokenTo = card.token;
+    // if (tokenFrom.token.mint === newTokenTo.mint) {
+    //   newTokenFrom = Object.assign({}, tokenTo.token);
+    // }
+    // const useOldInput: boolean = new BigNumber(card.amount).isNaN();
+    // const tokenToAmount = useOldInput? tokenFrom.amount : card.amount;
+    // let amountOut = useOldInput? tokenTo.amount : "";
+    // let amountOutWithSlippage = useOldInput? tokenTo.amountWithSlippage : "";
+    // if (!useOldInput && swapInfo && swapView.priceImpact) {
+    //   const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
+    //     getSwapOutAmount(
+    //       swapInfo,
+    //       newTokenFrom,
+    //       newTokenTo,
+    //       tokenFrom.amount ?? "0",
+    //       parseFloat(swapView.priceImpact),
+    //       marketPrice,
+    //     );
+    //   amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
+    //   amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
+    // }
+    // dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenFrom }));
+    // dispatch(
+    //   swapViewActions.setTokenFrom({
+    //     token: newTokenTo,
+    //     amount: amountOut,
+    //     amountWithSlippage: amountOutWithSlippage,
+    //   }),
+    // );
   };
 
   const swapCallback = useCallback(async () => {

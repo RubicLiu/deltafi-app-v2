@@ -62,10 +62,10 @@ describe("utils/swap", function () {
         2,
       ),
     ).toEqual({
-      amountOut: 19.97,
-      amountOutWithSlippage: 19.87015,
-      fee: 0.06,
-      priceImpact: 0.0015,
+      amountOut: "19.97",
+      amountOutWithSlippage: "19.87",
+      fee: "0.06",
+      priceImpact: "0.0015",
     });
 
     expect(
@@ -87,10 +87,10 @@ describe("utils/swap", function () {
         1,
       ),
     ).toEqual({
-      amountOut: 199.7,
-      amountOutWithSlippage: 197.703,
-      fee: 0.9,
-      priceImpact: 0.003,
+      amountOut: "199.7",
+      amountOutWithSlippage: "197.7",
+      fee: "0.9",
+      priceImpact: "0.003",
     });
   });
 
@@ -152,9 +152,10 @@ describe("utils/swap", function () {
             targetQuoteReserve: new anchor.BN(100_000_000),
             baseReserve: new anchor.BN(100_000_000),
             quoteReserve: new anchor.BN(100_000_000),
+            marketPrice: new anchor.BN("1000000000000000000"), // 1
           } as PoolState,
           swapConfig: {
-            slope: new anchor.BN("500000000000000000"),
+            slope: new anchor.BN("500000000000000000"), // 0.5
           } as SwapConfig,
         } as SwapInfo,
 
@@ -222,9 +223,10 @@ describe("utils/swap", function () {
             targetQuoteReserve: new anchor.BN(100_000_000),
             baseReserve: new anchor.BN(100_000_000 + 200_000),
             quoteReserve: new anchor.BN(100_000_000 - 199_800),
+            marketPrice: new anchor.BN("1000000000000000000"), // 1
           } as PoolState,
           swapConfig: {
-            slope: new anchor.BN("500000000000000000"),
+            slope: new anchor.BN("500000000000000000"), // 0.5
           } as SwapConfig,
         } as SwapInfo,
         new BigNumber(199_800),
@@ -271,10 +273,10 @@ describe("utils/swap", function () {
         new BigNumber(0.163),
       ),
     ).toEqual({
-      amountOut: 0.324,
-      amountOutWithSlippage: 0.32238,
-      fee: 0.001994,
-      priceImpact: 0.00001840490797546012,
+      amountOut: "0.324000",
+      amountOutWithSlippage: "0.322380",
+      fee: "0.001994",
+      priceImpact: "0.00001840490797546012",
     });
 
     // normal swap, sell base, enable confidence interval
@@ -313,10 +315,10 @@ describe("utils/swap", function () {
         new BigNumber(165),
       ),
     ).toEqual({
-      amountOut: 0.324,
-      amountOutWithSlippage: 0.32238,
-      fee: 0.001994,
-      priceImpact: 0.00001840490797546012,
+      amountOut: "0.324000",
+      amountOutWithSlippage: "0.322380",
+      fee: "0.001994",
+      priceImpact: "0.00001840490797546012",
     });
 
     // normal swap, sell quote, disable confidence interval
@@ -353,10 +355,10 @@ describe("utils/swap", function () {
         new BigNumber(0.163),
       ),
     ).toEqual({
-      amountOut: 1.99,
-      amountOutWithSlippage: 1.9701,
-      fee: 0.009999,
-      priceImpact: 0.0000183943864425622,
+      amountOut: "1.990000",
+      amountOutWithSlippage: "1.970100",
+      fee: "0.009999",
+      priceImpact: "0.0000183943864425622",
     });
 
     // normal swap, sell quote, disable confidence interval

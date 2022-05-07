@@ -27,17 +27,17 @@ export function getSwapOutAmount(
   marketPriceLow?: BigNumber,
   marketPriceHigh?: BigNumber,
 ): {
-  amountOut: number;
-  amountOutWithSlippage: number;
-  fee: number;
-  priceImpact: number;
+  amountOut: string;
+  amountOutWithSlippage: string;
+  fee: string;
+  priceImpact: string;
 } {
-  if (isNaN(parseFloat(amount))) {
+  if (new BigNumber(amount).isNaN()) {
     return {
-      amountOut: 0,
-      amountOutWithSlippage: 0,
-      fee: 0,
-      priceImpact: 0,
+      amountOut: "",
+      amountOutWithSlippage: "",
+      fee: "",
+      priceImpact: "",
     };
   }
   if (parseFloat(amount) < 0) {
@@ -225,14 +225,14 @@ export function generateResultFromAmountOut(
   marketPriceInforOut: BigNumber,
   mintDecimalsB: number,
 ): {
-  amountOut: number;
-  amountOutWithSlippage: number;
-  fee: number;
-  priceImpact: number;
+  amountOut: string;
+  amountOutWithSlippage: string;
+  fee: string;
+  priceImpact: string;
 } {
   const rawTradeFee: BigNumber = new BigNumber(rawGrossAmountOut)
     .multipliedBy(new BigNumber(swapConfig.tradeFeeNumerator.toString()))
-    .dividedBy(swapConfig.tradeFeeDenominator.toString());
+    .dividedToIntegerBy(swapConfig.tradeFeeDenominator.toString()); // round down the trade fee to integer, this is same as the contract
 
   const rawAmountOutWithTradeFee: BigNumber = new BigNumber(rawGrossAmountOut).minus(rawTradeFee);
   const rawAmountFromSlippage: BigNumber = rawAmountOutWithTradeFee
@@ -242,12 +242,12 @@ export function generateResultFromAmountOut(
     rawAmountOutWithTradeFee.minus(rawAmountFromSlippage);
 
   return {
-    amountOut: dividedByDecimals(rawAmountOutWithTradeFee, mintDecimalsB).toNumber(),
+    amountOut: dividedByDecimals(rawAmountOutWithTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
     amountOutWithSlippage: dividedByDecimals(
       rawAmountOutWithTradeFeeWithSlippage,
       mintDecimalsB,
-    ).toNumber(),
-    fee: dividedByDecimals(rawTradeFee, mintDecimalsB).toNumber(),
+    ).toFixed(mintDecimalsB),
+    fee: dividedByDecimals(rawTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
     priceImpact: calculatePriceImpact(
       currentReserveA,
       currentReserveB,
@@ -256,7 +256,7 @@ export function generateResultFromAmountOut(
       rawAmountIn,
       rawGrossAmountOut,
       marketPriceInforOut,
-    ).toNumber(),
+    ).toString(),
   };
 }
 

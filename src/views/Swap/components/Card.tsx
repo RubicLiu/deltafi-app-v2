@@ -123,30 +123,6 @@ const SwapCard: React.FC<CardProps> = (props) => {
     handleChangeCard({ ...card, amount: value });
   };
 
-  const value = useMemo(() => {
-    const pointIdx = card.amount.indexOf(".");
-    if (pointIdx !== card.amount.length - 1 && card.amount[card.amount.length - 1] === ".") {
-      // if there are more than one decimal points in the number string
-      // we need to remove the extra point
-      // value gets updated every time the user input value
-      // so we only need to check if there is an extra point at theend of string
-      card.amount = card.amount.substring(0, card.amount.length - 1);
-    }
-
-    if (
-      card?.token?.decimals &&
-      pointIdx > 0 &&
-      pointIdx < card.amount.length - 1 - card.token.decimals
-    ) {
-      // if the decimal point exist in the input value
-      // and the input decimals is larger than the card token's decimals
-      // we should fix the decimals to the token's decimals
-      return Number(card.amount).toFixed(card.token.decimals);
-    }
-
-    return card.amount;
-  }, [card]);
-
   return (
     <Paper className={classes.root}>
       <Box className={classes.main}>
@@ -166,7 +142,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
           minLength={0}
           maxLength={20}
           decimalsLimit={20}
-          value={value}
+          value={card.amount}
           onChange={inputHandler}
         />
       </Box>
