@@ -41,10 +41,11 @@ import {
   createClaimFarmRewardsTransaction,
   createUpdateStakeTransaction,
 } from "utils/transactions/stake";
-import { BN } from "@project-serum/anchor";
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
+import { anchorBnToBn, anchorBnToString, bnToAnchorBn } from "utils/tokenUtils";
+import { BN } from "@project-serum/anchor";
 
 const SECONDS_OF_YEAR = 31556926;
 
@@ -114,23 +115,23 @@ const Stake = (): ReactElement => {
     new BigNumber(farmPool?.farmConfig.quoteAprDenominator.toString()),
   );
 
-  const userBaseStaked = lpUser ? lpUser.basePosition.depositedAmount.toString() : "0";
-  const userQuoteStaked = lpUser ? lpUser.quotePosition.depositedAmount.toString() : "0";
-  const userTotalBase = lpUser
-    ? lpUser.baseShare.add(lpUser.basePosition.depositedAmount).toString()
-    : "0";
-  const userTotalQuote = lpUser
-    ? lpUser.quoteShare.add(lpUser.quotePosition.depositedAmount).toString()
-    : "0";
+  const [userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote] = useMemo(() => {
+    return [
+      lpUser ? lpUser.basePosition.depositedAmount : new BN(0),
+      lpUser ? lpUser.quotePosition.depositedAmount : new BN(0),
+      lpUser ? lpUser.baseShare.add(lpUser.basePosition.depositedAmount) : new BN(0),
+      lpUser ? lpUser.quoteShare.add(lpUser.quotePosition.depositedAmount) : new BN(0),
+    ];
+  }, [lpUser]);
 
   useEffect(() => {
     if (poolConfig) {
       dispatch(
         stakeViewActions.setBalance({
-          baseBalance: new BigNumber(userTotalBase),
-          quoteBalance: new BigNumber(userTotalQuote),
-          baseStaked: new BigNumber(userBaseStaked),
-          quoteStaked: new BigNumber(userQuoteStaked),
+          baseBalance: anchorBnToBn(poolConfig.baseTokenInfo, userTotalBase),
+          quoteBalance: anchorBnToBn(poolConfig.quoteTokenInfo, userTotalQuote),
+          baseStaked: anchorBnToBn(poolConfig.baseTokenInfo, userBaseStaked),
+          quoteStaked: anchorBnToBn(poolConfig.quoteTokenInfo, userQuoteStaked),
         }),
       );
     }
@@ -144,12 +145,10 @@ const Stake = (): ReactElement => {
       const baseAmount = staking.baseBalance
         .multipliedBy(new BigNumber(percentage))
         .dividedBy(new BigNumber(100))
-        .dividedBy(10 ** poolConfig.baseTokenInfo.decimals)
         .toFixed(poolConfig.baseTokenInfo.decimals);
       const quoteAmount = staking.quoteBalance
         .multipliedBy(new BigNumber(percentage))
         .dividedBy(new BigNumber(100))
-        .dividedBy(10 ** poolConfig.quoteTokenInfo.decimals)
         .toFixed(poolConfig.quoteTokenInfo.decimals);
       dispatch(
         stakeViewActions.setPercentage({
@@ -214,20 +213,14 @@ const Stake = (): ReactElement => {
     if (lpUser && baseApr && quoteApr) {
       const baseRate = exponentiatedBy(
         exponentiate(
-          new BigNumber(userBaseStaked)
-            .dividedBy(10 ** baseTokenInfo.decimals)
-            .multipliedBy(baseApr)
-            .dividedBy(365),
+          anchorBnToBn(baseTokenInfo, userBaseStaked).multipliedBy(baseApr).dividedBy(365),
           baseTokenInfo.decimals,
         ),
         DELTAFI_TOKEN_DECIMALS,
       );
       const quoteRate = exponentiatedBy(
         exponentiate(
-          new BigNumber(userQuoteStaked)
-            .dividedBy(10 ** quoteTokenInfo.decimals)
-            .multipliedBy(quoteApr)
-            .dividedBy(365),
+          anchorBnToBn(quoteTokenInfo, userQuoteStaked).multipliedBy(quoteApr).dividedBy(365),
           quoteTokenInfo.decimals,
         ),
         DELTAFI_TOKEN_DECIMALS,
@@ -245,11 +238,10 @@ const Stake = (): ReactElement => {
     const connection = program.provider.connection;
     dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
     try {
-      const baseAmount = new BigNumber(staking.baseAmount).multipliedBy(
-        new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
-      );
-      const quoteAmount = new BigNumber(staking.quoteAmount).multipliedBy(
-        new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
+      const baseAmount = bnToAnchorBn(poolConfig.baseTokenInfo, new BigNumber(staking.baseAmount));
+      const quoteAmount = bnToAnchorBn(
+        poolConfig.quoteTokenInfo,
+        new BigNumber(staking.quoteAmount),
       );
       const transaction = await createUpdateStakeTransaction(
         program,
@@ -257,8 +249,8 @@ const Stake = (): ReactElement => {
         poolConfig,
         walletPubkey,
         lpUser,
-        new BN(baseAmount.toFixed(0)),
-        new BN(quoteAmount.toFixed(0)),
+        baseAmount,
+        quoteAmount,
       );
 
       const signedTransaction = await signTransaction(transaction);
@@ -420,6 +412,9 @@ const Stake = (): ReactElement => {
 
   if (!farmPool) return null;
 
+  const userBaseStakedString = anchorBnToString(baseTokenInfo, userBaseStaked);
+  const userQuoteStakedString = anchorBnToString(quoteTokenInfo, userQuoteStaked);
+
   return (
     <Page>
       <Container className={classes.root}>
@@ -486,19 +481,11 @@ const Stake = (): ReactElement => {
         <Box className={classes.liquidityStaked}>
           <Typography className={classes.title}>Your Liquidity Staked</Typography>
           <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>
-              {new BigNumber(userBaseStaked)
-                .dividedBy(10 ** baseTokenInfo.decimals)
-                .toFixed(baseTokenInfo.decimals)}
-            </Typography>
+            <Typography className={classes.amount}>{userBaseStakedString}</Typography>
             <Typography className={classes.amount}>{baseTokenInfo.symbol}</Typography>
           </Box>
           <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>
-              {new BigNumber(userQuoteStaked)
-                .dividedBy(10 ** quoteTokenInfo.decimals)
-                .toFixed(quoteTokenInfo.decimals)}
-            </Typography>
+            <Typography className={classes.amount}>{userQuoteStakedString}</Typography>
             <Typography className={classes.amount}>{quoteTokenInfo.symbol}</Typography>
           </Box>
           <Box className={classes.cardBottom}>
