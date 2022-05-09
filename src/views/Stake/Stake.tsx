@@ -569,7 +569,7 @@ const Stake = (): ReactElement => {
                 data-amp-analytics-name="click"
                 data-amp-analytics-attrs="page: Deposit, target: Deposit"
               >
-                {staking.isStake ? "Stake" : "Unstake"}
+                {"Stake"}
               </ConnectButton>
             ) : (
               <ConnectButton size="large" fullWidth onClick={() => setMenu(true, "connect")}>
