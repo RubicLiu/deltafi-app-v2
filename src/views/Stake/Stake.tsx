@@ -120,14 +120,18 @@ const Stake = (): ReactElement => {
   const userQuoteShare = lpUser ? lpUser.quoteShare.toString() : "0";
   const userBaseStaked = lpUser ? lpUser.basePosition.depositedAmount.toString() : "0";
   const userQuoteStaked = lpUser ? lpUser.quotePosition.depositedAmount.toString() : "0";
+  const userTotalBase = lpUser ? lpUser.baseShare.add(lpUser.basePosition.depositedAmount).toString() : "0";
+  const userTotalQuote = lpUser ? lpUser.quoteShare.add(lpUser.quotePosition.depositedAmount).toString() : "0";
 
   useEffect(() => {
     if (poolConfig) {
       dispatch(
         stakeViewActions.setIsStake({
           isStake: true,
-          baseBalance: new BigNumber(userBaseShare),
-          quoteBalance: new BigNumber(userQuoteShare),
+          baseBalance: new BigNumber(userTotalBase),
+          quoteBalance: new BigNumber(userTotalQuote),
+          baseStaked: new BigNumber(userBaseStaked),
+          quoteStaked: new BigNumber(userQuoteStaked),
         }),
       );
     }
@@ -240,12 +244,14 @@ const Stake = (): ReactElement => {
       dispatch(
         stakeViewActions.setIsStake({
           isStake,
-          baseBalance: new BigNumber(isStake ? userBaseShare : userBaseStaked),
-          quoteBalance: new BigNumber(isStake ? userQuoteShare : userQuoteStaked),
+          baseBalance: new BigNumber(userTotalBase),
+          quoteBalance: new BigNumber(userTotalQuote),
+          baseStaked: new BigNumber(userBaseStaked),
+          quoteStaked: new BigNumber(userQuoteStaked),
         }),
       );
     },
-    [dispatch, userBaseShare, userQuoteShare, userBaseStaked, userQuoteStaked],
+    [dispatch, userBaseShare, userQuoteShare, userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote],
   );
 
   const handleStake = useCallback(async () => {

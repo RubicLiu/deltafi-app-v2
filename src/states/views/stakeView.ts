@@ -18,6 +18,8 @@ const initialState = {
     isStake: true,
     baseBalance: new BigNumber("0"),
     quoteBalance: new BigNumber("0"),
+    baseStaked: new BigNumber("0"),
+    quoteStaked: new BigNumber("0"),
     baseAmount: "0",
     quoteAmount: "0",
     percentage: 0,
@@ -47,11 +49,15 @@ const stakeViewSlice = createSlice({
         isStake: boolean;
         baseBalance: BigNumber;
         quoteBalance: BigNumber;
+        baseStaked: BigNumber;
+        quoteStaked: BigNumber;
       }>,
     ) {
       state.stake.isStake = action.payload.isStake;
       state.stake.baseBalance = action.payload.baseBalance;
       state.stake.quoteBalance = action.payload.quoteBalance;
+      state.stake.baseStaked = action.payload.baseStaked;
+      state.stake.quoteStaked = action.payload.quoteStaked;
       state.stake.percentage = 0;
       state.stake.baseAmount = "0";
       state.stake.quoteAmount = "0";
