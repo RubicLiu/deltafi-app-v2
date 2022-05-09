@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Box, Typography, makeStyles, Theme, Grid, Paper, Link, Avatar } from "@material-ui/core";
 import Page from "components/layout/Page";
@@ -16,6 +16,10 @@ import { deltafiUserSelector, programSelector, rewardViewSelector } from "states
 import { rewardViewActions } from "states/views/rewardView";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 import { createDeltafiUserTransaction } from "utils/transactions/deltafiUser";
+import { DELTAFI_TOKEN_DECIMALS } from "constants/index";
+import BN from "bn.js";
+import BigNumber from "bignumber.js";
+import { exponentiatedBy } from "utils/decimal";
 
 /*
  * mockup test data for reward page
@@ -144,6 +148,32 @@ const Home: React.FC = (props) => {
   const deltafiUser = useSelector(deltafiUserSelector);
   const referralLinkState = rewardView.referralLinkState;
   const referralLink = rewardView.referralLink;
+
+  const rewardDisplayInfo: {
+    claimedRewardFromSwap: string;
+    claimedRewardFromReferral: string;
+    owedRewardFromSwap: string;
+    owedRewardFromReferral: string;
+  } = useMemo(() => {
+    // const deltafiUserInfo = deltafiUser?.user;
+    const parseRewardBN = (rewardAmount: BN) =>
+      exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
+    if (deltafiUser?.user) {
+      return {
+        claimedRewardFromSwap: parseRewardBN(deltafiUser.user.claimedSwapRewards),
+        claimedRewardFromReferral: parseRewardBN(deltafiUser.user.claimedReferralRewards),
+        owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedSwapRewards),
+        owedRewardFromReferral: parseRewardBN(deltafiUser.user.owedReferralRewards),
+      };
+    }
+
+    return {
+      claimedRewardFromSwap: "--",
+      claimedRewardFromReferral: "--",
+      owedRewardFromSwap: "--",
+      owedRewardFromReferral: "--",
+    };
+  }, [deltafiUser]);
 
   useEffect(() => {
     const hasDeltafiUser = deltafiUser?.user != null;
@@ -386,6 +416,34 @@ const Home: React.FC = (props) => {
                 <ReferralCard caption={item.caption} detail={item.detail} image={item.image} />
               </Grid>
             ))}
+          </Grid>
+        </Box>
+
+        {/* Rewards summary */}
+        {/* TODO: improve layout of this section */}
+        <Box className={classes.defaultWrapper}>
+          <Typography variant="h5" color="primary" align="center" paragraph>
+            Rewards Summary
+          </Typography>
+          <Grid container spacing={2} style={{ width: "100%", margin: 0 }}>
+            <Grid item xs={12} sm={4} md={4}>
+              Reward Claimed:
+              <Grid item xs={12} sm={4} md={4}>
+                {`From Swap:${rewardDisplayInfo.claimedRewardFromSwap}`}
+              </Grid>
+              <Grid item xs={12} sm={4} md={4}>
+                {`From Referral:${rewardDisplayInfo.claimedRewardFromReferral}`}
+              </Grid>
+            </Grid>
+            <Grid item xs={12} sm={4} md={4}>
+              Reward Owed:
+              <Grid item xs={12} sm={4} md={4}>
+                {`From Swap:${rewardDisplayInfo.owedRewardFromSwap}`}
+              </Grid>
+              <Grid item xs={12} sm={4} md={4}>
+                {`From Referral:${rewardDisplayInfo.owedRewardFromReferral}`}
+              </Grid>
+            </Grid>
           </Grid>
         </Box>
       </Box>
