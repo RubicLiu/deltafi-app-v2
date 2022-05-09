@@ -427,22 +427,18 @@ const Home: React.FC = (props) => {
           </Typography>
           <Grid container spacing={2} style={{ width: "100%", margin: 0 }}>
             <Grid item xs={12} sm={4} md={4}>
-              Reward Claimed:
-              <Grid item xs={12} sm={4} md={4}>
-                {`From Swap:${rewardDisplayInfo.claimedRewardFromSwap}`}
-              </Grid>
-              <Grid item xs={12} sm={4} md={4}>
-                {`From Referral:${rewardDisplayInfo.claimedRewardFromReferral}`}
-              </Grid>
+              <Typography variant="h6" color="primary" align="left" paragraph>
+                Reward Claimed
+              </Typography>
+              <Box>{`From Swap: ${rewardDisplayInfo.claimedRewardFromSwap}`}</Box>
+              <Box>{`From Referral: ${rewardDisplayInfo.claimedRewardFromReferral}`}</Box>
             </Grid>
             <Grid item xs={12} sm={4} md={4}>
-              Reward Owed:
-              <Grid item xs={12} sm={4} md={4}>
-                {`From Swap:${rewardDisplayInfo.owedRewardFromSwap}`}
-              </Grid>
-              <Grid item xs={12} sm={4} md={4}>
-                {`From Referral:${rewardDisplayInfo.owedRewardFromReferral}`}
-              </Grid>
+              <Typography variant="h6" color="primary" align="left" paragraph>
+                Reward Owed
+              </Typography>
+              <Box>{`From Swap: ${rewardDisplayInfo.owedRewardFromSwap}`}</Box>
+              <Box>{`From Referral: ${rewardDisplayInfo.owedRewardFromReferral}`}</Box>
             </Grid>
           </Grid>
         </Box>
