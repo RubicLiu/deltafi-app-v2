@@ -84,8 +84,10 @@ const StakeCard: React.FC<CardProps> = (props) => {
   const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {};
   const baseDecimals = poolConfig.baseTokenInfo.decimals;
   const baseBalance = card.baseBalance.dividedBy(10 ** baseDecimals).toFixed(baseDecimals);
+  const baseStaked = card.baseStaked.dividedBy(10 ** baseDecimals).toFixed(baseDecimals);
   const quoteDecimals = poolConfig.quoteTokenInfo.decimals;
   const quoteBalance = card.quoteBalance.dividedBy(10 ** quoteDecimals).toFixed(quoteDecimals);
+  const quoteStaked = card.quoteStaked.dividedBy(10 ** quoteDecimals).toFixed(quoteDecimals);
 
   return (
     <Paper className={classes.root}>
@@ -132,10 +134,10 @@ const StakeCard: React.FC<CardProps> = (props) => {
       <Box display="flex" justifyContent="space-between">
         <Typography
           className={classes.tokenBalance}
-        >{`Available base share: ${baseBalance}`}</Typography>
+        >{`Staked base share: ${baseStaked}/${baseBalance}`}</Typography>
         <Typography
           className={classes.tokenBalance}
-        >{`Available quote share: ${quoteBalance}`}</Typography>
+        >{`Staked quote share: ${quoteStaked}/${quoteBalance}`}</Typography>
       </Box>
     </Paper>
   );

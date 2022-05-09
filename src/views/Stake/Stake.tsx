@@ -8,7 +8,6 @@ import {
   Box,
   Typography,
   Paper,
-  Button as MUIButton,
   IconButton,
   Link,
   Container,
@@ -40,8 +39,7 @@ import { tokenConfigs } from "constants/deployConfigV2";
 import { stakeViewActions } from "states/views/stakeView";
 import {
   createClaimFarmRewardsTransaction,
-  createStakeTransaction,
-  createUnstakeTransaction,
+  createUpdateStakeTransaction,
 } from "utils/transactions/stake";
 import { BN } from "@project-serum/anchor";
 import { sendSignedTransaction } from "utils/transactions";
@@ -116,22 +114,27 @@ const Stake = (): ReactElement => {
     new BigNumber(farmPool?.farmConfig.quoteAprDenominator.toString()),
   );
 
-  const userBaseShare = lpUser ? lpUser.baseShare.toString() : "0";
-  const userQuoteShare = lpUser ? lpUser.quoteShare.toString() : "0";
   const userBaseStaked = lpUser ? lpUser.basePosition.depositedAmount.toString() : "0";
   const userQuoteStaked = lpUser ? lpUser.quotePosition.depositedAmount.toString() : "0";
+  const userTotalBase = lpUser
+    ? lpUser.baseShare.add(lpUser.basePosition.depositedAmount).toString()
+    : "0";
+  const userTotalQuote = lpUser
+    ? lpUser.quoteShare.add(lpUser.quotePosition.depositedAmount).toString()
+    : "0";
 
   useEffect(() => {
     if (poolConfig) {
       dispatch(
-        stakeViewActions.setIsStake({
-          isStake: true,
-          baseBalance: new BigNumber(userBaseShare),
-          quoteBalance: new BigNumber(userQuoteShare),
+        stakeViewActions.setBalance({
+          baseBalance: new BigNumber(userTotalBase),
+          quoteBalance: new BigNumber(userTotalQuote),
+          baseStaked: new BigNumber(userBaseStaked),
+          quoteStaked: new BigNumber(userQuoteStaked),
         }),
       );
     }
-  }, [dispatch, poolConfig, userBaseShare, userQuoteShare]);
+  }, [dispatch, poolConfig, userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote]);
 
   const staking = stakeView.stake;
 
@@ -234,138 +237,67 @@ const Stake = (): ReactElement => {
     return "0";
   }, [userBaseStaked, userQuoteStaked, baseApr, quoteApr, lpUser, baseTokenInfo, quoteTokenInfo]);
 
-  const handleSwitchMethod = useCallback(
-    (method: "stake" | "unstake") => {
-      const isStake = method === "stake";
-      dispatch(
-        stakeViewActions.setIsStake({
-          isStake,
-          baseBalance: new BigNumber(isStake ? userBaseShare : userBaseStaked),
-          quoteBalance: new BigNumber(isStake ? userQuoteShare : userQuoteStaked),
-        }),
-      );
-    },
-    [dispatch, userBaseShare, userQuoteShare, userBaseStaked, userQuoteStaked],
-  );
-
   const handleStake = useCallback(async () => {
     if (!walletPubkey || !lpUser || !program) {
       return null;
     }
 
     const connection = program.provider.connection;
-    if (staking.isStake) {
-      dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
-      try {
-        const baseAmount = new BigNumber(staking.baseAmount).multipliedBy(
-          new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
-        );
-        const quoteAmount = new BigNumber(staking.quoteAmount).multipliedBy(
-          new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
-        );
-        const transaction = await createStakeTransaction(
-          program,
-          connection,
-          poolConfig,
-          walletPubkey,
-          new BN(baseAmount.toFixed(0)),
-          new BN(quoteAmount.toFixed(0)),
-        );
+    dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
+    try {
+      const baseAmount = new BigNumber(staking.baseAmount).multipliedBy(
+        new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
+      );
+      const quoteAmount = new BigNumber(staking.quoteAmount).multipliedBy(
+        new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
+      );
+      const transaction = await createUpdateStakeTransaction(
+        program,
+        connection,
+        poolConfig,
+        walletPubkey,
+        lpUser,
+        new BN(baseAmount.toFixed(0)),
+        new BN(quoteAmount.toFixed(0)),
+      );
 
-        const signedTransaction = await signTransaction(transaction);
-        const hash = await sendSignedTransaction({
-          signedTransaction,
-          connection,
-        });
+      const signedTransaction = await signTransaction(transaction);
+      const hash = await sendSignedTransaction({
+        signedTransaction,
+        connection,
+      });
 
-        await connection.confirmTransaction(hash, "confirmed");
+      await connection.confirmTransaction(hash, "confirmed");
 
-        dispatch(
-          stakeViewActions.setTransactionResult({
-            transactionResult: {
-              status: true,
-              action: "stake",
-              hash,
-              stake: staking,
-            },
-          }),
-        );
-      } catch (e) {
-        dispatch(
-          stakeViewActions.setTransactionResult({
-            transactionResult: {
-              status: false,
-            },
-          }),
-        );
-      } finally {
-        dispatch(
-          stakeViewActions.setPercentage({
-            percentage: 0,
-            baseAmount: "0",
-            quoteAmount: "0",
-          }),
-        );
-        dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
-        dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
-        dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
-      }
-    } else {
-      dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
-      try {
-        const baseAmount = new BigNumber(staking.baseAmount).multipliedBy(
-          new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
-        );
-        const quoteAmount = new BigNumber(staking.quoteAmount).multipliedBy(
-          new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
-        );
-        const transaction = await createUnstakeTransaction(
-          program,
-          connection,
-          poolConfig,
-          walletPubkey,
-          new BN(baseAmount.toFixed(0)),
-          new BN(quoteAmount.toFixed(0)),
-        );
-
-        const signedTransaction = await signTransaction(transaction);
-        const hash = await sendSignedTransaction({
-          signedTransaction,
-          connection,
-        });
-
-        await connection.confirmTransaction(hash, "confirmed");
-
-        dispatch(
-          stakeViewActions.setTransactionResult({
-            transactionResult: {
-              status: true,
-              action: "unstake",
-              hash,
-              stake: staking,
-            },
-          }),
-        );
-      } catch (e) {
-        dispatch(
-          stakeViewActions.setTransactionResult({
-            transactionResult: {
-              status: false,
-            },
-          }),
-        );
-      } finally {
-        dispatch(
-          stakeViewActions.setPercentage({
-            percentage: 0,
-            baseAmount: "0",
-            quoteAmount: "0",
-          }),
-        );
-        dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
-        dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
-        dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
-      }
+      dispatch(
+        stakeViewActions.setTransactionResult({
+          transactionResult: {
+            status: true,
+            action: "stake",
+            hash,
+            stake: staking,
+          },
+        }),
+      );
+    } catch (e) {
+      dispatch(
+        stakeViewActions.setTransactionResult({
+          transactionResult: {
+            status: false,
+          },
+        }),
+      );
+    } finally {
+      dispatch(
+        stakeViewActions.setPercentage({
+          percentage: 0,
+          baseAmount: "0",
+          quoteAmount: "0",
+        }),
+      );
+      dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
+      dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
+      dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
     }
   }, [walletPubkey, staking, signTransaction, dispatch, poolConfig, lpUser, program]);
 
@@ -451,7 +383,7 @@ const Stake = (): ReactElement => {
       );
     }
 
-    const { hash, action, stake } = stakeView.transactionResult;
+    const { hash, stake } = stakeView.transactionResult;
 
     return (
       <Box display="flex" alignItems="center">
@@ -463,7 +395,7 @@ const Stake = (): ReactElement => {
         <Box>
           {stake && (
             <Typography variant="body1" color="primary">
-              {`${action.charAt(0).toUpperCase() + action.slice(1)}
+              {`Update the staking to
               ${Number(stake?.baseAmount).toFixed(baseTokenInfo.decimals)} ${baseTokenInfo.symbol}
               share and ${Number(stake?.quoteAmount).toFixed(quoteTokenInfo.decimals)}
               ${quoteTokenInfo.symbol} share`}
@@ -605,24 +537,6 @@ const Stake = (): ReactElement => {
             <Typography color="primary" variant="body1" className={classes.marketCondition}>
               LIQUIDITY MINING
             </Typography>
-            <div className={classes.divider} />
-            <Box className={classes.tabs}>
-              <Box>
-                <MUIButton
-                  className={staking.isStake ? classes.activeBtn : classes.btn}
-                  onClick={() => handleSwitchMethod("stake")}
-                >
-                  Stake
-                </MUIButton>
-                &nbsp;
-                <MUIButton
-                  className={!staking.isStake ? classes.activeBtn : classes.btn}
-                  onClick={() => handleSwitchMethod("unstake")}
-                >
-                  Unstake
-                </MUIButton>
-              </Box>
-            </Box>
           </Box>
           <Box mb={1}>
             <Slider value={percentage} onChange={setStakePercentage} />
@@ -655,7 +569,7 @@ const Stake = (): ReactElement => {
                 data-amp-analytics-name="click"
                 data-amp-analytics-attrs="page: Deposit, target: Deposit"
               >
-                {staking.isStake ? "Stake" : "Unstake"}
+                {"Update Stake"}
               </ConnectButton>
             ) : (
               <ConnectButton size="large" fullWidth onClick={() => setMenu(true, "connect")}>
