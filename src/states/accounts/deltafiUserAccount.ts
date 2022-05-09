@@ -2,8 +2,13 @@ import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { deployConfigV2 } from "constants/deployConfigV2";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { DeltafiUser } from "anchor/type_definitions";
 
-const initialState = {
+const initialState: {
+  user: DeltafiUser;
+  publicKey: PublicKey;
+  fetched: boolean;
+} = {
   user: null,
   publicKey: null,
   fetched: false,
@@ -31,7 +36,9 @@ export const fetchDeltafiUserThunk = createAsyncThunk(
       program.programId,
     );
 
-    const deltafiUser = await program.account.deltafiUser.fetchNullable(deltafiUserPubkey);
+    const deltafiUser: DeltafiUser = await program.account.deltafiUser.fetchNullable(
+      deltafiUserPubkey,
+    );
     return {
       user: deltafiUser,
       publicKey: deltafiUserPubkey,
