@@ -42,6 +42,7 @@ import {
   createClaimFarmRewardsTransaction,
   createStakeTransaction,
   createUnstakeTransaction,
+  createUpdateStakeTransaction,
 } from "utils/transactions/stake";
 import { BN } from "@project-serum/anchor";
 import { sendSignedTransaction } from "utils/transactions";
@@ -120,8 +121,12 @@ const Stake = (): ReactElement => {
   const userQuoteShare = lpUser ? lpUser.quoteShare.toString() : "0";
   const userBaseStaked = lpUser ? lpUser.basePosition.depositedAmount.toString() : "0";
   const userQuoteStaked = lpUser ? lpUser.quotePosition.depositedAmount.toString() : "0";
-  const userTotalBase = lpUser ? lpUser.baseShare.add(lpUser.basePosition.depositedAmount).toString() : "0";
-  const userTotalQuote = lpUser ? lpUser.quoteShare.add(lpUser.quotePosition.depositedAmount).toString() : "0";
+  const userTotalBase = lpUser
+    ? lpUser.baseShare.add(lpUser.basePosition.depositedAmount).toString()
+    : "0";
+  const userTotalQuote = lpUser
+    ? lpUser.quoteShare.add(lpUser.quotePosition.depositedAmount).toString()
+    : "0";
 
   useEffect(() => {
     if (poolConfig) {
@@ -239,19 +244,16 @@ const Stake = (): ReactElement => {
   }, [userBaseStaked, userQuoteStaked, baseApr, quoteApr, lpUser, baseTokenInfo, quoteTokenInfo]);
 
   const handleSwitchMethod = useCallback(
-    (method: "stake" | "unstake") => {
-      const isStake = method === "stake";
-      dispatch(
-        stakeViewActions.setIsStake({
-          isStake,
-          baseBalance: new BigNumber(userTotalBase),
-          quoteBalance: new BigNumber(userTotalQuote),
-          baseStaked: new BigNumber(userBaseStaked),
-          quoteStaked: new BigNumber(userQuoteStaked),
-        }),
-      );
-    },
-    [dispatch, userBaseShare, userQuoteShare, userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote],
+    (method: "stake" | "unstake") => {},
+    [
+      dispatch,
+      userBaseShare,
+      userQuoteShare,
+      userBaseStaked,
+      userQuoteStaked,
+      userTotalBase,
+      userTotalQuote,
+    ],
   );
 
   const handleStake = useCallback(async () => {
@@ -269,11 +271,12 @@ const Stake = (): ReactElement => {
         const quoteAmount = new BigNumber(staking.quoteAmount).multipliedBy(
           new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
         );
-        const transaction = await createStakeTransaction(
+        const transaction = await createUpdateStakeTransaction(
           program,
           connection,
           poolConfig,
           walletPubkey,
+          lpUser,
           new BN(baseAmount.toFixed(0)),
           new BN(quoteAmount.toFixed(0)),
         );
@@ -611,24 +614,6 @@ const Stake = (): ReactElement => {
             <Typography color="primary" variant="body1" className={classes.marketCondition}>
               LIQUIDITY MINING
             </Typography>
-            <div className={classes.divider} />
-            <Box className={classes.tabs}>
-              <Box>
-                <MUIButton
-                  className={staking.isStake ? classes.activeBtn : classes.btn}
-                  onClick={() => handleSwitchMethod("stake")}
-                >
-                  Stake
-                </MUIButton>
-                &nbsp;
-                <MUIButton
-                  className={!staking.isStake ? classes.activeBtn : classes.btn}
-                  onClick={() => handleSwitchMethod("unstake")}
-                >
-                  Unstake
-                </MUIButton>
-              </Box>
-            </Box>
           </Box>
           <Box mb={1}>
             <Slider value={percentage} onChange={setStakePercentage} />
