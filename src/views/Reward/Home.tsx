@@ -155,7 +155,6 @@ const Home: React.FC = (props) => {
     owedRewardFromSwap: string;
     owedRewardFromReferral: string;
   } = useMemo(() => {
-    // const deltafiUserInfo = deltafiUser?.user;
     const parseRewardBN = (rewardAmount: BN) =>
       exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
     if (deltafiUser?.user) {
