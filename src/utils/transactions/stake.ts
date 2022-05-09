@@ -54,7 +54,7 @@ export async function createUpdateStakeTransaction(
     const quoteAmount = quoteDiffNegative ? quoteDiff.abs() : new BN(0);
     console.info("unstake", baseAmount.toNumber(), quoteAmount.toNumber());
     transaction.add(
-      program.transaction.depositToFarm(baseAmount, quoteAmount, {
+      program.transaction.withdrawFromFarm(baseAmount, quoteAmount, {
         accounts: {
           marketConfig: new PublicKey(deployConfigV2.marketConfig),
           farmInfo: new PublicKey(poolConfig.farmInfo),
