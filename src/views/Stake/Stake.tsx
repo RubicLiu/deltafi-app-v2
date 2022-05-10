@@ -44,8 +44,7 @@ import {
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
-import { anchorBnToBn, anchorBnToString, bnToAnchorBn, bnToString } from "utils/tokenUtils";
-import { BN } from "@project-serum/anchor";
+import { anchorBnToBn, bnToAnchorBn, bnToString } from "utils/tokenUtils";
 
 const SECONDS_OF_YEAR = 31556926;
 
@@ -127,7 +126,7 @@ const Stake = (): ReactElement => {
       ];
     }
     return [new BigNumber(0), new BigNumber(0), new BigNumber(0), new BigNumber(0)];
-  }, [lpUser]);
+  }, [lpUser, poolConfig]);
 
   useEffect(() => {
     if (poolConfig) {
