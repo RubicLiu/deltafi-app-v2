@@ -1,6 +1,5 @@
 import BigNumber from "bignumber.js";
 import { PublicKey } from "@solana/web3.js";
-import { exponentiatedBy } from "./decimal";
 import { BN } from "@project-serum/anchor";
 import { TokenConfig } from "constants/deployConfigV2";
 import { anchorBnToBn } from "./tokenUtils";
