@@ -11,9 +11,16 @@ env:
   NODE_ENV: production
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-18.04
 
+    steps:
+      - name: Linting
+        run: |
+          yarn lint:ci
+
+  build and test:
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -22,16 +29,10 @@ jobs:
       - name: Yarn Install
         run: |
           yarn install --silent --production=false
-      - name: Linting
-        run: |
-          yarn lint:ci
+      
       - name: Yarn Build
         run: |
           yarn build
-          
-  Tests:
-    runs-on: ubuntu-18.04
-    steps:
       - name: Jest
         run: |
           yarn jest
