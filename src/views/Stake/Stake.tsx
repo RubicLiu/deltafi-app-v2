@@ -44,7 +44,7 @@ import {
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
-import { anchorBnToBn, anchorBnToString, bnToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToBn, anchorBnToString, bnToAnchorBn, bnToString } from "utils/tokenUtils";
 import { BN } from "@project-serum/anchor";
 
 const SECONDS_OF_YEAR = 31556926;
@@ -116,22 +116,27 @@ const Stake = (): ReactElement => {
   );
 
   const [userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote] = useMemo(() => {
-    return [
-      lpUser ? lpUser.basePosition.depositedAmount : new BN(0),
-      lpUser ? lpUser.quotePosition.depositedAmount : new BN(0),
-      lpUser ? lpUser.baseShare.add(lpUser.basePosition.depositedAmount) : new BN(0),
-      lpUser ? lpUser.quoteShare.add(lpUser.quotePosition.depositedAmount) : new BN(0),
-    ];
+    if (lpUser) {
+      const baseTokenInfo = poolConfig.baseTokenInfo;
+      const quoteTokenInfo = poolConfig.quoteTokenInfo;
+      return [
+        anchorBnToBn(baseTokenInfo, lpUser.basePosition.depositedAmount),
+        anchorBnToBn(quoteTokenInfo, lpUser.quotePosition.depositedAmount),
+        anchorBnToBn(baseTokenInfo, lpUser.baseShare.add(lpUser.basePosition.depositedAmount)),
+        anchorBnToBn(quoteTokenInfo, lpUser.quoteShare.add(lpUser.quotePosition.depositedAmount)),
+      ];
+    }
+    return [new BigNumber(0), new BigNumber(0), new BigNumber(0), new BigNumber(0)];
   }, [lpUser]);
 
   useEffect(() => {
     if (poolConfig) {
       dispatch(
         stakeViewActions.setBalance({
-          baseBalance: anchorBnToBn(poolConfig.baseTokenInfo, userTotalBase),
-          quoteBalance: anchorBnToBn(poolConfig.quoteTokenInfo, userTotalQuote),
-          baseStaked: anchorBnToBn(poolConfig.baseTokenInfo, userBaseStaked),
-          quoteStaked: anchorBnToBn(poolConfig.quoteTokenInfo, userQuoteStaked),
+          baseBalance: userTotalBase,
+          quoteBalance: userTotalQuote,
+          baseStaked: userBaseStaked,
+          quoteStaked: userQuoteStaked,
         }),
       );
     }
@@ -212,15 +217,12 @@ const Stake = (): ReactElement => {
   const rewardRateByDay = useMemo(() => {
     if (lpUser && baseApr && quoteApr) {
       const baseRate = exponentiatedBy(
-        exponentiate(
-          anchorBnToBn(baseTokenInfo, userBaseStaked).multipliedBy(baseApr).dividedBy(365),
-          baseTokenInfo.decimals,
-        ),
+        exponentiate(userBaseStaked.multipliedBy(baseApr).dividedBy(365), baseTokenInfo.decimals),
         DELTAFI_TOKEN_DECIMALS,
       );
       const quoteRate = exponentiatedBy(
         exponentiate(
-          anchorBnToBn(quoteTokenInfo, userQuoteStaked).multipliedBy(quoteApr).dividedBy(365),
+          userQuoteStaked.multipliedBy(quoteApr).dividedBy(365),
           quoteTokenInfo.decimals,
         ),
         DELTAFI_TOKEN_DECIMALS,
@@ -412,8 +414,8 @@ const Stake = (): ReactElement => {
 
   if (!farmPool) return null;
 
-  const userBaseStakedString = anchorBnToString(baseTokenInfo, userBaseStaked);
-  const userQuoteStakedString = anchorBnToString(quoteTokenInfo, userQuoteStaked);
+  const userBaseStakedString = bnToString(baseTokenInfo, userBaseStaked);
+  const userQuoteStakedString = bnToString(quoteTokenInfo, userQuoteStaked);
 
   return (
     <Page>
