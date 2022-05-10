@@ -292,7 +292,7 @@ const Home: React.FC = (props) => {
       <ConnectButton
         variant="contained"
         onClick={handleRefresh}
-        disabled={rewardView.isRefreshing}
+        disabled={rewardView.isRefreshing || !deltafiUser?.user}
         data-amp-analytics-on="click"
         data-amp-analytics-name="click"
         data-amp-analytics-attrs="page: Reward, target: Refresh"
@@ -300,7 +300,7 @@ const Home: React.FC = (props) => {
         Refresh
       </ConnectButton>
     );
-  }, [rewardView, handleRefresh]);
+  }, [rewardView, deltafiUser, handleRefresh]);
 
   const claimRewardsButton = useMemo(() => {
     if (rewardView.isClaiming) {

@@ -52,7 +52,6 @@ export async function createClaimSwapRewardsTransaction(
   );
 
   let transactionCreateDeltafiTokenAccount: Transaction | undefined = undefined;
-  let transactionCreateDeltafiUser: Transaction | undefined = undefined;
 
   // if deltafi token does not exist
   // we create it for the user
@@ -65,18 +64,9 @@ export async function createClaimSwapRewardsTransaction(
     transactionCreateDeltafiTokenAccount = createTokenAccountResult.transaction;
   }
 
-  // if deltafi user account does not exist
-  // we create it for the user
+  // if deltafi user account does not exist, this function is not supposed to be called
   if (!deltafiUser) {
-    transactionCreateDeltafiUser = program.transaction.createDeltafiUser(deltafiUserBump, {
-      accounts: {
-        marketConfig,
-        owner: walletPubkey,
-        deltafiUser: deltafiUserPubkey,
-        systemProgram: web3.SystemProgram.programId,
-        rent: web3.SYSVAR_RENT_PUBKEY,
-      },
-    });
+    throw Error("Deltafi user context does not exist");
   }
 
   const transactionClaimRewards = program.transaction.claimSwapRewards({
@@ -91,11 +81,7 @@ export async function createClaimSwapRewardsTransaction(
   });
 
   return partialSignTransaction({
-    transaction: mergeTransactions([
-      transactionCreateDeltafiTokenAccount,
-      transactionCreateDeltafiUser,
-      transactionClaimRewards,
-    ]),
+    transaction: mergeTransactions([transactionCreateDeltafiTokenAccount, transactionClaimRewards]),
     feePayer: walletPubkey,
     signers: [],
     connection,
