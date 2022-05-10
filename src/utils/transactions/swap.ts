@@ -98,7 +98,7 @@ export async function createSwapTransaction(
     createAccountsCost += createTokenAccountCost;
   }
 
-  const hasReferrer = referrer != null && referrer.toBase58() !== ZERO_ADDRESS;
+  const hasReferrer = !!referrer && referrer.toBase58() !== ZERO_ADDRESS;
   const marketConfig = new PublicKey(deployConfigV2.marketConfig);
   const [deltafiUserPubkey, deltafiUserBump] = await PublicKey.findProgramAddress(
     [Buffer.from("User"), marketConfig.toBuffer(), walletPubkey.toBuffer()],
@@ -122,8 +122,10 @@ export async function createSwapTransaction(
     transaction.add(
       hasReferrer
         ? program.transaction.stableSwapWithReferrer(inAmount, minOutAmount, {
-            accounts: swapAccounts,
-            referrer,
+            accounts: {
+              ...swapAccounts,
+              referrer,
+            },
           })
         : program.transaction.stableSwap(inAmount, minOutAmount, {
             accounts: swapAccounts,
