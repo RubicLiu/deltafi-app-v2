@@ -46,7 +46,7 @@ export async function createClaimSwapRewardsTransaction(
   deltafiUser: DeltafiUser,
 ) {
   const marketConfig = new PublicKey(deployConfigV2.marketConfig);
-  const [deltafiUserPubkey, deltafiUserBump] = await PublicKey.findProgramAddress(
+  const [deltafiUserPubkey, _] = await PublicKey.findProgramAddress(
     [Buffer.from("User"), marketConfig.toBuffer(), walletPubkey.toBuffer()],
     program.programId,
   );
