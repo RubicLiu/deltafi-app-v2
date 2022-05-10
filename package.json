@@ -74,7 +74,7 @@
     "build-dev": "REACT_APP_DEPLOYMENT_MODE=mainnet-test DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",
     "build-dev-2": "REACT_APP_DEPLOYMENT_MODE=mainnet-test-2 DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",
     "build-debug": "REACT_APP_DEPLOYMENT_MODE=mainnet-test DISABLE_ESLINT_PLUGIN=true react-scripts build",
-    "test": "react-scripts test",
+    "test": "yarn jest",
     "eject": "react-scripts eject",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",
     "lint:ci": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
