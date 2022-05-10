@@ -12,14 +12,24 @@ import copy from "copy-to-clipboard";
 import { sendSignedTransaction } from "utils/transactions";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
-import { deltafiUserSelector, programSelector, rewardViewSelector } from "states/selectors";
+import {
+  deltafiUserSelector,
+  programSelector,
+  rewardViewSelector,
+  selectTokenAccountInfoByMint,
+} from "states/selectors";
 import { rewardViewActions } from "states/views/rewardView";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
-import { createDeltafiUserTransaction } from "utils/transactions/deltafiUser";
+import {
+  createClaimRewardsTransaction,
+  createDeltafiUserTransaction,
+} from "utils/transactions/deltafiUser";
 import { DELTAFI_TOKEN_DECIMALS } from "constants/index";
 import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
+import { deployConfigV2 } from "constants/deployConfigV2";
+import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
 
 /*
  * mockup test data for reward page
@@ -146,6 +156,7 @@ const Home: React.FC = (props) => {
 
   const rewardView = useSelector(rewardViewSelector);
   const deltafiUser = useSelector(deltafiUserSelector);
+  const userDeltafiToken = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
   const referralLinkState = rewardView.referralLinkState;
   const referralLink = rewardView.referralLink;
 
@@ -235,6 +246,12 @@ const Home: React.FC = (props) => {
 
   const handleClaimRewards = useCallback(() => {
     console.log("claim rewards");
+    const transaction = createClaimRewardsTransaction(
+      program,
+      program.provider.connection,
+      walletPubkey,
+      userDeltafiToken,
+    );
   }, []);
 
   return (

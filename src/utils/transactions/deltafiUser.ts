@@ -4,7 +4,8 @@ import { deployConfigV2 } from "constants/deployConfigV2";
 import { web3 } from "@project-serum/anchor";
 import * as token from "@solana/spl-token";
 import { DeltafiUser } from "anchor/type_definitions";
-import { Transaction } from "ethers";
+import { Transaction } from "@solana/web3.js";
+import { createTokenAccountTransaction } from "utils/transactions";
 
 export async function createDeltafiUserTransaction(
   program: any,
@@ -36,7 +37,7 @@ export async function createDeltafiUserTransaction(
   });
 }
 
-export async function claimRewardsTransaction(
+export async function createClaimRewardsTransaction(
   program: any,
   connection: Connection,
   walletPubkey: PublicKey,
@@ -48,11 +49,22 @@ export async function claimRewardsTransaction(
     program.programId,
   );
 
+  let transactionCreateDeltafiTokenAccount: Transaction | undefined = undefined;
+  let transactionCreateDeltafiUser: Transaction | undefined = undefined;
+
+  if (!userDeltafiToken) {
+    const createTokenAccountResult = await createTokenAccountTransaction({
+      walletPubkey,
+      mintPublicKey: new PublicKey(deployConfigV2.DELTAFI_TOKEN_MINT),
+    });
+    userDeltafiToken = createTokenAccountResult.newAccountPubkey;
+    transactionCreateDeltafiTokenAccount = createTokenAccountResult.transaction;
+  }
+
   const deltafiUser: DeltafiUser = await program.account.deltafiUser.fetchNullable(
     deltafiUserPubkey,
   );
 
-  let transactionCreateDeltafiUser: Transaction | undefined = undefined;
   if (!deltafiUser) {
     transactionCreateDeltafiUser = program.transaction.createDeltafiUser(deltafiUserBump, {
       accounts: {
