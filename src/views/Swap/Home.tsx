@@ -287,11 +287,7 @@ const Home: React.FC = (props) => {
     const connection = program.provider.connection;
     dispatch(swapViewActions.setIsProcessing({ isProcessing: true }));
     try {
-      const referrer = enableReferral
-        ? deltafiUser?.referrer
-          ? deltafiUser?.referrer
-          : app.referrer
-        : null;
+      const referrer = enableReferral ? (deltafiUser?.referrer || app.referrer) : null;
       const amountIn = stringToAnchorBn(tokenFrom.token, tokenFrom.amount);
       const minimumAmountOut = stringToAnchorBn(tokenTo.token, tokenTo.amountWithSlippage);
       const swapDirection =
