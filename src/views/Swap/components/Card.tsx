@@ -4,11 +4,12 @@ import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
 
 import { DropDown } from "components";
 import { CardProps } from "./types";
-import { exponentiatedBy } from "utils/decimal";
 import BigNumber from "bignumber.js";
 import { useSelector } from "react-redux";
 import { selectTokenAccountInfoByMint } from "states/selectors";
 import { getTokenConfigBySymbol } from "constants/deployConfigV2";
+import { anchorBnToBn } from "utils/tokenUtils";
+import { BN } from "@project-serum/anchor";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -89,7 +90,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
 
   const tokenBalance = useMemo(() => {
     if (tokenAccount && card) {
-      return exponentiatedBy(tokenAccount.amount, card.token.decimals);
+      return anchorBnToBn(card.token, new BN(tokenAccount.amount.toString()));
     }
     return null;
   }, [tokenAccount, card]);

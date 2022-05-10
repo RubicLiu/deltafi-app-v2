@@ -24,7 +24,7 @@ import { ConnectButton } from "components";
 import SettingsPanel from "components/SettingsPanel/SettingsPanel";
 import SwapCard from "./components/Card";
 import { useModal } from "providers/modal";
-import { exponentiate, exponentiatedBy } from "utils/decimal";
+import { exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK } from "constants/index";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
@@ -57,6 +57,7 @@ import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { createSwapTransaction } from "utils/transactions/swap";
 import { BN } from "@project-serum/anchor";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
+import { anchorBnToString, stringToAnchorBn } from "utils/tokenUtils";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -288,12 +289,8 @@ const Home: React.FC = (props) => {
     try {
       const referrer = enableReferral ? deltafiUser?.referrer : app.referrer;
 
-      const amountIn = BigInt(
-        exponentiate(tokenFrom.amount, tokenFrom.token.decimals).integerValue().toString(),
-      );
-      const minimumAmountOut = BigInt(
-        exponentiate(tokenTo.amountWithSlippage, tokenTo.token.decimals).integerValue().toString(),
-      );
+      const amountIn = stringToAnchorBn(tokenFrom.token, tokenFrom.amount);
+      const minimumAmountOut = stringToAnchorBn(tokenTo.token, tokenTo.amountWithSlippage);
       const swapDirection =
         tokenFrom.token.mint === swapInfo.mintBase.toBase58()
           ? SWAP_DIRECTION.SellBase
@@ -311,8 +308,8 @@ const Home: React.FC = (props) => {
           deltafiUser,
           referrer,
           swapDirection,
-          new BN(amountIn.toString()),
-          new BN(minimumAmountOut.toString()),
+          amountIn,
+          minimumAmountOut,
         );
 
       transaction = await signTransaction(transaction);
@@ -378,8 +375,14 @@ const Home: React.FC = (props) => {
         toProcessFee = (await getTransactionFee()) + createAccountsCost;
       }
 
-      const actualAmountFrom = new BigNumber(-fromTokenBalanceDiff - fromProcessFee);
-      const actualAmountTo = new BigNumber(toTokenBalanceDiff + toProcessFee);
+      const actualAmountFrom = anchorBnToString(
+        tokenFrom.token,
+        new BN(-fromTokenBalanceDiff - fromProcessFee),
+      );
+      const actualAmountTo = anchorBnToString(
+        tokenTo.token,
+        new BN(toTokenBalanceDiff + toProcessFee),
+      );
 
       dispatch(
         swapViewActions.setTransactionResult({
@@ -388,11 +391,11 @@ const Home: React.FC = (props) => {
             signature,
             base: {
               ...tokenFrom,
-              amount: exponentiatedBy(actualAmountFrom, tokenFrom.token.decimals).toString(),
+              amount: actualAmountFrom,
             },
             quote: {
               ...tokenTo,
-              amount: exponentiatedBy(actualAmountTo, tokenTo.token.decimals).toString(),
+              amount: actualAmountTo,
             },
           },
         }),
