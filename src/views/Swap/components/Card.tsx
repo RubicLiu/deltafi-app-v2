@@ -120,8 +120,17 @@ const SwapCard: React.FC<CardProps> = (props) => {
 
   const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.replace(/[^\d.-]/g, "");
-    if (isNaN(parseFloat(value)) && value !== "") return;
-    handleChangeCard({ ...card, amount: value });
+    if (new BigNumber(value).isNaN() && value !== "") {
+      return;
+    } else if (value === "") {
+      handleChangeCard({ ...card, amount: "0" });
+    } else {
+      const valueToFixedDecimal = parseFloat(value).toFixed(card.token.decimals);
+      handleChangeCard({
+        ...card,
+        amount: value.length > valueToFixedDecimal.length ? valueToFixedDecimal : value,
+      });
+    }
   };
 
   return (
@@ -139,7 +148,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
           disabled={isDisabledInput}
           className={classes.currencyInput}
           autoComplete="off"
-          placeholder="0.00"
+          placeholder="0"
           minLength={0}
           maxLength={20}
           decimalsLimit={20}

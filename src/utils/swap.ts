@@ -242,7 +242,9 @@ export function generateResultFromAmountOut(
     rawAmountOutWithTradeFee.minus(rawAmountFromSlippage);
 
   return {
-    amountOut: dividedByDecimals(rawAmountOutWithTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
+    amountOut: parseFloat(
+      dividedByDecimals(rawAmountOutWithTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
+    ).toString(),
     amountOutWithSlippage: dividedByDecimals(
       rawAmountOutWithTradeFeeWithSlippage,
       mintDecimalsB,

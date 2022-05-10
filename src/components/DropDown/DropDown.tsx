@@ -258,7 +258,7 @@ const DropDown = <T extends TokenConfig>(props: DropDownProps<T> & { children?: 
                       </Box>
                       {option.symbol && (
                         <Typography className={classes.optionLabel}>
-                          {"0.00"} {option.symbol}
+                          {"0"} {option.symbol}
                         </Typography>
                       )}
                     </Box>

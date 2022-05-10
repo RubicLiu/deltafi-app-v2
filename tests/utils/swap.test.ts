@@ -273,7 +273,7 @@ describe("utils/swap", function () {
         new BigNumber(0.163),
       ),
     ).toEqual({
-      amountOut: "0.324000",
+      amountOut: "0.324",
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
       priceImpact: "0.00001840490797546012",
@@ -315,7 +315,7 @@ describe("utils/swap", function () {
         new BigNumber(165),
       ),
     ).toEqual({
-      amountOut: "0.324000",
+      amountOut: "0.324",
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
       priceImpact: "0.00001840490797546012",
@@ -355,7 +355,7 @@ describe("utils/swap", function () {
         new BigNumber(0.163),
       ),
     ).toEqual({
-      amountOut: "1.990000",
+      amountOut: "1.99",
       amountOutWithSlippage: "1.970100",
       fee: "0.009999",
       priceImpact: "0.0000183943864425622",
