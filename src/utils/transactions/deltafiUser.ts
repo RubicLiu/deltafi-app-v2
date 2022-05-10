@@ -52,6 +52,8 @@ export async function createClaimRewardsTransaction(
   let transactionCreateDeltafiTokenAccount: Transaction | undefined = undefined;
   let transactionCreateDeltafiUser: Transaction | undefined = undefined;
 
+  // if deltafi token does not exist
+  // we create it for the user
   if (!userDeltafiToken) {
     const createTokenAccountResult = await createTokenAccountTransaction({
       walletPubkey,
@@ -65,6 +67,8 @@ export async function createClaimRewardsTransaction(
     deltafiUserPubkey,
   );
 
+  // if deltafi user account does not exist
+  // we create it for the user
   if (!deltafiUser) {
     transactionCreateDeltafiUser = program.transaction.createDeltafiUser(deltafiUserBump, {
       accounts: {
@@ -80,7 +84,7 @@ export async function createClaimRewardsTransaction(
   const transactionClaimRewards = program.transaction.claimSwapRewards({
     accounts: {
       marketConfig,
-      deltafiUser,
+      deltafiUser: deltafiUserPubkey,
       userDeltafiToken,
       swapDeltafiToken: new PublicKey(deployConfigV2.deltafiToken),
       owner: walletPubkey,
@@ -89,7 +93,11 @@ export async function createClaimRewardsTransaction(
   });
 
   return partialSignTransaction({
-    transaction: mergeTransactions([transactionCreateDeltafiUser, transactionClaimRewards]),
+    transaction: mergeTransactions([
+      transactionCreateDeltafiTokenAccount,
+      transactionCreateDeltafiUser,
+      transactionClaimRewards,
+    ]),
     feePayer: walletPubkey,
     signers: [],
     connection,

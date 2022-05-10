@@ -23,11 +23,14 @@ export const fetchSwapsThunk = createAsyncThunk(
     const swapAddressList = deployConfigV2.poolInfoList.map(
       ({ swapInfo }) => new PublicKey(swapInfo),
     );
+    console.log("fetching");
     const swapInfoList = await program.account.swapInfo.fetchMultiple(swapAddressList);
     const swapKeyToSwapInfo = {};
     for (let i = 0; i < poolInfoList.length; ++i) {
       const poolInfo = poolInfoList[i];
       const swapInfo = swapInfoList[i];
+      console.log("poolInfo.swapInfo", poolInfo.swapInfo);
+      console.log("swapInfo", swapInfo);
       swapKeyToSwapInfo[poolInfo.swapInfo] = swapInfo;
     }
 
