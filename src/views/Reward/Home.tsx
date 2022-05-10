@@ -19,7 +19,10 @@ import {
   selectTokenAccountInfoByMint,
 } from "states/selectors";
 import { rewardViewActions } from "states/views/rewardView";
-import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
+import {
+  fetchDeltafiUserManually,
+  fetchDeltafiUserThunk,
+} from "states/accounts/deltafiUserAccount";
 import {
   createClaimRewardsTransaction,
   createDeltafiUserTransaction,
@@ -29,7 +32,6 @@ import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
 import { deployConfigV2 } from "constants/deployConfigV2";
-import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
 
 /*
  * mockup test data for reward page
@@ -240,24 +242,90 @@ const Home: React.FC = (props) => {
     }
   }, [dispatch, walletPubkey, signTransaction, program]);
 
-  const handleRefresh = useCallback(() => {
-    console.log("refresh");
-  }, []);
+  const connection = program.provider.connection;
+  const handleRefresh = useCallback(async () => {
+    dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: true }));
+
+    try {
+      await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
+    } catch (e) {
+      console.error(e);
+      // TODO(leqiang): Add error display her
+    } finally {
+      dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: false }));
+    }
+  }, [connection, walletPubkey, dispatch]);
 
   const handleClaimRewards = useCallback(async () => {
-    console.log("claim rewards");
-    const connection = program.provider.connection;
-    const partialSignedTransaction = await createClaimRewardsTransaction(
-      program,
-      connection,
-      walletPubkey,
-      userDeltafiToken.publicKey,
-    );
+    dispatch(rewardViewActions.setIsClaiming({ isClaiming: true }));
 
-    const signedTransaction = await signTransaction(partialSignedTransaction);
-    const signature = await sendSignedTransaction({ signedTransaction, connection });
-    await connection.confirmTransaction(signature, "confirmed");
-  }, []);
+    try {
+      const partialSignedTransaction = await createClaimRewardsTransaction(
+        program,
+        connection,
+        walletPubkey,
+        userDeltafiToken.publicKey,
+      );
+
+      const signedTransaction = await signTransaction(partialSignedTransaction);
+      const signature = await sendSignedTransaction({ signedTransaction, connection });
+      await connection.confirmTransaction(signature, "confirmed");
+      await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
+    } catch (e) {
+      console.error(e);
+      // TODO(leqiang): Add error display here
+    } finally {
+      dispatch(rewardViewActions.setIsClaiming({ isClaiming: false }));
+    }
+  }, [connection, program, walletPubkey, userDeltafiToken, dispatch, signTransaction]);
+
+  const refreshButton = useMemo(() => {
+    if (rewardView.isRefreshing) {
+      return (
+        <ConnectButton variant="contained" disabled={true}>
+          <Avatar src={loadingIcon} />
+        </ConnectButton>
+      );
+    }
+    return (
+      <ConnectButton
+        variant="contained"
+        onClick={handleRefresh}
+        disabled={rewardView.isRefreshing}
+        data-amp-analytics-on="click"
+        data-amp-analytics-name="click"
+        data-amp-analytics-attrs="page: Reward, target: Refresh"
+      >
+        Refresh
+      </ConnectButton>
+    );
+  }, [rewardView, handleRefresh]);
+
+  const claimRewardsButton = useMemo(() => {
+    if (rewardView.isClaiming) {
+      return (
+        <ConnectButton variant="contained" disabled={true}>
+          <Avatar src={loadingIcon} />
+        </ConnectButton>
+      );
+    }
+    return (
+      <ConnectButton
+        variant="contained"
+        onClick={handleClaimRewards}
+        disabled={
+          !deltafiUser?.user?.owedReferralRewards ||
+          !deltafiUser?.user?.owedSwapRewards ||
+          deltafiUser?.user.owedReferralRewards.add(deltafiUser?.user.owedSwapRewards).eq(new BN(0))
+        }
+        data-amp-analytics-on="click"
+        data-amp-analytics-name="click"
+        data-amp-analytics-attrs="page: Reward, target: claimRewards"
+      >
+        Claim Rewards
+      </ConnectButton>
+    );
+  }, [rewardView, deltafiUser, handleClaimRewards]);
 
   return (
     <Page>
@@ -471,35 +539,8 @@ const Home: React.FC = (props) => {
             </Grid>
 
             <Grid item xs={12} sm={4} md={4}>
-              <Box>
-                <ConnectButton
-                  variant="contained"
-                  onClick={handleRefresh}
-                  data-amp-analytics-on="click"
-                  data-amp-analytics-name="click"
-                  data-amp-analytics-attrs="page: Farms, target: Claim"
-                >
-                  Refresh
-                </ConnectButton>
-              </Box>
-              <Box>
-                <ConnectButton
-                  variant="contained"
-                  onClick={handleClaimRewards}
-                  disabled={
-                    !deltafiUser?.user?.owedReferralRewards ||
-                    !deltafiUser?.user?.owedSwapRewards ||
-                    deltafiUser?.user.owedReferralRewards
-                      .add(deltafiUser?.user.owedSwapRewards)
-                      .eq(new BN(0))
-                  }
-                  data-amp-analytics-on="click"
-                  data-amp-analytics-name="click"
-                  data-amp-analytics-attrs="page: Farms, target: Claim"
-                >
-                  Claim Rewards
-                </ConnectButton>
-              </Box>
+              <Box>{refreshButton}</Box>
+              <Box>{claimRewardsButton}</Box>
             </Grid>
           </Grid>
         </Box>
