@@ -113,7 +113,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
       );
       const userQuoteTvl = getUserTokenTvl(
         quoteTvl,
-        farmInfo.stakedQuoteShare.toString(),
+        farmInfo.stakedQuoteShare,
         swapInfo.poolState.quoteSupply,
       );
       return userBaseTvl.plus(userQuoteTvl);
