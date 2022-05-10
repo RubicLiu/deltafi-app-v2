@@ -75,8 +75,8 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000;
 };
 
-const DEFAULT_TIMEOUT = 15000;
-const DEFAULT_MAX_RETRIES = 3;
+const DEFAULT_TIMEOUT = 10000;
+const DEFAULT_MAX_RETRIES = 4;
 
 export async function sendSignedTransaction({
   signedTransaction,
