@@ -100,18 +100,13 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const tvl = baseTvl.plus(quoteTvl);
 
-  // export function getUserTokenTvl(tvl: BigNumber, share: BigNumber, supply: BigNumber) {
   const sharePrice = useMemo(() => {
     if (swapInfo && lpUser) {
-      const userBaseTvl = getUserTokenTvl(
-        baseTvl,
-        new BigNumber(lpUser.baseShare),
-        new BigNumber(swapInfo.poolState.baseSupply),
-      );
+      const userBaseTvl = getUserTokenTvl(baseTvl, lpUser.baseShare, swapInfo.poolState.baseSupply);
       const userQuoteTvl = getUserTokenTvl(
         quoteTvl,
-        new BigNumber(lpUser.quoteShare),
-        new BigNumber(swapInfo.poolState.quoteSupply),
+        lpUser.quoteShare,
+        swapInfo.poolState.quoteSupply,
       );
       return userBaseTvl.plus(userQuoteTvl);
     }
@@ -122,13 +117,13 @@ const PoolCard: React.FC<CardProps> = (props) => {
     if (swapInfo && lpUser) {
       const userBaseTvl = getUserTokenTvl(
         baseTvl,
-        new BigNumber(lpUser.basePosition.depositedAmount),
-        new BigNumber(swapInfo.poolState.baseSupply),
+        lpUser.basePosition.depositedAmount,
+        swapInfo.poolState.baseSupply,
       );
       const userQuoteTvl = getUserTokenTvl(
         quoteTvl,
-        new BigNumber(lpUser.quotePosition.depositedAmount),
-        new BigNumber(swapInfo.poolState.quoteSupply.toString()),
+        lpUser.quotePosition.depositedAmount,
+        swapInfo.poolState.quoteSupply,
       );
       return userBaseTvl.plus(userQuoteTvl);
     }

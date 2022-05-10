@@ -108,13 +108,13 @@ const FarmCard: React.FC<CardProps> = (props) => {
     if (swapInfo && farmInfo) {
       const userBaseTvl = getUserTokenTvl(
         baseTvl,
-        new BigNumber(farmInfo.stakedBaseShare.toString()),
-        new BigNumber(swapInfo.poolState.baseSupply.toString()),
+        farmInfo.stakedBaseShare,
+        swapInfo.poolState.baseSupply,
       );
       const userQuoteTvl = getUserTokenTvl(
         quoteTvl,
-        new BigNumber(farmInfo.stakedQuoteShare.toString()),
-        new BigNumber(swapInfo.poolState.quoteSupply.toString()),
+        farmInfo.stakedQuoteShare.toString(),
+        swapInfo.poolState.quoteSupply,
       );
       return userBaseTvl.plus(userQuoteTvl);
     }
@@ -125,13 +125,13 @@ const FarmCard: React.FC<CardProps> = (props) => {
     if (swapInfo && lpUser) {
       const userBaseTvl = getUserTokenTvl(
         baseTvl,
-        new BigNumber(lpUser.basePosition.depositedAmount.toString()),
-        new BigNumber(swapInfo.poolState.baseSupply.toString()),
+        lpUser.basePosition.depositedAmount,
+        swapInfo.poolState.baseSupply,
       );
       const userQuoteTvl = getUserTokenTvl(
         quoteTvl,
-        new BigNumber(lpUser.quotePosition.depositedAmount.toString()),
-        new BigNumber(swapInfo.poolState.quoteSupply.toString()),
+        lpUser.quotePosition.depositedAmount,
+        swapInfo.poolState.quoteSupply,
       );
       return userBaseTvl.plus(userQuoteTvl);
     }

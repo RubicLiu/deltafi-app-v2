@@ -36,11 +36,13 @@ export function getTokenTvl(tokenConfig: TokenConfig, amount: BN, price: BigNumb
   return anchorBnToBn(tokenConfig, amount).multipliedBy(price);
 }
 
-export function getUserTokenTvl(tvl: BigNumber, share: BigNumber, supply: BigNumber) {
-  if (share.isZero() || share.isNaN()) {
+export function getUserTokenTvl(tvl: BigNumber, share: BN, supply: BN) {
+  if (share.isZero()) {
     return new BigNumber(0);
   }
-  return tvl.multipliedBy(share).dividedBy(supply);
+  return tvl
+    .multipliedBy(new BigNumber(share.toString()))
+    .dividedBy(new BigNumber(supply.toString()));
 }
 
 export function validate(expression: boolean, errMsg: string) {
