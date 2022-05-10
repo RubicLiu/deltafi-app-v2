@@ -3,7 +3,6 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import { PriceData, ProductData, parsePriceData } from "@pythnetwork/client";
 import BigNumber from "bignumber.js";
 
-import { getMultipleAccounts } from "utils/account";
 import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { validate } from "utils/utils";
 
@@ -46,11 +45,12 @@ export const pythAccountReducer = createReducer(initialState, (builder) => {
 async function getPythDataList(connection: Connection) {
   const tokenInfoList = deployConfigV2.tokenInfoList;
   const pythPriceKeys = tokenInfoList.map(({ pyth }) => new PublicKey(pyth.price));
-  const priceInfos = await getMultipleAccounts(connection, pythPriceKeys, "confirmed");
+
+  const priceInfos = await connection.getMultipleAccountsInfo(pythPriceKeys, "confirmed");
   const pythDataList = [];
   for (let i = 0; i < priceInfos.keys.length; i++) {
-    const priceKey = priceInfos.keys[i];
-    const priceData = parsePriceData(priceInfos.array[i].data as Buffer);
+    const priceKey = pythPriceKeys[i];
+    const priceData = parsePriceData(priceInfos[i].data as Buffer);
     const symbol = tokenInfoList[i].symbol;
     pythDataList.push({
       priceKey,
