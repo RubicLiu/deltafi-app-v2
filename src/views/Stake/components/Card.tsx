@@ -103,7 +103,7 @@ const StakeCard: React.FC<CardProps> = (props) => {
           disabled={true}
           className={classes.currencyInput}
           autoComplete="off"
-          placeholder="0.00"
+          placeholder="0"
           minLength={0}
           maxLength={20}
           decimalsLimit={20}
@@ -123,7 +123,7 @@ const StakeCard: React.FC<CardProps> = (props) => {
           disabled={true}
           className={classes.currencyInput}
           autoComplete="off"
-          placeholder="0.00"
+          placeholder="0"
           minLength={0}
           maxLength={20}
           decimalsLimit={20}

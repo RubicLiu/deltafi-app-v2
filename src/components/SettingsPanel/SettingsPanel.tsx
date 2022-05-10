@@ -151,7 +151,7 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
             className={classes.currencyInput}
             defaultValue={0}
             autoComplete="off"
-            placeholder="0.00"
+            placeholder="0"
             allowNegativeValue={false}
             suffix="%"
             decimalScale={1}

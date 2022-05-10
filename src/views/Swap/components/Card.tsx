@@ -126,7 +126,11 @@ const SwapCard: React.FC<CardProps> = (props) => {
     } else if (value === "") {
       handleChangeCard({ ...card, amount: "0" });
     } else {
-      handleChangeCard({ ...card, amount: value });
+      const valueToFixedDecimal = parseFloat(value).toFixed(card.token.decimals);
+      handleChangeCard({
+        ...card,
+        amount: value.length > valueToFixedDecimal.length ? valueToFixedDecimal : value,
+      });
     }
   };
 
@@ -145,7 +149,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
           disabled={isDisabledInput}
           className={classes.currencyInput}
           autoComplete="off"
-          placeholder="0.00"
+          placeholder="0"
           minLength={0}
           maxLength={20}
           decimalsLimit={20}

@@ -755,7 +755,7 @@ const Deposit: React.FC = () => {
 
   const reserveDisplay = (reserve: BigNumber, decimals: number): string => {
     if (!reserve || !decimals) {
-      return "0.00";
+      return "0";
     }
 
     const displayThreshold = 1;
