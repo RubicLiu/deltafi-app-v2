@@ -210,27 +210,21 @@ const Home: React.FC = (props) => {
       newTokenTo = Object.assign({}, tokenFrom.token);
     }
 
-    const useOldInput: boolean = new BigNumber(card.amount).isNaN();
-    const tokenFromAmount = useOldInput ? tokenFrom.amount : card.amount;
-    let amountOut = useOldInput ? tokenTo.amount : "";
-    let amountOutWithSlippage = useOldInput ? tokenTo.amountWithSlippage : "";
+    const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
+      getSwapOutAmount(
+        swapInfo,
+        newTokenFrom,
+        newTokenTo,
+        card.amount ?? "0",
+        parseFloat(swapView.priceImpact),
+        marketPrice,
+      );
 
-    if (!useOldInput && swapInfo && swapView.priceImpact) {
-      const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
-        getSwapOutAmount(
-          swapInfo,
-          newTokenFrom,
-          newTokenTo,
-          tokenFromAmount ?? "0",
-          parseFloat(swapView.priceImpact),
-          marketPrice,
-        );
+    const amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
+    const amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
 
-      amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
-      amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
-    }
     dispatch(
-      swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: tokenFromAmount }),
+      swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: card.amount }),
     );
     dispatch(
       swapViewActions.setTokenTo({

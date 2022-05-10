@@ -177,6 +177,7 @@ const DropDown = <T extends TokenConfig>(props: DropDownProps<T> & { children?: 
               <Avatar src={value?.logoURI} alt={value?.symbol} className={classes.icon} />
             ) : (
               (() => {
+                console.log(value)
                 if (!value?.symbol) {
                   return null;
                 }

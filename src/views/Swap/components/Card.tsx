@@ -120,8 +120,13 @@ const SwapCard: React.FC<CardProps> = (props) => {
 
   const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.replace(/[^\d.-]/g, "");
-    if (isNaN(parseFloat(value)) && value !== "") return;
-    handleChangeCard({ ...card, amount: value });
+    if (new BigNumber(value).isNaN() && value !== "") {
+      return;
+    } else if (value === "") {
+      handleChangeCard({ ...card, amount: "0" });
+    } else {
+      handleChangeCard({ ...card, amount: value });
+    }
   };
 
   return (
