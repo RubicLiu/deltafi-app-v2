@@ -28,6 +28,10 @@ jobs:
       - name: Yarn Build
         run: |
           yarn build
+          
+  Tests:
+    runs-on: ubuntu-18.04
+    steps:
       - name: Jest
         run: |
           yarn jest
