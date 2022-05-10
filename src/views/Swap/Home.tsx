@@ -236,12 +236,12 @@ const Home: React.FC = (props) => {
   };
 
   const handleTokenToInput = (card: ISwapCard) => {
+    let newTokenFrom = tokenFrom.token;
+    let newTokenTo = card.token;
+    if (tokenFrom.token.mint === newTokenTo.mint) {
+      newTokenFrom = Object.assign({}, tokenTo.token);
+    }
     // TODO(leqiang): add calculate input amount from output amount and enable this
-    // let newTokenFrom = tokenFrom.token;
-    // let newTokenTo = card.token;
-    // if (tokenFrom.token.mint === newTokenTo.mint) {
-    //   newTokenFrom = Object.assign({}, tokenTo.token);
-    // }
     // const useOldInput: boolean = new BigNumber(card.amount).isNaN();
     // const tokenToAmount = useOldInput? tokenFrom.amount : card.amount;
     // let amountOut = useOldInput? tokenTo.amount : "";
@@ -259,14 +259,15 @@ const Home: React.FC = (props) => {
     //   amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
     //   amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
     // }
-    // dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenFrom }));
-    // dispatch(
-    //   swapViewActions.setTokenFrom({
-    //     token: newTokenTo,
-    //     amount: amountOut,
-    //     amountWithSlippage: amountOutWithSlippage,
-    //   }),
-    // );
+    dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenTo }));
+    dispatch(
+      swapViewActions.setTokenFrom({
+        ...tokenFrom,
+        token: newTokenFrom,
+        // amount: amountOut,
+        // amountWithSlippage: amountOutWithSlippage,
+      }),
+    );
   };
 
   const swapCallback = useCallback(async () => {
