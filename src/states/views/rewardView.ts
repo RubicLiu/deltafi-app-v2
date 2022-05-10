@@ -3,6 +3,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 const initialState = {
   referralLinkState: "Unavailable",
   referralLink: "",
+  isRefreshing: false,
+  isClaiming: false,
 };
 
 const rewardViewSlice = createSlice({
@@ -15,6 +17,14 @@ const rewardViewSlice = createSlice({
 
     setReferralLink(state, action: PayloadAction<{ referralLink: string }>) {
       state.referralLink = action.payload.referralLink;
+    },
+
+    setIsRefreshing(state, action: PayloadAction<{ isRefreshing: boolean }>) {
+      state.isRefreshing = action.payload.isRefreshing;
+    },
+
+    setIsClaiming(state, action: PayloadAction<{ isClaiming: boolean }>) {
+      state.isClaiming = action.payload.isClaiming;
     },
   },
 });
