@@ -22,6 +22,7 @@ const rewardViewSlice = createSlice({
     setIsRefreshing(state, action: PayloadAction<{ isRefreshing: boolean }>) {
       state.isRefreshing = action.payload.isRefreshing;
     },
+    
     setIsClaiming(state, action: PayloadAction<{ isClaiming: boolean }>) {
       state.isClaiming = action.payload.isClaiming;
     },
