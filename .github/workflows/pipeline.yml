@@ -28,6 +28,6 @@ jobs:
       - name: Yarn Build
         run: |
           yarn build
-      - name: Yarn Jest
+      - name: Jest
         run: |
           yarn jest
