@@ -7,7 +7,7 @@ import { CardProps } from "./types";
 import BigNumber from "bignumber.js";
 import { useSelector } from "react-redux";
 import { selectTokenAccountInfoByMint } from "states/selectors";
-import { getTokenConfigBySymbol } from "constants/deployConfigV2";
+import { getTokenConfigBySymbol, TokenConfig } from "constants/deployConfigV2";
 import { anchorBnToBn } from "utils/tokenUtils";
 import { BN } from "@project-serum/anchor";
 
@@ -114,6 +114,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
   }, [disabled, card.token]);
 
   const handleChangeToken = (token) => {
+    console.log(token);
     const newToken = getTokenConfigBySymbol(token.symbol);
     handleChangeCard({ ...card, token: newToken });
   };
