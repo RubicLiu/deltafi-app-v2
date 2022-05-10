@@ -18,6 +18,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
+      - name: Yarn Install
+        run: |
+          yarn install --silent --production=false
       - name: Linting
         run: |
           yarn lint:ci
@@ -29,10 +32,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-      - name: Yarn Install
-        run: |
-          yarn install --silent --production=false
-      
+
       - name: Yarn Build
         run: |
           yarn build
