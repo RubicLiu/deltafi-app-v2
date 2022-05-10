@@ -44,7 +44,7 @@ import {
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
-import { anchorBnToBn, bnToAnchorBn, bnToString, stringToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToBn, bnToString, stringToAnchorBn } from "utils/tokenUtils";
 
 const SECONDS_OF_YEAR = 31556926;
 
