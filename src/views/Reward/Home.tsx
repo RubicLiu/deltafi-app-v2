@@ -229,6 +229,14 @@ const Home: React.FC = (props) => {
     }
   }, [dispatch, walletPubkey, signTransaction, program]);
 
+  const handleRefresh = useCallback(() => {
+    console.log("refresh");
+  }, []);
+
+  const handleClaimRewards = useCallback(() => {
+    console.log("claim rewards");
+  }, []);
+
   return (
     <Page>
       <Box className={classes.root}>
@@ -438,6 +446,38 @@ const Home: React.FC = (props) => {
               </Typography>
               <Box>{`From Swap: ${rewardDisplayInfo.owedRewardFromSwap}`}</Box>
               <Box>{`From Referral: ${rewardDisplayInfo.owedRewardFromReferral}`}</Box>
+            </Grid>
+
+            <Grid item xs={12} sm={4} md={4}>
+              <Box>
+                <ConnectButton
+                  variant="contained"
+                  onClick={handleRefresh}
+                  data-amp-analytics-on="click"
+                  data-amp-analytics-name="click"
+                  data-amp-analytics-attrs="page: Farms, target: Claim"
+                >
+                  Refresh
+                </ConnectButton>
+              </Box>
+              <Box>
+                <ConnectButton
+                  variant="contained"
+                  onClick={handleClaimRewards}
+                  disabled={
+                    !deltafiUser?.user?.owedReferralRewards ||
+                    !deltafiUser?.user?.owedSwapRewards ||
+                    deltafiUser?.user.owedReferralRewards
+                      .add(deltafiUser?.user.owedSwapRewards)
+                      .eq(new BN(0))
+                  }
+                  data-amp-analytics-on="click"
+                  data-amp-analytics-name="click"
+                  data-amp-analytics-attrs="page: Farms, target: Claim"
+                >
+                  Claim Rewards
+                </ConnectButton>
+              </Box>
             </Grid>
           </Grid>
         </Box>

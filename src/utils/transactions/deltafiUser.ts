@@ -1,7 +1,10 @@
 import { Connection, PublicKey } from "@solana/web3.js";
-import { partialSignTransaction } from ".";
+import { mergeTransactions, partialSignTransaction } from ".";
 import { deployConfigV2 } from "constants/deployConfigV2";
 import { web3 } from "@project-serum/anchor";
+import * as token from "@solana/spl-token";
+import { DeltafiUser } from "anchor/type_definitions";
+import { Transaction } from "ethers";
 
 export async function createDeltafiUserTransaction(
   program: any,
@@ -29,6 +32,54 @@ export async function createDeltafiUserTransaction(
     transaction,
     feePayer: walletPubkey,
     signers,
+    connection,
+  });
+}
+
+export async function claimRewardsTransaction(
+  program: any,
+  connection: Connection,
+  walletPubkey: PublicKey,
+  userDeltafiToken: PublicKey,
+) {
+  const marketConfig = new PublicKey(deployConfigV2.marketConfig);
+  const [deltafiUserPubkey, deltafiUserBump] = await PublicKey.findProgramAddress(
+    [Buffer.from("User"), marketConfig.toBuffer(), walletPubkey.toBuffer()],
+    program.programId,
+  );
+
+  const deltafiUser: DeltafiUser = await program.account.deltafiUser.fetchNullable(
+    deltafiUserPubkey,
+  );
+
+  let transactionCreateDeltafiUser: Transaction | undefined = undefined;
+  if (!deltafiUser) {
+    transactionCreateDeltafiUser = program.transaction.createDeltafiUser(deltafiUserBump, {
+      accounts: {
+        marketConfig,
+        owner: walletPubkey,
+        deltafiUser: deltafiUserPubkey,
+        systemProgram: web3.SystemProgram.programId,
+        rent: web3.SYSVAR_RENT_PUBKEY,
+      },
+    });
+  }
+
+  const transactionClaimRewards = program.transaction.claimSwapRewards({
+    accounts: {
+      marketConfig,
+      deltafiUser,
+      userDeltafiToken,
+      swapDeltafiToken: new PublicKey(deployConfigV2.deltafiToken),
+      owner: walletPubkey,
+      tokenProgram: token.TOKEN_PROGRAM_ID,
+    },
+  });
+
+  return partialSignTransaction({
+    transaction: mergeTransactions([transactionCreateDeltafiUser, transactionClaimRewards]),
+    feePayer: walletPubkey,
+    signers: [],
     connection,
   });
 }
