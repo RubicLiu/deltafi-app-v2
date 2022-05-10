@@ -44,7 +44,7 @@ import {
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
-import { anchorBnToBn, bnToAnchorBn, bnToString } from "utils/tokenUtils";
+import { anchorBnToBn, bnToAnchorBn, bnToString, stringToAnchorBn } from "utils/tokenUtils";
 
 const SECONDS_OF_YEAR = 31556926;
 
@@ -239,11 +239,8 @@ const Stake = (): ReactElement => {
     const connection = program.provider.connection;
     dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
     try {
-      const baseAmount = bnToAnchorBn(poolConfig.baseTokenInfo, new BigNumber(staking.baseAmount));
-      const quoteAmount = bnToAnchorBn(
-        poolConfig.quoteTokenInfo,
-        new BigNumber(staking.quoteAmount),
-      );
+      const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, staking.baseAmount);
+      const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, staking.quoteAmount);
       const transaction = await createUpdateStakeTransaction(
         program,
         connection,
