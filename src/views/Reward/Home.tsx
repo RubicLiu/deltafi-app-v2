@@ -278,7 +278,7 @@ const Home: React.FC = (props) => {
     } finally {
       dispatch(rewardViewActions.setIsClaiming({ isClaiming: false }));
     }
-  }, [connection, program, walletPubkey, userDeltafiToken, dispatch, signTransaction]);
+  }, [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction]);
 
   const refreshButton = useMemo(() => {
     if (rewardView.isRefreshing) {
