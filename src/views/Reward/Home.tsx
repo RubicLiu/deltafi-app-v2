@@ -264,7 +264,7 @@ const Home: React.FC = (props) => {
         program,
         connection,
         walletPubkey,
-        userDeltafiToken.publicKey,
+        userDeltafiToken?.publicKey,
       );
 
       const signedTransaction = await signTransaction(partialSignedTransaction);

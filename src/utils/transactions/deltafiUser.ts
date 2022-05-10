@@ -6,6 +6,7 @@ import * as token from "@solana/spl-token";
 import { DeltafiUser } from "anchor/type_definitions";
 import { Transaction } from "@solana/web3.js";
 import { createTokenAccountTransaction } from "utils/transactions";
+import { DELTAFI_TOKEN_MINT } from "constants/index";
 
 export async function createDeltafiUserTransaction(
   program: any,
@@ -57,7 +58,7 @@ export async function createClaimRewardsTransaction(
   if (!userDeltafiToken) {
     const createTokenAccountResult = await createTokenAccountTransaction({
       walletPubkey,
-      mintPublicKey: new PublicKey(deployConfigV2.DELTAFI_TOKEN_MINT),
+      mintPublicKey: new PublicKey(DELTAFI_TOKEN_MINT),
     });
     userDeltafiToken = createTokenAccountResult.newAccountPubkey;
     transactionCreateDeltafiTokenAccount = createTokenAccountResult.transaction;
