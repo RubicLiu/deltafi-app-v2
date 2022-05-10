@@ -292,7 +292,7 @@ const Home: React.FC = (props) => {
       <ConnectButton
         variant="contained"
         onClick={handleRefresh}
-        disabled={rewardView.isRefreshing || !deltafiUser?.user}
+        disabled={!deltafiUser?.user}
         data-amp-analytics-on="click"
         data-amp-analytics-name="click"
         data-amp-analytics-attrs="page: Reward, target: Refresh"
