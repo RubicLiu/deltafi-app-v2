@@ -86,14 +86,14 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const baseTvl = useMemo(() => {
     if (basePrice && swapInfo) {
-      return getTokenTvl(baseTokenInfo, swapInfo.poolState.baseReserve.toNumber(), basePrice);
+      return getTokenTvl(baseTokenInfo, swapInfo.poolState.baseReserve, basePrice);
     }
     return new BigNumber(0);
   }, [basePrice, swapInfo, baseTokenInfo]);
 
   const quoteTvl = useMemo(() => {
     if (quotePrice && swapInfo) {
-      return getTokenTvl(quoteTokenInfo, swapInfo.poolState.quoteReserve.toNumber(), quotePrice);
+      return getTokenTvl(quoteTokenInfo, swapInfo.poolState.quoteReserve, quotePrice);
     }
     return new BigNumber(0);
   }, [quotePrice, swapInfo, quoteTokenInfo]);
