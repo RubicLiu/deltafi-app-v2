@@ -1,6 +1,8 @@
 import BigNumber from "bignumber.js";
 import { PublicKey } from "@solana/web3.js";
-import { exponentiatedBy } from "./decimal";
+import { BN } from "@project-serum/anchor";
+import { TokenConfig } from "constants/deployConfigV2";
+import { anchorBnToBn } from "./tokenUtils";
 
 export const convertDollar = (value) => {
   return "USD " + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -30,15 +32,17 @@ export function chunks<T>(array: T[], size: number): T[][] {
   );
 }
 
-export function getTokenTvl(reserve: string, decimals: number, price: BigNumber) {
-  return exponentiatedBy(new BigNumber(reserve).multipliedBy(price), decimals);
+export function getTokenTvl(tokenConfig: TokenConfig, amount: BN, price: BigNumber) {
+  return anchorBnToBn(tokenConfig, amount).multipliedBy(price);
 }
 
-export function getUserTokenTvl(tvl: BigNumber, share: BigNumber, supply: BigNumber) {
-  if (share.isZero() || share.isNaN()) {
+export function getUserTokenTvl(tvl: BigNumber, share: BN, supply: BN) {
+  if (share.isZero()) {
     return new BigNumber(0);
   }
-  return tvl.multipliedBy(share).dividedBy(supply);
+  return tvl
+    .multipliedBy(new BigNumber(share.toString()))
+    .dividedBy(new BigNumber(supply.toString()));
 }
 
 export function validate(expression: boolean, errMsg: string) {

@@ -1,4 +1,4 @@
-name: Lint and Build
+name: CI
 on:
   push:
     branches:
@@ -11,20 +11,29 @@ env:
   NODE_ENV: production
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-18.04
-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-      - name: Yarn Install
-        run: |
-          yarn install --silent --production=false
+      - run: yarn install --silent --production=false
       - name: Linting
         run: |
           yarn lint:ci
+
+  build-and-test:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - run: yarn install --silent --production=false
       - name: Yarn Build
         run: |
           yarn build
+      - name: Jest
+        run: |
+          yarn jest

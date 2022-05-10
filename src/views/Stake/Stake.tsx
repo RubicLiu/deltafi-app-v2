@@ -96,13 +96,13 @@ const Stake = (): ReactElement => {
 
   const baseTotalStaked = useMemo(() => {
     return farmPool
-      ? exponentiatedBy(farmPool.stakedBaseShare.toString(), poolConfig.baseTokenInfo.decimals)
+      ? anchorBnToBn(poolConfig.baseTokenInfo, farmPool.stakedBaseShare)
       : new BigNumber(0);
   }, [farmPool, poolConfig]);
 
   const quoteTotalStaked = useMemo(() => {
     return farmPool
-      ? exponentiatedBy(farmPool.stakedQuoteShare.toString(), poolConfig.quoteTokenInfo.decimals)
+      ? anchorBnToBn(poolConfig.quoteTokenInfo, farmPool.stakedQuoteShare)
       : new BigNumber(0);
   }, [farmPool, poolConfig]);
 

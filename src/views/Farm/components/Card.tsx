@@ -90,22 +90,14 @@ const FarmCard: React.FC<CardProps> = (props) => {
 
   const baseTvl = useMemo(() => {
     if (basePrice && swapInfo) {
-      return getTokenTvl(
-        swapInfo.poolState.baseReserve.toNumber(),
-        baseTokenInfo.decimals,
-        basePrice,
-      );
+      return getTokenTvl(baseTokenInfo, swapInfo.poolState.baseReserve, basePrice);
     }
     return new BigNumber(0);
   }, [basePrice, swapInfo, baseTokenInfo]);
 
   const quoteTvl = useMemo(() => {
     if (quotePrice && swapInfo) {
-      return getTokenTvl(
-        swapInfo.poolState.quoteReserve.toNumber(),
-        quoteTokenInfo.decimals,
-        quotePrice,
-      );
+      return getTokenTvl(quoteTokenInfo, swapInfo.poolState.quoteReserve, quotePrice);
     }
     return new BigNumber(0);
   }, [quotePrice, swapInfo, quoteTokenInfo]);
@@ -116,13 +108,13 @@ const FarmCard: React.FC<CardProps> = (props) => {
     if (swapInfo && farmInfo) {
       const userBaseTvl = getUserTokenTvl(
         baseTvl,
-        new BigNumber(farmInfo.stakedBaseShare.toString()),
-        new BigNumber(swapInfo.poolState.baseSupply.toString()),
+        farmInfo.stakedBaseShare,
+        swapInfo.poolState.baseSupply,
       );
       const userQuoteTvl = getUserTokenTvl(
         quoteTvl,
-        new BigNumber(farmInfo.stakedQuoteShare.toString()),
-        new BigNumber(swapInfo.poolState.quoteSupply.toString()),
+        farmInfo.stakedQuoteShare,
+        swapInfo.poolState.quoteSupply,
       );
       return userBaseTvl.plus(userQuoteTvl);
     }
@@ -133,13 +125,13 @@ const FarmCard: React.FC<CardProps> = (props) => {
     if (swapInfo && lpUser) {
       const userBaseTvl = getUserTokenTvl(
         baseTvl,
-        new BigNumber(lpUser.basePosition.depositedAmount.toString()),
-        new BigNumber(swapInfo.poolState.baseSupply.toString()),
+        lpUser.basePosition.depositedAmount,
+        swapInfo.poolState.baseSupply,
       );
       const userQuoteTvl = getUserTokenTvl(
         quoteTvl,
-        new BigNumber(lpUser.quotePosition.depositedAmount.toString()),
-        new BigNumber(swapInfo.poolState.quoteSupply.toString()),
+        lpUser.quotePosition.depositedAmount,
+        swapInfo.poolState.quoteSupply,
       );
       return userBaseTvl.plus(userQuoteTvl);
     }

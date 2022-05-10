@@ -6,7 +6,7 @@ import BigNumber from "bignumber.js";
 import styled from "styled-components";
 
 import { ConnectButton } from "components";
-import { convertDollar, getTokenTvl } from "utils/utils";
+import { convertDollar, getTokenTvl, getUserTokenTvl } from "utils/utils";
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
 import {
@@ -86,22 +86,14 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const baseTvl = useMemo(() => {
     if (basePrice && swapInfo) {
-      return getTokenTvl(
-        swapInfo.poolState.baseReserve.toNumber(),
-        baseTokenInfo.decimals,
-        basePrice,
-      );
+      return getTokenTvl(baseTokenInfo, swapInfo.poolState.baseReserve, basePrice);
     }
     return new BigNumber(0);
   }, [basePrice, swapInfo, baseTokenInfo]);
 
   const quoteTvl = useMemo(() => {
     if (quotePrice && swapInfo) {
-      return getTokenTvl(
-        swapInfo.poolState.quoteReserve.toNumber(),
-        quoteTokenInfo.decimals,
-        quotePrice,
-      );
+      return getTokenTvl(quoteTokenInfo, swapInfo.poolState.quoteReserve, quotePrice);
     }
     return new BigNumber(0);
   }, [quotePrice, swapInfo, quoteTokenInfo]);
@@ -110,12 +102,12 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const sharePrice = useMemo(() => {
     if (swapInfo && lpUser) {
-      const userBaseTvl = baseTvl
-        .multipliedBy(new BigNumber(lpUser.baseShare))
-        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()));
-      const userQuoteTvl = quoteTvl
-        .multipliedBy(new BigNumber(lpUser.quoteShare))
-        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()));
+      const userBaseTvl = getUserTokenTvl(baseTvl, lpUser.baseShare, swapInfo.poolState.baseSupply);
+      const userQuoteTvl = getUserTokenTvl(
+        quoteTvl,
+        lpUser.quoteShare,
+        swapInfo.poolState.quoteSupply,
+      );
       return userBaseTvl.plus(userQuoteTvl);
     }
     return new BigNumber(0);
@@ -123,12 +115,16 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const stakingPrice = useMemo(() => {
     if (swapInfo && lpUser) {
-      const userBaseTvl = baseTvl
-        .multipliedBy(new BigNumber(lpUser.basePosition.depositedAmount))
-        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()));
-      const userQuoteTvl = quoteTvl
-        .multipliedBy(new BigNumber(lpUser.quotePosition.depositedAmount))
-        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()));
+      const userBaseTvl = getUserTokenTvl(
+        baseTvl,
+        lpUser.basePosition.depositedAmount,
+        swapInfo.poolState.baseSupply,
+      );
+      const userQuoteTvl = getUserTokenTvl(
+        quoteTvl,
+        lpUser.quotePosition.depositedAmount,
+        swapInfo.poolState.quoteSupply,
+      );
       return userBaseTvl.plus(userQuoteTvl);
     }
     return new BigNumber(0);
