@@ -49,7 +49,9 @@ import {
   enableReferral,
   getPoolConfigBySymbols,
   getTokenConfigBySymbol,
+  PoolConfig,
   poolConfigs,
+  TokenConfig,
   tokenConfigs,
 } from "constants/deployConfigV2";
 import { swapViewActions } from "states/views/swapView";
@@ -58,6 +60,7 @@ import { createSwapTransaction } from "utils/transactions/swap";
 import { BN } from "@project-serum/anchor";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 import { anchorBnToString, stringToAnchorBn } from "utils/tokenUtils";
+import { DeltafiUser, SwapInfo } from "anchor/type_definitions";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -153,9 +156,12 @@ const Home: React.FC = (props) => {
   const tokenFrom = swapView.tokenFrom;
   const tokenTo = swapView.tokenTo;
 
-  const poolConfig = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
-  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
-  const deltafiUser = useSelector(deltafiUserSelector).user;
+  const poolConfig: PoolConfig = getPoolConfigBySymbols(
+    tokenFrom.token.symbol,
+    tokenTo.token.symbol,
+  );
+  const swapInfo: SwapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
+  const deltafiUser: DeltafiUser = useSelector(deltafiUserSelector).user;
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
   const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.mint));
@@ -204,10 +210,17 @@ const Home: React.FC = (props) => {
   }, [dispatch]);
 
   const handleTokenFromInput = (card: ISwapCard) => {
-    let newTokenFrom = card.token;
-    let newTokenTo = tokenTo.token;
+    let newTokenFrom: TokenConfig = card.token;
+    let newTokenTo: TokenConfig = tokenTo.token;
     if (tokenTo.token.mint === newTokenFrom.mint) {
       newTokenTo = Object.assign({}, tokenFrom.token);
+    }
+
+    if (newTokenTo.mint !== tokenTo.token.mint || newTokenFrom.mint !== tokenFrom.token.mint) {
+      // change buy/sell token, clear the input/output to 0
+      dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: "0" }));
+      dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenTo, amount: "0" }));
+      return;
     }
 
     const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
