@@ -5,7 +5,6 @@ import BigNumber from "bignumber.js";
 import { blob, struct } from "buffer-layout";
 import { deployConfigV2 } from "constants/deployConfigV2";
 import { Dispatch } from "react";
-import { getMultipleAccounts } from "utils/account";
 import { u64, publicKey } from "utils/layout";
 
 export type TokenAccountInfo = {
@@ -115,10 +114,10 @@ async function getTokenAcountInfoList(
   }
 
   const tokenAccountInfoList: TokenAccountInfo[] = [];
-  const accountInfoList = await getMultipleAccounts(connection, tokenAddressList, commitment);
-  for (let i = 0; i < accountInfoList.keys.length; i++) {
-    const accountInfo = accountInfoList.array[i];
-    const tokenAccountPublicKey = accountInfoList.keys[i];
+  const accountInfoList = await connection.getMultipleAccountsInfo(tokenAddressList, commitment);
+  for (let i = 0; i < accountInfoList.length; i++) {
+    const accountInfo = accountInfoList[i];
+    const tokenAccountPublicKey = tokenAddressList[i];
     if (!accountInfo) {
       continue;
     }
