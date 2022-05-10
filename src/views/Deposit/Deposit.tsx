@@ -19,7 +19,6 @@ import { useParams } from "react-router";
 import clx from "classnames";
 import BigNumber from "bignumber.js";
 
-import { BN } from "@project-serum/anchor";
 import SwapCard from "views/Swap/components/Card";
 import { ConnectButton } from "components";
 import Page from "components/layout/Page";
@@ -50,6 +49,7 @@ import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
 import { createDepositTransaction, createWithdrawTransaction } from "utils/transactions/deposit";
+import { anchorBnToBn, stringToAnchorBn } from "utils/tokenUtils";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -303,20 +303,18 @@ const Deposit: React.FC = () => {
 
   const baseShare = useMemo(() => {
     if (swapInfo && basePercent) {
-      return new BigNumber(swapInfo.poolState.baseReserve)
+      return anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve)
         .multipliedBy(basePercent)
-        .dividedBy(100)
-        .dividedBy(10 ** baseTokenInfo.decimals);
+        .dividedBy(100);
     }
     return new BigNumber(0);
   }, [swapInfo, basePercent, baseTokenInfo]);
 
   const quoteShare = useMemo(() => {
     if (swapInfo && quotePercent) {
-      return new BigNumber(swapInfo.poolState.quoteReserve)
+      return anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve)
         .multipliedBy(quotePercent)
-        .dividedBy(100)
-        .dividedBy(10 ** quoteTokenInfo.decimals);
+        .dividedBy(100);
     }
     return new BigNumber(0);
   }, [swapInfo, quotePercent, quoteTokenInfo]);
@@ -359,12 +357,8 @@ const Deposit: React.FC = () => {
       }
 
       dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
-      const baseAmount = new BigNumber(base.amount).multipliedBy(
-        new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
-      );
-      const quoteAmount = new BigNumber(quote.amount).multipliedBy(
-        new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
-      );
+      const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, base.amount);
+      const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, quote.amount);
       transaction = await createDepositTransaction(
         program,
         connection,
@@ -374,8 +368,8 @@ const Deposit: React.FC = () => {
         quoteTokenAccount.publicKey,
         walletPubkey,
         lpUser,
-        new BN(baseAmount.toFixed(0)),
-        new BN(quoteAmount.toFixed(0)),
+        baseAmount,
+        quoteAmount,
       );
 
       const signedTransaction = await signTransaction(transaction);
@@ -451,12 +445,8 @@ const Deposit: React.FC = () => {
       }
       dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
 
-      const baseAmount = new BigNumber(base.amount).multipliedBy(
-        new BigNumber(10 ** poolConfig.baseTokenInfo.decimals),
-      );
-      const quoteAmount = new BigNumber(quote.amount).multipliedBy(
-        new BigNumber(10 ** poolConfig.quoteTokenInfo.decimals),
-      );
+      const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, base.amount);
+      const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, quote.amount);
 
       const program = getDeltafiDexV2(
         new PublicKey(deployConfigV2.programId),
@@ -471,8 +461,8 @@ const Deposit: React.FC = () => {
         baseTokenAccount.publicKey,
         quoteTokenAccount.publicKey,
         walletPubkey,
-        new BN(baseAmount.toFixed(0)),
-        new BN(quoteAmount.toFixed(0)),
+        baseAmount,
+        quoteAmount,
       );
 
       transaction = await signTransaction(transaction);
@@ -584,14 +574,12 @@ const Deposit: React.FC = () => {
     (value: number) => {
       if (lpUser && basePrice && quotePrice) {
         // TODO(ypeng): Consider price and pool ratio
-        const baseAmount = new BigNumber(lpUser.baseShare)
+        const baseAmount = anchorBnToBn(baseTokenInfo, lpUser.baseShare)
           .multipliedBy(value)
-          .dividedBy(100)
-          .dividedBy(10 ** baseTokenInfo.decimals);
-        const quoteAmount = new BigNumber(lpUser.quoteShare)
+          .dividedBy(100);
+        const quoteAmount = anchorBnToBn(quoteTokenInfo, lpUser.quoteShare)
           .multipliedBy(value)
-          .dividedBy(100)
-          .dividedBy(10 ** quoteTokenInfo.decimals);
+          .dividedBy(100);
         dispatch(
           depositViewActions.setTokenAmount({
             baseAmount: baseAmount.toString(),
