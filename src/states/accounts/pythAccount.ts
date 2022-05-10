@@ -48,7 +48,7 @@ async function getPythDataList(connection: Connection) {
 
   const priceInfos = await connection.getMultipleAccountsInfo(pythPriceKeys, "confirmed");
   const pythDataList = [];
-  for (let i = 0; i < priceInfos.keys.length; i++) {
+  for (let i = 0; i < priceInfos.length; i++) {
     const priceKey = pythPriceKeys[i];
     const priceData = parsePriceData(priceInfos[i].data as Buffer);
     const symbol = tokenInfoList[i].symbol;
