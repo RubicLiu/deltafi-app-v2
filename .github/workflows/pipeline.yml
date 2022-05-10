@@ -13,13 +13,12 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-18.04
-
     steps:
       - name: Linting
         run: |
           yarn lint:ci
 
-  build and test:
+  build-and-test:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
