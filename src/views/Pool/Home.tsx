@@ -79,16 +79,14 @@ const Home: React.FC = () => {
 
         let volumn = new BigNumber(0);
         if (basePrice && quotePrice && swapInfo) {
-          const baseDecimals = poolConfig.baseTokenInfo.decimals;
-          const quoteDecimals = poolConfig.quoteTokenInfo.decimals;
           const baseTvl = getTokenTvl(
-            swapInfo.poolState.baseReserve.toNumber(),
-            baseDecimals,
+            poolConfig.baseTokenInfo,
+            swapInfo.poolState.baseReserve,
             basePrice,
           );
           const quoteTvl = getTokenTvl(
-            swapInfo.poolState.quoteReserve.toNumber(),
-            quoteDecimals,
+            poolConfig.quoteTokenInfo,
+            swapInfo.poolState.quoteReserve,
             quotePrice,
           );
           volumn = baseTvl.plus(quoteTvl);
