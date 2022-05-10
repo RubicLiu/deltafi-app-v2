@@ -24,7 +24,7 @@ import {
   fetchDeltafiUserThunk,
 } from "states/accounts/deltafiUserAccount";
 import {
-  createClaimRewardsTransaction,
+  createClaimSwapRewardsTransaction,
   createDeltafiUserTransaction,
 } from "utils/transactions/deltafiUser";
 import { DELTAFI_TOKEN_DECIMALS } from "constants/index";
@@ -260,11 +260,12 @@ const Home: React.FC = (props) => {
     dispatch(rewardViewActions.setIsClaiming({ isClaiming: true }));
 
     try {
-      const partialSignedTransaction = await createClaimRewardsTransaction(
+      const partialSignedTransaction = await createClaimSwapRewardsTransaction(
         program,
         connection,
         walletPubkey,
         userDeltafiToken?.publicKey,
+        deltafiUser.user,
       );
 
       const signedTransaction = await signTransaction(partialSignedTransaction);

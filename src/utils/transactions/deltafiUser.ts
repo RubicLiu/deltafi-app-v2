@@ -38,11 +38,12 @@ export async function createDeltafiUserTransaction(
   });
 }
 
-export async function createClaimRewardsTransaction(
+export async function createClaimSwapRewardsTransaction(
   program: any,
   connection: Connection,
   walletPubkey: PublicKey,
   userDeltafiToken: PublicKey,
+  deltafiUser: DeltafiUser,
 ) {
   const marketConfig = new PublicKey(deployConfigV2.marketConfig);
   const [deltafiUserPubkey, deltafiUserBump] = await PublicKey.findProgramAddress(
@@ -63,10 +64,6 @@ export async function createClaimRewardsTransaction(
     userDeltafiToken = createTokenAccountResult.newAccountPubkey;
     transactionCreateDeltafiTokenAccount = createTokenAccountResult.transaction;
   }
-
-  const deltafiUser: DeltafiUser = await program.account.deltafiUser.fetchNullable(
-    deltafiUserPubkey,
-  );
 
   // if deltafi user account does not exist
   // we create it for the user
