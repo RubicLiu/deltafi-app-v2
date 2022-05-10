@@ -244,14 +244,19 @@ const Home: React.FC = (props) => {
     console.log("refresh");
   }, []);
 
-  const handleClaimRewards = useCallback(() => {
+  const handleClaimRewards = useCallback(async () => {
     console.log("claim rewards");
-    const transaction = createClaimRewardsTransaction(
+    const connection = program.provider.connection;
+    const partialSignedTransaction = await createClaimRewardsTransaction(
       program,
-      program.provider.connection,
+      connection,
       walletPubkey,
-      userDeltafiToken,
+      userDeltafiToken.publicKey,
     );
+
+    const signedTransaction = await signTransaction(partialSignedTransaction);
+    const signature = await sendSignedTransaction({ signedTransaction, connection });
+    await connection.confirmTransaction(signature, "confirmed");
   }, []);
 
   return (
