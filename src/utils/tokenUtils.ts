@@ -22,3 +22,7 @@ export function anchorBnToString(tokenConfig: TokenConfig, amount: BN): string {
 export function stringToAnchorBn(tokenConfig: TokenConfig, amount: string): BN {
   return bnToAnchorBn(tokenConfig, new BigNumber(amount));
 }
+
+export function stringCutTokenDecimals(tokenConfig: TokenConfig, amount: string) {
+  return parseFloat(parseFloat(amount).toFixed(tokenConfig.decimals)).toString();
+}

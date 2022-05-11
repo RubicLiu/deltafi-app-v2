@@ -135,6 +135,8 @@ const StakeCard: React.FC<CardProps> = (props) => {
         <Typography
           className={classes.tokenBalance}
         >{`Staked base share: ${baseStaked}/${baseBalance}`}</Typography>
+      </Box>
+      <Box>
         <Typography
           className={classes.tokenBalance}
         >{`Staked quote share: ${quoteStaked}/${quoteBalance}`}</Typography>
