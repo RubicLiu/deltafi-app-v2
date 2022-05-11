@@ -21,7 +21,8 @@ export function getSwapInResult(
   fee: string;
   priceImpact: string;
 } {
-  if (new BigNumber(amount).isNaN()) {
+  const amountOut: BigNumber = new BigNumber(amount);
+  if (amountOut.isNaN()) {
     return {
       amountIn: "",
       amountOutWithSlippage: "",
@@ -29,11 +30,11 @@ export function getSwapInResult(
       priceImpact: "",
     };
   }
-  if (parseFloat(amount) < 0) {
+  if (amountOut.toNumber() < 0) {
     throw Error(`invalid amount input: ${amount}`);
   }
 
-  const grossAmountOut: BigNumber = new BigNumber(amount)
+  const grossAmountOut: BigNumber = amountOut
     .multipliedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
     .dividedBy(
       swapInfo.swapConfig.tradeFeeDenominator.sub(swapInfo.swapConfig.tradeFeeNumerator).toString(),
@@ -59,12 +60,10 @@ export function getSwapInResult(
   const amountIn: string = parseFloat(bnToString(fromToken, amountInNeg.negated())).toString();
   const amountOutWithSlippage: string = bnToString(
     toToken,
-    new BigNumber(amount).multipliedBy(
-      new BigNumber(100).minus(new BigNumber(maxSlippage)).dividedBy(100),
-    ),
+    amountOut.multipliedBy(new BigNumber(100).minus(new BigNumber(maxSlippage)).dividedBy(100)),
   );
 
-  const fee: string = bnToString(toToken, grossAmountOut.minus(new BigNumber(amount)));
+  const fee: string = bnToString(toToken, grossAmountOut.minus(amountOut));
 
   return {
     amountIn,
