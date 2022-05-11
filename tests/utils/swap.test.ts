@@ -3,7 +3,7 @@ import {
   generateResultFromAmountOut,
   getSwapOutAmountSellBase,
   getSwapOutAmountSellQuote,
-  getSwapOutAmount,
+  getSwapOutResult,
 } from "../../src/utils/swap";
 
 import { PoolInfo } from "../../src/providers/types";
@@ -235,13 +235,13 @@ describe("utils/swap", function () {
     ).toEqual(199_999); // less than 200_000 due to the floorings
   });
 
-  it("getSwapOutAmount", function () {
+  it("getSwapOutResult", function () {
     const baseMintPublicKey: PublicKey = new Keypair().publicKey;
     const quoteMintPublicKey: PublicKey = new Keypair().publicKey;
 
     // normal swap, sell base, disable confidence interval
     expect(
-      getSwapOutAmount(
+      getSwapOutResult(
         {
           mintBase: baseMintPublicKey,
           mintQuote: quoteMintPublicKey,
@@ -275,13 +275,13 @@ describe("utils/swap", function () {
     ).toEqual({
       amountOut: "0.324",
       amountOutWithSlippage: "0.322380",
-      fee: "0.001994",
+      fee: "0.00162",
       priceImpact: "0.00001840490797546012",
     });
 
     // normal swap, sell base, enable confidence interval
     expect(
-      getSwapOutAmount(
+      getSwapOutResult(
         {
           mintBase: baseMintPublicKey,
           mintQuote: quoteMintPublicKey,
@@ -317,13 +317,13 @@ describe("utils/swap", function () {
     ).toEqual({
       amountOut: "0.324",
       amountOutWithSlippage: "0.322380",
-      fee: "0.001994",
+      fee: "0.00162",
       priceImpact: "0.00001840490797546012",
     });
 
     // normal swap, sell quote, disable confidence interval
     expect(
-      getSwapOutAmount(
+      getSwapOutResult(
         {
           mintBase: baseMintPublicKey,
           mintQuote: quoteMintPublicKey,
@@ -357,13 +357,13 @@ describe("utils/swap", function () {
     ).toEqual({
       amountOut: "1.99",
       amountOutWithSlippage: "1.970100",
-      fee: "0.009999",
-      priceImpact: "0.0000183943864425622",
+      fee: "0.0199",
+      priceImpact: "0.00001839438644256218",
     });
 
     // normal swap, sell quote, disable confidence interval
     expect(() =>
-      getSwapOutAmount(
+      getSwapOutResult(
         {
           base: baseMintPublicKey,
           quote: quoteMintPublicKey,

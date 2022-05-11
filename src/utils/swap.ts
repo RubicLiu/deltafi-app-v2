@@ -5,33 +5,34 @@ import { SwapConfig, SwapInfo } from "anchor/type_definitions";
 import { WAD } from "../constants";
 import { exponentiate, exponentiatedBy } from "./decimal";
 
-export function getSwapInAmount(
-  swapInfo: SwapInfo,
-  fromToken: TokenConfig,
-  toToken: TokenConfig,
-  amount: string,
-  maxSlippage: number,
-  marketPrice: BigNumber,
-  marketPriceLow?: BigNumber,
-  marketPriceHigh?: BigNumber,
-): {
-  amountIn: string;
-  amountOutWithSlippage: string;
-  fee: string;
-  priceImpact: string;
-} {
-  if (new BigNumber(amount).isNaN()) {
-    return {
-      amountIn: "",
-      amountOutWithSlippage: "",
-      fee: "",
-      priceImpact: "",
-    };
-  }
-  if (parseFloat(amount) < 0) {
-    throw Error(`invalid amount input: ${amount}`);
-  }
-}
+//TODO(leqiang): implement getSwapInResult
+// export function getSwapInResult(
+//   swapInfo: SwapInfo,
+//   fromToken: TokenConfig,
+//   toToken: TokenConfig,
+//   amount: string,
+//   maxSlippage: number,
+//   marketPrice: BigNumber,
+//   marketPriceLow?: BigNumber,
+//   marketPriceHigh?: BigNumber,
+// ): {
+//   amountIn: string;
+//   amountOutWithSlippage: string;
+//   fee: string;
+//   priceImpact: string;
+// } {
+//   if (new BigNumber(amount).isNaN()) {
+//     return {
+//       amountIn: "",
+//       amountOutWithSlippage: "",
+//       fee: "",
+//       priceImpact: "",
+//     };
+//   }
+//   if (parseFloat(amount) < 0) {
+//     throw Error(`invalid amount input: ${amount}`);
+//   }
+// }
 
 export function getSwapOutResult(
   swapInfo: SwapInfo,
@@ -45,6 +46,7 @@ export function getSwapOutResult(
 ): {
   amountOut: string;
   amountOutWithSlippage: string;
+  fee: string;
   priceImpact: string;
 } {
   const amountIn: BigNumber = new BigNumber(amount);
@@ -52,6 +54,7 @@ export function getSwapOutResult(
     return {
       amountOut: "",
       amountOutWithSlippage: "",
+      fee: "",
       priceImpact: "",
     };
   }
@@ -59,7 +62,11 @@ export function getSwapOutResult(
     throw Error(`invalid amount input: ${amount}`);
   }
 
-  const { amountOut: grossAmountOut, impliedPrice, decimals } = getSwappedAmountsAndImpliedPrice(
+  const {
+    amountOut: grossAmountOut,
+    impliedPrice,
+    decimals,
+  } = getSwappedAmountsAndImpliedPrice(
     swapInfo,
     fromToken,
     toToken,
@@ -85,9 +92,16 @@ export function getSwapOutResult(
     .abs()
     .dividedBy(impliedPrice);
 
+  const amountOut: string = parseFloat(amountOutAfterTradeFee.toFixed(decimals)).toString();
+  const amountOutWithSlippage: string = amountOutAfterTradeFeeWithSlippage.toFixed(decimals);
+  const fee: string = new BigNumber(amountOut)
+    .minus(new BigNumber(amountOutWithSlippage))
+    .toString();
   return {
-    amountOut: amountOutAfterTradeFee.toFixed(decimals),
-    amountOutWithSlippage: amountOutAfterTradeFeeWithSlippage.toFixed(decimals),
+    amountOut,
+    amountOutWithSlippage,
+    fee,
+    priceImpact: priceImpact.toString(),
   };
 }
 
@@ -138,14 +152,14 @@ export function getSwappedAmountsAndImpliedPrice(
       amountIn,
       amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintQuoteDecimals),
       impliedPrice,
-      decimals: swapInfo.mintBaseDecimals,
+      decimals: swapInfo.mintQuoteDecimals,
     };
   } else if (
     fromToken.mint === swapInfo.mintQuote.toBase58() &&
     toToken.mint === swapInfo.mintBase.toBase58()
   ) {
     // sell quote case
-    const rawAmountIn: BigNumber = exponentiate(amountIn, swapInfo.mintBaseDecimals);
+    const rawAmountIn: BigNumber = exponentiate(amountIn, swapInfo.mintQuoteDecimals);
     const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
       marketPriceSellQuote,
       swapInfo.mintBaseDecimals,
@@ -165,136 +179,10 @@ export function getSwappedAmountsAndImpliedPrice(
 
     return {
       amountIn,
-      amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintQuoteDecimals),
+      amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintBaseDecimals),
       impliedPrice,
-      decimals: swapInfo.mintBaseDecimals
+      decimals: swapInfo.mintBaseDecimals,
     };
-  }
-
-  // if the above if - else-if condition is not satisfied
-  // the input from/to mint addresses do not match the pool's base and quote mint address
-  throw Error(
-    "Wrong to and from token mint: " +
-      toToken.mint +
-      " " +
-      fromToken.mint +
-      ", pool's base and quote tokens are: " +
-      swapInfo.mintBase.toBase58() +
-      " " +
-      swapInfo.mintQuote.toBase58(),
-  );
-}
-
-/**
- * Main interface function of this module, calculate the output information
- * of a swap with the swap input information
- * @param swapInfo pool's information, includes pool state, pool's configs of fees and all tokens and token accounts info
- * @param fromToken info of the input token
- * @param toToken info of the output token
- * @param amount amount of the input token to be traded
- * @param maxSlippage max maxSlippage limit, in percentage
- * @param marketPrice basePrice / quotePrice
- * @param marketPriceHigh upper bound of the market price after confidence interval adjustion
- * @param marketPriceLow lower bound of the market price after confidence interval adjustion
- * @returns amount out information
- */
-export function _getSwapOutAmount(
-  swapInfo: SwapInfo,
-  fromToken: TokenConfig,
-  toToken: TokenConfig,
-  amount: string,
-  maxSlippage: number,
-  marketPrice: BigNumber,
-  marketPriceLow?: BigNumber,
-  marketPriceHigh?: BigNumber,
-): {
-  amountOut: string;
-  amountOutWithSlippage: string;
-  fee: string;
-  priceImpact: string;
-} {
-  if (new BigNumber(amount).isNaN()) {
-    return {
-      amountOut: "",
-      amountOutWithSlippage: "",
-      fee: "",
-      priceImpact: "",
-    };
-  }
-  if (parseFloat(amount) < 0) {
-    throw Error(`invalid amount input: ${amount}`);
-  }
-
-  // if the confidence interval is not enabled, we use fair market price for both adjusted
-  // market price
-  if (
-    !(marketPriceHigh && marketPriceLow) ||
-    swapInfo.swapConfig.enableConfidenceInterval === false
-  ) {
-    marketPriceHigh = marketPrice;
-    marketPriceLow = marketPrice;
-  }
-
-  if (
-    fromToken.mint === swapInfo.mintBase.toBase58() &&
-    toToken.mint === swapInfo.mintQuote.toBase58()
-  ) {
-    // sell base case
-    const rawAmountIn: BigNumber = multipliedByDecimals(
-      new BigNumber(amount),
-      swapInfo.mintBaseDecimals,
-    );
-    const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
-      marketPriceLow,
-      swapInfo.mintBaseDecimals,
-      swapInfo.mintQuoteDecimals,
-    );
-    const rawAmountOut: BigNumber = new BigNumber(
-      getSwapOutAmountSellBase(swapInfo, rawAmountIn, normalizedMaketPrice),
-    );
-
-    return generateResultFromAmountOut(
-      new BigNumber(swapInfo.poolState.baseReserve.toString()),
-      new BigNumber(swapInfo.poolState.quoteReserve.toString()),
-      new BigNumber(swapInfo.poolState.targetBaseReserve.toString()),
-      new BigNumber(swapInfo.poolState.targetQuoteReserve.toString()),
-      rawAmountIn,
-      rawAmountOut,
-      maxSlippage,
-      swapInfo.swapConfig,
-      new BigNumber(normalizedMaketPrice),
-      swapInfo.mintQuoteDecimals,
-    );
-  } else if (
-    fromToken.mint === swapInfo.mintQuote.toBase58() &&
-    toToken.mint === swapInfo.mintBase.toBase58()
-  ) {
-    // sell quote case
-    const rawAmountIn: BigNumber = multipliedByDecimals(
-      new BigNumber(amount),
-      swapInfo.mintQuoteDecimals,
-    );
-    const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
-      marketPriceHigh,
-      swapInfo.mintBaseDecimals,
-      swapInfo.mintQuoteDecimals,
-    );
-    const rawAmountOut: BigNumber = new BigNumber(
-      getSwapOutAmountSellQuote(swapInfo, rawAmountIn, normalizedMaketPrice),
-    );
-
-    return generateResultFromAmountOut(
-      new BigNumber(swapInfo.poolState.quoteReserve.toString()),
-      new BigNumber(swapInfo.poolState.baseReserve.toString()),
-      new BigNumber(swapInfo.poolState.targetQuoteReserve.toString()),
-      new BigNumber(swapInfo.poolState.targetBaseReserve.toString()),
-      rawAmountIn,
-      rawAmountOut,
-      maxSlippage,
-      swapInfo.swapConfig,
-      new BigNumber(1).dividedBy(new BigNumber(normalizedMaketPrice)),
-      swapInfo.mintBaseDecimals,
-    );
   }
 
   // if the above if - else-if condition is not satisfied
@@ -424,13 +312,13 @@ export function generateResultFromAmountOut(
 
   return {
     amountOut: parseFloat(
-      dividedByDecimals(rawAmountOutWithTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
+      exponentiatedBy(rawAmountOutWithTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
     ).toString(),
-    amountOutWithSlippage: dividedByDecimals(
+    amountOutWithSlippage: exponentiatedBy(
       rawAmountOutWithTradeFeeWithSlippage,
       mintDecimalsB,
     ).toFixed(mintDecimalsB),
-    fee: dividedByDecimals(rawTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
+    fee: exponentiatedBy(rawTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
     priceImpact: calculatePriceImpact(
       currentReserveA,
       currentReserveB,
@@ -493,18 +381,10 @@ export function normalizeMarketPriceWithDecimals(
   mintQuoteDecimals: number,
 ): BigNumber {
   if (mintBaseDecimals > mintQuoteDecimals) {
-    return dividedByDecimals(marketPrice, mintBaseDecimals - mintQuoteDecimals);
+    return exponentiatedBy(marketPrice, mintBaseDecimals - mintQuoteDecimals);
   } else if (mintBaseDecimals < mintQuoteDecimals) {
-    return multipliedByDecimals(marketPrice, mintQuoteDecimals - mintBaseDecimals);
+    return exponentiate(marketPrice, mintQuoteDecimals - mintBaseDecimals);
   } else {
     return marketPrice;
   }
-}
-
-export function multipliedByDecimals(multiplicand: BigNumber, decimals: number) {
-  return multiplicand.multipliedBy(new BigNumber(10).pow(decimals));
-}
-
-export function dividedByDecimals(dividend: BigNumber, decimals: number) {
-  return dividend.dividedBy(new BigNumber(10).pow(decimals));
 }

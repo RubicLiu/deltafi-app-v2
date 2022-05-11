@@ -28,7 +28,7 @@ import { exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK } from "constants/index";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
-import { getSwapOutAmount } from "utils/swap";
+import { getSwapOutResult } from "utils/swap";
 import { SwapCard as ISwapCard } from "./components/types";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
@@ -224,7 +224,7 @@ const Home: React.FC = (props) => {
     }
 
     const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
-      getSwapOutAmount(
+      getSwapOutResult(
         swapInfo,
         newTokenFrom,
         newTokenTo,
@@ -261,7 +261,7 @@ const Home: React.FC = (props) => {
     // let amountOutWithSlippage = useOldInput? tokenTo.amountWithSlippage : "";
     // if (!useOldInput && swapInfo && swapView.priceImpact) {
     //   const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
-    //     getSwapOutAmount(
+    //     getSwapOutResult(
     //       swapInfo,
     //       newTokenFrom,
     //       newTokenTo,
