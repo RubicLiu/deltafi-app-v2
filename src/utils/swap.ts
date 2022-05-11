@@ -75,11 +75,7 @@ export function getSwapOutResult(
     throw Error(`invalid amount input: ${amount}`);
   }
 
-  const {
-    amountOut: grossAmountOut,
-    impliedPrice,
-    decimals,
-  } = getSwappedAmountsAndImpliedPrice(
+  const { amountOut: grossAmountOut, impliedPrice } = getSwappedAmountsAndImpliedPrice(
     swapInfo,
     fromToken,
     toToken,
@@ -105,8 +101,12 @@ export function getSwapOutResult(
     .abs()
     .dividedBy(impliedPrice);
 
-  const amountOut: string = parseFloat(amountOutAfterTradeFee.toFixed(decimals)).toString();
-  const amountOutWithSlippage: string = amountOutAfterTradeFeeWithSlippage.toFixed(decimals);
+  const amountOut: string = parseFloat(amountOutAfterTradeFee.toFixed(toToken.decimals)).toString();
+  const amountOutWithSlippage: string = amountOutAfterTradeFeeWithSlippage.toFixed(
+    toToken.decimals,
+  );
+
+  console.log(toToken.decimals);
   const fee: string = new BigNumber(amountOut)
     .minus(new BigNumber(amountOutWithSlippage))
     .toString();
@@ -130,7 +130,6 @@ export function getSwappedAmountsAndImpliedPrice(
   amountIn: BigNumber;
   amountOut: BigNumber;
   impliedPrice: BigNumber;
-  decimals: number;
 } {
   if (
     !(marketPriceSellBase && marketPriceSellQuote) ||
@@ -165,7 +164,6 @@ export function getSwappedAmountsAndImpliedPrice(
       amountIn,
       amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintQuoteDecimals),
       impliedPrice,
-      decimals: swapInfo.mintQuoteDecimals,
     };
   } else if (
     fromToken.mint === swapInfo.mintQuote.toBase58() &&
@@ -194,7 +192,6 @@ export function getSwappedAmountsAndImpliedPrice(
       amountIn,
       amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintBaseDecimals),
       impliedPrice,
-      decimals: swapInfo.mintBaseDecimals,
     };
   }
 

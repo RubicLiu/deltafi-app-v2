@@ -264,9 +264,11 @@ describe("utils/swap", function () {
         } as SwapInfo,
         {
           mint: baseMintPublicKey.toBase58(),
+          decimals: 6,
         } as TokenConfig,
         {
           mint: quoteMintPublicKey.toBase58(),
+          decimals: 6,
         } as TokenConfig,
         "2.000000",
         0.5,
@@ -304,9 +306,11 @@ describe("utils/swap", function () {
         } as SwapInfo,
         {
           mint: baseMintPublicKey.toBase58(),
+          decimals: 9,
         } as TokenConfig,
         {
           mint: quoteMintPublicKey.toBase58(),
+          decimals: 6,
         } as TokenConfig,
         "0.002000000",
         0.5,
@@ -346,9 +350,11 @@ describe("utils/swap", function () {
         } as SwapInfo,
         {
           mint: quoteMintPublicKey.toBase58(),
+          decimals: 6,
         } as TokenConfig,
         {
           mint: baseMintPublicKey.toBase58(),
+          decimals: 6,
         } as TokenConfig,
         "0.325994",
         1,
