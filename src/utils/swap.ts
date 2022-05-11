@@ -1,8 +1,39 @@
 import BigNumber from "bignumber.js";
 import { calculateOutAmountNormalSwap, calculateOutAmountStableSwap } from "lib/curve";
 import { TokenConfig } from "constants/deployConfigV2";
-import { SwapConfig, SwapInfo } from "anchor/type_definitions";
+import { SwapInfo } from "anchor/type_definitions";
 import { WAD } from "../constants";
+import { exponentiate, exponentiatedBy } from "./decimal";
+import { bnToString } from "./tokenUtils";
+
+//TODO(leqiang): implement getSwapInResult
+// export function getSwapInResult(
+//   swapInfo: SwapInfo,
+//   fromToken: TokenConfig,
+//   toToken: TokenConfig,
+//   amount: string,
+//   maxSlippage: number,
+//   marketPrice: BigNumber,
+//   marketPriceLow?: BigNumber,
+//   marketPriceHigh?: BigNumber,
+// ): {
+//   amountIn: string;
+//   amountOutWithSlippage: string;
+//   fee: string;
+//   priceImpact: string;
+// } {
+//   if (new BigNumber(amount).isNaN()) {
+//     return {
+//       amountIn: "",
+//       amountOutWithSlippage: "",
+//       fee: "",
+//       priceImpact: "",
+//     };
+//   }
+//   if (parseFloat(amount) < 0) {
+//     throw Error(`invalid amount input: ${amount}`);
+//   }
+// }
 
 /**
  * Main interface function of this module, calculate the output information
@@ -17,7 +48,7 @@ import { WAD } from "../constants";
  * @param marketPriceLow lower bound of the market price after confidence interval adjustion
  * @returns amount out information
  */
-export function getSwapOutAmount(
+export function getSwapOutResult(
   swapInfo: SwapInfo,
   fromToken: TokenConfig,
   toToken: TokenConfig,
@@ -32,7 +63,8 @@ export function getSwapOutAmount(
   fee: string;
   priceImpact: string;
 } {
-  if (new BigNumber(amount).isNaN()) {
+  const amountIn: BigNumber = new BigNumber(amount);
+  if (amountIn.isNaN()) {
     return {
       amountOut: "",
       amountOutWithSlippage: "",
@@ -44,14 +76,65 @@ export function getSwapOutAmount(
     throw Error(`invalid amount input: ${amount}`);
   }
 
-  // if the confidence interval is not enabled, we use fair market price for both adjusted
-  // market price
+  const { amountOut: grossAmountOut, impliedPrice } = getSwappedAmountsAndImpliedPrice(
+    swapInfo,
+    fromToken,
+    toToken,
+    amountIn,
+    marketPrice,
+    marketPriceLow,
+    marketPriceHigh,
+  );
+
+  const tradeFee: BigNumber = grossAmountOut
+    .multipliedBy(swapInfo.swapConfig.tradeFeeNumerator.toString())
+    .dividedBy(swapInfo.swapConfig.tradeFeeDenominator.toString());
+
+  const amountOutAfterTradeFee: BigNumber = grossAmountOut.minus(tradeFee);
+
+  const amountOutAfterTradeFeeWithSlippage: BigNumber = amountOutAfterTradeFee
+    .multipliedBy(100 - maxSlippage)
+    .dividedBy(100);
+
+  const priceImpact: BigNumber = grossAmountOut
+    .dividedBy(amountIn)
+    .minus(impliedPrice)
+    .abs()
+    .dividedBy(impliedPrice);
+
+  const amountOut: string = parseFloat(bnToString(toToken, amountOutAfterTradeFee)).toString();
+  const amountOutWithSlippage: string = bnToString(toToken, amountOutAfterTradeFeeWithSlippage);
+
+  const fee: string = new BigNumber(amountOut)
+    .minus(new BigNumber(amountOutWithSlippage))
+    .toString();
+  return {
+    amountOut,
+    amountOutWithSlippage,
+    fee,
+    priceImpact: priceImpact.toString(),
+  };
+}
+
+export function getSwappedAmountsAndImpliedPrice(
+  swapInfo: SwapInfo,
+  fromToken: TokenConfig,
+  toToken: TokenConfig,
+  amountIn: BigNumber,
+  marketPrice: BigNumber,
+  marketPriceSellBase?: BigNumber,
+  marketPriceSellQuote?: BigNumber,
+): {
+  amountIn: BigNumber;
+  amountOut: BigNumber;
+  impliedPrice: BigNumber;
+} {
   if (
-    !(marketPriceHigh && marketPriceLow) ||
+    !(marketPriceSellBase && marketPriceSellQuote) ||
     swapInfo.swapConfig.enableConfidenceInterval === false
   ) {
-    marketPriceHigh = marketPrice;
-    marketPriceLow = marketPrice;
+    marketPriceSellBase = marketPrice;
+    marketPriceSellQuote = marketPrice;
   }
 
   if (
@@ -59,12 +142,9 @@ export function getSwapOutAmount(
     toToken.mint === swapInfo.mintQuote.toBase58()
   ) {
     // sell base case
-    const rawAmountIn: BigNumber = multipliedByDecimals(
-      new BigNumber(amount),
-      swapInfo.mintBaseDecimals,
-    );
+    const rawAmountIn: BigNumber = exponentiate(amountIn, swapInfo.mintBaseDecimals);
     const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
-      marketPriceLow,
+      marketPriceSellBase,
       swapInfo.mintBaseDecimals,
       swapInfo.mintQuoteDecimals,
     );
@@ -72,29 +152,25 @@ export function getSwapOutAmount(
       getSwapOutAmountSellBase(swapInfo, rawAmountIn, normalizedMaketPrice),
     );
 
-    return generateResultFromAmountOut(
-      new BigNumber(swapInfo.poolState.baseReserve.toString()),
-      new BigNumber(swapInfo.poolState.quoteReserve.toString()),
-      new BigNumber(swapInfo.poolState.targetBaseReserve.toString()),
-      new BigNumber(swapInfo.poolState.targetQuoteReserve.toString()),
-      rawAmountIn,
-      rawAmountOut,
-      maxSlippage,
-      swapInfo.swapConfig,
-      new BigNumber(normalizedMaketPrice),
-      swapInfo.mintQuoteDecimals,
-    );
+    const impliedPrice = marketPriceSellBase
+      .multipliedBy(swapInfo.poolState.targetBaseReserve.toString())
+      .multipliedBy(swapInfo.poolState.quoteReserve.toString())
+      .dividedBy(swapInfo.poolState.targetQuoteReserve.toString())
+      .dividedBy(swapInfo.poolState.baseReserve.toString());
+
+    return {
+      amountIn,
+      amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintQuoteDecimals),
+      impliedPrice,
+    };
   } else if (
     fromToken.mint === swapInfo.mintQuote.toBase58() &&
     toToken.mint === swapInfo.mintBase.toBase58()
   ) {
     // sell quote case
-    const rawAmountIn: BigNumber = multipliedByDecimals(
-      new BigNumber(amount),
-      swapInfo.mintQuoteDecimals,
-    );
+    const rawAmountIn: BigNumber = exponentiate(amountIn, swapInfo.mintQuoteDecimals);
     const normalizedMaketPrice = normalizeMarketPriceWithDecimals(
-      marketPriceHigh,
+      marketPriceSellQuote,
       swapInfo.mintBaseDecimals,
       swapInfo.mintQuoteDecimals,
     );
@@ -102,18 +178,19 @@ export function getSwapOutAmount(
       getSwapOutAmountSellQuote(swapInfo, rawAmountIn, normalizedMaketPrice),
     );
 
-    return generateResultFromAmountOut(
-      new BigNumber(swapInfo.poolState.quoteReserve.toString()),
-      new BigNumber(swapInfo.poolState.baseReserve.toString()),
-      new BigNumber(swapInfo.poolState.targetQuoteReserve.toString()),
-      new BigNumber(swapInfo.poolState.targetBaseReserve.toString()),
-      rawAmountIn,
-      rawAmountOut,
-      maxSlippage,
-      swapInfo.swapConfig,
-      new BigNumber(1).dividedBy(new BigNumber(normalizedMaketPrice)),
-      swapInfo.mintBaseDecimals,
+    const impliedPrice = new BigNumber(1).dividedBy(
+      marketPriceSellQuote
+        .multipliedBy(swapInfo.poolState.targetBaseReserve.toString())
+        .multipliedBy(swapInfo.poolState.quoteReserve.toString())
+        .dividedBy(swapInfo.poolState.targetQuoteReserve.toString())
+        .dividedBy(swapInfo.poolState.baseReserve.toString()),
     );
+
+    return {
+      amountIn,
+      amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintBaseDecimals),
+      impliedPrice,
+    };
   }
 
   // if the above if - else-if condition is not satisfied
@@ -204,99 +281,6 @@ export function getSwapOutAmountSellQuote(
 }
 
 /**
- * Generates the actual amount out results from pool state and calculated amount out
- * @param currentReserveA reserve before the transaction of the input token
- * @param currentReserveB reserve before the transaction of the output token
- * @param amountIn token input amount
- * @param rawAmountOut token output amount without trade fees, calculated from the curve formula
- * @param maxSlippage max slippage limit, in percentage
- * @param fees config of the fees
- * @returns amount out information
- */
-export function generateResultFromAmountOut(
-  currentReserveA: BigNumber,
-  currentReserveB: BigNumber,
-  targetReserveA: BigNumber,
-  targetReserveB: BigNumber,
-  rawAmountIn: BigNumber,
-  rawGrossAmountOut: BigNumber,
-  maxSlippage: number,
-  swapConfig: SwapConfig,
-  marketPriceInforOut: BigNumber,
-  mintDecimalsB: number,
-): {
-  amountOut: string;
-  amountOutWithSlippage: string;
-  fee: string;
-  priceImpact: string;
-} {
-  const rawTradeFee: BigNumber = new BigNumber(rawGrossAmountOut)
-    .multipliedBy(new BigNumber(swapConfig.tradeFeeNumerator.toString()))
-    .dividedToIntegerBy(swapConfig.tradeFeeDenominator.toString()); // round down the trade fee to integer, this is same as the contract
-
-  const rawAmountOutWithTradeFee: BigNumber = new BigNumber(rawGrossAmountOut).minus(rawTradeFee);
-  const rawAmountFromSlippage: BigNumber = rawAmountOutWithTradeFee
-    .multipliedBy(maxSlippage)
-    .dividedBy(100);
-  const rawAmountOutWithTradeFeeWithSlippage: BigNumber =
-    rawAmountOutWithTradeFee.minus(rawAmountFromSlippage);
-
-  return {
-    amountOut: parseFloat(
-      dividedByDecimals(rawAmountOutWithTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
-    ).toString(),
-    amountOutWithSlippage: dividedByDecimals(
-      rawAmountOutWithTradeFeeWithSlippage,
-      mintDecimalsB,
-    ).toFixed(mintDecimalsB),
-    fee: dividedByDecimals(rawTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
-    priceImpact: calculatePriceImpact(
-      currentReserveA,
-      currentReserveB,
-      targetReserveA,
-      targetReserveB,
-      rawAmountIn,
-      rawGrossAmountOut,
-      marketPriceInforOut,
-    ).toString(),
-  };
-}
-
-/**
- * Price impact value that indicates the change from the implied price before and after the transaction
- * impliedPrice = marketPrice * (currentReserveA * targetReserveB) / (currentReserveB * targetReserveA)
- * Assuming the target reserves and the market price are not changed after this transaction
- * futureImpliedPrice / impliedPrice = (futureReserveA / futureReserveB) / (currentReserveA / currentReserveB)
- * priceImpact = abs(impliedPrice - futureImpliedPrice) / impliedPrice
- *             = (1 - (futureReserveA / futureReserveB)) / (currentReserveA / currentReserveB)
- * @param currentReserveA reserve before the transaction of the input token
- * @param currentReserveB reserve before the transaction of the output token
- * @param targetReserveA target reserve of token A
- * @param targetReserveB target reserve of token B
- * @param amountIn token input amount
- * @param rawAmountOut token output amount without trade fees, calculated from the curve formula
- * @param marketPriceAforB amount of B from 1 A
- * @returns price impact value
- */
-export function calculatePriceImpact(
-  currentReserveA: BigNumber,
-  currentReserveB: BigNumber,
-  targetReserveA: BigNumber,
-  targetReserveB: BigNumber,
-  amountIn: BigNumber,
-  rawAmountOut: BigNumber,
-  marketPriceAforB: BigNumber,
-): BigNumber {
-  const impliedPrice = marketPriceAforB
-    .multipliedBy(targetReserveA)
-    .multipliedBy(currentReserveB)
-    .dividedBy(targetReserveB.multipliedBy(currentReserveA));
-  const actualPrice = rawAmountOut.dividedBy(amountIn);
-
-  return impliedPrice.minus(actualPrice).abs().dividedBy(impliedPrice);
-}
-
-/**
  * Market price is the price of actual base and quote token values
  * We represent token amounts in integer which is realValue * 10^decimalPlaces
  * When calculating with market price with our integer representations,
@@ -312,18 +296,10 @@ export function normalizeMarketPriceWithDecimals(
   mintQuoteDecimals: number,
 ): BigNumber {
   if (mintBaseDecimals > mintQuoteDecimals) {
-    return dividedByDecimals(marketPrice, mintBaseDecimals - mintQuoteDecimals);
+    return exponentiatedBy(marketPrice, mintBaseDecimals - mintQuoteDecimals);
   } else if (mintBaseDecimals < mintQuoteDecimals) {
-    return multipliedByDecimals(marketPrice, mintQuoteDecimals - mintBaseDecimals);
+    return exponentiate(marketPrice, mintQuoteDecimals - mintBaseDecimals);
   } else {
     return marketPrice;
   }
-}
-
-export function multipliedByDecimals(multiplicand: BigNumber, decimals: number) {
-  return multiplicand.multipliedBy(new BigNumber(10).pow(decimals));
-}
-
-export function dividedByDecimals(dividend: BigNumber, decimals: number) {
-  return dividend.dividedBy(new BigNumber(10).pow(decimals));
 }
