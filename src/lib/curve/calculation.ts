@@ -80,7 +80,10 @@ export function calculateOutAmountNormalSwap(
     ).toNumber(),
   );
 
-  const finalResult = Math.max(approximationResult, calculationResult);
+  const finalResult =
+    approximationResult === 0
+      ? calculationResult
+      : Math.max(approximationResult, calculationResult);
   validate(
     finalResult <= impliedOutAmount,
     "final result for swap out amount should not be larger than the implied out amount",

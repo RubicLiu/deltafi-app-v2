@@ -34,11 +34,9 @@ export function getSwapInResult(
   }
 
   const grossAmountOut: BigNumber = new BigNumber(amount)
-    .multipliedBy(swapInfo.swapConfig.tradeRewardDenominator.toString())
+    .multipliedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
     .dividedBy(
-      swapInfo.swapConfig.tradeRewardDenominator
-        .sub(swapInfo.swapConfig.tradeFeeNumerator)
-        .toString(),
+      swapInfo.swapConfig.tradeFeeDenominator.sub(swapInfo.swapConfig.tradeFeeNumerator).toString(),
     );
 
   const { amountOut: amountInNeg, impliedPrice } = getSwappedAmountsAndImpliedPrice(
@@ -47,8 +45,8 @@ export function getSwapInResult(
     fromToken,
     grossAmountOut.negated(),
     marketPrice,
-    marketPriceLow,
     marketPriceHigh,
+    marketPriceLow,
   );
 
   const priceImpact: string = amountInNeg
@@ -147,9 +145,8 @@ export function getSwapOutResult(
   const amountOut: string = parseFloat(bnToString(toToken, amountOutAfterTradeFee)).toString();
   const amountOutWithSlippage: string = bnToString(toToken, amountOutAfterTradeFeeWithSlippage);
 
-  const fee: string = new BigNumber(amountOut)
-    .minus(new BigNumber(amountOutWithSlippage))
-    .toString();
+  const fee: string = grossAmountOut.minus(new BigNumber(amountOut)).toString();
+
   return {
     amountOut,
     amountOutWithSlippage,
@@ -227,7 +224,12 @@ export function getSwappedAmountsAndImpliedPrice(
         .dividedBy(swapInfo.poolState.targetQuoteReserve.toString())
         .dividedBy(swapInfo.poolState.baseReserve.toString()),
     );
-
+    console.log(marketPriceSellQuote.toString());
+    console.log(swapInfo.poolState.targetBaseReserve.toString());
+    console.log(swapInfo.poolState.quoteReserve.toString());
+    console.log(swapInfo.poolState.targetQuoteReserve.toString());
+    console.log(swapInfo.poolState.baseReserve.toString());
+    console.log(impliedPrice.toString());
     return {
       amountIn,
       amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintBaseDecimals),
