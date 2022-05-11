@@ -785,7 +785,7 @@ const Deposit: React.FC = () => {
       <Container className={classes.container}>
         <Box display="flex" justifyContent="space-between" className={classes.header}>
           <Typography variant="h6" color="primary">
-            {"pool"}
+            {`${baseTokenInfo.name}-${quoteTokenInfo.name}`}
           </Typography>
           <Box className={classes.iconGroup}>
             <img
