@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { calculateOutAmountNormalSwap, calculateOutAmountStableSwap } from "lib/curve";
 import { TokenConfig } from "constants/deployConfigV2";
-import { SwapConfig, SwapInfo } from "anchor/type_definitions";
+import { SwapInfo } from "anchor/type_definitions";
 import { WAD } from "../constants";
 import { exponentiate, exponentiatedBy } from "./decimal";
 import { bnToString } from "./tokenUtils";
