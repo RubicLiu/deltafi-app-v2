@@ -34,6 +34,19 @@ import { exponentiate, exponentiatedBy } from "./decimal";
 //   }
 // }
 
+/**
+ * Main interface function of this module, calculate the output information
+ * of a swap with the swap input information
+ * @param swapInfo pool's information, includes pool state, pool's configs of fees and all tokens and token accounts info
+ * @param fromToken info of the input token
+ * @param toToken info of the output token
+ * @param amount amount of the input token to be traded
+ * @param maxSlippage max maxSlippage limit, in percentage
+ * @param marketPrice basePrice / quotePrice
+ * @param marketPriceHigh upper bound of the market price after confidence interval adjustion
+ * @param marketPriceLow lower bound of the market price after confidence interval adjustion
+ * @returns amount out information
+ */
 export function getSwapOutResult(
   swapInfo: SwapInfo,
   fromToken: TokenConfig,
