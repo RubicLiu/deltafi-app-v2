@@ -224,12 +224,7 @@ export function getSwappedAmountsAndImpliedPrice(
         .dividedBy(swapInfo.poolState.targetQuoteReserve.toString())
         .dividedBy(swapInfo.poolState.baseReserve.toString()),
     );
-    console.log(marketPriceSellQuote.toString());
-    console.log(swapInfo.poolState.targetBaseReserve.toString());
-    console.log(swapInfo.poolState.quoteReserve.toString());
-    console.log(swapInfo.poolState.targetQuoteReserve.toString());
-    console.log(swapInfo.poolState.baseReserve.toString());
-    console.log(impliedPrice.toString());
+
     return {
       amountIn,
       amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintBaseDecimals),
