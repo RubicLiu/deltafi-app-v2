@@ -57,7 +57,7 @@ export function getSwapInResult(
     .abs()
     .dividedBy(impliedPrice);
 
-  const amountIn: string = parseFloat(amountInNeg.negated().toFixed(fromToken.decimals)).toString();
+  const amountIn: string = parseFloat(bnToString(fromToken, amountInNeg.negated())).toString();
 }
 
 /**
