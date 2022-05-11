@@ -1,9 +1,10 @@
 import BigNumber from "bignumber.js";
 import { calculateOutAmountNormalSwap, calculateOutAmountStableSwap } from "lib/curve";
 import { TokenConfig } from "constants/deployConfigV2";
-import { SwapConfig, SwapInfo } from "anchor/type_definitions";
+import { SwapInfo } from "anchor/type_definitions";
 import { WAD } from "../constants";
 import { exponentiate, exponentiatedBy } from "./decimal";
+import { bnToString } from "./tokenUtils";
 
 export function getSwapInResult(
   swapInfo: SwapInfo,
@@ -126,10 +127,9 @@ export function getSwapOutResult(
     .abs()
     .dividedBy(impliedPrice);
 
-  const amountOut: string = parseFloat(amountOutAfterTradeFee.toFixed(toToken.decimals)).toString();
-  const amountOutWithSlippage: string = amountOutAfterTradeFeeWithSlippage.toFixed(
-    toToken.decimals,
-  );
+  const amountOut: string = parseFloat(bnToString(toToken, amountOutAfterTradeFee)).toString();
+  const amountOutWithSlippage: string = bnToString(toToken, amountOutAfterTradeFeeWithSlippage);
+
   const fee: string = new BigNumber(amountOut)
     .minus(new BigNumber(amountOutWithSlippage))
     .toString();
@@ -187,7 +187,6 @@ export function getSwappedAmountsAndImpliedPrice(
       amountIn,
       amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintQuoteDecimals),
       impliedPrice,
-      decimals: swapInfo.mintQuoteDecimals,
     };
   } else if (
     fromToken.mint === swapInfo.mintQuote.toBase58() &&
@@ -216,7 +215,6 @@ export function getSwappedAmountsAndImpliedPrice(
       amountIn,
       amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintBaseDecimals),
       impliedPrice,
-      decimals: swapInfo.mintBaseDecimals,
     };
   }
 
@@ -305,99 +303,6 @@ export function getSwapOutAmountSellQuote(
   } else {
     throw Error("Wrong swaptype: " + pool.swapType);
   }
-}
-
-/**
- * Generates the actual amount out results from pool state and calculated amount out
- * @param currentReserveA reserve before the transaction of the input token
- * @param currentReserveB reserve before the transaction of the output token
- * @param amountIn token input amount
- * @param rawAmountOut token output amount without trade fees, calculated from the curve formula
- * @param maxSlippage max slippage limit, in percentage
- * @param fees config of the fees
- * @returns amount out information
- */
-export function generateResultFromAmountOut(
-  currentReserveA: BigNumber,
-  currentReserveB: BigNumber,
-  targetReserveA: BigNumber,
-  targetReserveB: BigNumber,
-  rawAmountIn: BigNumber,
-  rawGrossAmountOut: BigNumber,
-  maxSlippage: number,
-  swapConfig: SwapConfig,
-  marketPriceInforOut: BigNumber,
-  mintDecimalsB: number,
-): {
-  amountOut: string;
-  amountOutWithSlippage: string;
-  fee: string;
-  priceImpact: string;
-} {
-  const rawTradeFee: BigNumber = new BigNumber(rawGrossAmountOut)
-    .multipliedBy(new BigNumber(swapConfig.tradeFeeNumerator.toString()))
-    .dividedToIntegerBy(swapConfig.tradeFeeDenominator.toString()); // round down the trade fee to integer, this is same as the contract
-
-  const rawAmountOutWithTradeFee: BigNumber = new BigNumber(rawGrossAmountOut).minus(rawTradeFee);
-  const rawAmountFromSlippage: BigNumber = rawAmountOutWithTradeFee
-    .multipliedBy(maxSlippage)
-    .dividedBy(100);
-  const rawAmountOutWithTradeFeeWithSlippage: BigNumber =
-    rawAmountOutWithTradeFee.minus(rawAmountFromSlippage);
-
-  return {
-    amountOut: parseFloat(
-      exponentiatedBy(rawAmountOutWithTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
-    ).toString(),
-    amountOutWithSlippage: exponentiatedBy(
-      rawAmountOutWithTradeFeeWithSlippage,
-      mintDecimalsB,
-    ).toFixed(mintDecimalsB),
-    fee: exponentiatedBy(rawTradeFee, mintDecimalsB).toFixed(mintDecimalsB),
-    priceImpact: calculatePriceImpact(
-      currentReserveA,
-      currentReserveB,
-      targetReserveA,
-      targetReserveB,
-      rawAmountIn,
-      rawGrossAmountOut,
-      marketPriceInforOut,
-    ).toString(),
-  };
-}
-
-/**
- * Price impact value that indicates the change from the implied price before and after the transaction
- * impliedPrice = marketPrice * (currentReserveA * targetReserveB) / (currentReserveB * targetReserveA)
- * Assuming the target reserves and the market price are not changed after this transaction
- * futureImpliedPrice / impliedPrice = (futureReserveA / futureReserveB) / (currentReserveA / currentReserveB)
- * priceImpact = abs(impliedPrice - futureImpliedPrice) / impliedPrice
- *             = (1 - (futureReserveA / futureReserveB)) / (currentReserveA / currentReserveB)
- * @param currentReserveA reserve before the transaction of the input token
- * @param currentReserveB reserve before the transaction of the output token
- * @param targetReserveA target reserve of token A
- * @param targetReserveB target reserve of token B
- * @param amountIn token input amount
- * @param rawAmountOut token output amount without trade fees, calculated from the curve formula
- * @param marketPriceAforB amount of B from 1 A
- * @returns price impact value
- */
-export function calculatePriceImpact(
-  currentReserveA: BigNumber,
-  currentReserveB: BigNumber,
-  targetReserveA: BigNumber,
-  targetReserveB: BigNumber,
-  amountIn: BigNumber,
-  rawAmountOut: BigNumber,
-  marketPriceAforB: BigNumber,
-): BigNumber {
-  const impliedPrice = marketPriceAforB
-    .multipliedBy(targetReserveA)
-    .multipliedBy(currentReserveB)
-    .dividedBy(targetReserveB.multipliedBy(currentReserveA));
-  const actualPrice = rawAmountOut.dividedBy(amountIn);
-
-  return impliedPrice.minus(actualPrice).abs().dividedBy(impliedPrice);
 }
 
 /**

@@ -1,6 +1,4 @@
 import {
-  calculatePriceImpact,
-  generateResultFromAmountOut,
   getSwapOutAmountSellBase,
   getSwapOutAmountSellQuote,
   getSwapOutResult,
@@ -16,84 +14,6 @@ import { Keypair, PublicKey } from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
 
 describe("utils/swap", function () {
-  it("calculatePriceImpact", function () {
-    expect(
-      calculatePriceImpact(
-        new BigNumber(100_000),
-        new BigNumber(200_000),
-        new BigNumber(100_000),
-        new BigNumber(200_000),
-        new BigNumber(1000),
-        new BigNumber(2003),
-        new BigNumber(2),
-      ),
-    ).toEqual(new BigNumber(0.0015));
-
-    expect(
-      calculatePriceImpact(
-        new BigNumber(200_000),
-        new BigNumber(100_000),
-        new BigNumber(200_000),
-        new BigNumber(100_000),
-        new BigNumber(4000),
-        new BigNumber(2006),
-        new BigNumber(0.5),
-      ),
-    ).toEqual(new BigNumber(0.003));
-  });
-
-  it("generateResultFromAmountOut", function () {
-    expect(
-      generateResultFromAmountOut(
-        new BigNumber(100_000),
-        new BigNumber(200_000),
-        new BigNumber(100_000),
-        new BigNumber(200_000),
-        new BigNumber(1000),
-        new BigNumber(2003),
-        0.5, // 0.5%
-        {
-          adminTradeFeeNumerator: new anchor.BN(1),
-          adminTradeFeeDenominator: new anchor.BN(2),
-          tradeFeeNumerator: new anchor.BN(6),
-          tradeFeeDenominator: new anchor.BN(2003),
-        } as SwapConfig,
-        new BigNumber(2),
-        2,
-      ),
-    ).toEqual({
-      amountOut: "19.97",
-      amountOutWithSlippage: "19.87",
-      fee: "0.06",
-      priceImpact: "0.0015",
-    });
-
-    expect(
-      generateResultFromAmountOut(
-        new BigNumber(200_000),
-        new BigNumber(100_000),
-        new BigNumber(200_000),
-        new BigNumber(100_000),
-        new BigNumber(4000),
-        new BigNumber(2006),
-        1, // 1%
-        {
-          adminTradeFeeNumerator: new anchor.BN(1),
-          adminTradeFeeDenominator: new anchor.BN(3),
-          tradeFeeNumerator: new anchor.BN(9),
-          tradeFeeDenominator: new anchor.BN(2006),
-        } as SwapConfig,
-        new BigNumber(0.5),
-        1,
-      ),
-    ).toEqual({
-      amountOut: "199.7",
-      amountOutWithSlippage: "197.7",
-      fee: "0.9",
-      priceImpact: "0.003",
-    });
-  });
-
   it("getSwapOutAmountSellBase", function () {
     expect(
       getSwapOutAmountSellBase(
@@ -264,9 +184,11 @@ describe("utils/swap", function () {
         } as SwapInfo,
         {
           mint: baseMintPublicKey.toBase58(),
+          decimals: 6,
         } as TokenConfig,
         {
           mint: quoteMintPublicKey.toBase58(),
+          decimals: 6,
         } as TokenConfig,
         "2.000000",
         0.5,
@@ -304,9 +226,11 @@ describe("utils/swap", function () {
         } as SwapInfo,
         {
           mint: baseMintPublicKey.toBase58(),
+          decimals: 9,
         } as TokenConfig,
         {
           mint: quoteMintPublicKey.toBase58(),
+          decimals: 6,
         } as TokenConfig,
         "0.002000000",
         0.5,
@@ -346,9 +270,11 @@ describe("utils/swap", function () {
         } as SwapInfo,
         {
           mint: quoteMintPublicKey.toBase58(),
+          decimals: 6,
         } as TokenConfig,
         {
           mint: baseMintPublicKey.toBase58(),
+          decimals: 6,
         } as TokenConfig,
         "0.325994",
         1,
