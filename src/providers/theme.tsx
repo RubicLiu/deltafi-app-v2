@@ -8,6 +8,8 @@ import {
 } from "@material-ui/core";
 import { darkTheme, lightTheme } from "theme";
 import GlobalStyle from "style/Global";
+import "@fontsource/ibm-plex-mono";
+import "typeface-rubik";
 
 const ThemeContext = React.createContext({ isDark: null, toggleDarkMode: () => null });
 

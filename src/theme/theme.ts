@@ -46,6 +46,7 @@ declare module "@material-ui/core/styles/createPalette" {
     tertiary?: React.CSSProperties["color"];
     black?: React.CSSProperties["color"];
     lightBlack?: React.CSSProperties["color"];
+    complementary?: React.CSSProperties["color"];
   }
   export interface TypeBackgroundOptions {
     bgImage?: React.CSSProperties["background"];
@@ -73,7 +74,12 @@ declare module "@material-ui/core/styles/createPalette" {
 
 const baseTheme: Theme = createTheme({
   typography: {
-    fontFamily: ["Poppins", "DM Sans", "sans-serif"].join(","),
+    fontFamily: "Rubik",
+    h5: {
+      // fontSize: 20,
+      color: "#f6f6f6",
+      fontWeight: 500,
+    },
   },
   status: {
     danger: "#ff0000",
@@ -92,7 +98,7 @@ const baseTheme: Theme = createTheme({
   },
   mixins: {
     toolbar: {
-      minHeight: 96,
+      minHeight: 76,
       "@media (max-width: 600px) and (orientation: landscape)": {
         minHeight: 48,
       },
@@ -119,24 +125,27 @@ const darkTheme: Theme = createTheme({
     background: {
       bgImage: 'url("/images/bg.png") center center / 100% 100% no-repeat', // eslint-disable-line
       investorBg: "url(/images/investors-bg-dark.png)",
-      primary: "#1D1A27",
-      secondary: "#2F2C3E",
+      primary: "#1c1c1c",
+      secondary: "#333333",
       default: "rgb(35, 36, 47)",
       tertiary: "#13111A",
       black: "#000000",
-      lightBlack: "#15161D",
+      lightBlack: "#3d3d3d",
+      complementary: "#D4FF00",
       // secondaryBlack: '#15161D',
     },
     gradient: {
-      cta: "linear-gradient(rgb(35, 36, 47) 0%, rgb(12, 12, 19) 100%)",
+      cta: "linear-gradient(111.31deg, #D4FF00 15.34%, #BDFF00 95.74%)",
       btnCta: "linear-gradient(90deg, #7A6FFF 0%, #B372CE 50.52%, #FF7586 100%)",
       ctaContained: "linear-gradient(229.09deg, rgba(229, 124, 255, 0.81) 13.9%, #4558FF 85.28%)",
       logo: "linear-gradient(314.49deg, #4048FF 0%, #FF6492 97.42%)",
     },
     text: {
+      primary: "#f6f6f6",
+      secondary: "#D3D3D3",
       crypto: "#515369",
       link: "#C94A75",
-      success: "#0B9409",
+      success: "#D4FF00",
       blue: "#2B8CFF",
       dark: "#D3D3D3",
     },
@@ -171,7 +180,7 @@ const lightTheme: Theme = createTheme({
       default: "#EBECF1",
     },
     gradient: {
-      cta: "linear-gradient(168.15deg, rgb(255, 255, 255) -145.84%, rgb(224, 219, 239) 148.53%)",
+      cta: "linear-gradient(111.31deg, #D4FF00 15.34%, #BDFF00 95.74%)",
     },
     text: {
       crypto: "#515369",

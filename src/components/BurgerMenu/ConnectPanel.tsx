@@ -1,12 +1,12 @@
 import { useState } from "react";
 import styled from "styled-components";
-import Switch from "react-switch";
 import CloseIcon from "@material-ui/icons/Close";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Wallet, WalletName } from "@solana/wallet-adapter-wallets";
-import { Box, IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
+import { Box, Checkbox, IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
 
 import { useModal } from "providers/modal";
+import { CheckBoxOutlineBlankOutlined, CheckBoxOutlined } from "@material-ui/icons";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   header: {},
@@ -16,6 +16,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     [breakpoints.up("sm")]: {
       marginTop: spacing(5),
     },
+  },
+  checkBox: {
+    color: palette.text.success,
   },
   grayScale: {
     filter: "none !important",
@@ -52,7 +55,7 @@ interface ConnectProps {
   readonly isAccept: boolean;
 }
 const ExternalLink = styled.a`
-  color: ${({ theme }) => theme.palette.text.link};
+  color: ${({ theme }) => theme.palette.text.success};
   outline: none;
   text-decoration: none;
 `;
@@ -171,21 +174,19 @@ const ConnectPanel: React.FC = (props) => {
         </Box>
       </Box>
       <Box display="flex" alignItems="center" className={classes.footer}>
-        <Switch
-          onColor="#76EE59"
-          offColor="#DFDFDF"
-          width={50}
-          checkedIcon={false}
-          uncheckedIcon={false}
+        <Checkbox
           checked={isAccept}
-          onChange={(value) => setAccept(value)}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setAccept(event.target.checked)}
+          checkedIcon={<CheckBoxOutlined className={classes.checkBox} />}
+          icon={<CheckBoxOutlineBlankOutlined className={classes.checkBox} />}
+          style={{ width: 30, height: 30 }}
         />
-        <Typography variant="body2" className={classes.footerText} color="textSecondary">
+        <Box ml={1} fontWeight={400} fontSize={12} color="#B7B4C7">
           I have read, understand, and agree to the{" "}
           <ExternalLink href="/terms" target="_blank" rel="noreferrer noopener">
             Terms of Service
           </ExternalLink>
-        </Typography>
+        </Box>
       </Box>
     </Box>
   );

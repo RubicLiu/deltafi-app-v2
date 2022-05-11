@@ -1,24 +1,22 @@
-import { ReactElement, useMemo, useCallback, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { ReactElement, useMemo, useCallback, useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import clx from "classnames";
 import {
   Snackbar,
   SnackbarContent,
   Box,
   Typography,
-  Paper,
   IconButton,
   Link,
-  Container,
   Avatar,
+  Modal,
+  Divider,
+  Button as MUIButton,
 } from "@material-ui/core";
 import { Close as CloseIcon } from "@material-ui/icons";
 import BigNumber from "bignumber.js";
 
 import StakeCard from "views/Stake/components/Card";
-import Page from "components/layout/Page";
-import { ConnectButton, LinkIcon } from "components";
+import { ConnectButton } from "components";
 
 import useStyles from "./styles";
 import { useModal } from "providers/modal";
@@ -44,36 +42,38 @@ import {
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
-import { anchorBnToBn, bnToString, stringToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToBn, stringToAnchorBn } from "utils/tokenUtils";
+import StakePanel from "components/BurgerMenu/StakePanel";
 
-const SECONDS_OF_YEAR = 31556926;
+// const SECONDS_OF_YEAR = 31556926;
 
-const getUnclaimedReward = (
-  apr: BigNumber,
-  lastUpdateTs: BigNumber,
-  nextClaimTs: BigNumber,
-  rewardsOwed: BigNumber,
-  depositBalance: BigNumber,
-  deltafiTokenDecimals: number,
-) => {
-  const currentTs: BigNumber = new BigNumber(Date.now()).div(new BigNumber(1000));
-  if (currentTs <= nextClaimTs) {
-    return new BigNumber(0);
-  }
-  const unTrackedReward: BigNumber = currentTs
-    .minus(lastUpdateTs)
-    .div(new BigNumber(SECONDS_OF_YEAR))
-    .multipliedBy(depositBalance)
-    .multipliedBy(apr);
+// const getUnclaimedReward = (
+//   apr: BigNumber,
+//   lastUpdateTs: BigNumber,
+//   nextClaimTs: BigNumber,
+//   rewardsOwed: BigNumber,
+//   depositBalance: BigNumber,
+//   deltafiTokenDecimals: number,
+// ) => {
+//   const currentTs: BigNumber = new BigNumber(Date.now()).div(new BigNumber(1000));
+//   if (currentTs <= nextClaimTs) {
+//     return new BigNumber(0);
+//   }
+//   const unTrackedReward: BigNumber = currentTs
+//     .minus(lastUpdateTs)
+//     .div(new BigNumber(SECONDS_OF_YEAR))
+//     .multipliedBy(depositBalance)
+//     .multipliedBy(apr);
 
-  return exponentiatedBy(unTrackedReward.plus(rewardsOwed), deltafiTokenDecimals);
-};
+//   return exponentiatedBy(unTrackedReward.plus(rewardsOwed), deltafiTokenDecimals);
+// };
 
 const Stake = (): ReactElement => {
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [isStaking, setIsStaking] = useState(true);
   const classes = useStyles();
-  const location = useLocation();
-
-  const farmPoolId = location.pathname.split("/").pop();
+  const { data, setMenu } = useModal();
+  const farmPoolId = data.farmInfo;
   const farmPool = useSelector(selectFarmByFarmKey(farmPoolId));
   const poolConfig = getPoolConfigByFarmKey(farmPoolId);
   const baseTokenInfo = poolConfig.baseTokenInfo;
@@ -88,17 +88,14 @@ const Stake = (): ReactElement => {
 
   const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
-  const { setMenu } = useModal();
   const dispatch = useDispatch();
   const stakeView = useSelector(stakeViewSelector);
-  const vertical = "bottom";
-  const horizontal = "left";
 
-  const baseTotalStaked = useMemo(() => {
-    return farmPool
-      ? anchorBnToBn(poolConfig.baseTokenInfo, farmPool.stakedBaseShare)
-      : new BigNumber(0);
-  }, [farmPool, poolConfig]);
+  // const baseTotalStaked = useMemo(() => {
+  //   return farmPool
+  //     ? anchorBnToBn(poolConfig.baseTokenInfo, farmPool.stakedBaseShare)
+  //     : new BigNumber(0);
+  // }, [farmPool, poolConfig]);
 
   const quoteTotalStaked = useMemo(() => {
     return farmPool
@@ -167,38 +164,38 @@ const Stake = (): ReactElement => {
 
   const setStakeAmount = useCallback((value: string) => {}, []);
 
-  const unclaimedReward = (() => {
-    if (lpUser) {
-      const baseReward = getUnclaimedReward(
-        baseApr,
-        lpUser.basePosition.lastUpdateTs,
-        lpUser.basePosition.nextClaimTs,
-        lpUser.basePosition.rewardsOwed,
-        lpUser.basePosition.depositedAmount,
-        DELTAFI_TOKEN_DECIMALS,
-      );
-      const quoteReward = getUnclaimedReward(
-        quoteApr,
-        lpUser.quotePosition.lastUpdateTs,
-        lpUser.quotePosition.nextClaimTs,
-        lpUser.quotePosition.rewardsOwed,
-        lpUser.quotePosition.depositedAmount,
-        DELTAFI_TOKEN_DECIMALS,
-      );
-      return baseReward.plus(quoteReward);
-    }
-    return new BigNumber(0);
-  })();
+  // const unclaimedReward = (() => {
+  //   if (lpUser) {
+  //     const baseReward = getUnclaimedReward(
+  //       baseApr,
+  //       lpUser.basePosition.lastUpdateTs,
+  //       lpUser.basePosition.nextClaimTs,
+  //       lpUser.basePosition.rewardsOwed,
+  //       lpUser.basePosition.depositedAmount,
+  //       DELTAFI_TOKEN_DECIMALS,
+  //     );
+  //     const quoteReward = getUnclaimedReward(
+  //       quoteApr,
+  //       lpUser.quotePosition.lastUpdateTs,
+  //       lpUser.quotePosition.nextClaimTs,
+  //       lpUser.quotePosition.rewardsOwed,
+  //       lpUser.quotePosition.depositedAmount,
+  //       DELTAFI_TOKEN_DECIMALS,
+  //     );
+  //     return baseReward.plus(quoteReward);
+  //   }
+  //   return new BigNumber(0);
+  // })();
 
-  const basePoolRateByDay = useMemo(() => {
-    if (farmPool && baseTotalStaked && baseTokenInfo) {
-      return exponentiatedBy(
-        exponentiate(baseTotalStaked.multipliedBy(baseApr).dividedBy(365), baseTokenInfo.decimals),
-        DELTAFI_TOKEN_DECIMALS,
-      ).toFixed(6);
-    }
-    return "--";
-  }, [farmPool, baseTokenInfo, baseApr, baseTotalStaked]);
+  // const basePoolRateByDay = useMemo(() => {
+  //   if (farmPool && baseTotalStaked && baseTokenInfo) {
+  //     return exponentiatedBy(
+  //       exponentiate(baseTotalStaked.multipliedBy(baseApr).dividedBy(365), baseTokenInfo.decimals),
+  //       DELTAFI_TOKEN_DECIMALS,
+  //     ).toFixed(6);
+  //   }
+  //   return "--";
+  // }, [farmPool, baseTokenInfo, baseApr, baseTotalStaked]);
 
   const quotePoolRateByDay = useMemo(() => {
     if (farmPool && quoteTotalStaked && quoteTokenInfo) {
@@ -344,11 +341,11 @@ const Stake = (): ReactElement => {
 
   const snackAction = useMemo(() => {
     return (
-      <IconButton size="small" onClick={handleSnackBarClose} className={classes.snackBarClose}>
+      <IconButton size="small" onClick={handleSnackBarClose}>
         <CloseIcon />
       </IconButton>
     );
-  }, [handleSnackBarClose, classes]);
+  }, [handleSnackBarClose]);
 
   const snackMessasge = useMemo(() => {
     if (!stakeView.transactionResult || !stakeView.transactionResult.status) {
@@ -359,14 +356,10 @@ const Stake = (): ReactElement => {
             alt="snack-status-icon"
             className={classes.snackBarIcon}
           />
-          <Box>
-            <Typography variant="h6" color="primary">
-              Transaction failed(try again later)
-            </Typography>
+          <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+            <Box>Transaction failed(try again later)</Box>
             <Box>
-              <Typography variant="body1" color="primary">
-                failed to send transaction: Transaction simulation failed: Blockhash not found
-              </Typography>
+              failed to send transaction: Transaction simulation failed: Blockhash not found
             </Box>
           </Box>
         </Box>
@@ -377,24 +370,21 @@ const Stake = (): ReactElement => {
 
     return (
       <Box display="flex" alignItems="center">
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="h5">Deposit</Typography>
+          <IconButton size="small" onClick={() => setMenu(false, "")}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
         <img
           src={"/images/snack-success.svg"}
           alt="snack-status-icon"
           className={classes.snackBarIcon}
         />
-        <Box>
-          {stake && (
-            <Typography variant="body1" color="primary">
-              {`Update the staking to
-              ${Number(stake?.baseAmount).toFixed(baseTokenInfo.decimals)} ${baseTokenInfo.symbol}
-              share and ${Number(stake?.quoteAmount).toFixed(quoteTokenInfo.decimals)}
-              ${quoteTokenInfo.symbol} share`}
-            </Typography>
-          )}
+        <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+          {stake && <Box>{`${Number(stake?.amount).toFixed(6)} ${stake.token.symbol} LP`}</Box>}
           <Box display="flex" alignItems="center">
-            <Typography variant="subtitle2" color="primary">
-              View Transaction:
-            </Typography>
+            <Box>View Transaction:</Box>
             <Link
               className={classes.snackBarLink}
               target="_blank"
@@ -406,169 +396,120 @@ const Stake = (): ReactElement => {
         </Box>
       </Box>
     );
-  }, [stakeView, classes, network, baseTokenInfo, quoteTokenInfo]);
+  }, [stakeView.transactionResult, classes, network, setMenu]);
 
   if (!farmPool) return null;
 
-  const userBaseStakedString = bnToString(baseTokenInfo, userBaseStaked);
-  const userQuoteStakedString = bnToString(quoteTokenInfo, userQuoteStaked);
-
   return (
-    <Page>
-      <Container className={classes.root}>
-        <Box display="flex" justifyContent="space-between" pb={2}>
-          <Typography variant="h6">{farmPool.name} LP Token Staking</Typography>
-          <Box className={classes.iconGroup}>
-            <img
-              src={baseTokenInfo.logoURI}
-              alt="staking-coin"
-              className={clx(classes.coinIcon, classes.firstCoin)}
-            />
-            <img src={quoteTokenInfo.logoURI} alt="earning-coin" className={classes.coinIcon} />
-          </Box>
+    <Box>
+      <Box display="flex" justifyContent="space-between" pb={2}>
+        <Typography variant="h6">Deposit</Typography>
+        <IconButton size="small" onClick={() => setMenu(false, "")}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+      <Box display="flex" justifyContent="space-between" pb={4}>
+        <Box>
+          <Typography className={classes.label}>Total Staked</Typography>
+          <Typography className={classes.value}>{`${staking.baseStaked
+            .plus(staking.quoteStaked)
+            .toFixed(2)
+            .toString()} ${farmPool.name}`}</Typography>
         </Box>
-        <Box display="flex" justifyContent="space-between" pb={4}>
-          <Box>
-            <Typography>Total Staked {baseTokenInfo.symbol}</Typography>
-            <Typography>{`${baseTotalStaked.toFixed(2).toString()}`}</Typography>
-          </Box>
-          <Box>
-            <Typography>Pool Rate</Typography>
-            <Typography>{basePoolRateByDay} DELFI / day</Typography>
-          </Box>
+        <Box textAlign="right">
+          <Typography className={classes.label}>Pool Rate</Typography>
+          <Typography className={classes.value}>{rewardRateByDay} DELFI / day</Typography>
         </Box>
-        <Box display="flex" justifyContent="space-between" pb={4}>
-          <Box>
-            <Typography>Total Staked {quoteTokenInfo.symbol}</Typography>
-            <Typography>{`${quoteTotalStaked.toFixed(2).toString()}`}</Typography>
-          </Box>
-          <Box>
-            <Typography>Pool Rate</Typography>
-            <Typography>{quotePoolRateByDay} DELFI / day</Typography>
-          </Box>
-        </Box>
+      </Box>
 
-        {isConnectedWallet && (
-          <Box className={classes.desc}>
-            <Typography variant="h6" paragraph>
-              About {farmPool.name} LP shares
-            </Typography>
-            <Typography variant="subtitle2">
-              LP shares represents shares of the liquidity provided to a swap pool. You may obtain{" "}
-              {poolConfig.name} LP shares by depositing {poolConfig.base} and {poolConfig.quote}{" "}
-              into the {poolConfig.name} pool.
-            </Typography>
-            <Box display="flex" alignItems="center" mt={3}>
-              <Link
-                href={"/deposit/" + poolConfig?.swapInfo}
-                target="_blank"
-                rel="noreferrer noopener"
-                underline="always"
-                className={classes.link}
-                data-amp-analytics-on="click"
-                data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Farms, target: DELFI"
-              >
-                Deposit into the {poolConfig.name} Pool
-                <LinkIcon className={classes.linkIcon} isDark width="15px" />
-              </Link>
-            </Box>
+      <Box display="flex" justifyContent="space-between" pb={4}>
+        <Box>
+          <Typography className={classes.label}>{quoteTokenInfo.symbol} Staked</Typography>
+          <Typography className={classes.value}>{`${stakeView.stake.quoteStaked
+            .toFixed(2)
+            .toString()} ${farmPool.name}`}</Typography>
+        </Box>
+        <Box textAlign="right">
+          <Typography className={classes.label}>Pool Rate</Typography>
+          <Typography className={classes.value}>{quotePoolRateByDay} DELFI / day</Typography>
+        </Box>
+      </Box>
+      <Divider />
+      <Box className={classes.ratePanel}>
+        <Box className={classes.tabs}>
+          <Box>
+            <MUIButton
+              className={isStaking ? classes.activeBtn : classes.btn}
+              onClick={() => setIsStaking(true)}
+            >
+              Stake
+            </MUIButton>
+            <MUIButton
+              className={!isStaking ? classes.activeBtn : classes.btn}
+              onClick={() => setIsStaking(false)}
+            >
+              Unstake
+            </MUIButton>
           </Box>
+        </Box>
+      </Box>
+      {isStaking || (
+        <Box mb={3}>
+          <Slider value={percentage} onChange={setStakePercentage} />
+        </Box>
+      )}
+      <Box display="flex" flexDirection="column" alignItems="flex-end">
+        <StakeCard
+          card={staking}
+          handleChangeCard={setStakeAmount}
+          tokens={tokenConfigs}
+          disableDrop
+          percentage={percentage < 0.02 ? 0 : percentage}
+          poolConfig={poolConfig}
+        />
+      </Box>
+      <Box marginTop={3} width="100%">
+        {stakeView.isProcessingStake ? (
+          <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
+            <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
+          </ConnectButton>
+        ) : isConnectedWallet ? (
+          <ConnectButton
+            fullWidth
+            size="large"
+            variant="contained"
+            onClick={() => setOpenConfirm(true)}
+            data-amp-analytics-on="click"
+            data-amp-analytics-name="click"
+            data-amp-analytics-attrs="page: Deposit, target: Deposit"
+          >
+            {isStaking ? "Stake" : "Unstake"}
+          </ConnectButton>
+        ) : (
+          <ConnectButton size="large" fullWidth onClick={() => setMenu(true, "connect")}>
+            Connect Wallet
+          </ConnectButton>
         )}
-
-        <Box className={classes.liquidityStaked}>
-          <Typography className={classes.title}>Your Liquidity Staked</Typography>
-          <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>{userBaseStakedString}</Typography>
-            <Typography className={classes.amount}>{baseTokenInfo.symbol}</Typography>
-          </Box>
-          <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>{userQuoteStakedString}</Typography>
-            <Typography className={classes.amount}>{quoteTokenInfo.symbol}</Typography>
-          </Box>
-          <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>{rewardRateByDay} / Day</Typography>
-            <Typography className={classes.amount}>DELFI</Typography>
-          </Box>
-        </Box>
-        <Box className={classes.unclaimedToken}>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography className={classes.title}>Your Unclaimed Token</Typography>
-            {stakeView.isProcessingClaim ? (
-              <ConnectButton variant="contained" disabled={true}>
-                <Avatar className={classes.claimLoadingButton} src={loadingIcon} />
-              </ConnectButton>
-            ) : (
-              <ConnectButton
-                variant="contained"
-                onClick={handleClaim}
-                disabled={!unclaimedReward.gt(0)}
-                data-amp-analytics-on="click"
-                data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Farms, target: Claim"
-              >
-                CLAIM
-              </ConnectButton>
-            )}
-          </Box>
-          <Box className={classes.cardBottom}>
-            <Typography className={classes.amount}>
-              {unclaimedReward.toFixed(DELTAFI_TOKEN_DECIMALS)}
-            </Typography>
-          </Box>
-        </Box>
-        <Paper className={classes.minting}>
-          <Box className={classes.ratePanel}>
-            <Typography color="primary" variant="body1" className={classes.marketCondition}>
-              LIQUIDITY MINING
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Slider value={percentage} onChange={setStakePercentage} />
-          </Box>
-
-          {
-            <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <StakeCard
-                poolConfig={poolConfig}
-                card={staking}
-                handleChangeCard={setStakeAmount}
-                tokens={tokenConfigs}
-                disableDrop
-                percentage={percentage < 0.02 ? 0 : percentage}
-              />
-            </Box>
-          }
-          <Box marginTop={2} width="100%">
-            {stakeView.isProcessingStake ? (
-              <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
-                <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
-              </ConnectButton>
-            ) : isConnectedWallet ? (
-              <ConnectButton
-                fullWidth
-                size="large"
-                variant="contained"
-                onClick={handleStake}
-                data-amp-analytics-on="click"
-                data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Deposit, target: Deposit"
-              >
-                {"Update Stake"}
-              </ConnectButton>
-            ) : (
-              <ConnectButton size="large" fullWidth onClick={() => setMenu(true, "connect")}>
-                Connect Wallet
-              </ConnectButton>
-            )}
-          </Box>
-        </Paper>
-      </Container>
+      </Box>
+      <Box fontSize={12} fontWeight={500} textAlign="center" mt={3}>
+        <Link href="#" underline="always">
+          About DeltaFi LT Tokens
+        </Link>
+      </Box>
+      <Box>
+        <Modal className={classes.modalContainer} open={openConfirm}>
+          <StakePanel
+            address={farmPoolId}
+            onClose={() => setOpenConfirm(false)}
+            onConfirm={isStaking ? handleStake : handleClaim}
+          />
+        </Modal>
+      </Box>
       <Snackbar
-        anchorOrigin={{ vertical, horizontal }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={stakeView.openSnackbar}
         onClose={handleSnackBarClose}
-        key={vertical + horizontal}
+        key="stakeSnack"
       >
         <SnackbarContent
           aria-describedby="message-id2"
@@ -577,7 +518,7 @@ const Stake = (): ReactElement => {
           action={snackAction}
         />
       </Snackbar>
-    </Page>
+    </Box>
   );
 };
 

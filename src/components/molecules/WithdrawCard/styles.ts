@@ -49,8 +49,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
   tokenBalance: {
-    color: palette.text.dark,
-    fontFamily: "Inter",
+    color: palette.text.secondary,
     fontSize: 12,
     fontWeight: 500,
     [breakpoints.up("md")]: {
@@ -78,7 +77,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     justifyContent: "center",
   },
   withdrawNumber: {
-    color: palette.text.link,
+    color: "#D4FF00",
   },
 }));
 

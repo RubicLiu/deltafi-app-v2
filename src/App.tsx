@@ -41,8 +41,8 @@ import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 const Farm = lazy(() => import("./views/Farm"));
 const Swap = lazy(() => import("./views/Swap"));
 const Pool = lazy(() => import("./views/Pool"));
-const Reward = lazy(() => import("./views/Reward"));
-const Deposit = lazy(() => import("./views/Deposit"));
+const Dashboard = lazy(() => import("./views/Dashboard"));
+const Bridge = lazy(() => import("./views/Bridge"));
 const Stake = lazy(() => import("./views/Stake"));
 const Unavailable = lazy(() => import("./views/Unavailable"));
 const Terms = lazy(() => import("./views/Terms"));
@@ -155,11 +155,12 @@ const App: React.FC = () => {
             <Redirect exact from="/" to="/swap" />
             <Route path="/swap" exact component={Swap} />
             <Route path="/pools" exact component={Pool} />
-            <Route path="/deposit/:poolAddress" exact component={Deposit} />
+            {/* <Route path="/deposit/:poolAddress" exact component={Deposit} /> */}
             <Route path="/farms" exact component={Farm} />
-            <Route path="/rewards" exact component={Reward} />
+            <Route path="/dashboard" exact component={Dashboard} />
             <Route path="/stake/:id" exact component={Stake} />
             <Route path="/terms" exact component={Terms} />
+            <Route path="/bridge" exact component={Bridge} />
             <Redirect from="*" to="/swap" />
           </Switch>
         ) : (

@@ -19,7 +19,7 @@ import { getTokenConfigBySymbol, TokenConfig } from "constants/deployConfigV2";
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
     borderRadius: 28,
-    backgroundColor: theme.palette.background.tertiary,
+    backgroundColor: theme.palette.background.primary,
     padding: `${theme.spacing(0.75)}px ${theme.spacing(2)}px`,
     fontFamily: "Inter",
     fontSize: 12,
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: "absolute",
     zIndex: theme.zIndex.modal,
     marginTop: theme.spacing(1),
-    backgroundColor: theme.palette.background.tertiary,
+    backgroundColor: theme.palette.background.primary,
     border: "1px solid #3e3e3e",
     borderRadius: theme.spacing(2),
     padding: `${theme.spacing(3)}px ${theme.spacing(2)}px`,
@@ -62,38 +62,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: ".5rem 1rem",
     textTransform: "inherit",
     borderRadius: 100,
+    border: "1px solid #D3D3D3",
     backgroundColor: "transparent",
-    boxShadow: "2px 1000px 1px transparent inset",
     "&:hover": {
       backgroundColor: "transparent",
     },
-    "& i": {
-      content: "''",
-      position: "absolute",
-      zIndex: -1,
-      top: 0,
-      left: 0,
-      bottom: 0,
-      right: 0,
-      padding: "1px",
-      borderRadius: 100,
-      /* the below will do the magic */
-      "-webkit-mask":
-        "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) padding-box" /* this will cover the content and the padding */,
-      /* needed for old browsers until the below is more supported */
-      "-webkit-mask-composite": "destination-out",
-      /* this will exclude the first layer from the second so only the padding area will be kept visible */
-      maskComposite: "destination-out",
-      "&::before": {
-        content: "''",
-        position: "absolute",
-        left: "50%",
-        top: "50%",
-        width: "100%",
-        height: "100%",
-        background: theme.palette.gradient.btnCta,
-        transform: "translate(-50%, -50%) rotate(0deg)",
-      },
+    "& .MuiSvgIcon-root": {
+      color: "#d3d3d3",
     },
   },
   searchInput: {
@@ -121,6 +96,34 @@ const useStyles = makeStyles((theme: Theme) => ({
     textTransform: "capitalize",
     [theme.breakpoints.up("md")]: {
       fontSize: 16,
+    },
+  },
+  gradientBorder: {
+    content: "''",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    padding: "1px",
+    zIndex: -1,
+    borderRadius: "16px",
+    /* the below will do the magic */
+    "-webkit-mask":
+      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) padding-box" /* this will cover the content and the padding */,
+    /* needed for old browsers until the below is more supported */
+    "-webkit-mask-composite": "destination-out",
+    /* this will exclude the first layer from the second so only the padding area will be kept visible */
+    maskComposite: "destination-out",
+    "&::before": {
+      content: "''",
+      position: "absolute",
+      left: "50%",
+      top: "50%",
+      width: "100%",
+      height: "100%",
+      background: theme.palette.gradient.cta,
+      transform: "translate(-50%, -50%) rotate(0deg)",
     },
   },
 }));
@@ -208,7 +211,6 @@ const DropDown = <T extends TokenConfig>(props: DropDownProps<T> & { children?: 
         {open ? (
           <Box className={classes.dropdownContainer}>
             <Box className={classes.inputContainer}>
-              <i />
               <SearchOutlined />
               <InputBase
                 id="input"
@@ -219,7 +221,7 @@ const DropDown = <T extends TokenConfig>(props: DropDownProps<T> & { children?: 
                 {...inputProps}
               />
             </Box>
-            <Box sx={{ mt: 1 }}>
+            <Box maxHeight={360} overflow="auto" sx={{ mt: 1 }}>
               {optionList.map((option) => (
                 <Button
                   key={option.mint}
@@ -266,6 +268,7 @@ const DropDown = <T extends TokenConfig>(props: DropDownProps<T> & { children?: 
                 </Button>
               ))}
             </Box>
+            <i className={classes.gradientBorder} />
           </Box>
         ) : null}
       </Box>

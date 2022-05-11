@@ -16,7 +16,11 @@ interface IConfirmSwapPanelProps {
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
-  header: {},
+  root: {
+    background: palette.background.secondary,
+    width: "100%",
+    margin: "auto",
+  },
   content: {
     marginTop: 32,
   },
@@ -55,7 +59,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   success: {
     color: palette.text.success,
   },
-  footer: {},
+  priceImpact: {
+    color: "#D4FF00",
+  },
 }));
 
 const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
@@ -67,7 +73,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
     data?.tokenTo.token.symbol,
   );
   const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
-  const { marketPrice } = useSelector(selectMarketPriceByPool(poolConfig));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const swapOut = useMemo(() => {
     if (swapInfo && data) {
@@ -84,6 +90,19 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
     return null;
   }, [data, marketPrice, swapInfo]);
 
+  const exchangeRateLabel = useMemo(() => {
+    if (basePrice && quotePrice && data) {
+      if (data?.tokenFrom.token.symbol === data?.tokenTo.token.symbol) {
+        return Number(basePrice / quotePrice).toFixed(6);
+      } else if (data?.tokenFrom.token.symbol === data?.tokenTo.token.symbol) {
+        return Number(quotePrice / basePrice).toFixed(6);
+      }
+    }
+    return "-";
+  }, [basePrice, quotePrice, data]);
+
+  const minSwapOut = swapOut;
+
   const handleConfirm = () => {
     data?.callback();
     setMenu(false, "");
@@ -91,8 +110,8 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
 
   return (
     <Box width="100%">
-      <Box display="flex" justifyContent="space-between" className={classes.header}>
-        <Typography variant="h6" color="textSecondary">
+      <Box display="flex" justifyContent="space-between">
+        <Typography variant="h5" color="textSecondary">
           Review Swap
         </Typography>
         <IconButton size="small" onClick={() => setMenu(false, "")}>
@@ -129,7 +148,32 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
             </Box>
           </Box>
           <Box display="flex" justifyContent="space-between" className={classes.row}>
-            <Typography color="textSecondary">Transaction Fee</Typography>
+            <Typography color="textSecondary">Minimum Received</Typography>
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <img
+                src={data?.tokenTo.token.logoURI}
+                alt={`${data?.tokenTo.token.symbol} coin`}
+                className={classes.img}
+              />
+              <Typography>{`${fixedNumber(minSwapOut.amountOut) ?? 0} ${
+                data?.tokenTo.token.symbol
+              }`}</Typography>
+            </Box>
+          </Box>
+          <Box display="flex" justifyContent="space-between" className={classes.row}>
+            <Typography color="textSecondary">Exchange Rate</Typography>
+            <Typography color="primary" variant="body1">
+              {`1 ${data?.tokenFrom.token.symbol} = ${exchangeRateLabel} ${data?.tokenTo.token.symbol}`}
+            </Typography>
+          </Box>
+          <Box display="flex" justifyContent="space-between" className={classes.row}>
+            <Typography color="textSecondary">Price impact</Typography>
+            <Typography className={classes.priceImpact} variant="body1">
+              {parseFloat(data?.slippage)}%
+            </Typography>
+          </Box>
+          <Box display="flex" justifyContent="space-between" className={classes.row}>
+            <Typography color="textSecondary">Liquidity Provider Fee</Typography>
             <Box display="flex" justifyContent="center" alignItems="center">
               <img
                 src={data?.tokenTo.token.logoURI}
@@ -146,7 +190,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
           You may be asked to confirm the transaction via your wallet.
         </Typography>
       </Box>
-      <Box className={classes.footer}>
+      <Box>
         <ConnectButton fullWidth onClick={handleConfirm}>
           Confirm Swap
         </ConnectButton>

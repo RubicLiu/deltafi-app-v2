@@ -39,7 +39,7 @@ const IOSSwitch = withStyles((theme: Theme) =>
         },
         color: theme.palette.common.white,
         "& + $track": {
-          backgroundColor: "#52d869",
+          background: "linear-gradient(111.31deg, #D4FF00 15.34%, #BDFF00 95.74%)",
           opacity: 1,
           border: "none",
         },

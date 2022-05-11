@@ -15,7 +15,7 @@ const Icon: React.FC<BlogProps> = ({ ...props }) => {
       </g>
       <defs>
         <clipPath id="clip0_3350_9975">
-          <rect width="30" height="34" fill="white" />
+          <rect width="30" height="34" fill="#D4FF00" />
         </clipPath>
       </defs>
     </svg>

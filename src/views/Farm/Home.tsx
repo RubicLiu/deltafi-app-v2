@@ -1,20 +1,33 @@
 import React, { ReactElement } from "react";
-import { Box, Link, makeStyles, Theme, Typography } from "@material-ui/core";
+import { Box, Grid, Link, makeStyles, Theme } from "@material-ui/core";
 
 import Page from "components/layout/Page";
-import { LinkIcon } from "components";
-import FarmCard from "./components/Card";
-import { useDarkMode } from "providers/theme";
+import Card from "./components/Card_v2";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
+import ShareIcon from "components/Svg/icons/ShareIcon";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
-  root: {
+  container: {
     width: "100%",
     flex: 1,
-    padding: `0px ${spacing(2)}px`,
-    [breakpoints.up("sm")]: {
-      maxWidth: 600,
-      padding: 0,
+    marginBottom: spacing(2),
+  },
+  poolCardContainer: {
+    marginBottom: spacing(2),
+    marginLeft: "auto",
+    marginRight: "auto",
+    "&:last-child": {
+      marginBottom: 0,
+    },
+    maxWidth: 630,
+    [breakpoints.up("md")]: {
+      maxWidth: 945,
+    },
+    [breakpoints.up("lg")]: {
+      maxWidth: 1260,
+    },
+    [breakpoints.up("xl")]: {
+      maxWidth: 1890,
     },
   },
   title: {
@@ -49,6 +62,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     border: "2px solid #3E3E3E",
     padding: spacing(2),
     borderRadius: spacing(2),
+    textAlign: "center",
     [breakpoints.up("sm")]: {
       padding: spacing(4),
       borderRadius: spacing(3),
@@ -105,60 +119,66 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginBottom: spacing(4),
     marginTop: spacing(2),
   },
-  yourFarmsCardHeader: {
+  header: {
     display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    lineHeight: 1,
     alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: spacing(3),
+    backgroundImage: "url('/images/banner/main.png')",
+    backgroundColor: palette.background.primary,
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+    height: 200,
   },
 }));
 
 const Home: React.FC = (props): ReactElement => {
   const classes = useStyles(props);
-  const { isDark } = useDarkMode();
 
   return (
     <Page>
-      <Box className={classes.root}>
-        <Typography variant="h5" color="primary" paragraph>
-          Farms
-        </Typography>
-        <Box className={classes.descContainer}>
-          <Typography variant="h6" className={classes.title}>
+      <Box className={classes.container}>
+        <Box color="#fff" textAlign="center" className={classes.header}>
+          <Box marginTop={1} fontSize={16}>
             DeltaFi Liquidity Mining
-          </Typography>
-          <Typography className={classes.description}>
-            Deposit your Liquidity Provider tokens to receive DELFI, the DeltaFi governance token.
-          </Typography>
-          <Box display="flex" alignItems="center" mt={2}>
-            <Typography className={classes.description}>Read more about</Typography>
-            <Link
-              href="https://coinmarketcap.com/currencies/deltafi/"
-              target="_blank"
-              rel="noreferrer noopener"
-              underline="always"
-              className={classes.link}
-              data-amp-analytics-on="click"
-              data-amp-analytics-name="click"
-              data-amp-analytics-attrs="page: Farms, target: DELFI"
-            >
-              DELFI
-              <LinkIcon className={classes.linkIcon} isDark={isDark} />
+          </Box>
+          <Box fontSize={58} color="#D4FF00" fontWeight={600}>
+            Coming Soon
+          </Box>
+          <Box marginTop={1.5} fontSize={18}>
+            Last DELFI Price
+          </Box>
+          <Box display="flex" alignItems="end" mt={1}>
+            <Link href="https://www.gate.io/trade/DELFI_USDT" underline="always">
+              Read more about DLT
             </Link>
+            <Box ml={0.5} height={16} width={16}>
+              <ShareIcon />
+            </Box>
           </Box>
         </Box>
-        <Box display="flex" justifyContent="space-between" mt={2}>
-          <Typography className={classes.title}>Last DELFI Price: Coming Soon</Typography>
-        </Box>
-
-        <Box className={classes.list}>
-          <Typography variant="h6" color="primary" paragraph>
-            Active Farms
-          </Typography>
-          {poolConfigs.map((poolConfig: PoolConfig) => (
-            <FarmCard key={poolConfig.farmInfo} poolConfig={poolConfig} />
-          ))}
-        </Box>
+        {poolConfigs.length && (
+          <Grid container className={classes.poolCardContainer} justifyContent="center">
+            {poolConfigs.map((poolConfig: PoolConfig, idx) => (
+              <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+                <Card
+                  color={
+                    idx % 4 === 0
+                      ? "greenYellow"
+                      : idx % 4 === 1
+                      ? "lime"
+                      : idx % 4 === 2
+                      ? "indigo"
+                      : "dodgerBlue"
+                  }
+                  key={poolConfig.farmInfo}
+                  poolConfig={poolConfig}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Box>
     </Page>
   );

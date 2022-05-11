@@ -5,31 +5,74 @@ import { withStyles } from "@material-ui/styles";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
-    background: palette.background.secondary,
-    padding: spacing(2),
+    display: "flex",
+    flexDirection: "column",
     borderRadius: 16,
-    [breakpoints.up("md")]: {
-      padding: `${spacing(3)}px ${spacing(2.5)}px`,
+    width: "100%",
+    background: palette.background.secondary,
+    marginBottom: spacing(1),
+    padding: `${spacing(1.5)}px ${spacing(2)}px`,
+    [breakpoints.up("sm")]: {
+      padding: `${spacing(2.5)}px ${spacing(3)}px`,
     },
   },
-  label: {
-    backgroundColor: palette.background.tertiary,
-    width: 156,
-    borderRadius: 28,
-    marginRight: 25,
+  title: {
+    fontSize: 10,
+    fontWeight: 500,
+    lineHeight: "18px",
+    color: palette.text.secondary,
+    marginBottom: spacing(2),
+    [breakpoints.up("sm")]: {
+      fontSize: 16,
+    },
+  },
+  content: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    "& .slider-value": {
+      fontSize: 12,
+      fontWeight: 400,
+      color: palette.text.secondary,
+    },
+    [breakpoints.up("sm")]: {
+      "& .slider-value": {
+        fontSize: 16,
+      },
+    },
+  },
+  percent: {
+    width: 1000,
+    height: 32,
+    [breakpoints.up("sm")]: {
+      width: 140,
+      height: 40,
+    },
+    background: palette.background.primary,
+    borderRadius: 2,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: spacing(4),
+    boxSizing: "border-box",
+  },
+  slider: {
+    cursor: "pointer",
+    "& .rc-slider-handle": {
+      cursor: "inherit",
+    },
+    "& .rc-slider-handle:active": {
+      borderShadow: "none",
+    },
   },
 }));
 
 const CustomSlider = withStyles((theme: Theme) => ({
-  root: {
-    color: theme.palette.text.link,
-    height: 8,
-  },
   thumb: {
     height: 20,
     width: 20,
-    backgroundColor: theme.palette.text.link,
-    border: "1px solid white",
+    backgroundColor: "#D4FF00",
+    border: "none",
     marginTop: -6,
     marginLeft: -10,
     "&:focus, &:hover": {
@@ -39,10 +82,12 @@ const CustomSlider = withStyles((theme: Theme) => ({
   rail: {
     height: 8,
     borderRadius: 4,
+    backgroundColor: "#C4C4C4",
   },
   track: {
     height: 8,
     borderRadius: 4,
+    backgroundColor: "#D4FF00",
   },
 }))(Slider);
 
@@ -61,9 +106,9 @@ const PercentageSlider: React.FC<SliderProps> = (props) => {
 
   return (
     <Box className={classes.root}>
-      <Typography>Select the percentage of your position to stake:</Typography>
-      <Box display="flex" alignItems="center" mt={2.5}>
-        <Box className={classes.label} py={2} textAlign="center">
+      <Typography className={classes.title}>Percentage of unstake:</Typography>
+      <Box className={classes.content}>
+        <Box className={classes.percent}>
           <Typography>{value}%</Typography>
         </Box>
         <CustomSlider

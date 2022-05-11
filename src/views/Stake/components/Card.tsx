@@ -1,7 +1,7 @@
 import React from "react";
 import CurrencyInput from "react-currency-input-field";
 import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
-
+import clx from "classnames";
 import { DropDown } from "components";
 import { CardProps } from "./types";
 
@@ -62,7 +62,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
   tokenBalance: {
-    color: palette.text.dark,
+    color: palette.text.secondary,
     fontFamily: "Inter",
     fontSize: 12,
     fontWeight: 500,
@@ -75,6 +75,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     borderRadius: 28,
     backgroundColor: palette.background.tertiary,
   },
+  withdrawNumber: {
+    color: "#D4FF00",
+  },
 }));
 
 const StakeCard: React.FC<CardProps> = (props) => {
@@ -84,10 +87,8 @@ const StakeCard: React.FC<CardProps> = (props) => {
   const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {};
   const baseDecimals = poolConfig.baseTokenInfo.decimals;
   const baseBalance = card.baseBalance.toFixed(baseDecimals);
-  const baseStaked = card.baseStaked.toFixed(baseDecimals);
   const quoteDecimals = poolConfig.quoteTokenInfo.decimals;
   const quoteBalance = card.quoteBalance.toFixed(quoteDecimals);
-  const quoteStaked = card.quoteStaked.toFixed(quoteDecimals);
 
   return (
     <Paper className={classes.root}>
@@ -132,12 +133,24 @@ const StakeCard: React.FC<CardProps> = (props) => {
         />
       </Box>
       <Box display="flex" justifyContent="space-between">
-        <Typography
+        {/* <Typography
           className={classes.tokenBalance}
         >{`Staked base share: ${baseStaked}/${baseBalance}`}</Typography>
         <Typography
           className={classes.tokenBalance}
-        >{`Staked quote share: ${quoteStaked}/${quoteBalance}`}</Typography>
+        >{`Staked quote share: ${quoteStaked}/${quoteBalance}`}</Typography> */}
+        <Box display="flex">
+          <Typography className={classes.tokenBalance}>Balance:</Typography>
+          &nbsp;
+          <Typography className={clx(classes.tokenBalance, classes.withdrawNumber)} variant="body2">
+            {card.baseBalance.plus(card.quoteBalance).toFixed(2).toString()}
+          </Typography>
+          &nbsp;
+          <Typography className={classes.tokenBalance}>${poolConfig.name}</Typography>
+        </Box>
+        <Typography className={classes.tokenBalance}>
+          ~${Number(baseBalance) + Number(quoteBalance) || "--"}
+        </Typography>
       </Box>
     </Paper>
   );

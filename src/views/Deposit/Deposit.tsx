@@ -1,27 +1,26 @@
-import React, { useMemo, useCallback, useEffect } from "react";
+import React, { useMemo, useCallback, useEffect, useState } from "react";
 import {
   Typography,
   IconButton,
   makeStyles,
   Theme,
-  Paper,
-  Container,
   Box,
   Button as MUIButton,
   Snackbar,
   SnackbarContent,
   Link,
   Avatar,
+  Divider,
+  Modal,
+  Fade,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useParams } from "react-router";
 import clx from "classnames";
 import BigNumber from "bignumber.js";
 
 import SwapCard from "views/Swap/components/Card";
 import { ConnectButton } from "components";
-import Page from "components/layout/Page";
 import { SwapCard as ISwapCard } from "views/Swap/components/types";
 import { WithdrawSelectCard } from "components/molecules";
 import WithdrawCard from "components/molecules/WithdrawCard";
@@ -30,7 +29,6 @@ import { useModal } from "providers/modal";
 import { exponentiatedBy } from "utils/decimal";
 import { convertDollar, getTokenTvl } from "utils/utils";
 import { SOLSCAN_LINK } from "constants/index";
-import { PoolInformation } from "./PoolInformation";
 import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
 import { getPoolConfigBySwapKey, deployConfigV2 } from "constants/deployConfigV2";
@@ -48,6 +46,8 @@ import { sendSignedTransaction } from "utils/transactions";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
+import ConfirmDepositPanel from "components/BurgerMenu/ConfirmDepositPanel";
+import WithdrawPanel from "components/BurgerMenu/WithdrawPanel";
 import { createDepositTransaction, createWithdrawTransaction } from "utils/transactions/deposit";
 import { anchorBnToBn, stringToAnchorBn } from "utils/tokenUtils";
 
@@ -57,9 +57,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     [breakpoints.up("sm")]: {
       maxWidth: 560,
     },
-  },
-  header: {
-    marginBottom: 24,
   },
   root: {
     background: palette.background.primary,
@@ -86,12 +83,22 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing(3),
+    marginBottom: spacing(2.5),
+    marginTop: spacing(2),
+    fontSize: 16,
+    "& .MuiButton-text": {
+      padding: 0,
+    },
+    "& .MuiButton-root": {
+      minWidth: 0,
+      borderRadius: 3,
+      marginRight: 20,
+    },
   },
   ratePanel: {
     display: "flex",
     flexDirection: "column",
-    // marginBottom: 20,
+    marginTop: 12,
   },
   statsPanel: {
     padding: `${spacing(3)}px ${spacing(2)}px`,
@@ -107,6 +114,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
   iconGroup: {
+    flexDirection: "column",
     display: "flex",
     alignItems: "center",
   },
@@ -118,11 +126,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
       width: 28,
       height: 28,
     },
-    boxShadow: "rgb(0 0 0 / 8%) 0px 6px 10px",
-    color: "rgb(86, 90, 105)",
+    background: palette.background.black,
+    border: "1px solid #d4ff00",
   },
   firstCoin: {
-    marginRight: -5,
+    marginTop: -5,
     zIndex: 1,
   },
   divider: {
@@ -139,20 +147,19 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginRight: 20,
   },
   statsBottom: {
-    background: palette.background.secondary,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
-    padding: spacing(2),
+    paddingTop: spacing(2),
+    fontSize: 12,
+    gap: 18,
     [breakpoints.up("sm")]: {
-      padding: spacing(2),
+      padding: spacing(3),
     },
   },
   snackBarContent: {
-    maxWidth: 421,
+    maxWidth: 393,
     backgroundColor: palette.background.lightBlack,
     display: "flex",
     flexWrap: "unset",
-    alignItems: "start",
+    alignItems: "center",
   },
   snackBarIcon: {
     marginRight: spacing(2),
@@ -161,7 +168,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginTop: 5,
   },
   snackBarLink: {
-    color: palette.text.blue,
+    color: palette.text.success,
     cursor: "pointer",
     textDecoration: "none !important",
     marginLeft: spacing(1),
@@ -175,7 +182,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontWeight: "bold",
   },
   label: {
-    fontFamily: "Inter",
     fontWeight: 500,
     fontSize: 12,
     lineHeight: 1.2,
@@ -190,6 +196,18 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     height: 50,
     marginTop: 4,
     marginBottom: 4,
+  },
+  modalContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    overflow: "auto",
+  },
+  error: {
+    textAlign: "center",
+    color: "#F60505",
+    marginBottom: "24px",
   },
 }));
 
@@ -215,8 +233,8 @@ function getPairedTokenAmount(
 const Deposit: React.FC = () => {
   const classes = useStyles();
   const { connected: isConnectedWallet } = useWallet();
-  const { setMenu } = useModal();
-  const { poolAddress } = useParams<{ poolAddress: string }>();
+  const { setMenu, data } = useModal();
+  const { poolAddress } = data;
   const swapInfo = useSelector(selectSwapBySwapKey(poolAddress));
   const program = useSelector(programSelector);
 
@@ -232,6 +250,8 @@ const Deposit: React.FC = () => {
   const dispatch = useDispatch();
   const network = deployConfigV2.network;
 
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [openWithdraw, setOpenWithdraw] = useState(false);
   useEffect(() => {
     if (baseTokenInfo && quoteTokenInfo) {
       dispatch(depositViewActions.setTokenInfo({ baseTokenInfo, quoteTokenInfo }));
@@ -251,10 +271,6 @@ const Deposit: React.FC = () => {
     }
     return new BigNumber(0);
   }, [quotePrice, swapInfo, quoteTokenInfo]);
-
-  const tvl = useMemo(() => {
-    return baseTvl.plus(quoteTvl);
-  }, [baseTvl, quoteTvl]);
 
   const basePercent = useMemo(() => {
     if (lpUser && swapInfo) {
@@ -407,6 +423,7 @@ const Deposit: React.FC = () => {
           connection,
         }),
       );
+      setOpenConfirm(false);
     }
   }, [
     poolConfig,
@@ -500,6 +517,7 @@ const Deposit: React.FC = () => {
           connection,
         }),
       );
+      setOpenWithdraw(false);
     }
   }, [
     wallet,
@@ -604,14 +622,10 @@ const Deposit: React.FC = () => {
             alt="snack-status-icon"
             className={classes.snackBarIcon}
           />
-          <Box>
-            <Typography variant="h6" color="primary">
-              Transaction failed(try again later)
-            </Typography>
+          <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+            <Box>Transaction failed(try again later)</Box>
             <Box>
-              <Typography variant="body1" color="primary">
-                failed to send transaction: Transaction simulation failed: Blockhash not found
-              </Typography>
+              failed to send transaction: Transaction simulation failed: Blockhash not found
             </Box>
           </Box>
         </Box>
@@ -628,17 +642,17 @@ const Deposit: React.FC = () => {
           className={classes.snackBarIcon}
         />
         <Box>
-          <Typography variant="body1" color="primary">
+          <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
             {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(base.amount).toFixed(
               6,
             )} ${base.token.symbol} and ${Number(quote.amount).toFixed(6)} ${
               quote.token.symbol
             } to ${base.token.symbol}-${quote.token.symbol} pool`}
-          </Typography>
+          </Box>
           <Box display="flex" alignItems="center">
-            <Typography variant="subtitle2" color="primary">
+            <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
               View Transaction:
-            </Typography>
+            </Box>
             <Link
               className={classes.snackBarLink}
               target="_blank"
@@ -654,11 +668,11 @@ const Deposit: React.FC = () => {
 
   const snackAction = useMemo(() => {
     return (
-      <IconButton size="small" onClick={handleSnackBarClose} className={classes.snackBarClose}>
+      <IconButton size="small" onClick={handleSnackBarClose}>
         <CloseIcon />
       </IconButton>
     );
-  }, [handleSnackBarClose, classes]);
+  }, [handleSnackBarClose]);
 
   const actionButton = useMemo(() => {
     if (!isConnectedWallet) {
@@ -689,9 +703,21 @@ const Deposit: React.FC = () => {
           );
         if (isInsufficient) {
           return (
-            <ConnectButton size="large" fullWidth disabled>
-              Insufficient balance
-            </ConnectButton>
+            <Box>
+              <Box className={classes.error}>Insufficient balance</Box>
+              <ConnectButton
+                fullWidth
+                size="large"
+                variant="contained"
+                disabled
+                onClick={() => setOpenConfirm(true)}
+                data-amp-analytics-on="click"
+                data-amp-analytics-name="click"
+                data-amp-analytics-attrs="page: Deposit, target: Deposit"
+              >
+                Deposit
+              </ConnectButton>
+            </Box>
           );
         }
       }
@@ -700,7 +726,7 @@ const Deposit: React.FC = () => {
           fullWidth
           size="large"
           variant="contained"
-          onClick={handleDeposit}
+          onClick={() => setOpenConfirm(true)}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Deposit, target: Deposit"
@@ -726,7 +752,7 @@ const Deposit: React.FC = () => {
           fullWidth
           size="large"
           variant="contained"
-          onClick={handleWithdraw}
+          onClick={() => setOpenWithdraw(true)}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Withdraw, target: Withdraw"
@@ -743,15 +769,14 @@ const Deposit: React.FC = () => {
     quoteTokenAccount,
     quoteShare,
     setMenu,
-    handleDeposit,
-    handleWithdraw,
     classes.actionLoadingButton,
+    classes.error,
   ]);
 
   if (!swapInfo) return null;
 
-  const vertical = "bottom";
-  const horizontal = "left";
+  const vertical = "Top";
+  const horizontal = "Right";
 
   const reserveDisplay = (reserve: BigNumber, decimals: number): string => {
     if (!reserve || !decimals) {
@@ -769,154 +794,136 @@ const Deposit: React.FC = () => {
   const method = depositView.method;
 
   return (
-    <Page>
-      <Container className={classes.container}>
-        <Box display="flex" justifyContent="space-between" className={classes.header}>
-          <Typography variant="h6" color="primary">
-            {swapInfo.name}
-          </Typography>
+    <Box width="100%">
+      <Box display="flex" justifyContent="space-between">
+        <Typography variant="h5">Deposit</Typography>
+        <IconButton size="small" onClick={() => setMenu(false, "")}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+      <Box className={classes.container}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          marginTop={3.5}
+          marginBottom={4}
+          fontSize={16}
+          fontWeight={500}
+          lineHeight="28px"
+        >
           <Box className={classes.iconGroup}>
             <img
               src={baseTokenInfo.logoURI}
               alt={`${baseTokenInfo.symbol} coin`}
-              className={clx(classes.coinIcon, classes.firstCoin)}
+              className={classes.coinIcon}
             />
             <img
               src={quoteTokenInfo.logoURI}
               alt={`${quoteTokenInfo.symbol} coin`}
-              className={classes.coinIcon}
+              className={clx(classes.coinIcon, classes.firstCoin)}
             />
           </Box>
+          <Box marginLeft={2}>
+            <Box>
+              {`${reserveDisplay(swapInfo.poolState.baseReserve, baseTokenInfo.decimals)} ${
+                baseTokenInfo.symbol
+              }(${basePercent?.toFormat(2) || "-"}%)`}
+            </Box>
+            <Box>
+              {`${reserveDisplay(swapInfo.poolState.quoteReserve, quoteTokenInfo.decimals)} ${
+                quoteTokenInfo.symbol
+              }(${quotePercent?.toFormat(2) || "-"}%)`}
+            </Box>
+          </Box>
+          <Box marginLeft="auto" textAlign="right">
+            <Box sx={{ color: "#D3D3D3", fontSize: 14 }}>Total Share</Box>
+            <Box>{convertDollar(userTvl.toFixed(2).toString()) || "-"}%</Box>
+          </Box>
         </Box>
-        <Box display="flex" flexDirection="column" className={classes.header}>
-          <Typography variant="body1" color="primary">
-            Total Share
-          </Typography>
-          <Typography variant="body1" color="primary">
-            {convertDollar(userTvl.toFixed(2).toString())}
-          </Typography>
+        <Divider />
+        <Box className={classes.ratePanel}>
+          <Box className={classes.tabs}>
+            <Box>
+              <MUIButton
+                className={method === "deposit" ? classes.activeBtn : classes.btn}
+                onClick={() => handleSwitchMethod("deposit")}
+              >
+                Deposit
+              </MUIButton>
+              <MUIButton
+                className={method === "withdraw" ? classes.activeBtn : classes.btn}
+                onClick={() => handleSwitchMethod("withdraw")}
+              >
+                Withdraw
+              </MUIButton>
+            </Box>
+          </Box>
         </Box>
-        <Paper className={classes.root}>
-          <Box className={classes.ratePanel}>
-            <Typography className={classes.marketCondition}>POSITION MANAGEMENT</Typography>
-            <div className={classes.divider} />
-            <Box className={classes.tabs}>
-              <Box>
-                <MUIButton
-                  className={method === "deposit" ? classes.activeBtn : classes.btn}
-                  onClick={() => handleSwitchMethod("deposit")}
-                >
-                  Deposit
-                </MUIButton>
-                &nbsp;
-                <MUIButton
-                  className={method === "withdraw" ? classes.activeBtn : classes.btn}
-                  onClick={() => handleSwitchMethod("withdraw")}
-                >
-                  Withdraw
-                </MUIButton>
-              </Box>
-            </Box>
+        {method === "withdraw" ? (
+          <Box display="flex" flexDirection="column" alignItems="flex-end">
+            <WithdrawSelectCard
+              percentage={depositView.withdrawPercentage}
+              onUpdatePercentage={handleWithdrawSlider}
+            />
+            <WithdrawCard
+              card={depositView.base}
+              handleChangeCard={handleBaseTokenInput}
+              withdrawal={baseShare?.toFixed(6).toString()}
+              disableDrop={true}
+            />
+            <Box mt={1} />
+            <WithdrawCard
+              card={depositView.quote}
+              handleChangeCard={handleQuoteTokenInput}
+              withdrawal={quoteShare?.toFixed(6).toString()}
+              disableDrop={true}
+            />
           </Box>
-          {method === "withdraw" ? (
-            <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <WithdrawSelectCard
-                percentage={depositView.withdrawPercentage}
-                onUpdatePercentage={handleWithdrawSlider}
-              />
-              <WithdrawCard
-                card={depositView.base}
-                handleChangeCard={handleBaseTokenInput}
-                withdrawal={baseShare?.toFixed(6).toString()}
-                disableDrop={true}
-              />
-              <Box mt={1} />
-              <WithdrawCard
-                card={depositView.quote}
-                handleChangeCard={handleQuoteTokenInput}
-                withdrawal={quoteShare?.toFixed(6).toString()}
-                disableDrop={true}
-              />
-            </Box>
-          ) : (
-            <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <SwapCard
-                card={depositView.base}
-                handleChangeCard={handleBaseTokenInput}
-                disableDrop={true}
-              />
-              <Box mt={1} />
-              <SwapCard
-                card={depositView.quote}
-                handleChangeCard={handleQuoteTokenInput}
-                disableDrop={true}
-              />
-            </Box>
-          )}
-          <Box mt={3} width="100%" sx={{ position: "relative", zIndex: 1 }}>
-            {actionButton}
+        ) : (
+          <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
+            <SwapCard
+              card={depositView.base}
+              handleChangeCard={handleBaseTokenInput}
+              disableDrop={true}
+            />
+            <SwapCard
+              card={depositView.quote}
+              handleChangeCard={handleQuoteTokenInput}
+              disableDrop={true}
+            />
           </Box>
-        </Paper>
+        )}
+        <Box mt={3} width="100%" sx={{ position: "relative", zIndex: 1 }}>
+          {actionButton}
+        </Box>
+        <Box display="flex" justifyContent="center" className={classes.statsBottom}>
+          <Box>{swapFee.toString()}% Swap Fee</Box>
+          <Box>{withdrawFee.toString()}% Withdraw Fee</Box>
+        </Box>
+      </Box>
 
-        <Paper className={classes.stats}>
-          <Box className={classes.statsPanel}>
-            <Typography className={classes.marketCondition}>POOL STATS</Typography>
-            <div className={classes.divider} />
-            <Box display="flex" flexDirection="column">
-              <Box display="flex" justifyContent="space-between">
-                <Typography className={classes.label}>Currency Reserves</Typography>
-                <Box marginBottom={2}>
-                  <Box display="flex" marginBottom={1} alignItems="center" justifyContent="start">
-                    <img
-                      src={baseTokenInfo.logoURI}
-                      alt={`${baseTokenInfo.symbol} coin`}
-                      className={clx(classes.coinIcon, classes.statsIcon)}
-                    />
-                    <Typography className={classes.label}>
-                      {`${reserveDisplay(swapInfo.poolState.baseReserve, baseTokenInfo.decimals)} ${
-                        baseTokenInfo.symbol
-                      }(${basePercent?.toFormat(2) || "-"}%)`}
-                    </Typography>
-                  </Box>
-                  <Box display="flex">
-                    <img
-                      src={quoteTokenInfo.logoURI}
-                      alt={`${quoteTokenInfo.symbol} coin`}
-                      className={clx(classes.coinIcon, classes.statsIcon)}
-                    />
-                    <Typography className={classes.label}>
-                      {`${reserveDisplay(
-                        swapInfo.poolState.quoteReserve,
-                        quoteTokenInfo.decimals,
-                      )} ${quoteTokenInfo.symbol}(${quotePercent?.toFormat(2) || "-"}%)`}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-              <Box display="flex" justifyContent="space-between" marginBottom={2}>
-                <Typography className={classes.label}>Total Reserves</Typography>
-                <Typography className={classes.label}>
-                  {convertDollar(tvl?.toFixed(2).toString())}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-          <Box className={classes.statsBottom}>
-            <Box display="flex" justifyContent="space-between" marginBottom={1}>
-              <Typography className={classes.label}>Swap Fee</Typography>
-              <Typography className={classes.label}>{swapFee?.toString()}%</Typography>
-            </Box>
-            <Box display="flex" justifyContent="space-between">
-              <Typography className={classes.label}>Withdraw Fee</Typography>
-              <Typography className={classes.label}>{withdrawFee?.toString()}%</Typography>
-            </Box>
-          </Box>
-        </Paper>
-
-        <PoolInformation pool={poolConfig} />
-      </Container>
+      <div>
+        <Modal className={classes.modalContainer} open={openConfirm}>
+          <Fade in={openConfirm}>
+            <ConfirmDepositPanel
+              address={poolAddress}
+              onClose={() => setOpenConfirm(false)}
+              onConfirm={handleDeposit}
+            />
+          </Fade>
+        </Modal>
+        <Modal className={classes.modalContainer} open={openWithdraw}>
+          <Fade in={openConfirm}>
+            <WithdrawPanel
+              address={poolAddress}
+              onClose={() => setOpenWithdraw(false)}
+              onConfirm={handleWithdraw}
+            />
+          </Fade>
+        </Modal>
+      </div>
       <Snackbar
-        anchorOrigin={{ vertical, horizontal }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={depositView.openSnackbar}
         onClose={handleSnackBarClose}
         key={vertical + horizontal}
@@ -928,7 +935,7 @@ const Deposit: React.FC = () => {
           action={snackAction}
         />
       </Snackbar>
-    </Page>
+    </Box>
   );
 };
 

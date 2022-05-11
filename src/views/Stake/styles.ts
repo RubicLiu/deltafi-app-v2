@@ -1,12 +1,6 @@
 import { Theme, makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
-  root: {
-    margin: "0 auto",
-    [breakpoints.up("sm")]: {
-      maxWidth: 560,
-    },
-  },
   iconGroup: {
     display: "flex",
     alignItems: "center",
@@ -78,20 +72,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     backgroundColor: palette.background.secondary,
     border: `3px solid ${palette.background.primary}`,
   },
-  minting: {
-    background: palette.background.primary,
-    borderRadius: spacing(2),
-    marginBottom: spacing(3),
-    marginTop: spacing(3),
-    padding: `${spacing(3)}px ${spacing(2)}px`,
-    [breakpoints.up("sm")]: {
-      padding: `${spacing(5)}px ${spacing(4)}px`,
-      borderRadius: spacing(3),
-      marginBottom: spacing(5),
-      marginTop: spacing(5),
-      maxWidth: 560,
-    },
-  },
   ratePanel: {
     display: "flex",
     flexDirection: "column",
@@ -107,7 +87,17 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing(4),
+    marginBottom: spacing(2.5),
+    marginTop: spacing(2),
+    fontSize: 16,
+    "& .MuiButton-text": {
+      padding: 0,
+    },
+    "& .MuiButton-root": {
+      minWidth: 0,
+      borderRadius: 3,
+      marginRight: 20,
+    },
   },
   marketCondition: {
     fontWeight: "bold",
@@ -145,20 +135,17 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginRight: spacing(2),
   },
   snackBarLink: {
-    color: palette.text.blue,
+    color: palette.text.success,
     cursor: "pointer",
     textDecoration: "none !important",
     marginLeft: spacing(1),
   },
   snackBarContent: {
-    maxWidth: 421,
+    maxWidth: 393,
     backgroundColor: palette.background.lightBlack,
     display: "flex",
     flexWrap: "unset",
-    alignItems: "start",
-  },
-  snackBarClose: {
-    marginTop: 5,
+    alignItems: "centers",
   },
   claimLoadingButton: {
     marginTop: 0,
@@ -173,6 +160,21 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     height: 50,
     marginTop: 4,
     marginBottom: 5,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: 500,
+    color: "#d3d3d3",
+  },
+  value: {
+    fontSize: 16,
+    fontWeight: 500,
+    color: "#f6f6f6",
+  },
+  modalContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
 }));
 

@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { Box, makeStyles, Typography } from "@material-ui/core";
+import { Box, Grid, makeStyles } from "@material-ui/core";
 import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
 
 import Page from "components/layout/Page";
-import PoolCard from "./components/Card";
+import Card from "./components/Card_v2";
 import { convertDollar, getTokenTvl } from "utils/utils";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { useSelector } from "react-redux";
@@ -37,11 +37,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
     width: "100%",
     flex: 1,
-    padding: `0px ${spacing(2)}px`,
     marginBottom: spacing(2),
-    [breakpoints.up("sm")]: {
-      maxWidth: 560,
-    },
   },
   listContainer: {
     background: palette.background.primary,
@@ -54,9 +50,33 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   },
   poolCardContainer: {
     marginBottom: spacing(2),
+    marginLeft: "auto",
+    marginRight: "auto",
     "&:last-child": {
       marginBottom: 0,
     },
+    maxWidth: 630,
+    [breakpoints.up("md")]: {
+      maxWidth: 945,
+    },
+    [breakpoints.up("lg")]: {
+      maxWidth: 1260,
+    },
+    [breakpoints.up("xl")]: {
+      maxWidth: 1890,
+    },
+  },
+  header: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    lineHeight: 1,
+    alignItems: "center",
+    backgroundImage: "url('/images/banner/main.png')",
+    backgroundColor: palette.background.primary,
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+    height: 200,
   },
 }));
 
@@ -97,51 +117,50 @@ const Home: React.FC = () => {
     return new BigNumber(0);
   }, [symbolToPythData, poolState]);
 
-  const poolConfigsWithDeposit = poolConfigs.filter((poolConfig) =>
-    hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
-  );
-  const poolConfigsWithoutDeposit = poolConfigs.filter(
-    (poolConfig) => !hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
-  );
+  // const poolConfigsWithDeposit = poolConfigs.filter((poolConfig) =>
+  //   hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
+  // );
+  // const poolConfigsWithoutDeposit = poolConfigs.filter(
+  //   (poolConfig) => !hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
+  // );
 
   return (
     <Page>
-      <Box className={classes.container}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h5" color="textPrimary" align="center">
-            Pools
-          </Typography>
-          <Typography align="center" color="textPrimary">
-            Total Value Locked: {convertDollar(tvl.toFixed(2))}
-          </Typography>
-        </Box>
-        <br />
-        {isConnectedWallet && (
-          <Box className={classes.listContainer}>
-            <Typography>Your Pools</Typography>
-            <Box mt={3.5}>
-              {poolConfigsWithDeposit.map((poolConfig) => (
-                <PoolCard isUserPool key={poolConfig.swapInfo} poolConfig={poolConfig} />
-              ))}
-            </Box>
+      <Box padding={0} className={classes.container}>
+        <Box color="#fff" textAlign="center" className={classes.header}>
+          <Box fontSize={58} color="#D4FF00" fontWeight={600}>
+            {convertDollar(tvl.toFixed(2))}
           </Box>
-        )}
-        <Box className={classes.listContainer} mt={isConnectedWallet ? 4 : 0}>
-          {isConnectedWallet && (
-            <Box mb={3.5}>
-              <Typography>Other Pools</Typography>
-            </Box>
-          )}
-          {poolConfigs.length > 0 && (
-            <Box className={classes.poolCardContainer}>
-              {poolConfigsWithoutDeposit.map((poolConfig) => (
-                <Box key={poolConfig.swapInfo}>
-                  <PoolCard poolConfig={poolConfig} />
-                </Box>
-              ))}
-            </Box>
-          )}
+          <Box marginTop={1} fontSize={18}>
+            Total Value Locked
+          </Box>
         </Box>
+
+        {poolConfigs.length > 0 && (
+          <Grid container className={classes.poolCardContainer} justifyContent="center">
+            {poolConfigs.map((poolConfig, idx) => (
+              <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+                <Card
+                  color={
+                    idx % 4 === 0
+                      ? "greenYellow"
+                      : idx % 4 === 1
+                      ? "lime"
+                      : idx % 4 === 2
+                      ? "indigo"
+                      : "dodgerBlue"
+                  }
+                  isUserPool={
+                    isConnectedWallet &&
+                    hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig)
+                  }
+                  key={poolConfig.swapInfo}
+                  poolConfig={poolConfig}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Box>
     </Page>
   );
