@@ -10,7 +10,7 @@ export function getSwapInResult(
   swapInfo: SwapInfo,
   fromToken: TokenConfig,
   toToken: TokenConfig,
-  amount: string,
+  outAmount: string,
   maxSlippage: number,
   marketPrice: BigNumber,
   marketPriceLow?: BigNumber,
@@ -21,7 +21,7 @@ export function getSwapInResult(
   fee: string;
   priceImpact: string;
 } {
-  const amountOut: BigNumber = new BigNumber(amount);
+  const amountOut: BigNumber = new BigNumber(outAmount);
   if (amountOut.isNaN()) {
     return {
       amountIn: "",
@@ -31,7 +31,7 @@ export function getSwapInResult(
     };
   }
   if (amountOut.toNumber() < 0) {
-    throw Error(`invalid amount input: ${amount}`);
+    throw Error(`invalid amount input: ${outAmount}`);
   }
 
   const grossAmountOut: BigNumber = amountOut
@@ -90,7 +90,7 @@ export function getSwapOutResult(
   swapInfo: SwapInfo,
   fromToken: TokenConfig,
   toToken: TokenConfig,
-  amount: string,
+  inAmount: string,
   maxSlippage: number,
   marketPrice: BigNumber,
   marketPriceLow?: BigNumber,
@@ -101,7 +101,7 @@ export function getSwapOutResult(
   fee: string;
   priceImpact: string;
 } {
-  const amountIn: BigNumber = new BigNumber(amount);
+  const amountIn: BigNumber = new BigNumber(inAmount);
   if (amountIn.isNaN()) {
     return {
       amountOut: "",
@@ -110,8 +110,8 @@ export function getSwapOutResult(
       priceImpact: "",
     };
   }
-  if (parseFloat(amount) < 0) {
-    throw Error(`invalid amount input: ${amount}`);
+  if (parseFloat(inAmount) < 0) {
+    throw Error(`invalid amount input: ${inAmount}`);
   }
 
   const { amountOut: grossAmountOut, impliedPrice } = getSwappedAmountsAndImpliedPrice(
