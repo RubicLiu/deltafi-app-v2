@@ -21,6 +21,10 @@ export function calculateOutAmountNormalSwapInternal(
   currentResreveB: BigNumber,
   inputAAmount: BigNumber,
 ): BigNumber {
+  if (inputAAmount.isLessThanOrEqualTo(currentReserveA.negated())) {
+    return new BigNumber(-Infinity);
+  }
+
   // need to ceil the core
   let core: BigNumber = BigNumberWithConfig(currentReserveA, {
     ROUNDING_MODE: BigNumber.ROUND_CEIL,
@@ -84,6 +88,7 @@ export function calculateOutAmountNormalSwap(
     approximationResult === 0
       ? calculationResult
       : Math.max(approximationResult, calculationResult);
+
   validate(
     finalResult <= impliedOutAmount,
     "final result for swap out amount should not be larger than the implied out amount",
@@ -178,6 +183,10 @@ export function calculateOutAmountStableSwapInternal(
     .minus(slope)
     .multipliedBy(balancedReserveA)
     .plus(slope.multipliedBy(currentReserveA.plus(inputAAmount)));
+
+  if (coreDenumerator.isLessThanOrEqualTo(0)) {
+    return new BigNumber(-Infinity);
+  }
 
   // need to floor the multiplier
   let multiplier: BigNumber = new BigNumber(1).minus(
