@@ -28,7 +28,7 @@ import { exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK } from "constants/index";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
-import { getSwapOutResult } from "utils/swap";
+import { getSwapInResult, getSwapOutResult } from "utils/swap";
 import { SwapCard as ISwapCard } from "./components/types";
 import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
@@ -254,31 +254,40 @@ const Home: React.FC = (props) => {
     if (tokenFrom.token.mint === newTokenTo.mint) {
       newTokenFrom = Object.assign({}, tokenTo.token);
     }
-    // TODO(leqiang): add calculate input amount from output amount and enable this
-    // const useOldInput: boolean = new BigNumber(card.amount).isNaN();
-    // const tokenToAmount = useOldInput? tokenFrom.amount : card.amount;
-    // let amountOut = useOldInput? tokenTo.amount : "";
-    // let amountOutWithSlippage = useOldInput? tokenTo.amountWithSlippage : "";
-    // if (!useOldInput && swapInfo && swapView.priceImpact) {
-    //   const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
-    //     getSwapOutResult(
-    //       swapInfo,
-    //       newTokenFrom,
-    //       newTokenTo,
-    //       tokenFrom.amount ?? "0",
-    //       parseFloat(swapView.priceImpact),
-    //       marketPrice,
-    //     );
-    //   amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
-    //   amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
-    // }
-    dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenTo }));
+
+    if (newTokenTo.mint !== tokenTo.token.mint || newTokenFrom.mint !== tokenFrom.token.mint) {
+      // change buy/sell token, clear the input/output to 0
+      dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: "0" }));
+      dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenTo, amount: "0" }));
+      return;
+    }
+
+    const { amountIn: baseAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
+      getSwapInResult(
+        swapInfo,
+        newTokenFrom,
+        newTokenTo,
+        card.amount ?? "0",
+        parseFloat(swapView.priceImpact),
+        marketPrice,
+      );
+
+    const amountIn = baseAmount === "NaN" ? "" : baseAmount;
+    const amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
+
+    dispatch(
+      swapViewActions.setTokenTo({
+        ...tokenTo,
+        token: newTokenTo,
+        amount: card.amount,
+        amountWithSlippage: amountOutWithSlippage,
+      }),
+    );
     dispatch(
       swapViewActions.setTokenFrom({
         ...tokenFrom,
         token: newTokenFrom,
-        // amount: amountOut,
-        // amountWithSlippage: amountOutWithSlippage,
+        amount: amountIn,
       }),
     );
   };
@@ -621,7 +630,7 @@ const Home: React.FC = (props) => {
                 card={tokenTo}
                 tokens={possibleTokenToConfigs}
                 handleChangeCard={handleTokenToInput}
-                disabled={true}
+                disabled={false}
               />
             </Box>
             <SettingsPanel
