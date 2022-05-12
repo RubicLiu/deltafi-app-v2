@@ -13,7 +13,9 @@ describe("utils/tokenUtils", function () {
     expect(stringCutDecimals(4, "2.2222220")).toEqual("2.2222");
     expect(stringCutDecimals(4, "2.0000")).toEqual("2");
     expect(stringCutDecimals(4, "2.000001")).toEqual("2");
-    expect(stringCutDecimals(4, "222222222222222222222222222222.000001")).toEqual("222222222222222222222222222222");
+    expect(stringCutDecimals(4, "222222222222222222222222222222.000001")).toEqual(
+      "222222222222222222222222222222",
+    );
     expect(stringCutDecimals(5, "2.000001")).toEqual("2");
     expect(stringCutDecimals(6, "2.000001")).toEqual("2.000001");
     expect(stringCutDecimals(10, "2.000001")).toEqual("2.000001");
