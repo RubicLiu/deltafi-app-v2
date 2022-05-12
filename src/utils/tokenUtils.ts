@@ -23,6 +23,29 @@ export function stringToAnchorBn(tokenConfig: TokenConfig, amount: string): BN {
   return bnToAnchorBn(tokenConfig, new BigNumber(amount));
 }
 
+export function stringCutDecimals(decimals: number, amount: string): string {
+  const amountBN = new BigNumber(amount);
+  if (amountBN.isNaN()) {
+    throw Error("Invalid amount: " + amount);
+  }
+
+  const amountBNFixed = amountBN.toFixed(decimals);
+
+  const decimalPointIndex = amountBNFixed.indexOf(".");
+  if (decimalPointIndex < 0) {
+    return amountBNFixed;
+  }
+
+  let lastNoneZeroIndex = decimalPointIndex - 1;
+  for (let i = amountBNFixed.length - 1; i > decimalPointIndex; i--) {
+    if (amountBNFixed[i] !== "0") {
+      lastNoneZeroIndex = i;
+      break;
+    }
+  }
+  return amount.substring(0, lastNoneZeroIndex + 1);
+}
+
 export function stringCutTokenDecimals(tokenConfig: TokenConfig, amount: string) {
-  return parseFloat(parseFloat(amount).toFixed(tokenConfig.decimals)).toString();
+  return stringCutDecimals(tokenConfig.decimals, amount);
 }
