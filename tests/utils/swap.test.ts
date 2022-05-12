@@ -1,4 +1,5 @@
 import {
+  getSwapInResult,
   getSwapOutAmountSellBase,
   getSwapOutAmountSellQuote,
   getSwapOutResult,
@@ -197,7 +198,7 @@ describe("utils/swap", function () {
     ).toEqual({
       amountOut: "0.324",
       amountOutWithSlippage: "0.322380",
-      fee: "0.00162",
+      fee: "0.001994",
       priceImpact: "0.00001840490797546012",
     });
 
@@ -241,7 +242,7 @@ describe("utils/swap", function () {
     ).toEqual({
       amountOut: "0.324",
       amountOutWithSlippage: "0.322380",
-      fee: "0.00162",
+      fee: "0.001994",
       priceImpact: "0.00001840490797546012",
     });
 
@@ -283,7 +284,7 @@ describe("utils/swap", function () {
     ).toEqual({
       amountOut: "1.99",
       amountOutWithSlippage: "1.970100",
-      fee: "0.0199",
+      fee: "0.009999",
       priceImpact: "0.00001839438644256218",
     });
 
@@ -305,6 +306,96 @@ describe("utils/swap", function () {
         new BigNumber(1),
       ),
     ).toThrow();
+  });
+
+  it("getSwapInResult", function () {
+    const baseMintPublicKey: PublicKey = new Keypair().publicKey;
+    const quoteMintPublicKey: PublicKey = new Keypair().publicKey;
+
+    expect(
+      getSwapInResult(
+        {
+          mintBase: baseMintPublicKey,
+          mintQuote: quoteMintPublicKey,
+          mintBaseDecimals: 6,
+          mintQuoteDecimals: 6,
+          swapType: { normalSwap: {} } as SwapType,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(20_000_000),
+            baseReserve: new anchor.BN(100_000_000_000),
+            quoteReserve: new anchor.BN(20_000_000_000),
+          } as PoolState,
+          swapConfig: {
+            enableConfidenceInterval: false,
+            adminTradeFeeNumerator: new anchor.BN(1),
+            adminTradeFeeDenominator: new anchor.BN(2),
+            tradeFeeNumerator: new anchor.BN(1994),
+            tradeFeeDenominator: new anchor.BN(325_994),
+          } as SwapConfig,
+        } as SwapInfo,
+        {
+          mint: baseMintPublicKey.toBase58(),
+          decimals: 6,
+        } as TokenConfig,
+        {
+          mint: quoteMintPublicKey.toBase58(),
+          decimals: 6,
+        } as TokenConfig,
+        "0.324",
+        0.5,
+        new BigNumber(0.163),
+      ),
+    ).toEqual({
+      amountIn: "2",
+      amountOutWithSlippage: "0.322380",
+      fee: "0.001994",
+      priceImpact: "0.00001840524672233231",
+    });
+
+    // normal swap, sell base, enable confidence interval
+    expect(
+      getSwapInResult(
+        {
+          mintBase: baseMintPublicKey,
+          mintQuote: quoteMintPublicKey,
+          mintBaseDecimals: 9,
+          mintQuoteDecimals: 6,
+          swapType: { normalSwap: {} } as SwapType,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(20_000_000),
+            baseReserve: new anchor.BN(100_000_000_000),
+            quoteReserve: new anchor.BN(20_000_000_000),
+          } as PoolState,
+          swapConfig: {
+            enableConfidenceInterval: true,
+            adminTradeFeeNumerator: new anchor.BN(1),
+            adminTradeFeeDenominator: new anchor.BN(2),
+            tradeFeeNumerator: new anchor.BN(1994),
+            tradeFeeDenominator: new anchor.BN(325_994),
+          } as SwapConfig,
+        } as SwapInfo,
+        {
+          mint: baseMintPublicKey.toBase58(),
+          decimals: 9,
+        } as TokenConfig,
+        {
+          mint: quoteMintPublicKey.toBase58(),
+          decimals: 6,
+        } as TokenConfig,
+        "0.324",
+        0.5,
+        new BigNumber(164),
+        new BigNumber(163),
+        new BigNumber(165),
+      ),
+    ).toEqual({
+      amountIn: "0.002",
+      amountOutWithSlippage: "0.322380",
+      fee: "0.001994",
+      priceImpact: "0.00001840524672233257",
+    });
   });
 
   it("normalizeMarketPriceWithDecimals", function () {});

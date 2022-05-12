@@ -6,34 +6,72 @@ import { WAD } from "../constants";
 import { exponentiate, exponentiatedBy } from "./decimal";
 import { bnToString } from "./tokenUtils";
 
-//TODO(leqiang): implement getSwapInResult
-// export function getSwapInResult(
-//   swapInfo: SwapInfo,
-//   fromToken: TokenConfig,
-//   toToken: TokenConfig,
-//   amount: string,
-//   maxSlippage: number,
-//   marketPrice: BigNumber,
-//   marketPriceLow?: BigNumber,
-//   marketPriceHigh?: BigNumber,
-// ): {
-//   amountIn: string;
-//   amountOutWithSlippage: string;
-//   fee: string;
-//   priceImpact: string;
-// } {
-//   if (new BigNumber(amount).isNaN()) {
-//     return {
-//       amountIn: "",
-//       amountOutWithSlippage: "",
-//       fee: "",
-//       priceImpact: "",
-//     };
-//   }
-//   if (parseFloat(amount) < 0) {
-//     throw Error(`invalid amount input: ${amount}`);
-//   }
-// }
+export function getSwapInResult(
+  swapInfo: SwapInfo,
+  fromToken: TokenConfig,
+  toToken: TokenConfig,
+  amountOut: string,
+  maxSlippage: number,
+  marketPrice: BigNumber,
+  marketPriceLow?: BigNumber,
+  marketPriceHigh?: BigNumber,
+): {
+  amountIn: string;
+  amountOutWithSlippage: string;
+  fee: string;
+  priceImpact: string;
+} {
+  const amountOutBN: BigNumber = new BigNumber(amountOut);
+  if (amountOutBN.isNaN()) {
+    return {
+      amountIn: "",
+      amountOutWithSlippage: "",
+      fee: "",
+      priceImpact: "",
+    };
+  }
+  if (amountOutBN.toNumber() < 0) {
+    throw Error(`invalid amount input: ${amountOut}`);
+  }
+
+  const grossAmountOutBN: BigNumber = amountOutBN
+    .multipliedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
+    .dividedBy(
+      swapInfo.swapConfig.tradeFeeDenominator.sub(swapInfo.swapConfig.tradeFeeNumerator).toString(),
+    );
+
+  const { amountOut: amountInNegBN, impliedPrice } = getSwappedAmountsAndImpliedPrice(
+    swapInfo,
+    toToken,
+    fromToken,
+    grossAmountOutBN.negated(),
+    marketPrice,
+    marketPriceHigh,
+    marketPriceLow,
+  );
+
+  const priceImpact: string = amountInNegBN
+    .dividedBy(grossAmountOutBN.negated())
+    .minus(impliedPrice)
+    .abs()
+    .dividedBy(impliedPrice)
+    .toString();
+
+  const amountIn: string = parseFloat(bnToString(fromToken, amountInNegBN.negated())).toString();
+  const amountOutWithSlippage: string = bnToString(
+    toToken,
+    amountOutBN.multipliedBy(new BigNumber(100).minus(new BigNumber(maxSlippage)).dividedBy(100)),
+  );
+
+  const fee: string = bnToString(toToken, grossAmountOutBN.minus(amountOutBN));
+
+  return {
+    amountIn,
+    amountOutWithSlippage,
+    fee,
+    priceImpact,
+  };
+}
 
 /**
  * Main interface function of this module, calculate the output information
@@ -52,7 +90,7 @@ export function getSwapOutResult(
   swapInfo: SwapInfo,
   fromToken: TokenConfig,
   toToken: TokenConfig,
-  amount: string,
+  amountIn: string,
   maxSlippage: number,
   marketPrice: BigNumber,
   marketPriceLow?: BigNumber,
@@ -63,8 +101,8 @@ export function getSwapOutResult(
   fee: string;
   priceImpact: string;
 } {
-  const amountIn: BigNumber = new BigNumber(amount);
-  if (amountIn.isNaN()) {
+  const amountInBN: BigNumber = new BigNumber(amountIn);
+  if (amountInBN.isNaN()) {
     return {
       amountOut: "",
       amountOutWithSlippage: "",
@@ -72,47 +110,47 @@ export function getSwapOutResult(
       priceImpact: "",
     };
   }
-  if (parseFloat(amount) < 0) {
-    throw Error(`invalid amount input: ${amount}`);
+  if (parseFloat(amountIn) < 0) {
+    throw Error(`invalid amount input: ${amountIn}`);
   }
 
-  const { amountOut: grossAmountOut, impliedPrice } = getSwappedAmountsAndImpliedPrice(
+  const { amountOut: grossAmountOutBN, impliedPrice } = getSwappedAmountsAndImpliedPrice(
     swapInfo,
     fromToken,
     toToken,
-    amountIn,
+    amountInBN,
     marketPrice,
     marketPriceLow,
     marketPriceHigh,
   );
 
-  const tradeFee: BigNumber = grossAmountOut
+  const tradeFeeBN: BigNumber = grossAmountOutBN
     .multipliedBy(swapInfo.swapConfig.tradeFeeNumerator.toString())
     .dividedBy(swapInfo.swapConfig.tradeFeeDenominator.toString());
 
-  const amountOutAfterTradeFee: BigNumber = grossAmountOut.minus(tradeFee);
+  const amountOutAfterTradeFeeBN: BigNumber = grossAmountOutBN.minus(tradeFeeBN);
 
-  const amountOutAfterTradeFeeWithSlippage: BigNumber = amountOutAfterTradeFee
+  const amountOutAfterTradeFeeWithSlippageBN: BigNumber = amountOutAfterTradeFeeBN
     .multipliedBy(100 - maxSlippage)
     .dividedBy(100);
 
-  const priceImpact: BigNumber = grossAmountOut
-    .dividedBy(amountIn)
+  const priceImpact: string = grossAmountOutBN
+    .dividedBy(amountInBN)
     .minus(impliedPrice)
     .abs()
-    .dividedBy(impliedPrice);
-
-  const amountOut: string = parseFloat(bnToString(toToken, amountOutAfterTradeFee)).toString();
-  const amountOutWithSlippage: string = bnToString(toToken, amountOutAfterTradeFeeWithSlippage);
-
-  const fee: string = new BigNumber(amountOut)
-    .minus(new BigNumber(amountOutWithSlippage))
+    .dividedBy(impliedPrice)
     .toString();
+
+  const amountOut: string = parseFloat(bnToString(toToken, amountOutAfterTradeFeeBN)).toString();
+  const amountOutWithSlippage: string = bnToString(toToken, amountOutAfterTradeFeeWithSlippageBN);
+
+  const fee: string = grossAmountOutBN.minus(new BigNumber(amountOut)).toString();
+
   return {
     amountOut,
     amountOutWithSlippage,
     fee,
-    priceImpact: priceImpact.toString(),
+    priceImpact,
   };
 }
 
