@@ -20,7 +20,8 @@ describe("utils/tokenUtils", function () {
     expect(stringCutDecimals(6, "2.000001")).toEqual("2.000001");
     expect(stringCutDecimals(10, "2.000001")).toEqual("2.000001");
     expect(stringCutDecimals(10, "2")).toEqual("2");
-
+    expect(stringCutDecimals(6, "2.0")).toEqual("2");
+    expect(stringCutDecimals(6, "1.000")).toEqual("1");
     expect(() => stringCutDecimals(5, "223.3.3")).toThrow("Invalid amount");
     expect(() => stringCutDecimals(-1, "223.333")).toThrow("Invalid decimals");
     expect(() => stringCutDecimals(3.3, "223.333")).toThrow("Invalid decimals");
