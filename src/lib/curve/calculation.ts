@@ -21,10 +21,18 @@ export function calculateOutAmountNormalSwapInternal(
   currentResreveB: BigNumber,
   inputAAmount: BigNumber,
 ): BigNumber {
+  // when we calculate amountIn from amountOut, we will have negative inputAAmount with a negative result
+  // the result must be a negative value. If currentReserveA + inputAAmount < 0, the result
+  // is negative
+  const coreDenumerator: BigNumber = currentReserveA.plus(inputAAmount);
+  if (coreDenumerator.isNegative()) {
+    return new BigNumber(-Infinity);
+  }
+
   // need to ceil the core
   let core: BigNumber = BigNumberWithConfig(currentReserveA, {
     ROUNDING_MODE: BigNumber.ROUND_CEIL,
-  }).dividedBy(currentReserveA.plus(inputAAmount));
+  }).dividedBy(coreDenumerator);
 
   // need to floor the exp
   let exp: BigNumber = BigNumberWithConfig(marketPrice, {
@@ -84,6 +92,7 @@ export function calculateOutAmountNormalSwap(
     approximationResult === 0
       ? calculationResult
       : Math.max(approximationResult, calculationResult);
+
   validate(
     finalResult <= impliedOutAmount,
     "final result for swap out amount should not be larger than the implied out amount",
@@ -178,6 +187,11 @@ export function calculateOutAmountStableSwapInternal(
     .minus(slope)
     .multipliedBy(balancedReserveA)
     .plus(slope.multipliedBy(currentReserveA.plus(inputAAmount)));
+
+  // similar to the normal swap, the result should be -infinity if this denumerator has negative value
+  if (coreDenumerator.isLessThanOrEqualTo(0)) {
+    return new BigNumber(-Infinity);
+  }
 
   // need to floor the multiplier
   let multiplier: BigNumber = new BigNumber(1).minus(
