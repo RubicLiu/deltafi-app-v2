@@ -49,7 +49,8 @@ import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
 import { createDepositTransaction, createWithdrawTransaction } from "utils/transactions/deposit";
-import { anchorBnToBn, stringToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/tokenUtils";
+import { SwapInfo } from "anchor/type_definitions";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -217,7 +218,7 @@ const Deposit: React.FC = () => {
   const { connected: isConnectedWallet } = useWallet();
   const { setMenu } = useModal();
   const { poolAddress } = useParams<{ poolAddress: string }>();
-  const swapInfo = useSelector(selectSwapBySwapKey(poolAddress));
+  const swapInfo: SwapInfo = useSelector(selectSwapBySwapKey(poolAddress));
   const program = useSelector(programSelector);
 
   const poolConfig = getPoolConfigBySwapKey(poolAddress);
@@ -260,7 +261,7 @@ const Deposit: React.FC = () => {
     if (lpUser && swapInfo) {
       return new BigNumber(lpUser.baseShare)
         .plus(new BigNumber(lpUser.basePosition.depositedAmount))
-        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply))
+        .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()))
         .multipliedBy(100);
     }
     return new BigNumber(0);
@@ -270,7 +271,7 @@ const Deposit: React.FC = () => {
     if (lpUser && swapInfo) {
       return new BigNumber(lpUser.quoteShare)
         .plus(new BigNumber(lpUser.quotePosition.depositedAmount))
-        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply))
+        .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()))
 
         .multipliedBy(100);
     }
@@ -535,9 +536,15 @@ const Deposit: React.FC = () => {
         basePrice,
         quotePrice,
       );
-      dispatch(depositViewActions.setTokenAmount({ baseAmount, quoteAmount }));
+
+      dispatch(
+        depositViewActions.setTokenAmount({
+          baseAmount,
+          quoteAmount: stringCutTokenDecimals(quoteTokenInfo, quoteAmount),
+        }),
+      );
     },
-    [basePrice, quotePrice, dispatch, swapInfo],
+    [basePrice, quotePrice, dispatch, swapInfo, quoteTokenInfo],
   );
 
   const handleQuoteTokenInput = useCallback(
@@ -557,9 +564,14 @@ const Deposit: React.FC = () => {
         quotePrice,
         basePrice,
       );
-      dispatch(depositViewActions.setTokenAmount({ baseAmount, quoteAmount }));
+      dispatch(
+        depositViewActions.setTokenAmount({
+          baseAmount: stringCutTokenDecimals(baseTokenInfo, baseAmount),
+          quoteAmount,
+        }),
+      );
     },
-    [basePrice, quotePrice, dispatch, swapInfo],
+    [basePrice, quotePrice, dispatch, swapInfo, baseTokenInfo],
   );
 
   const handleWithdrawSlider = useCallback(
@@ -773,7 +785,7 @@ const Deposit: React.FC = () => {
       <Container className={classes.container}>
         <Box display="flex" justifyContent="space-between" className={classes.header}>
           <Typography variant="h6" color="primary">
-            {swapInfo.name}
+            {poolConfig.name}
           </Typography>
           <Box className={classes.iconGroup}>
             <img
@@ -873,9 +885,10 @@ const Deposit: React.FC = () => {
                       className={clx(classes.coinIcon, classes.statsIcon)}
                     />
                     <Typography className={classes.label}>
-                      {`${reserveDisplay(swapInfo.poolState.baseReserve, baseTokenInfo.decimals)} ${
-                        baseTokenInfo.symbol
-                      }(${basePercent?.toFormat(2) || "-"}%)`}
+                      {`${reserveDisplay(
+                        new BigNumber(swapInfo.poolState.baseReserve.toString()),
+                        baseTokenInfo.decimals,
+                      )} ${baseTokenInfo.symbol}(${basePercent?.toFormat(2) || "-"}%)`}
                     </Typography>
                   </Box>
                   <Box display="flex">
@@ -886,7 +899,7 @@ const Deposit: React.FC = () => {
                     />
                     <Typography className={classes.label}>
                       {`${reserveDisplay(
-                        swapInfo.poolState.quoteReserve,
+                        new BigNumber(swapInfo.poolState.quoteReserve.toString()),
                         quoteTokenInfo.decimals,
                       )} ${quoteTokenInfo.symbol}(${quotePercent?.toFormat(2) || "-"}%)`}
                     </Typography>
