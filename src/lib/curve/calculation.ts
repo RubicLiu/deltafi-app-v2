@@ -21,6 +21,9 @@ export function calculateOutAmountNormalSwapInternal(
   currentResreveB: BigNumber,
   inputAAmount: BigNumber,
 ): BigNumber {
+  // when we calculate amountIn from amountOut, we will have negative inputAAmount with a negative result
+  // the result must be a negative value. If currentReserveA + inputAAmount < 0, the result
+  // is negative
   const coreDenumerator: BigNumber = currentReserveA.plus(inputAAmount);
   if (coreDenumerator.isNegative()) {
     return new BigNumber(-Infinity);
@@ -185,6 +188,7 @@ export function calculateOutAmountStableSwapInternal(
     .multipliedBy(balancedReserveA)
     .plus(slope.multipliedBy(currentReserveA.plus(inputAAmount)));
 
+  // similar to the normal swap, the result should be -infinity if this denumerator has negative value
   if (coreDenumerator.isLessThanOrEqualTo(0)) {
     return new BigNumber(-Infinity);
   }
