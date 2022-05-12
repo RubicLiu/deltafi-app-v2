@@ -21,14 +21,15 @@ export function calculateOutAmountNormalSwapInternal(
   currentResreveB: BigNumber,
   inputAAmount: BigNumber,
 ): BigNumber {
-  if (inputAAmount.isLessThanOrEqualTo(currentReserveA.negated())) {
+  const coreDenumerator: BigNumber = currentReserveA.plus(inputAAmount);
+  if (coreDenumerator.isNegative()) {
     return new BigNumber(-Infinity);
   }
 
   // need to ceil the core
   let core: BigNumber = BigNumberWithConfig(currentReserveA, {
     ROUNDING_MODE: BigNumber.ROUND_CEIL,
-  }).dividedBy(currentReserveA.plus(inputAAmount));
+  }).dividedBy(coreDenumerator);
 
   // need to floor the exp
   let exp: BigNumber = BigNumberWithConfig(marketPrice, {
