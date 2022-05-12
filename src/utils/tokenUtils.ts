@@ -24,7 +24,7 @@ export function stringToAnchorBn(tokenConfig: TokenConfig, amount: string): BN {
 }
 
 export function stringCutDecimals(decimals: number, amount: string): string {
-  if (isNaN(decimals) || decimals < 0) {
+  if (isNaN(decimals) || decimals < 0 || Math.floor(decimals) !== decimals) {
     throw Error("Invalid decimals: " + decimals.toString());
   }
   const amountBN = new BigNumber(amount);
