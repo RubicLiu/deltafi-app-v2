@@ -66,7 +66,7 @@ export function approximateOutAmount(
   // diffFromImpliedAmount = kMultiplier * kMultiplicand
   const diffFromImpliedAmount: BigNumber = kMultiplier.multipliedBy(kMultiplicand);
 
-  if (impliedOutAmountBigNumber.abs().isLessThanOrEqualTo(diffFromImpliedAmount.abs())) {
+  if (impliedOutAmountBigNumber.abs().isLessThanOrEqualTo(diffFromImpliedAmount)) {
     return {
       impliedOutAmount: Math.floor(impliedOutAmountBigNumber.toNumber()),
       approximationResult: 0,
