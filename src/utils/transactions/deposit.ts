@@ -82,38 +82,30 @@ export async function createDepositTransaction(
       ),
     );
 
+  const depositAccounts = {
+    swapInfo: new PublicKey(poolConfig.swapInfo),
+    userTokenBase: baseSourceRef,
+    userTokenQuote,
+    quoteSourceRef,
+    liquidityProvider: lpPublicKey,
+    tokenBase: swapInfo.tokenBase,
+    tokenQuote: swapInfo.tokenQuote,
+    pythPriceBase: swapInfo.pythPriceBase,
+    pythPriceQuote: swapInfo.pythPriceQuote,
+    userAuthority: userTransferAuthority.publicKey,
+    tokenProgram: token.TOKEN_PROGRAM_ID,
+  };
+
   if (swapInfo.swapType.stableSwap) {
     transaction.add(
       program.transaction.depositToStableSwap(baseAmount, qouteAmount, {
-        accounts: {
-          swapInfo: new PublicKey(poolConfig.swapInfo),
-          userTokenBase: baseSourceRef,
-          userTokenQuote,
-          quoteSourceRef,
-          liquidityProvider: lpPublicKey,
-          tokenBase: swapInfo.tokenBase,
-          tokenQuote: swapInfo.tokenQuote,
-          userAuthority: userTransferAuthority.publicKey,
-          tokenProgram: token.TOKEN_PROGRAM_ID,
-        },
+        accounts: depositAccounts,
       }),
     );
   } else {
     transaction.add(
       program.transaction.depositToNormalSwap(baseAmount, qouteAmount, {
-        accounts: {
-          swapInfo: new PublicKey(poolConfig.swapInfo),
-          userTokenBase: baseSourceRef,
-          userTokenQuote,
-          quoteSourceRef,
-          liquidityProvider: lpPublicKey,
-          tokenBase: swapInfo.tokenBase,
-          tokenQuote: swapInfo.tokenQuote,
-          pythPriceBase: swapInfo.pythPriceBase,
-          pythPriceQuote: swapInfo.pythPriceQuote,
-          userAuthority: userTransferAuthority.publicKey,
-          tokenProgram: token.TOKEN_PROGRAM_ID,
-        },
+        accounts: depositAccounts,
       }),
     );
   }
@@ -206,42 +198,31 @@ export async function createWithdrawTransaction(
   );
 
   let transaction = new Transaction();
+  const withdrawAccounts = {
+    swapInfo: new PublicKey(poolConfig.swapInfo),
+    userTokenBase: baseSourceRef,
+    userTokenQuote,
+    quoteSourceRef,
+    liquidityProvider: lpPublicKey,
+    tokenBase: swapInfo.tokenBase,
+    tokenQuote: swapInfo.tokenQuote,
+    adminFeeTokenBase: swapInfo.adminFeeTokenBase,
+    adminFeeTokenQuote: swapInfo.adminFeeTokenQuote,
+    pythPriceBase: swapInfo.pythPriceBase,
+    pythPriceQuote: swapInfo.pythPriceQuote,
+    userAuthority: walletPubkey,
+    tokenProgram: token.TOKEN_PROGRAM_ID,
+  };
   if (swapInfo.swapType.stableSwap) {
     transaction.add(
       program.transaction.withdrawFromStableSwap(baseAmount, qouteAmount, {
-        accounts: {
-          swapInfo: new PublicKey(poolConfig.swapInfo),
-          userTokenBase: baseSourceRef,
-          userTokenQuote,
-          quoteSourceRef,
-          liquidityProvider: lpPublicKey,
-          tokenBase: swapInfo.tokenBase,
-          tokenQuote: swapInfo.tokenQuote,
-          adminFeeTokenBase: swapInfo.adminFeeTokenBase,
-          adminFeeTokenQuote: swapInfo.adminFeeTokenQuote,
-          userAuthority: walletPubkey,
-          tokenProgram: token.TOKEN_PROGRAM_ID,
-        },
+        accounts: withdrawAccounts,
       }),
     );
   } else {
     transaction.add(
       program.transaction.withdrawFromNormalSwap(baseAmount, qouteAmount, {
-        accounts: {
-          swapInfo: new PublicKey(poolConfig.swapInfo),
-          userTokenBase: baseSourceRef,
-          userTokenQuote,
-          quoteSourceRef,
-          liquidityProvider: lpPublicKey,
-          tokenBase: swapInfo.tokenBase,
-          tokenQuote: swapInfo.tokenQuote,
-          adminFeeTokenBase: swapInfo.adminFeeTokenBase,
-          adminFeeTokenQuote: swapInfo.adminFeeTokenQuote,
-          pythPriceBase: swapInfo.pythPriceBase,
-          pythPriceQuote: swapInfo.pythPriceQuote,
-          userAuthority: walletPubkey,
-          tokenProgram: token.TOKEN_PROGRAM_ID,
-        },
+        accounts: withdrawAccounts,
       }),
     );
   }

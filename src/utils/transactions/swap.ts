@@ -114,6 +114,8 @@ export async function createSwapTransaction(
     swapDestinationToken,
     deltafiUser: deltafiUserPubkey,
     adminDestinationToken,
+    pythPriceBase: swapInfo.pythPriceBase,
+    pythPriceQuote: swapInfo.pythPriceQuote,
     userAuthority: userTransferAuthority.publicKey,
     tokenProgram: token.TOKEN_PROGRAM_ID,
   };
@@ -137,17 +139,11 @@ export async function createSwapTransaction(
         ? program.transaction.normalSwapWithReferrer(inAmount, minOutAmount, {
             accounts: {
               ...swapAccounts,
-              pythPriceBase: swapInfo.pythPriceBase,
-              pythPriceQuote: swapInfo.pythPriceQuote,
               referrer,
             },
           })
         : program.transaction.normalSwap(inAmount, minOutAmount, {
-            accounts: {
-              ...swapAccounts,
-              pythPriceBase: swapInfo.pythPriceBase,
-              pythPriceQuote: swapInfo.pythPriceQuote,
-            },
+            accounts: swapAccounts,
           }),
     );
   }
