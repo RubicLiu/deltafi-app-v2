@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from "react";
-import ReactCardFlip from "react-card-flip";
 import {
   Typography,
   IconButton,
@@ -13,9 +12,12 @@ import {
   SnackbarContent,
   Link,
   Avatar,
+  TextField,
+  InputAdornment,
+  Grid,
 } from "@material-ui/core";
 import { useWallet } from "@solana/wallet-adapter-react";
-import SettingsIcon from "@material-ui/icons/Settings";
+import SearchIcon from "@material-ui/icons/Search";
 import SyncAlt from "@material-ui/icons/SyncAlt";
 import CloseIcon from "@material-ui/icons/Close";
 
@@ -61,6 +63,8 @@ import { BN } from "@project-serum/anchor";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 import { anchorBnToString, stringToAnchorBn } from "utils/tokenUtils";
 import { DeltafiUser, SwapInfo } from "anchor/type_definitions";
+import Autocomplete from "@material-ui/lab/Autocomplete/Autocomplete";
+import CompareArrows from "components/Svg/icons/CompareArrows";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -68,18 +72,29 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     margin: "0 auto",
     flex: 1,
   },
+  searchCt: {
+    marginTop: 30,
+    marginBottom: 12,
+    [breakpoints.up("md")]: {
+      marginTop: 60,
+      marginBottom: 24,
+    },
+  },
   title: {
     textAlign: "start",
     marginBottom: spacing(4),
   },
   root: {
+    marginBottom: spacing(2),
     background: palette.background.primary,
     borderRadius: spacing(2),
     padding: `${spacing(3)}px ${spacing(2)}px`,
     [breakpoints.up("sm")]: {
       padding: `${spacing(5)}px ${spacing(4)}px`,
       borderRadius: spacing(3),
+      marginBottom: spacing(4),
     },
+    position: "relative",
   },
   swapIcon: {
     transform: "rotate(90deg)",
@@ -89,6 +104,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginBottom: -16,
     backgroundColor: palette.background.secondary,
     border: `3px solid ${palette.background.primary}`,
+    boxShadow: "none",
   },
   ratePanel: {
     display: "flex",
@@ -103,11 +119,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontWeight: "bold",
   },
   snackBarContent: {
-    maxWidth: 421,
+    maxWidth: 393,
     backgroundColor: palette.background.lightBlack,
     display: "flex",
     flexWrap: "unset",
-    alignItems: "start",
+    alignItems: "center",
   },
   snackBarLink: {
     color: palette.text.blue,
@@ -123,9 +139,98 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   },
   actionLoadingButton: {
     width: 50,
-    height: 50,
     marginTop: 4,
     marginBottom: 4,
+  },
+  textField: {
+    width: "100%",
+    height: "60px",
+    borderRadius: "100px",
+    border: "1px solid #d4ff00",
+    background: palette.background.primary,
+    display: "flex",
+    justifyContent: "center",
+    "& .MuiInput-underline:before": {
+      content: "",
+      border: 0,
+    },
+    "& .MuiInput-underline:after": {
+      content: "",
+      border: 0,
+    },
+    "& .MuiInput-underline:hover:before": {
+      content: "",
+      border: 0,
+    },
+    "& .MuiInput-underline:hover:after": {
+      content: "",
+      border: 0,
+    },
+    "& div.MuiInputBase-fullWidth": {
+      padding: "20px 24px",
+      width: "calc(100%)",
+    },
+  },
+  optionsPaper: {
+    borderRadius: "20px",
+    border: "1px solid #D4FF00",
+    paddingTop: "18px",
+    paddingBottom: "24px",
+    "& ul::before": {
+      content: "'Top Traded Pairs'",
+      display: "block",
+      fontSize: "20px",
+      fontWeight: "500",
+      lineHeight: "24px",
+      marginLeft: "48px",
+      marginBottom: "12px",
+    },
+    "& .MuiAutocomplete-option": {
+      height: 70,
+      "&:hover": {
+        background:
+          "linear-gradient(111.31deg, rgba(212, 255, 0, 0.1) 15.34%, rgba(189, 255, 0, 0.1) 95.74%)",
+      },
+    },
+  },
+  icon: {
+    width: spacing(2.5),
+    height: spacing(2.5),
+    [breakpoints.up("sm")]: {
+      width: spacing(4),
+      height: spacing(4),
+    },
+  },
+  tradePairTitle: {
+    fontSize: 16,
+    fontWeight: 600,
+  },
+  tradePairName: {
+    fontSize: 12,
+    fontWeight: 400,
+  },
+  priceImpactBtn: {
+    height: 30,
+    borderRadius: 50,
+    "& span": {
+      fontWeight: 400,
+      fontSize: 12,
+      lineHeight: 14,
+    },
+    padding: "1px !important",
+  },
+  currency: {
+    background: palette.background.secondary,
+    borderRadius: 20,
+    padding: "24px 24px",
+    marginTop: 24,
+    fontSize: 12,
+    lineHeight: "24px",
+    color: palette.text.dark,
+  },
+  compareArrow: {
+    marginLeft: 3,
+    marginRight: 3,
   },
 }));
 
@@ -290,6 +395,25 @@ const Home: React.FC = (props) => {
         amount: amountIn,
       }),
     );
+  };
+
+  const handleTradePairChange = (event, value) => {
+    if (value) {
+      dispatch(
+        swapViewActions.setTokenFrom({
+          ...tokenFrom,
+          token: getTokenConfigBySymbol(value.tokenFrom),
+          amount: "0",
+        }),
+      );
+      dispatch(
+        swapViewActions.setTokenTo({
+          ...tokenTo,
+          token: getTokenConfigBySymbol(value.tokenTo),
+          amount: "0",
+        }),
+      );
+    }
   };
 
   const swapCallback = useCallback(async () => {
@@ -534,7 +658,6 @@ const Home: React.FC = (props) => {
         <ConnectButton
           fullWidth
           size="large"
-          variant="outlined"
           disabled={
             unavailable ||
             sourceAccountNonExist ||
@@ -583,68 +706,167 @@ const Home: React.FC = (props) => {
     classes.actionLoadingButton,
   ]);
 
-  const vertical = "bottom";
-  const horizontal = "left";
+  const vertical = "top";
+  const horizontal = "right";
 
   return (
     <Page>
-      <Container className={classes.container}>
-        <Typography variant="h5" color="primary" align="center" paragraph className={classes.title}>
-          Swap
-        </Typography>
+      <Box className={classes.container}>
+        <Autocomplete
+          renderInput={(params) => {
+            return (
+              <TextField
+                placeholder="TOP traded pairs"
+                className={classes.textField}
+                {...params}
+                InputProps={Object.assign(params.InputProps, {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon style={{ color: "rgba(255, 255, 255, 0.5)" }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: null,
+                })}
+                margin="normal"
+              />
+            );
+          }}
+          onChange={handleTradePairChange}
+          getOptionLabel={(option) => `${option.tokenFrom} - ${option.tokenTo}`}
+          renderOption={(option) => {
+            const tokenFrom = getTokenConfigBySymbol(option.tokenFrom);
+            const tokenTo = getTokenConfigBySymbol(option.tokenTo);
+            return (
+              <Box display="flex" alignItems="center">
+                <Box display="flex" alignItems="center" marginLeft="30px">
+                  <Avatar
+                    src={tokenFrom?.logoURI}
+                    alt={tokenFrom?.symbol}
+                    className={classes.icon}
+                  />
+                  <Box className={classes.compareArrow}>
+                    <CompareArrows />
+                  </Box>
+                  <Avatar src={tokenTo?.logoURI} alt={tokenTo?.symbol} className={classes.icon} />
+                </Box>
+                <Box marginLeft="20px">
+                  <Typography className={classes.tradePairTitle}>
+                    {option.tokenFrom} - {option.tokenTo}
+                  </Typography>
+                  <Typography className={classes.tradePairName}>
+                    {tokenFrom.name} - {tokenTo.name}
+                  </Typography>
+                </Box>
+              </Box>
+            );
+          }}
+          options={[
+            ...poolConfigs.map((poolConfig) => ({
+              tokenFrom: poolConfig.base,
+              tokenTo: poolConfig.quote,
+            })),
+            ...poolConfigs.map((poolConfig) => ({
+              tokenFrom: poolConfig.quote,
+              tokenTo: poolConfig.base,
+            })),
+          ]}
+          classes={{ paper: classes.optionsPaper }}
+          className={classes.searchCt}
+        ></Autocomplete>
         <Paper className={classes.root}>
           <Box className={classes.ratePanel}>
             <Typography color="primary" variant="body1" className={classes.marketCondition}>
               {`1 ${tokenFrom.token.symbol} = ${exchangeRateLabel} ${tokenTo.token.symbol}`}
             </Typography>
-            <IconButton
+            <ConnectButton
               onClick={handleOpenSettings}
+              variant={swapView.openSettings ? "contained" : "outlined"}
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
               data-amp-analytics-attrs="page: Swap, target: Settings"
+              className={`${classes.priceImpactBtn} ${swapView.openSettings ? "active" : ""}`}
+              key="settingBtn"
             >
-              <SettingsIcon color="primary" />
-            </IconButton>
+              {swapView.priceImpact}%
+            </ConnectButton>
           </Box>
-          <ReactCardFlip
-            isFlipped={swapView.openSettings}
-            containerStyle={{ position: "relative", zIndex: 2 }}
-          >
-            <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <SwapCard
-                card={tokenFrom}
-                tokens={tokenConfigs}
-                handleChangeCard={handleTokenFromInput}
-              />
-              {!swapView.openSettings && (
-                <Fab
-                  color="secondary"
-                  size="small"
-                  className={classes.swapIcon}
-                  onClick={handleSwapDirectionChange}
-                >
-                  <SyncAlt />
-                </Fab>
-              )}
-              <SwapCard
-                card={tokenTo}
-                tokens={possibleTokenToConfigs}
-                handleChangeCard={handleTokenToInput}
-                disabled={false}
-              />
-            </Box>
+          <Box display="flex" flexDirection="column" alignItems="flex-end">
+            <SwapCard
+              card={tokenFrom}
+              tokens={tokenConfigs}
+              handleChangeCard={handleTokenFromInput}
+            />
+            <Fab
+              color="secondary"
+              size="small"
+              className={classes.swapIcon}
+              onClick={handleSwapDirectionChange}
+            >
+              <SyncAlt />
+            </Fab>
+            <SwapCard
+              card={tokenTo}
+              tokens={possibleTokenToConfigs}
+              handleChangeCard={handleTokenToInput}
+            />
+          </Box>
+          {swapView.openSettings && (
             <SettingsPanel
               isOpen={swapView.openSettings}
               priceImpact={swapView.priceImpact}
               handleChangeImpact={handleChangeImpact}
               handleClose={handleOpenSettings}
             />
-          </ReactCardFlip>
-          <Box marginTop={2} width="100%" position="relative" zIndex={1}>
+          )}
+          <Paper className={`${classes.root} ${classes.currency}`}>
+            <Grid container alignItems="center" justifyContent="center">
+              <Grid item xs={1}>
+                <Avatar
+                  src={tokenFrom?.token.logoURI}
+                  alt={tokenFrom?.token.symbol}
+                  className={classes.icon}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Box marginLeft={0.5}>
+                  <Box sx={{ color: "#fff", fontSize: "16px" }}>{tokenFrom.token.symbol}</Box>
+                  <Box>{tokenFrom.token.name}</Box>
+                </Box>
+              </Grid>
+              <Grid item xs={5}>
+                <Box>Price</Box>
+                <Box sx={{ color: "#fff" }}>
+                  {Number(basePrice).toFixed(poolConfig?.baseTokenInfo?.decimals)}
+                </Box>
+              </Grid>
+            </Grid>
+            <Grid container alignItems="center">
+              <Grid item xs={1}>
+                <Avatar
+                  src={tokenTo?.token.logoURI}
+                  alt={tokenTo?.token.symbol}
+                  className={classes.icon}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Box marginLeft={0.5}>
+                  <Box sx={{ color: "#fff", fontSize: "16px" }}>{tokenTo.token.symbol}</Box>
+                  <Box>{tokenTo.token.name}</Box>
+                </Box>
+              </Grid>
+              <Grid item xs={5}>
+                <Box>Price</Box>
+                <Box sx={{ color: "#fff" }}>
+                  {Number(quotePrice).toFixed(poolConfig?.quoteTokenInfo?.decimals)}
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
+          <Box marginTop={3} width="100%" position="relative" zIndex={1}>
             {actionButton}
           </Box>
         </Paper>
-      </Container>
+      </Box>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
         open={swapView.openSnackbar}

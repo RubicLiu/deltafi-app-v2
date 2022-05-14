@@ -1,19 +1,15 @@
 import { useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { Box, IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import { /*Avatar,*/ Box, Divider, makeStyles, Theme } from "@material-ui/core";
 import styled from "styled-components";
-
-import { Text } from "components/Text";
-import { CopyAddressIcon, DisconnectWalletIcon } from "components";
-import { useDarkMode } from "providers/theme";
+import { CopyAddressIcon } from "components";
 import { useModal } from "providers/modal";
+import { CheckOutlined } from "@material-ui/icons";
+import Reset from "components/Svg/icons/Reset";
+// import CompareArrows from "components/Svg/icons/CompareArrows";
+// import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
-  header: {},
-  scrollBar: {
-    marginTop: spacing(2),
-  },
   sectionDesktop: {
     display: "none",
     [breakpoints.up("md")]: {
@@ -36,10 +32,27 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     padding: `${spacing(4)}px ${spacing(3.5)}px`,
     marginTop: spacing(2),
     "& .icon": {
-      width: "30px",
       marginRight: spacing(2),
     },
     cursor: "pointer",
+  },
+  icon: {
+    width: "22px",
+    marginRight: 16,
+    marginLeft: "auto",
+  },
+  root: {
+    backgroundColor: "#3c3c3c",
+    padding: "20px 20px",
+    boxShadow: "0px 5px 20px rgba(0, 0, 0, 0.15)",
+    borderRadius: 10,
+  },
+  check: {
+    color: "#D4FF00",
+  },
+  avatar: {
+    width: 14,
+    height: 14,
   },
 }));
 
@@ -49,12 +62,26 @@ const ConnectList = styled.div`
   width: 100%;
 `;
 
-const WalletPanel: React.FC = (props) => {
-  const { disconnect, publicKey } = useWallet();
-  const { setMenu } = useModal();
-  const { isDark } = useDarkMode();
+const Img = styled.img`
+  width: 24px;
+  height: 24px;
+  ${({ theme }) => theme.muibreakpoints.up("sm")} {
+    width: 28px;
+    height: 28px;
+  }
+`;
 
+const StyledDivider = styled(Divider)`
+  margin: 16px 0;
+  background: #313131;
+`;
+
+const WalletPanel: React.FC = (props) => {
+  const { wallet, disconnect, publicKey } = useWallet();
+  const { setMenu } = useModal();
   const classes = useStyles(props);
+
+  const accountAddress = publicKey ? publicKey.toString() : "";
 
   const onCopyAddress = () => {
     navigator.clipboard.writeText(publicKey.toString());
@@ -67,43 +94,81 @@ const WalletPanel: React.FC = (props) => {
   }, [disconnect, setMenu]);
 
   return (
-    <Box width="100%">
-      <Box display="flex" justifyContent="space-between" className={classes.header}>
-        <Typography variant="h6" color="textSecondary">
-          Wallet Setting
-        </Typography>
-        <IconButton size="small" onClick={() => setMenu(false, "")}>
-          <CloseIcon />
-        </IconButton>
-      </Box>
-      <Box className={classes.scrollBar}>
-        <ConnectList>
-          <Box
-            onClick={onCopyAddress}
-            data-amp-analytics-on="click"
-            data-amp-analytics-name="click"
-            data-amp-analytics-attrs="page: WalletSetting, target: CopyAddress"
-            className={classes.item}
-          >
-            <CopyAddressIcon className="icon" />
-            <Text color={isDark ? "#FFF" : "#23242F"} className="connect-type">
-              Copy Address
-            </Text>
+    <Box width={300} className={classes.root}>
+      <ConnectList>
+        <Box display="flex" width="100%" textAlign="center" alignItems="center">
+          <CheckOutlined className={classes.check} />
+          <Box marginLeft={1.2} marginRight={2}>
+            <Img src={wallet.icon} alt={wallet.name} />
           </Box>
-          <Box
-            onClick={onDisconnectWallet}
-            data-amp-analytics-on="click"
-            data-amp-analytics-name="click"
-            data-amp-analytics-attrs="page: WalletSetting, target: DisconnectWallet"
-            className={classes.item}
-          >
-            <DisconnectWalletIcon isDark={isDark} className="icon" />
-            <Text color={isDark ? "#FFF" : "#23242F"} className="connect-type">
-              Disconnet Wallet
-            </Text>
+          <Box color="#fff">
+            {accountAddress?.substring(0, 4)}...
+            {accountAddress?.substring(accountAddress?.length - 4)}
           </Box>
-        </ConnectList>
-      </Box>
+          <CopyAddressIcon height={22} className={classes.icon} onClick={onCopyAddress} />
+          <Reset width={22} onClick={onDisconnectWallet} />
+        </Box>
+        {/* dump style, could be displayed when the data is ready */}
+        {/* <StyledDivider />
+        <Box>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            fontWeight={400}
+            fontSize={16}
+            color="#F6F6F6"
+          >
+            <Box>100.00 USDC</Box>
+            <Box display="flex" alignItems="center">
+              <Avatar
+                className={classes.avatar}
+                src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
+              ></Avatar>
+              <Box marginLeft={0.5} marginRight={0.5}>
+                <CompareArrows></CompareArrows>
+              </Box>
+              <Avatar
+                className={classes.avatar}
+                src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
+              ></Avatar>
+            </Box>
+            <Box>100.00 USDC</Box>
+          </Box>
+        </Box>
+        <Box>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            fontWeight={400}
+            fontSize={16}
+            color="#F6F6F6"
+          >
+            <Box display="flex" flexDirection="column">
+              <Box>UUID: De4H...qFHK</Box>
+              <Box>Mar 30 2022 12:00</Box>
+            </Box>
+            <Box color="#D4FF00" display="flex" alignItems="center">
+              <CheckCircleOutlineIcon />
+              <Box ml={0.5}>Swap Successful</Box>
+            </Box>
+          </Box>
+        </Box>
+        <StyledDivider />
+        <Box
+          display="flex"
+          color="#D4FF00"
+          onClick={() => setMenu(true, "connect")}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <AddCircleOutline fontSize="large" />
+          <Box ml={1.5} fontSize={18} fontWeight={600}>
+            Connect Wallet
+          </Box>
+        </Box> */}
+      </ConnectList>
     </Box>
   );
 };

@@ -7,6 +7,8 @@ import Fade from "@material-ui/core/Fade";
 import ConnectPanel from "components/BurgerMenu/ConnectPanel";
 import WalletPanel from "components/BurgerMenu/WalletPanel";
 import ConfirmSwapPanel from "components/BurgerMenu/ConfirmSwapPanel";
+import Deposit from "views/Deposit/Deposit";
+import Stake from "views/Stake/Stake";
 import { useModal } from "providers/modal";
 
 const useStyles = makeStyles((theme) => ({
@@ -14,6 +16,8 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "auto",
+    flexWrap: "wrap",
   },
   paper: {
     backgroundColor: theme.palette.background.primary,
@@ -44,7 +48,9 @@ export default function ModalMenu() {
       case "confirm-swap":
         return <ConfirmSwapPanel />;
       case "deposit":
-        return null; // <DepositPanel />
+        return <Deposit />;
+      case "stake":
+        return <Stake />;
       case "withdraw":
         return null; // <WithdrawPanel />
       default:

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import styled from "styled-components";
-import { Box, Divider, IconButton, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
 import CurrencyInput from "react-currency-input-field";
 
 import { Button } from "components/Button";
@@ -11,12 +10,22 @@ const PRICE_LIST = ["0.5", "1.0", "2.0"];
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
-    background: palette.background.secondary,
     padding: spacing(2),
-    borderRadius: 16,
     [breakpoints.up("sm")]: {
       padding: spacing(3),
     },
+    top: 80,
+    left: "4%",
+    width: "92%",
+    position: "absolute",
+    /* Style */
+
+    background: "#313131",
+    /* Style */
+
+    border: "1px solid #D4FF00",
+    boxSizing: "border-box",
+    borderRadius: 20,
   },
   currencyInput: {
     textAlign: "center",
@@ -30,31 +39,55 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     color: palette.text.dark,
     borderRadius: 2,
 
+    height: "100%",
     "&::placeholder": {
       color: palette.text.dark,
     },
     "&:focus": {
-      border: "1px solid #9D9D9D",
+      border: "1px solid #D4FF00",
       backgroundColor: "#000",
       color: palette.text.primary,
     },
   },
-  priceImpact: {
-    padding: `${spacing(1.5)}px 0px`,
-    [breakpoints.up("sm")]: {
-      padding: `${spacing(2)}px 0px`,
-    },
+  maxImpact: {
+    fontWeight: 500,
+    fontSize: 20,
+    lineHeight: 1.2,
   },
   description: {
-    fontFamily: "Inter",
-    fontSize: 12,
-    lineHeight: "15px",
-    color: "#F7F7F7",
-    marginBottom: spacing(1.5),
-    [breakpoints.up("sm")]: {
-      fontSize: 16,
-      lineHeight: "19px",
-      marginBottom: spacing(2),
+    fontSize: 14,
+    lineHeight: "18px",
+    color: "#D3D3D3",
+    [breakpoints.down("sm")]: {
+      fontSize: 12,
+    },
+  },
+
+  gradientBorder: {
+    content: "''",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    zIndex: -1,
+    padding: "1px",
+    /* the below will do the magic */
+    "-webkit-mask":
+      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) padding-box" /* this will cover the content and the padding */,
+    /* needed for old browsers until the below is more supported */
+    "-webkit-mask-composite": "destination-out",
+    /* this will exclude the first layer from the second so only the padding area will be kept visible */
+    maskComposite: "destination-out",
+    "&::before": {
+      content: "''",
+      position: "absolute",
+      left: "50%",
+      top: "50%",
+      width: "100%",
+      height: "100%",
+      background: palette.gradient.cta,
+      transform: "translate(-50%, -50%) rotate(0deg)",
     },
   },
 }));
@@ -81,6 +114,8 @@ const PriceItem = styled.li`
   border-radius: 2px;
   box-shadow: rgb(0 0 0 / 8%) 0px 20px 100px;
   box-sizing: border-box;
+  border: "1px transparent",
+  position: "absolute",
 
   &:last-child {
     grid-column: auto;
@@ -94,13 +129,41 @@ const PriceItem = styled.li`
   }
 
   &.active {
+    border: none;
+    position: relative;
     background: ${({ theme }) => theme.palette.background.black};
-    border: 1px solid #9d9d9d;
+    & i {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1px;
+      position: absolute;
+      border-radius: 2px;
+      /* the below will do the magic */
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) padding-box /* this will cover the content and the padding */;
+      /* needed for old browsers until the below is more supported */
+      -webkit-mask-composite: destination-out;
+      /* this will exclude the first layer from the second so only the padding area will be kept visible */
+      mask-composite: destination-out;
+      &::before {
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        content: '';
+        position: absolute;
+        background: ${({ theme }) => theme.palette.gradient.cta};
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+    }
   }
 `;
 
 const SettingsPanel = (props: SettingsProps): JSX.Element => {
-  const { priceImpact, isSmall, handleChangeImpact, handleClose } = props;
+  const { priceImpact, isSmall, handleChangeImpact } = props;
   const classes = useStyles(props);
   const currencyInputRef = useRef<HTMLInputElement>();
 
@@ -118,17 +181,8 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
 
   return (
     <Paper className={classes.root}>
-      <Box display="flex" justifyContent="space-between" marginBottom={2}>
-        <Typography variant="subtitle1" color="textPrimary">
-          Settings
-        </Typography>
-        <IconButton size="small" onClick={handleClose}>
-          <CloseIcon />
-        </IconButton>
-      </Box>
-      <Divider />
-      <Box className={classes.priceImpact}>
-        <Typography variant="body1" color="textPrimary">
+      <Box>
+        <Typography variant="body1" className={classes.maxImpact} color="textPrimary">
           Max Price Impact
         </Typography>
         <PriceList className={isSmall ? "small" : ""}>
@@ -141,7 +195,10 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
               data-amp-analytics-name="click"
               data-amp-analytics-attrs={`page: Settings, target: MaxPriceImpact(${price})}`}
             >
-              <Button variant="text" fullWidth>{`${price}%`}</Button>
+              <Button variant="text" fullWidth>
+                {`${price}%`}
+              </Button>
+              <i />
             </PriceItem>
           ))}
           <CurrencyInput

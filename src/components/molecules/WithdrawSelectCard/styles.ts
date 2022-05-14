@@ -14,11 +14,10 @@ const useStyles = makeStyles(({ breakpoints, spacing, palette }: Theme) => ({
     },
   },
   title: {
-    fontFamily: "Inter",
     fontSize: 10,
     fontWeight: 500,
     lineHeight: "18px",
-    color: palette.text.dark,
+    color: palette.text.secondary,
     marginBottom: spacing(2),
     [breakpoints.up("sm")]: {
       fontSize: 16,
@@ -31,27 +30,37 @@ const useStyles = makeStyles(({ breakpoints, spacing, palette }: Theme) => ({
     "& .slider-value": {
       fontSize: 12,
       fontWeight: 400,
+      color: palette.text.secondary,
     },
     [breakpoints.up("sm")]: {
       "& .slider-value": {
-        fontSize: 18,
+        fontSize: 16,
       },
     },
   },
   percent: {
-    width: 108,
+    width: 1000,
     height: 32,
     [breakpoints.up("sm")]: {
-      width: 150,
-      height: 48,
+      width: 140,
+      height: 40,
     },
-    background: palette.background.tertiary,
-    borderRadius: 28,
+    background: palette.background.primary,
+    borderRadius: 2,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     marginRight: spacing(4),
     boxSizing: "border-box",
+  },
+  slider: {
+    cursor: "pointer",
+    "& .rc-slider-handle": {
+      cursor: "inherit",
+    },
+    "& .rc-slider-handle:active": {
+      borderShadow: "none",
+    },
   },
 }));
 
