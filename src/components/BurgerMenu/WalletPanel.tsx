@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { /*Avatar,*/ Box, Divider, makeStyles, Theme } from "@material-ui/core";
+import { /*Avatar,*/ Box, /*Divider,*/ makeStyles, Theme } from "@material-ui/core";
 import styled from "styled-components";
 import { CopyAddressIcon } from "components";
 import { useModal } from "providers/modal";
@@ -71,10 +71,10 @@ const Img = styled.img`
   }
 `;
 
-const StyledDivider = styled(Divider)`
-  margin: 16px 0;
-  background: #313131;
-`;
+// const StyledDivider = styled(Divider)`
+//   margin: 16px 0;
+//   background: #313131;
+// `;
 
 const WalletPanel: React.FC = (props) => {
   const { wallet, disconnect, publicKey } = useWallet();

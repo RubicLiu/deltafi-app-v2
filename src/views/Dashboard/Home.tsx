@@ -213,7 +213,7 @@ const Home: React.FC = (props) => {
                 centered
                 aria-label="dashboard tabs"
               >
-                <Tab label="My Pools" style={{textTransform:"none"}} value="pool" />
+                <Tab label="My Pools" style={{ textTransform: "none" }} value="pool" />
                 <Tab label="My Farms" value="farm" />
                 <Tab label="Invite & Earn" value="reward" />
               </TabList>

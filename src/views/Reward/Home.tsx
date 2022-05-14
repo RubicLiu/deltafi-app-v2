@@ -1,22 +1,9 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import {
-  Box,
-  Typography,
-  makeStyles,
-  Theme,
-  Grid,
-  Paper,
-  Link,
-  Avatar,
-  Divider,
-} from "@material-ui/core";
-import Page from "components/layout/Page";
+import { Box, makeStyles, Theme, Link, Avatar, Divider } from "@material-ui/core";
 import { ConnectButton } from "components";
 import { useModal } from "providers/modal";
-import ReferralCard from "./components/ReferralCard";
-import CopyLinkButton from "./components/CopyLinkButton";
-import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from "components";
+import { ShareDiscord, ShareMedium, ShareTelegram, ShareTwitter } from "components";
 import copy from "copy-to-clipboard";
 
 import { sendSignedTransaction } from "utils/transactions";
@@ -43,26 +30,26 @@ import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
 import { deployConfigV2 } from "constants/deployConfigV2";
 
-/*
- * mockup test data for reward page
- */
-const referralIntroCard = [
-  {
-    caption: "Get a referral link",
-    detail: "Connect a wallet and generate a referral link to share.",
-    image: "/images/get_referral_link.png",
-  },
-  {
-    caption: "Share with friends",
-    detail: "Invite your friends to register via your referral link.",
-    image: "/images/share_friends.png",
-  },
-  {
-    caption: "Earn crypto",
-    detail: "Get referral rewards from your friends’ earnings & swaps.",
-    image: "/images/earn_crypto.png",
-  },
-];
+// /*
+//  * mockup test data for reward page
+//  */
+// const referralIntroCard = [
+//   {
+//     caption: "Get a referral link",
+//     detail: "Connect a wallet and generate a referral link to share.",
+//     image: "/images/get_referral_link.png",
+//   },
+//   {
+//     caption: "Share with friends",
+//     detail: "Invite your friends to register via your referral link.",
+//     image: "/images/share_friends.png",
+//   },
+//   {
+//     caption: "Earn crypto",
+//     detail: "Get referral rewards from your friends’ earnings & swaps.",
+//     image: "/images/earn_crypto.png",
+//   },
+// ];
 
 const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   root: {
@@ -370,7 +357,9 @@ const Home: React.FC = (props) => {
           Invite friends, earn crypto together
         </Box>
         <Box mt={0.5} fontSize={14} fontWeight={400} color="#f6f6f6">
-          Before referral, you need to connect your wallet
+          {!isConnectedWallet
+            ? "Before referral, you need to connect your wallet"
+            : "Invite your friends to register via your referral link."}
         </Box>
 
         {/* Connect Wallet */}
