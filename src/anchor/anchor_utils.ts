@@ -137,6 +137,8 @@ export async function initSwap(
   } else {
     await program.rpc.initStableSwap(amountA, amountB, {
       accounts: {
+        pythPriceBase,
+        pythPriceQuote,
         ...initSwapAccounts,
       },
       signers: [adminKeypair],
@@ -186,11 +188,17 @@ export async function updateFarmConfig(program, marketConfig, farmInfo, farmConf
   });
 }
 
-export async function createLiquidityProvider(program, marketConfig, swapInfo, ownerKeypair) {
+export async function getOrCreateLiquidityProvider(program, marketConfig, swapInfo, ownerKeypair) {
   const [lpPublicKey, lpBump] = await PublicKey.findProgramAddress(
     [Buffer.from("LiquidityProvider"), swapInfo.toBuffer(), ownerKeypair.publicKey.toBuffer()],
     program.programId,
   );
+
+  const lp = await program.account.liquidityProvider.fetchNullable(lpPublicKey);
+  if (lp) {
+    return lpPublicKey;
+  }
+
   await program.rpc.createLiquidityProvider(lpBump, {
     accounts: {
       marketConfig,

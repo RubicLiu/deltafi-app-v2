@@ -49,6 +49,8 @@ export interface SwapConfig {
   tradeRewardCap: anchor.BN;
   referralRewardNumerator: anchor.BN;
   referralRewardDenominator: anchor.BN;
+  maxStablePriceDiffNumerator: anchor.BN;
+  maxStablePriceDiffDenominator: anchor.BN;
   reservedU64: Array<any>;
 }
 

@@ -326,6 +326,16 @@
           "isSigner": false
         },
         {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAuthority",
           "isMut": false,
           "isSigner": true
@@ -492,6 +502,16 @@
           "isSigner": false
         },
         {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAuthority",
           "isMut": false,
           "isSigner": true
@@ -619,6 +639,16 @@
         {
           "name": "tokenQuote",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -852,6 +882,16 @@
           "isSigner": false
         },
         {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAuthority",
           "isMut": false,
           "isSigner": true
@@ -919,6 +959,16 @@
         {
           "name": "adminDestinationToken",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -1711,6 +1761,14 @@
             "type": "u64"
           },
           {
+            "name": "maxStablePriceDiffNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "maxStablePriceDiffDenominator",
+            "type": "u64"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -2136,6 +2194,11 @@
       "code": 6063,
       "name": "InsufficientPoolReserve",
       "msg": "Insufficient pool reserve"
+    },
+    {
+      "code": 6064,
+      "name": "StableSwapPriceDiffLimitExceeded",
+      "msg": "stable swap price diff limit exceeded"
     }
   ]
 }

@@ -326,6 +326,16 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAuthority",
           "isMut": false,
           "isSigner": true
@@ -492,6 +502,16 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAuthority",
           "isMut": false,
           "isSigner": true
@@ -619,6 +639,16 @@ export type DeltafiDexV2 = {
         {
           "name": "tokenQuote",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -852,6 +882,16 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAuthority",
           "isMut": false,
           "isSigner": true
@@ -919,6 +959,16 @@ export type DeltafiDexV2 = {
         {
           "name": "adminDestinationToken",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -1711,6 +1761,14 @@ export type DeltafiDexV2 = {
             "type": "u64"
           },
           {
+            "name": "maxStablePriceDiffNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "maxStablePriceDiffDenominator",
+            "type": "u64"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -2136,6 +2194,11 @@ export type DeltafiDexV2 = {
       "code": 6063,
       "name": "InsufficientPoolReserve",
       "msg": "Insufficient pool reserve"
+    },
+    {
+      "code": 6064,
+      "name": "StableSwapPriceDiffLimitExceeded",
+      "msg": "stable swap price diff limit exceeded"
     }
   ]
 };
@@ -2468,6 +2531,16 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAuthority",
           "isMut": false,
           "isSigner": true
@@ -2634,6 +2707,16 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAuthority",
           "isMut": false,
           "isSigner": true
@@ -2761,6 +2844,16 @@ export const IDL: DeltafiDexV2 = {
         {
           "name": "tokenQuote",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -2994,6 +3087,16 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "userAuthority",
           "isMut": false,
           "isSigner": true
@@ -3061,6 +3164,16 @@ export const IDL: DeltafiDexV2 = {
         {
           "name": "adminDestinationToken",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceBase",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pythPriceQuote",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -3853,6 +3966,14 @@ export const IDL: DeltafiDexV2 = {
             "type": "u64"
           },
           {
+            "name": "maxStablePriceDiffNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "maxStablePriceDiffDenominator",
+            "type": "u64"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -4278,6 +4399,11 @@ export const IDL: DeltafiDexV2 = {
       "code": 6063,
       "name": "InsufficientPoolReserve",
       "msg": "Insufficient pool reserve"
+    },
+    {
+      "code": 6064,
+      "name": "StableSwapPriceDiffLimitExceeded",
+      "msg": "stable swap price diff limit exceeded"
     }
   ]
 };
