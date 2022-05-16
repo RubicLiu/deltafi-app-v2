@@ -1,6 +1,5 @@
 import { ReactElement, useMemo, useCallback, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import clx from "classnames";
 import {
   Snackbar,
   SnackbarContent,
@@ -9,20 +8,19 @@ import {
   IconButton,
   Link,
   Container,
-  Avatar,
+  CircularProgress,
 } from "@material-ui/core";
 import { Close as CloseIcon } from "@material-ui/icons";
 import BigNumber from "bignumber.js";
 
 import StakeCard from "views/Stake/components/Card";
-import { ConnectButton, LinkIcon } from "components";
+import { ConnectButton } from "components";
 
 import useStyles from "./styles";
 import { useModal } from "providers/modal";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK, DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_MINT } from "constants/index";
 import Slider from "./components/Slider";
-import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectLpUserBySwapKey,
@@ -417,8 +415,8 @@ const Stake = (): ReactElement => {
             <CloseIcon />
           </IconButton>
         </Box>
-        <Box display="flex" justifyContent="space-between" pb={2}>
-          <Typography variant="h6">{farmPool.name} LP Token Staking</Typography>
+        {/* <Box display="flex" justifyContent="space-between" pb={2}>
+          <Typography variant="h6">{poolConfig.name} LP Token Staking</Typography>
           <Box className={classes.iconGroup}>
             <img
               src={baseTokenInfo.logoURI}
@@ -427,8 +425,8 @@ const Stake = (): ReactElement => {
             />
             <img src={quoteTokenInfo.logoURI} alt="earning-coin" className={classes.coinIcon} />
           </Box>
-        </Box>
-        <Box display="flex" justifyContent="space-between" pb={4}>
+        </Box> */}
+        <Box display="flex" justifyContent="space-between" mt={4} pb={4}>
           <Box>
             <Typography>Total Staked {baseTokenInfo.symbol}</Typography>
             <Typography>{`${baseTotalStaked.toFixed(2).toString()}`}</Typography>
@@ -468,7 +466,7 @@ const Stake = (): ReactElement => {
             <Typography className={classes.title}>Your Unclaimed Token</Typography>
             {stakeView.isProcessingClaim ? (
               <ConnectButton variant="contained" disabled={true}>
-                <Avatar className={classes.claimLoadingButton} src={loadingIcon} />
+                <CircularProgress color="inherit" />
               </ConnectButton>
             ) : (
               <ConnectButton
@@ -513,7 +511,7 @@ const Stake = (): ReactElement => {
         <Box marginTop={2} width="100%">
           {stakeView.isProcessingStake ? (
             <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
-              <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
+              <CircularProgress color="inherit" />
             </ConnectButton>
           ) : isConnectedWallet ? (
             <ConnectButton
@@ -533,33 +531,20 @@ const Stake = (): ReactElement => {
             </ConnectButton>
           )}
         </Box>
-        {isConnectedWallet && (
-          <Box className={classes.desc} mt={2}>
-            <Typography variant="h6" paragraph>
-              About {farmPool.name} LP shares
-            </Typography>
-            <Typography variant="subtitle2">
-              LP shares represents shares of the liquidity provided to a swap pool. You may obtain{" "}
-              {poolConfig.name} LP shares by depositing {poolConfig.base} and {poolConfig.quote}{" "}
-              into the {poolConfig.name} pool.
-            </Typography>
-            <Box display="flex" alignItems="center" mt={3}>
-              <Link
-                href={"/deposit/" + poolConfig?.swapInfo}
-                target="_blank"
-                rel="noreferrer noopener"
-                underline="always"
-                className={classes.link}
-                data-amp-analytics-on="click"
-                data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Farms, target: DELFI"
-              >
-                Deposit into the {poolConfig.name} Pool
-                <LinkIcon className={classes.linkIcon} isDark width="15px" />
-              </Link>
-            </Box>
-          </Box>
-        )}
+        <Box display="flex" justifyContent="center" mt={3}>
+          <Link
+            href={"/deposit/" + poolConfig?.swapInfo}
+            target="_blank"
+            rel="noreferrer noopener"
+            underline="always"
+            className={classes.link}
+            data-amp-analytics-on="click"
+            data-amp-analytics-name="click"
+            data-amp-analytics-attrs="page: Farms, target: DELFI"
+          >
+            Deposit into the {poolConfig.name} Pool
+          </Link>
+        </Box>
       </Container>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}

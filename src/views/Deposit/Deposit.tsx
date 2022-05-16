@@ -9,8 +9,8 @@ import {
   Snackbar,
   SnackbarContent,
   Link,
-  Avatar,
   Divider,
+  CircularProgress,
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -27,8 +27,8 @@ import { useModal } from "providers/modal";
 import { exponentiatedBy } from "utils/decimal";
 import { convertDollarSign as convertDollar, getTokenTvl } from "utils/utils";
 import { SOLSCAN_LINK } from "constants/index";
-import { PoolInformation } from "./PoolInformation";
-import loadingIcon from "components/gif/loading_white.gif";
+import { useHistory } from "react-router-dom";
+// import { PoolInformation } from "./PoolInformation";
 import { useDispatch, useSelector } from "react-redux";
 import { getPoolConfigBySwapKey, deployConfigV2 } from "constants/deployConfigV2";
 import {
@@ -149,7 +149,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontSize: 12,
     gap: 18,
     [breakpoints.up("sm")]: {
-      padding: spacing(3),
+      paddingTop: spacing(3),
     },
   },
   snackBarContent: {
@@ -227,11 +227,15 @@ function getPairedTokenAmount(
   return inputAmount.multipliedBy(srcPrice).dividedBy(dstPrice).toString();
 }
 
-const Deposit: React.FC = () => {
+const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
+  const history = useHistory();
   const classes = useStyles();
   const { connected: isConnectedWallet } = useWallet();
   const { setMenu, data } = useModal();
-  const { poolAddress } = data;
+  let poolAddress = props.poolAddress;
+  let isRouterModal = false;
+  if (poolAddress) isRouterModal = true;
+  if (data) poolAddress = data.poolAddress;
   const swapInfo: SwapInfo = useSelector(selectSwapBySwapKey(poolAddress));
   const program = useSelector(programSelector);
 
@@ -694,7 +698,7 @@ const Deposit: React.FC = () => {
     if (depositView.isProcessing) {
       return (
         <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
-          <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
+          <CircularProgress color="inherit" />
         </ConnectButton>
       );
     }
@@ -767,7 +771,6 @@ const Deposit: React.FC = () => {
     setMenu,
     handleDeposit,
     handleWithdraw,
-    classes.actionLoadingButton,
   ]);
 
   if (!swapInfo) return null;
@@ -794,7 +797,13 @@ const Deposit: React.FC = () => {
     <Box width="100%">
       <Box display="flex" justifyContent="space-between">
         <Typography variant="h5">Deposit</Typography>
-        <IconButton size="small" onClick={() => setMenu(false, "")}>
+        <IconButton
+          size="small"
+          onClick={() => {
+            if (isRouterModal) history.push("/pools");
+            else setMenu(false, "");
+          }}
+        >
           <CloseIcon />
         </IconButton>
       </Box>
@@ -947,7 +956,7 @@ const Deposit: React.FC = () => {
           <Box>{withdrawFee.toString()}% Withdraw Fee</Box>
         </Box>
       </Box>
-      <PoolInformation pool={poolConfig} />
+      {/* <PoolInformation pool={poolConfig} /> */}
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={depositView.openSnackbar}

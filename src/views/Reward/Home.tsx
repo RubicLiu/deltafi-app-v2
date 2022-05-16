@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { Box, makeStyles, Theme, Link, Avatar, Divider } from "@material-ui/core";
+import { Box, makeStyles, Theme, Link, Divider, CircularProgress } from "@material-ui/core";
 import { ConnectButton } from "components";
 import { useModal } from "providers/modal";
 import { ShareDiscord, ShareMedium, ShareTelegram, ShareTwitter } from "components";
 import copy from "copy-to-clipboard";
 
 import { sendSignedTransaction } from "utils/transactions";
-import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deltafiUserSelector,
@@ -306,7 +305,7 @@ const Home: React.FC = (props) => {
     if (rewardView.isRefreshing) {
       return (
         <ConnectButton variant="contained" disabled={true}>
-          <Avatar src={loadingIcon} />
+          <CircularProgress color="inherit" />
         </ConnectButton>
       );
     }
@@ -328,7 +327,7 @@ const Home: React.FC = (props) => {
     if (rewardView.isClaiming) {
       return (
         <ConnectButton variant="contained" disabled={true}>
-          <Avatar src={loadingIcon} />
+          <CircularProgress color="inherit" />
         </ConnectButton>
       );
     }
@@ -431,7 +430,7 @@ const Home: React.FC = (props) => {
                   case "Processing": {
                     return (
                       <ConnectButton disabled={true}>
-                        <Avatar className={classes.SettingUpAccountButton} src={loadingIcon} />
+                        <CircularProgress color="inherit" />
                       </ConnectButton>
                     );
                   }

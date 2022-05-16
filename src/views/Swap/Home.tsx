@@ -14,6 +14,7 @@ import {
   TextField,
   InputAdornment,
   Grid,
+  CircularProgress,
 } from "@material-ui/core";
 import { useWallet } from "@solana/wallet-adapter-react";
 import SearchIcon from "@material-ui/icons/Search";
@@ -31,7 +32,6 @@ import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
 import { getSwapInResult, getSwapOutResult } from "utils/swap";
 import { SwapCard as ISwapCard } from "./components/types";
-import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -678,7 +678,7 @@ const Home: React.FC = (props) => {
           ) : isInsufficientLiquidity ? (
             "Insufficient Liquidity"
           ) : swapView.isProcessing ? (
-            <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
+            <CircularProgress color="inherit" />
           ) : (
             "Swap"
           )}
@@ -702,7 +702,6 @@ const Home: React.FC = (props) => {
     tokenTo.amount,
     tokenTo.token.decimals,
     swapView,
-    classes.actionLoadingButton,
   ]);
 
   const vertical = "top";
@@ -796,7 +795,7 @@ const Home: React.FC = (props) => {
               handleChangeCard={handleTokenFromInput}
             />
             <Fab
-              color="secondary"
+              color="inherit"
               size="small"
               className={classes.swapIcon}
               onClick={handleSwapDirectionChange}

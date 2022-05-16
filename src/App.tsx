@@ -42,7 +42,6 @@ const Farm = lazy(() => import("./views/Farm"));
 const Swap = lazy(() => import("./views/Swap"));
 const Pool = lazy(() => import("./views/Pool"));
 const Reward = lazy(() => import("./views/Reward"));
-const Deposit = lazy(() => import("./views/Deposit"));
 const Stake = lazy(() => import("./views/Stake"));
 const Unavailable = lazy(() => import("./views/Unavailable"));
 const Terms = lazy(() => import("./views/Terms"));
@@ -155,7 +154,7 @@ const App: React.FC = () => {
             <Redirect exact from="/" to="/swap" />
             <Route path="/swap" exact component={Swap} />
             <Route path="/pools" exact component={Pool} />
-            <Route path="/deposit/:poolAddress" exact component={Deposit} />
+            <Route path="/deposit/:poolAddress" exact component={Pool} />
             <Route path="/farms" exact component={Farm} />
             <Route path="/rewards" exact component={Reward} />
             <Route path="/stake/:id" exact component={Stake} />

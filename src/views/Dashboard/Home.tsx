@@ -125,6 +125,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     "& .MuiTab-textColorInherit": {
       opacity: 1,
     },
+    "& .MuiTab-wrapper": {
+      textTransform: "none",
+    },
     [breakpoints.up("md")]: {
       padding: "0 24px",
     },
@@ -213,7 +216,7 @@ const Home: React.FC = (props) => {
                 centered
                 aria-label="dashboard tabs"
               >
-                <Tab label="My Pools" style={{ textTransform: "none" }} value="pool" />
+                <Tab label="My Pools" value="pool" />
                 <Tab label="My Farms" value="farm" />
                 <Tab label="Invite & Earn" value="reward" />
               </TabList>

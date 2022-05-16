@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Box, Grid, makeStyles } from "@material-ui/core";
+import { Backdrop, Box, Grid, makeStyles, Modal } from "@material-ui/core";
 import BigNumber from "bignumber.js";
 
 import Page from "components/layout/Page";
@@ -9,12 +9,29 @@ import { poolConfigs } from "constants/deployConfigV2";
 import { useSelector } from "react-redux";
 import { pythSelector, poolSelector } from "states/selectors";
 import { getPythMarketPrice } from "states/accounts/pythAccount";
+import { useParams } from "react-router";
+import Deposit from "views/Deposit/Deposit";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
     width: "100%",
     flex: 1,
     marginBottom: spacing(2),
+  },
+  backdrop: {
+    background: "rgba(0,0,0,0.8)",
+  },
+  paper: {
+    backgroundColor: palette.background.primary,
+    margin: spacing(2),
+    padding: `${spacing(3)}px ${spacing(2)}px`,
+    borderRadius: spacing(2),
+    [breakpoints.up("sm")]: {
+      borderRadius: spacing(3),
+      padding: `${spacing(5)}px ${spacing(4)}px`,
+      minWidth: 380,
+    },
+    outline: "none",
   },
   listContainer: {
     background: palette.background.primary,
@@ -61,9 +78,10 @@ const Home: React.FC = () => {
   const classes = useStyles();
 
   const poolState = useSelector(poolSelector);
-
   const pythState = useSelector(pythSelector);
   const symbolToPythData = pythState.symbolToPythData;
+  const params = useParams<{ poolAddress?: string }>();
+  const poolAddress = params?.poolAddress;
 
   const tvl = useMemo(() => {
     if (poolConfigs.length > 0) {
@@ -102,7 +120,6 @@ const Home: React.FC = () => {
             Total Value Locked
           </Box>
         </Box>
-
         {poolConfigs.length > 0 && (
           <Grid container className={classes.poolCardContainer} justifyContent="center">
             {poolConfigs.map((poolConfig, idx) => (
@@ -125,6 +142,28 @@ const Home: React.FC = () => {
           </Grid>
         )}
       </Box>
+      {poolAddress && (
+        <Modal
+          open
+          closeAfterTransition
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "auto",
+            flexWrap: "wrap",
+          }}
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
+            classes: { root: classes.backdrop },
+          }}
+        >
+          <Box className={classes.paper}>
+            <Deposit poolAddress={poolAddress} />
+          </Box>
+        </Modal>
+      )}
     </Page>
   );
 };
