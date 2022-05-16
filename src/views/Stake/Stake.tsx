@@ -1,31 +1,26 @@
 import { ReactElement, useMemo, useCallback, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
-import clx from "classnames";
 import {
   Snackbar,
   SnackbarContent,
   Box,
   Typography,
-  Paper,
   IconButton,
   Link,
   Container,
-  Avatar,
+  CircularProgress,
 } from "@material-ui/core";
 import { Close as CloseIcon } from "@material-ui/icons";
 import BigNumber from "bignumber.js";
 
 import StakeCard from "views/Stake/components/Card";
-import Page from "components/layout/Page";
-import { ConnectButton, LinkIcon } from "components";
+import { ConnectButton } from "components";
 
 import useStyles from "./styles";
 import { useModal } from "providers/modal";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK, DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_MINT } from "constants/index";
 import Slider from "./components/Slider";
-import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectLpUserBySwapKey,
@@ -71,9 +66,8 @@ const getUnclaimedReward = (
 
 const Stake = (): ReactElement => {
   const classes = useStyles();
-  const location = useLocation();
-
-  const farmPoolId = location.pathname.split("/").pop();
+  const { setMenu, data } = useModal();
+  const farmPoolId = data.farmInfo;
   const farmPool = useSelector(selectFarmByFarmKey(farmPoolId));
   const poolConfig = getPoolConfigByFarmKey(farmPoolId);
   const baseTokenInfo = poolConfig.baseTokenInfo;
@@ -88,7 +82,6 @@ const Stake = (): ReactElement => {
 
   const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
-  const { setMenu } = useModal();
   const dispatch = useDispatch();
   const stakeView = useSelector(stakeViewSelector);
   const vertical = "bottom";
@@ -414,10 +407,16 @@ const Stake = (): ReactElement => {
   const userQuoteStakedString = bnToString(quoteTokenInfo, userQuoteStaked);
 
   return (
-    <Page>
+    <Box>
       <Container className={classes.root}>
-        <Box display="flex" justifyContent="space-between" pb={2}>
-          <Typography variant="h6">{farmPool.name} LP Token Staking</Typography>
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="h5">Stake</Typography>
+          <IconButton size="small" onClick={() => setMenu(false, "")}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        {/* <Box display="flex" justifyContent="space-between" pb={2}>
+          <Typography variant="h6">{poolConfig.name} LP Token Staking</Typography>
           <Box className={classes.iconGroup}>
             <img
               src={baseTokenInfo.logoURI}
@@ -426,8 +425,8 @@ const Stake = (): ReactElement => {
             />
             <img src={quoteTokenInfo.logoURI} alt="earning-coin" className={classes.coinIcon} />
           </Box>
-        </Box>
-        <Box display="flex" justifyContent="space-between" pb={4}>
+        </Box> */}
+        <Box display="flex" justifyContent="space-between" mt={4} pb={4}>
           <Box>
             <Typography>Total Staked {baseTokenInfo.symbol}</Typography>
             <Typography>{`${baseTotalStaked.toFixed(2).toString()}`}</Typography>
@@ -447,36 +446,7 @@ const Stake = (): ReactElement => {
             <Typography>{quotePoolRateByDay} DELFI / day</Typography>
           </Box>
         </Box>
-
-        {isConnectedWallet && (
-          <Box className={classes.desc}>
-            <Typography variant="h6" paragraph>
-              About {farmPool.name} LP shares
-            </Typography>
-            <Typography variant="subtitle2">
-              LP shares represents shares of the liquidity provided to a swap pool. You may obtain{" "}
-              {poolConfig.name} LP shares by depositing {poolConfig.base} and {poolConfig.quote}{" "}
-              into the {poolConfig.name} pool.
-            </Typography>
-            <Box display="flex" alignItems="center" mt={3}>
-              <Link
-                href={"/deposit/" + poolConfig?.swapInfo}
-                target="_blank"
-                rel="noreferrer noopener"
-                underline="always"
-                className={classes.link}
-                data-amp-analytics-on="click"
-                data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Farms, target: DELFI"
-              >
-                Deposit into the {poolConfig.name} Pool
-                <LinkIcon className={classes.linkIcon} isDark width="15px" />
-              </Link>
-            </Box>
-          </Box>
-        )}
-
-        <Box className={classes.liquidityStaked}>
+        <Box>
           <Typography className={classes.title}>Your Liquidity Staked</Typography>
           <Box className={classes.cardBottom}>
             <Typography className={classes.amount}>{userBaseStakedString}</Typography>
@@ -496,7 +466,7 @@ const Stake = (): ReactElement => {
             <Typography className={classes.title}>Your Unclaimed Token</Typography>
             {stakeView.isProcessingClaim ? (
               <ConnectButton variant="contained" disabled={true}>
-                <Avatar className={classes.claimLoadingButton} src={loadingIcon} />
+                <CircularProgress color="inherit" />
               </ConnectButton>
             ) : (
               <ConnectButton
@@ -517,52 +487,64 @@ const Stake = (): ReactElement => {
             </Typography>
           </Box>
         </Box>
-        <Paper className={classes.minting}>
-          <Box className={classes.ratePanel}>
-            <Typography color="primary" variant="body1" className={classes.marketCondition}>
-              LIQUIDITY MINING
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Slider value={percentage} onChange={setStakePercentage} />
-          </Box>
+        <Box className={classes.ratePanel}>
+          <Typography color="primary" variant="body1" className={classes.marketCondition}>
+            LIQUIDITY MINING
+          </Typography>
+        </Box>
+        <Box mb={1}>
+          <Slider value={percentage} onChange={setStakePercentage} />
+        </Box>
 
-          {
-            <Box display="flex" flexDirection="column" alignItems="flex-end">
-              <StakeCard
-                poolConfig={poolConfig}
-                card={staking}
-                handleChangeCard={setStakeAmount}
-                tokens={tokenConfigs}
-                disableDrop
-                percentage={percentage < 0.02 ? 0 : percentage}
-              />
-            </Box>
-          }
-          <Box marginTop={2} width="100%">
-            {stakeView.isProcessingStake ? (
-              <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
-                <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
-              </ConnectButton>
-            ) : isConnectedWallet ? (
-              <ConnectButton
-                fullWidth
-                size="large"
-                variant="contained"
-                onClick={handleStake}
-                data-amp-analytics-on="click"
-                data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Deposit, target: Deposit"
-              >
-                {"Update Stake"}
-              </ConnectButton>
-            ) : (
-              <ConnectButton size="large" fullWidth onClick={() => setMenu(true, "connect")}>
-                Connect Wallet
-              </ConnectButton>
-            )}
+        {
+          <Box display="flex" flexDirection="column" alignItems="flex-end">
+            <StakeCard
+              poolConfig={poolConfig}
+              card={staking}
+              handleChangeCard={setStakeAmount}
+              tokens={tokenConfigs}
+              disableDrop
+              percentage={percentage < 0.02 ? 0 : percentage}
+            />
           </Box>
-        </Paper>
+        }
+        <Box marginTop={2} width="100%">
+          {stakeView.isProcessingStake ? (
+            <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
+              <CircularProgress color="inherit" />
+            </ConnectButton>
+          ) : isConnectedWallet ? (
+            <ConnectButton
+              fullWidth
+              size="large"
+              variant="contained"
+              onClick={handleStake}
+              data-amp-analytics-on="click"
+              data-amp-analytics-name="click"
+              data-amp-analytics-attrs="page: Deposit, target: Deposit"
+            >
+              {"Update Stake"}
+            </ConnectButton>
+          ) : (
+            <ConnectButton size="large" fullWidth onClick={() => setMenu(true, "connect")}>
+              Connect Wallet
+            </ConnectButton>
+          )}
+        </Box>
+        <Box display="flex" justifyContent="center" mt={3}>
+          <Link
+            href={"/deposit/" + poolConfig?.swapInfo}
+            target="_blank"
+            rel="noreferrer noopener"
+            underline="always"
+            className={classes.link}
+            data-amp-analytics-on="click"
+            data-amp-analytics-name="click"
+            data-amp-analytics-attrs="page: Farms, target: DELFI"
+          >
+            Deposit into the {poolConfig.name} Pool
+          </Link>
+        </Box>
       </Container>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
@@ -577,7 +559,7 @@ const Stake = (): ReactElement => {
           action={snackAction}
         />
       </Snackbar>
-    </Page>
+    </Box>
   );
 };
 

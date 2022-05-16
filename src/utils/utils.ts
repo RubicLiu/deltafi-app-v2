@@ -8,6 +8,9 @@ export const convertDollar = (value) => {
   return "USD " + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
+export const convertDollarSign = (value) => {
+  return "$" + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 export function formatPubkey(key: PublicKey) {
   if (key) {
     const keyStr = key.toBase58();

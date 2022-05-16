@@ -3,6 +3,7 @@ import { Theme, makeStyles } from "@material-ui/core";
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
     margin: "0 auto",
+    maxWidth: 360,
     [breakpoints.up("sm")]: {
       maxWidth: 560,
     },
@@ -151,11 +152,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginLeft: spacing(1),
   },
   snackBarContent: {
-    maxWidth: 421,
+    maxWidth: 393,
     backgroundColor: palette.background.lightBlack,
     display: "flex",
     flexWrap: "unset",
-    alignItems: "start",
+    alignItems: "center",
   },
   snackBarClose: {
     marginTop: 5,
@@ -170,7 +171,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   },
   actionLoadingButton: {
     width: 50,
-    height: 50,
     marginTop: 4,
     marginBottom: 5,
   },

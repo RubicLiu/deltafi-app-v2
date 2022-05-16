@@ -1,16 +1,12 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { Box, Typography, makeStyles, Theme, Grid, Paper, Link, Avatar } from "@material-ui/core";
-import Page from "components/layout/Page";
+import { Box, makeStyles, Theme, Link, Divider, CircularProgress } from "@material-ui/core";
 import { ConnectButton } from "components";
 import { useModal } from "providers/modal";
-import ReferralCard from "./components/ReferralCard";
-import CopyLinkButton from "./components/CopyLinkButton";
-import { ShareDiscord, ShareGithub, ShareMedium, ShareTelegram, ShareTwitter } from "components";
+import { ShareDiscord, ShareMedium, ShareTelegram, ShareTwitter } from "components";
 import copy from "copy-to-clipboard";
 
 import { sendSignedTransaction } from "utils/transactions";
-import loadingIcon from "components/gif/loading_white.gif";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deltafiUserSelector,
@@ -33,37 +29,35 @@ import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
 import { deployConfigV2 } from "constants/deployConfigV2";
 
-/*
- * mockup test data for reward page
- */
-const referralIntroCard = [
-  {
-    caption: "Get a referral link",
-    detail: "Connect a wallet and generate a referral link to share.",
-    image: "/images/get_referral_link.png",
-  },
-  {
-    caption: "Share with friends",
-    detail: "Invite your friends to register via your referral link.",
-    image: "/images/share_friends.png",
-  },
-  {
-    caption: "Earn crypto",
-    detail: "Get referral rewards from your friends’ earnings & swaps.",
-    image: "/images/earn_crypto.png",
-  },
-];
+// /*
+//  * mockup test data for reward page
+//  */
+// const referralIntroCard = [
+//   {
+//     caption: "Get a referral link",
+//     detail: "Connect a wallet and generate a referral link to share.",
+//     image: "/images/get_referral_link.png",
+//   },
+//   {
+//     caption: "Share with friends",
+//     detail: "Invite your friends to register via your referral link.",
+//     image: "/images/share_friends.png",
+//   },
+//   {
+//     caption: "Earn crypto",
+//     detail: "Get referral rewards from your friends’ earnings & swaps.",
+//     image: "/images/earn_crypto.png",
+//   },
+// ];
 
 const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   root: {
-    padding: `${spacing(10)}px 0px`,
-    maxWidth: 792,
     width: "100%",
-    [breakpoints.down("md")]: {
-      padding: "0 1rem",
-    },
+    margin: "auto",
   },
   defaultWrapper: {
+    marginTop: 30,
+    textAlign: "center",
     [breakpoints.down("sm")]: {
       maxWidth: 248,
       margin: "0 auto",
@@ -78,22 +72,15 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   subContentMargin2: {
     marginBottom: spacing(2),
   },
-  subContentMargin3: {
-    marginBottom: spacing(3),
-  },
   referralTitle: {
     fontWeight: 500,
     fontSize: 28,
   },
-  mainComponentMargin: {
-    marginBottom: spacing(8),
-  },
-  inviteComponentMargin: {
-    marginTop: spacing(8),
-    marginBottom: spacing(8),
-  },
   sharePanelRow: {
     display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexWrap: "wrap",
   },
   shareLabel: {
     marginRight: spacing(3),
@@ -126,12 +113,13 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     },
   },
   inputLink: {
-    borderRadius: 12,
-    background: "transparent",
-    border: "1px solid #B7B4C7",
-    padding: "16px 24px",
+    border: "none",
+    padding: "16px 40px",
+    maxWidth: 512,
     color: "white",
     marginRight: "16px",
+    background: "#1C1C1C",
+    borderRadius: 20,
     flex: 1,
     outline: "none",
     [breakpoints.down("sm")]: {
@@ -141,10 +129,43 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     },
   },
   SettingUpAccountButton: {
-    width: 40,
-    height: 40,
-    marginTop: 4,
-    marginBottom: 4,
+    marginLeft: 45,
+    marginRight: 45,
+    width: 24,
+    height: 24,
+  },
+  divider: {
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    width: "100%",
+  },
+  verticalDiver: {
+    background: "rgba(255, 255, 255, 0.3)",
+    margin: "5px 40px",
+  },
+  rewardBox: {
+    "&.first": {
+      border: "1px solid #D4FF00",
+      color: "#D4FF00",
+    },
+    border: "1px solid #03F2A0",
+    background: "#1C1C1C",
+    borderRadius: 10,
+    height: 100,
+    width: 200,
+    justifyContent: "center",
+    alignItems: "center",
+    display: "flex",
+    flexDirection: "column",
+    color: "#03F2A0",
+    "& .label": {
+      fontSize: 20,
+      fontWeight: 600,
+    },
+    "& .value": {
+      fontSize: 14,
+      fontWeight: 500,
+      color: "#d3d3d3",
+    },
   },
 }));
 
@@ -284,7 +305,7 @@ const Home: React.FC = (props) => {
     if (rewardView.isRefreshing) {
       return (
         <ConnectButton variant="contained" disabled={true}>
-          <Avatar src={loadingIcon} />
+          <CircularProgress color="inherit" />
         </ConnectButton>
       );
     }
@@ -306,7 +327,7 @@ const Home: React.FC = (props) => {
     if (rewardView.isClaiming) {
       return (
         <ConnectButton variant="contained" disabled={true}>
-          <Avatar src={loadingIcon} />
+          <CircularProgress color="inherit" />
         </ConnectButton>
       );
     }
@@ -329,224 +350,208 @@ const Home: React.FC = (props) => {
   }, [rewardView, deltafiUser, handleClaimRewards]);
 
   return (
-    <Page>
-      <Box className={classes.root}>
-        <Box className={classes.defaultWrapper}>
-          <Typography
-            variant="h4"
-            color="primary"
-            align="center"
-            className={classes.fontBold}
-            paragraph
-          >
-            Invite friends, earn crypto together
-          </Typography>
+    <Box className={classes.root}>
+      <Box className={classes.defaultWrapper}>
+        <Box fontSize={20} fontWeight={700} mt={1}>
+          Invite friends, earn crypto together
+        </Box>
+        <Box mt={0.5} fontSize={14} fontWeight={400} color="#f6f6f6">
+          {!isConnectedWallet
+            ? "Before referral, you need to connect your wallet"
+            : "Invite your friends to register via your referral link."}
+        </Box>
 
-          {/* Connect Wallet */}
-          {!isConnectedWallet && (
-            <Box
-              flexDirection="column"
-              display="flex"
-              alignItems="center"
-              className={classes.mainComponentMargin}
-            >
-              <Typography
-                variant="subtitle1"
-                align="center"
-                className={classes.subContent}
-                paragraph
-              >
-                Before referral, you need to connect your wallet
-              </Typography>
+        {/* Connect Wallet */}
+        {!isConnectedWallet && (
+          <>
+            <Box mt={5} mb={7.5} flexDirection="column" display="flex" alignItems="center">
               <ConnectButton onClick={() => setMenu(true, "connect")}>Connect Wallet</ConnectButton>
             </Box>
-          )}
-        </Box>
-
-        {/* Send Invitations */}
-        {isConnectedWallet && (
-          <>
-            <Box className={classes.inviteComponentMargin}>
-              <Typography variant="h5" color="primary" align="center" paragraph>
-                Send Invitations
-              </Typography>
-
-              <Paper className={classes.sharePannel}>
-                <Typography
-                  variant="subtitle1"
-                  color="primary"
-                  className={classes.subContentMargin2}
-                >
-                  My Referral Link
-                </Typography>
-                <Box className={`${classes.subContentMargin3} ${classes.sharePanelRow}`}>
-                  {referralLinkState === "Unavailable" ? (
-                    <input
-                      disabled={true}
-                      placeholder={"Please Create A DELFI User Before Referring Others!"}
-                      className={classes.inputLink}
-                    />
-                  ) : (
-                    <input
-                      placeholder={referralLink}
-                      disabled={referralLinkState === "Processing"}
-                      className={classes.inputLink}
-                    />
-                  )}
-                  {(() => {
-                    switch (referralLinkState) {
-                      case "Unavailable": {
-                        return (
-                          <CopyLinkButton onClick={handleCreateDeltafiUser}>
-                            {"Wallet Set Up"}
-                          </CopyLinkButton>
-                        );
-                      }
-                      case "Ready": {
-                        return (
-                          <CopyLinkButton
-                            onClick={() => {
-                              copy(referralLink);
-                              dispatch(
-                                rewardViewActions.setReferralLinkState({
-                                  referralLinkState: "Copied",
-                                }),
-                              );
-                              setTimeout(
-                                () =>
-                                  dispatch(
-                                    rewardViewActions.setReferralLinkState({
-                                      referralLinkState: "Ready",
-                                    }),
-                                  ),
-                                5000,
-                              );
-                            }}
-                          >
-                            {"Copy Link"}
-                          </CopyLinkButton>
-                        );
-                      }
-                      case "Copied": {
-                        return <CopyLinkButton>{"Copied"}</CopyLinkButton>;
-                      }
-                      case "Processing": {
-                        return (
-                          <CopyLinkButton disabled={true}>
-                            <Avatar className={classes.SettingUpAccountButton} src={loadingIcon} />
-                          </CopyLinkButton>
-                        );
-                      }
-                    }
-                  })()}
-                </Box>
-                <Box className={classes.sharePanelRow}>
-                  <Typography variant="subtitle1" color="primary" className={classes.shareLabel}>
-                    Share
-                  </Typography>
-                  <Box display="flex" className={classes.socialLinks}>
-                    <Link
-                      href="https://twitter.com/deltafi_ai"
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      data-amp-analytics-on="click"
-                      data-amp-analytics-name="click"
-                      data-amp-analytics-attrs="page: Reward, target: Twitter"
-                    >
-                      <ShareTwitter className={classes.shareButton} />
-                    </Link>
-
-                    <Link
-                      href="https://discord.gg/deltafi"
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      data-amp-analytics-on="click"
-                      data-amp-analytics-name="click"
-                      data-amp-analytics-attrs="page: Reward, target: Discord"
-                    >
-                      <ShareDiscord className={classes.shareButton} />
-                    </Link>
-                    <Link
-                      href="https://github.com/delta-fi"
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      data-amp-analytics-on="click"
-                      data-amp-analytics-name="click"
-                      data-amp-analytics-attrs="page: Reward, target: Github"
-                    >
-                      <ShareGithub className={classes.shareButton} />
-                    </Link>
-                    <Link
-                      href="https://medium.com/deltafi"
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      data-amp-analytics-on="click"
-                      data-amp-analytics-name="click"
-                      data-amp-analytics-attrs="page: Reward, target: Medium"
-                    >
-                      <ShareMedium className={classes.shareButton} />
-                    </Link>
-                    <Link
-                      href="https://t.me/deltafi_ai"
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      data-amp-analytics-on="click"
-                      data-amp-analytics-name="click"
-                      data-amp-analytics-attrs="page: Reward, target: Telegram"
-                    >
-                      <ShareTelegram className={classes.shareButton} />
-                    </Link>
-                  </Box>
-                </Box>
-              </Paper>
-            </Box>
+            <Divider className={classes.divider} />
           </>
         )}
+      </Box>
 
-        {/* How to invite friends */}
-        <Box className={classes.defaultWrapper}>
-          <Typography variant="h5" color="primary" align="center" paragraph>
-            How to invite friends
-          </Typography>
-          <Grid container spacing={2} style={{ width: "100%", margin: 0 }}>
-            {referralIntroCard.map((item, index) => (
-              <Grid item xs={12} sm={4} md={4} key={index}>
-                <ReferralCard caption={item.caption} detail={item.detail} image={item.image} />
-              </Grid>
-            ))}
-          </Grid>
+      {/* Send Invitations */}
+      {isConnectedWallet && (
+        <>
+          <Box mt={5} mb={7.5}>
+            <Box className={classes.sharePanelRow}>
+              {referralLinkState === "Unavailable" ? (
+                <input
+                  disabled={true}
+                  placeholder={"Please Create A DELFI Token Account Before Referring Others!"}
+                  className={classes.inputLink}
+                />
+              ) : (
+                <input
+                  placeholder={referralLink}
+                  disabled={referralLinkState === "Processing"}
+                  className={classes.inputLink}
+                />
+              )}
+              {(() => {
+                switch (referralLinkState) {
+                  case "Unavailable": {
+                    return (
+                      <ConnectButton onClick={handleCreateDeltafiUser}>
+                        {"Wallet Set Up"}
+                      </ConnectButton>
+                    );
+                  }
+                  case "Ready": {
+                    return (
+                      <ConnectButton
+                        onClick={() => {
+                          copy(referralLink);
+                          dispatch(
+                            rewardViewActions.setReferralLinkState({
+                              referralLinkState: "Copied",
+                            }),
+                          );
+                          setTimeout(
+                            () =>
+                              dispatch(
+                                rewardViewActions.setReferralLinkState({
+                                  referralLinkState: "Ready",
+                                }),
+                              ),
+                            5000,
+                          );
+                        }}
+                      >
+                        {"Copy Link"}
+                      </ConnectButton>
+                    );
+                  }
+                  case "Copied": {
+                    return <ConnectButton>{"Copied"}</ConnectButton>;
+                  }
+                  case "Processing": {
+                    return (
+                      <ConnectButton disabled={true}>
+                        <CircularProgress color="inherit" />
+                      </ConnectButton>
+                    );
+                  }
+                }
+              })()}
+              <Divider className={classes.verticalDiver} orientation="vertical" flexItem />
+              <Box display="flex" className={classes.socialLinks}>
+                <Link
+                  href="https://twitter.com/deltafi_ai"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  data-amp-analytics-on="click"
+                  data-amp-analytics-name="click"
+                  data-amp-analytics-attrs="page: Reward, target: Twitter"
+                >
+                  <ShareTwitter className={classes.shareButton} />
+                </Link>
+
+                <Link
+                  href="https://discord.gg/deltafi"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  data-amp-analytics-on="click"
+                  data-amp-analytics-name="click"
+                  data-amp-analytics-attrs="page: Reward, target: Discord"
+                >
+                  <ShareDiscord className={classes.shareButton} />
+                </Link>
+                {/* <Link
+                href="https://github.com/delta-fi"
+                target="_blank"
+                rel="noreferrer noopener"
+                data-amp-analytics-on="click"
+                data-amp-analytics-name="click"
+                data-amp-analytics-attrs="page: Reward, target: Github"
+              >
+                <ShareGithub className={classes.shareButton} />
+              </Link> */}
+                <Link
+                  href="https://medium.com/deltafi"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  data-amp-analytics-on="click"
+                  data-amp-analytics-name="click"
+                  data-amp-analytics-attrs="page: Reward, target: Medium"
+                >
+                  <ShareMedium className={classes.shareButton} />
+                </Link>
+                <Link
+                  href="https://t.me/deltafi_ai"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  data-amp-analytics-on="click"
+                  data-amp-analytics-name="click"
+                  data-amp-analytics-attrs="page: Reward, target: Telegram"
+                >
+                  <ShareTelegram className={classes.shareButton} />
+                </Link>
+              </Box>
+            </Box>
+          </Box>
+          <Divider className={classes.divider} />
+        </>
+      )}
+
+      {/* How to invite friends */}
+      <Box className={classes.defaultWrapper}>
+        <Box fontSize={20} mb={2} fontWeight={700}>
+          Rewards Summary
         </Box>
-
-        {/* Rewards summary */}
-        {/* TODO: improve layout of this section */}
-        <Box className={classes.defaultWrapper}>
-          <Typography variant="h5" color="primary" align="center" paragraph>
-            Rewards Summary
-          </Typography>
-          <Grid container spacing={2} style={{ width: "100%", margin: 0 }}>
-            <Grid item xs={12} sm={4} md={4}>
-              <Typography variant="h6" color="primary" align="left" paragraph>
-                Reward Claimed
-              </Typography>
-              <Box>{`From Swap: ${rewardDisplayInfo.claimedRewardFromSwap}`}</Box>
-              <Box>{`From Referral: ${rewardDisplayInfo.claimedRewardFromReferral}`}</Box>
-            </Grid>
-            <Grid item xs={12} sm={4} md={4}>
-              <Typography variant="h6" color="primary" align="left" paragraph>
-                Reward Owed
-              </Typography>
-              <Box>{`From Swap: ${rewardDisplayInfo.owedRewardFromSwap}`}</Box>
-              <Box>{`From Referral: ${rewardDisplayInfo.owedRewardFromReferral}`}</Box>
-            </Grid>
-
-            <Grid item xs={12} sm={4} md={4}>
+        {isConnectedWallet ? (
+          <Box>
+            <Box mt={3} fontSize={16} fontWeight={700}>
+              Reward Claimed
+            </Box>
+            <Box mt={2.5} mb={3} display="flex" gridGap={20} justifyContent="center">
+              <Box className={`${classes.rewardBox} first`}>
+                <Box className="label">{rewardDisplayInfo.claimedRewardFromSwap}</Box>
+                <Box className="value" mt={0.5}>
+                  From Swap
+                </Box>
+              </Box>
+              <Box className={classes.rewardBox}>
+                <Box className="label">{rewardDisplayInfo.claimedRewardFromReferral}</Box>
+                <Box className="value" mt={0.5}>
+                  From Referral
+                </Box>
+              </Box>
+            </Box>
+            <Box mt={2} fontSize={16} fontWeight={700}>
+              Reward Owed
+            </Box>
+            <Box mt={2.5} display="flex" gridGap={20} justifyContent="center">
+              <Box className={`${classes.rewardBox} first`}>
+                <Box className="label">{rewardDisplayInfo.owedRewardFromSwap}</Box>
+                <Box className="value" mt={0.5}>
+                  From Swap
+                </Box>
+              </Box>
+              <Box className={classes.rewardBox}>
+                <Box className="label">{rewardDisplayInfo.owedRewardFromReferral}</Box>
+                <Box className="value" mt={0.5}>
+                  From Referral
+                </Box>
+              </Box>
+            </Box>
+            <Box display="flex" gridGap={20} justifyContent="center" mt={3}>
               <Box>{refreshButton}</Box>
               <Box>{claimRewardsButton}</Box>
-            </Grid>
-          </Grid>
-        </Box>
+            </Box>
+          </Box>
+        ) : (
+          <Box mt={2.5}>
+            <img src="/images/ghost.svg" alt="no rewards" />
+            <Box fontSize={14} lineHeight={1.2} fontWeight={400} mt={2.5}>
+              No rewards, go to invite and earn
+            </Box>
+          </Box>
+        )}
       </Box>
-    </Page>
+    </Box>
   );
 };
 export default Home;

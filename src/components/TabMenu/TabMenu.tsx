@@ -3,17 +3,32 @@ import { useHistory, useLocation } from "react-router";
 import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
 import { makeStyles, Theme } from "@material-ui/core";
 
-const useStyles = makeStyles(({ palette, spacing }: Theme) => ({
+const useStyles = makeStyles(({ palette, breakpoints }: Theme) => ({
   button: {
-    width: 98,
-    fontWeight: 500,
     "&.Mui-selected": {
-      backgroundColor: palette.background.primary,
+      backgroundColor: palette.background.complementary,
+      color: "#333333",
+      "&:hover": {
+        backgroundColor: palette.background.complementary,
+        color: "#333333",
+      },
     },
     borderRadius: "100px !important",
     border: "none",
     textTransform: "capitalize",
     color: "#fff",
+    fontSize: 18,
+    fontFamily: "IBM Plex Mono",
+    fontWeight: 700,
+    margin: "0 12px",
+    padding: "10px 16px",
+    lineHeight: "100%",
+    [breakpoints.down("md")]: {
+      fontSize: 14,
+      fontWeight: 700,
+      margin: 0,
+      padding: "5px 8px",
+    },
   },
 }));
 
@@ -40,6 +55,9 @@ const TabMenu: React.FC = (props) => {
       onChange={(event: React.MouseEvent<HTMLElement>, value: string | null) => handleActive(value)}
       aria-label="Top Menu"
     >
+      <ToggleButton value="dashboard" aria-label="Dashboard" className={classes.button}>
+        Dashboard
+      </ToggleButton>
       <ToggleButton value="swap" aria-label="Swap" className={classes.button}>
         Swap
       </ToggleButton>
@@ -48,9 +66,6 @@ const TabMenu: React.FC = (props) => {
       </ToggleButton>
       <ToggleButton value="farms" aria-label="Farms" className={classes.button}>
         Farms
-      </ToggleButton>
-      <ToggleButton value="rewards" aria-label="Rewards" className={classes.button}>
-        Rewards
       </ToggleButton>
     </ToggleButtonGroup>
   );

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Box, Container, makeStyles, Theme, Typography, IconButton } from "@material-ui/core";
+import { Box, Container, makeStyles, Theme, IconButton } from "@material-ui/core";
 
 import { BLOG_LINK, TWITTER_LINK, TELEGRAM_LINK, DISCORD_LINK, GITHUB_LINK } from "constants/index";
 import { TwitterIcon, TelegramIcon, MediumIcon, GithubIcon, DiscordIcon } from "components";
@@ -8,7 +8,10 @@ import { useDarkMode } from "providers/theme";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
-    background: palette.background.lightBlack,
+    background: palette.background.secondary,
+    boxShadow: "0px -4px 4px rgba(0, 0, 0, 0.15)",
+    position: "absolute",
+    width: "100%",
   },
   container: {
     display: "flex",
@@ -136,7 +139,9 @@ const Footer: React.FC = (props) => {
             </IconButton>
           </IconWrapper>
         </StyledDiv>
-        <Typography>© 2022 DeltaFi. All rights reserved</Typography>
+        <Box fontSize={14} fontWeight={500} color="#F2F2F2">
+          © 2022 DeltaFi. All rights reserved
+        </Box>
       </Container>
     </Box>
   );

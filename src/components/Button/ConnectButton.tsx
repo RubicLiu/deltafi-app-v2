@@ -1,90 +1,90 @@
 import React from "react";
-import { Button, ButtonProps, makeStyles, Theme } from "@material-ui/core";
+import { Box, Button, ButtonProps } from "@material-ui/core";
+import styled from "styled-components";
 
-const useStyles = makeStyles(({ breakpoints, spacing, palette }: Theme) => ({
-  button: {
-    backgroundImage: `linear-gradient(52.7deg, #1AFA9A -3.73%, #478EF0 48.34%, #9945FD 93.4%), ${palette.gradient.btnCta}`,
-    color: palette.text.primary,
-    borderRadius: 100,
-    border: "solid 1px transparent",
-    backgroundOrigin: "border-box",
-    // backgroundClip: 'content-box, border-box',
-    boxShadow: `2px 1000px 1px ${palette.background.black} inset`,
-    fontSize: 14,
-    fontWeight: 500,
-    textTransform: "capitalize",
-    "&:hover": {
-      boxShadow: "none",
-      border: "solid 1px transparent",
-    },
-    "&.Mui-disabled": {
-      color: "#88809C",
-    },
-    [breakpoints.up("sm")]: {
-      fontSize: 18,
-    },
-  },
-  buttonContained: {
-    backgroundImage: `linear-gradient(52.7deg, #1AFA9A -3.73%, #478EF0 48.34%, #9945FD 93.4%), ${palette.gradient.btnCta}`,
-    boxShadow: "none",
-    border: "none",
-    "&:hover": { border: 0 },
-    fontWeight: 600,
-  },
-  buttonOutlined: {
-    border: 0,
-    "&:hover": { border: 0 },
-  },
-  buttonSmall: {
-    [breakpoints.up("sm")]: {
-      fontSize: 18,
-      lineHeight: "45px",
-      fontWeight: 500,
-      padding: "0 20px",
-    },
-  },
-  buttonLarge: {
-    [breakpoints.up("sm")]: {
-      fontSize: 21,
-      lineHeight: "58.31px",
-      fontWeight: 400,
-      color: "#F6F6F6",
-      paddingTop: 7,
-      paddingBottom: 7,
-    },
-  },
-  buttonDisabled: {
-    color: "#88809C",
-    textTransform: "capitalize",
-  },
-  roundButton: {
-    minWidth: 42,
-    height: 42,
-    padding: 0,
-    borderRadius: spacing(3),
-  },
-}));
+const StyledButton = styled(Button)`
+  font-style: normal;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 24px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  padding: 12px 36px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(111.31deg, #d4ff00 15.34%, #bdff00 95.74%);
+  border-radius: 100px;
+  color: #313131;
+  text-transform: none;
+  @media (max-width: 600px) {
+    padding: 6px 6px;
+  }
+  &.MuiButton-root:hover {
+    background: linear-gradient(
+      111.31deg,
+      rgba(212, 255, 0, 0.4) 15.34%,
+      rgba(189, 255, 0, 0.4) 95.74%
+    );
+  }
+  &.Mui-disabled {
+    color: #88809c;
+  }
+  &.MuiButton-outlined {
+    border: 2px solid transparent;
+    background: #1c1c1c;
+    color: #fff;
+    box-sizing: border-box;
+    background-clip: padding-box;
+  }
+  &.MuiButton-sizeLarge {
+    line-height: 50px;
+    font-size: 20px;
+  }
+`;
+
+const StyledOutlineCt = styled(Box)`
+  line-height: 24px;
+  padding: 2px; /* !importanté */
+  border-radius: 100px; /* !importanté */
+  background: linear-gradient(111.31deg, #d4ff00 15.34%, #bdff00 95.74%);
+  button {
+    width: 100%;
+    height: 100%;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 24px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    border-radius: 100px;
+    color: #fff;
+    background: #1c1c1c;
+    &.MuiButton-root:hover {
+      background: #333333;
+    }
+  }
+`;
 
 const ConnectButton: React.FC<ButtonProps> = (props) => {
   const { children, ...otherProps } = props;
-  const classes = useStyles(props);
 
   return (
-    <Button
-      color="primary"
-      variant="outlined"
-      classes={{
-        contained: classes.buttonContained,
-        sizeSmall: classes.buttonSmall,
-        sizeLarge: classes.buttonLarge,
-        disabled: classes.buttonDisabled,
-      }}
-      className={classes.button}
-      onClick={props.onClick}
-      {...otherProps}
-    >
-      {props.children}
-    </Button>
+    <>
+      {props.variant === "outlined" ? (
+        <StyledOutlineCt {...otherProps}>
+          <Button variant="outlined" onClick={props.onClick}>
+            {props.children}
+          </Button>
+        </StyledOutlineCt>
+      ) : (
+        <StyledButton variant="contained" onClick={props.onClick} {...otherProps}>
+          {props.children}
+        </StyledButton>
+      )}
+    </>
   );
 };
 
