@@ -60,6 +60,7 @@ const App: React.FC = () => {
   const wallet = useWallet();
   const { publicKey: walletAddress } = wallet;
   const { connection } = useConnection();
+  console.info(connection.rpcEndpoint);
   const program = useSelector(programSelector);
 
   useEffect(() => {
