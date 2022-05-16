@@ -399,11 +399,6 @@ export function IsSufficientReserve(
   amountSubstractedOut: BigNumber,
   marketPrice: BigNumber,
 ): boolean {
-  console.log(amountAddedIn.toString());
-  console.log(amountSubstractedOut.toString());
-  console.log(swapInfo.poolState.baseReserve.toString());
-  console.log(swapInfo.poolState.quoteReserve.toString());
-
   const targetBaseReserve = new BigNumber(swapInfo.poolState.targetBaseReserve.toString());
   const targetQuoteReserve = new BigNumber(swapInfo.poolState.targetQuoteReserve.toString());
 
