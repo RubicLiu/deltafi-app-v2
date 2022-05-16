@@ -1,7 +1,7 @@
 import { DeltafiDexV2 } from "./types/deltafi_dex_v2";
 import deltafiDexV2Idl from "./idl/deltafi_dex_v2.json";
 import { Keypair, PublicKey } from "@solana/web3.js";
-import { Program, Provider, web3 } from "@project-serum/anchor";
+import { Program, AnchorProvider, web3 } from "@project-serum/anchor";
 import * as token from "@solana/spl-token";
 import { MarketConfig, SwapConfig, SwapType } from "./type_definitions";
 
@@ -13,15 +13,15 @@ export function getClusterApiUrl(network: string) {
 }
 
 export function makeProvider(connection, wallet) {
-  return new Provider(connection, wallet, Provider.defaultOptions());
+  return new AnchorProvider(connection, wallet, AnchorProvider.defaultOptions());
 }
 
 export function getDeltafiDexV2(
   programId: PublicKey,
-  provider: Provider = null,
+  provider: AnchorProvider = null,
 ): Program<DeltafiDexV2> {
   const idl = JSON.parse(JSON.stringify(deltafiDexV2Idl));
-  return new Program(idl, programId, provider != null ? provider : Provider.local());
+  return new Program(idl, programId, provider != null ? provider : AnchorProvider.local());
 }
 
 export async function createMarketConfig(program, pythProgramId, deltafiMint, adminKeypair) {
