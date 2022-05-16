@@ -7,6 +7,19 @@ import { exponentiate, exponentiatedBy } from "./decimal";
 import { bnToString } from "./tokenUtils";
 import { SWAP_DIRECTION } from "lib/instructions";
 
+/**
+ * Main interface function of this module, calculate the input information
+ * of a swap with the swap output information
+ * @param swapInfo pool's information, includes pool state, pool's configs of fees and all tokens and token accounts info
+ * @param fromToken info of the input token
+ * @param toToken info of the output token
+ * @param amountOut amount of the output token to be traded
+ * @param maxSlippage max maxSlippage limit, in percentage
+ * @param marketPrice basePrice / quotePrice
+ * @param marketPriceHigh upper bound of the market price after confidence interval adjustion
+ * @param marketPriceLow lower bound of the market price after confidence interval adjustion
+ * @returns amount in information (+ amount out with max slippage)
+ */
 export function getSwapInResult(
   swapInfo: SwapInfo,
   fromToken: TokenConfig,
@@ -361,6 +374,7 @@ export function normalizeMarketPriceWithDecimals(
   }
 }
 
+// get swapDirection from fromToken and toToken
 export function getSwapDirection(
   fromToken: TokenConfig,
   toToken: TokenConfig,
@@ -381,6 +395,7 @@ export function getSwapDirection(
   throw Error("Invalid to/from token pair: " + fromToken.mint + " " + toToken.mint);
 }
 
+// get the opposite swap direction from the current swap direction
 export function getOppsiteSwapDirection(swapDirection: SWAP_DIRECTION): SWAP_DIRECTION {
   switch (swapDirection) {
     case SWAP_DIRECTION.SellBase:
@@ -392,6 +407,7 @@ export function getOppsiteSwapDirection(swapDirection: SWAP_DIRECTION): SWAP_DIR
   }
 }
 
+// check if there is sufficient reserves after swap with the reserve limit
 export function IsSufficientReserve(
   swapDirection: SWAP_DIRECTION,
   swapInfo: SwapInfo,
@@ -464,6 +480,8 @@ export function getNormalizedReserves(
   };
 }
 
+// get the base/quote reserves after a swap,
+// with amount to be added in and the amount to be substracted out
 export function getReservesAfterSwap(
   poolState: PoolState,
   amountAddedIn: BigNumber,
@@ -494,6 +512,8 @@ export function getReservesAfterSwap(
   }
 }
 
+// giving base/quote reserves and normalized base/quote reserves
+// check if they satisfies the reserve limit
 export function checkIfReserveIsSufficient(
   baseReserve: BigNumber,
   quoteReserve: BigNumber,
