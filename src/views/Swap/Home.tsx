@@ -520,6 +520,7 @@ const Home: React.FC = (props) => {
     if (isConnectedWallet) {
       const unavailable = !swapInfo;
       const sourceAccountNonExist = !sourceBalance;
+      // TODO(leqiang): remove this variabe and use a swapView state instead
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount);
       const isInsufficientLiquidity =
         swapInfo &&

@@ -181,6 +181,7 @@ describe("utils/swap", function () {
             adminTradeFeeDenominator: new anchor.BN(2),
             tradeFeeNumerator: new anchor.BN(1994),
             tradeFeeDenominator: new anchor.BN(325_994),
+            minReserveLimitPercentage: 0,
           } as SwapConfig,
         } as SwapInfo,
         {
@@ -200,6 +201,7 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
       priceImpact: "0.00001840490797546012",
+      sufficientReserve: true,
     });
 
     // normal swap, sell base, enable confidence interval
@@ -223,6 +225,7 @@ describe("utils/swap", function () {
             adminTradeFeeDenominator: new anchor.BN(2),
             tradeFeeNumerator: new anchor.BN(1994),
             tradeFeeDenominator: new anchor.BN(325_994),
+            minReserveLimitPercentage: 0,
           } as SwapConfig,
         } as SwapInfo,
         {
@@ -244,6 +247,7 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
       priceImpact: "0.00001840490797546012",
+      sufficientReserve: true,
     });
 
     // normal swap, sell quote, disable confidence interval
@@ -267,6 +271,7 @@ describe("utils/swap", function () {
             adminTradeFeeDenominator: new anchor.BN(2),
             tradeFeeNumerator: new anchor.BN(9999),
             tradeFeeDenominator: new anchor.BN(1999999),
+            minReserveLimitPercentage: 0,
           } as SwapConfig,
         } as SwapInfo,
         {
@@ -286,6 +291,7 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "1.970100",
       fee: "0.009999",
       priceImpact: "0.00001839438644256218",
+      sufficientReserve: true,
     });
 
     // normal swap, sell quote, disable confidence interval
@@ -332,6 +338,7 @@ describe("utils/swap", function () {
             adminTradeFeeDenominator: new anchor.BN(2),
             tradeFeeNumerator: new anchor.BN(1994),
             tradeFeeDenominator: new anchor.BN(325_994),
+            minReserveLimitPercentage: 50,
           } as SwapConfig,
         } as SwapInfo,
         {
@@ -351,6 +358,7 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
       priceImpact: "0.00001840524672233231",
+      sufficientReserve: true,
     });
 
     // normal swap, sell base, enable confidence interval
@@ -374,6 +382,7 @@ describe("utils/swap", function () {
             adminTradeFeeDenominator: new anchor.BN(2),
             tradeFeeNumerator: new anchor.BN(1994),
             tradeFeeDenominator: new anchor.BN(325_994),
+            minReserveLimitPercentage: 10,
           } as SwapConfig,
         } as SwapInfo,
         {
@@ -395,6 +404,50 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
       priceImpact: "0.00001840524672233257",
+      sufficientReserve: true,
+    });
+
+    expect(
+      getSwapInResult(
+        {
+          mintBase: baseMintPublicKey,
+          mintQuote: quoteMintPublicKey,
+          mintBaseDecimals: 6,
+          mintQuoteDecimals: 6,
+          swapType: { normalSwap: {} } as SwapType,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(20_000_000),
+            baseReserve: new anchor.BN(100_000_000_000),
+            quoteReserve: new anchor.BN(20_000_000_000),
+          } as PoolState,
+          swapConfig: {
+            enableConfidenceInterval: false,
+            adminTradeFeeNumerator: new anchor.BN(1),
+            adminTradeFeeDenominator: new anchor.BN(2),
+            tradeFeeNumerator: new anchor.BN(10),
+            tradeFeeDenominator: new anchor.BN(20010),
+            minReserveLimitPercentage: 50,
+          } as SwapConfig,
+        } as SwapInfo,
+        {
+          mint: baseMintPublicKey.toBase58(),
+          decimals: 6,
+        } as TokenConfig,
+        {
+          mint: quoteMintPublicKey.toBase58(),
+          decimals: 6,
+        } as TokenConfig,
+        "20000",
+        0.5,
+        new BigNumber(0.163),
+      ),
+    ).toEqual({
+      amountIn: "Infinity",
+      amountOutWithSlippage: "19900.000000",
+      fee: "10.000000",
+      priceImpact: "Infinity",
+      sufficientReserve: false,
     });
   });
 
