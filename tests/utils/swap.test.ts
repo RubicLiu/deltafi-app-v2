@@ -1,4 +1,5 @@
 import {
+  getNormalizedReserves,
   getSwapInResult,
   getSwapOutAmountSellBase,
   getSwapOutAmountSellQuote,
@@ -451,5 +452,31 @@ describe("utils/swap", function () {
     });
   });
 
-  it("normalizeMarketPriceWithDecimals", function () {});
+  it("getNormalizedReserves", function () {
+    expect(
+      getNormalizedReserves(
+        new BigNumber(1000),
+        new BigNumber(2000),
+        new BigNumber(1),
+        new BigNumber(2),
+        new BigNumber(3),
+      ),
+    ).toEqual({
+      normalizedBaseReserve: new BigNumber(1000),
+      normalizedQuoteReserve: new BigNumber(2000),
+    });
+
+    expect(
+      getNormalizedReserves(
+        new BigNumber(1000),
+        new BigNumber(5000),
+        new BigNumber(20),
+        new BigNumber(20),
+        new BigNumber(3),
+      ),
+    ).toEqual({
+      normalizedBaseReserve: new BigNumber(2000),
+      normalizedQuoteReserve: new BigNumber(2000),
+    });
+  });
 });
