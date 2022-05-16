@@ -1506,7 +1506,7 @@ export type DeltafiDexV2 = {
             "name": "reservedU64",
             "type": {
               "array": [
-                "u8",
+                "u64",
                 32
               ]
             }
@@ -3711,7 +3711,7 @@ export const IDL: DeltafiDexV2 = {
             "name": "reservedU64",
             "type": {
               "array": [
-                "u8",
+                "u64",
                 32
               ]
             }

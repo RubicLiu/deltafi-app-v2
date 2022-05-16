@@ -1506,7 +1506,7 @@
             "name": "reservedU64",
             "type": {
               "array": [
-                "u8",
+                "u64",
                 32
               ]
             }
