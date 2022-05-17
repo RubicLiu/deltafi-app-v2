@@ -202,7 +202,7 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
       priceImpact: "0.00001840490797546012",
-      sufficientReserve: true,
+      insufficientLiquidity: false,
     });
 
     // normal swap, sell base, enable confidence interval
@@ -248,7 +248,7 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
       priceImpact: "0.00001840490797546012",
-      sufficientReserve: true,
+      insufficientLiquidity: false,
     });
 
     // normal swap, sell quote, disable confidence interval
@@ -292,7 +292,7 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "1.970100",
       fee: "0.009999",
       priceImpact: "0.00001839438644256218",
-      sufficientReserve: true,
+      insufficientLiquidity: false,
     });
 
     // normal swap, sell quote, disable confidence interval
@@ -359,7 +359,7 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
       priceImpact: "0.00001840524672233231",
-      sufficientReserve: true,
+      insufficientLiquidity: false,
     });
 
     // normal swap, sell base, enable confidence interval
@@ -405,7 +405,7 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
       priceImpact: "0.00001840524672233257",
-      sufficientReserve: true,
+      insufficientLiquidity: false,
     });
 
     expect(
@@ -448,7 +448,7 @@ describe("utils/swap", function () {
       amountOutWithSlippage: "19900.000000",
       fee: "10.000000",
       priceImpact: "Infinity",
-      sufficientReserve: false,
+      insufficientLiquidity: true,
     });
   });
 
