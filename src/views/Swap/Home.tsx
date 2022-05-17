@@ -43,7 +43,6 @@ import {
   appSelector,
   programSelector,
 } from "states/selectors";
-import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
   deployConfigV2,
@@ -327,15 +326,20 @@ const Home: React.FC = (props) => {
       return;
     }
 
-    const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
-      getSwapOutResult(
-        swapInfo,
-        newTokenFrom,
-        newTokenTo,
-        card.amount ?? "0",
-        parseFloat(swapView.priceImpact),
-        marketPrice,
-      );
+    const {
+      insufficientLiquidity,
+      amountOut: quoteAmount,
+      amountOutWithSlippage: quoteAmountWithSlippage,
+    } = getSwapOutResult(
+      swapInfo,
+      newTokenFrom,
+      newTokenTo,
+      card.amount ?? "0",
+      parseFloat(swapView.priceImpact),
+      marketPrice,
+    );
+
+    dispatch(swapViewActions.setInsufficientLiquidity({ insufficientLiquidity }));
 
     const amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
     const amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
@@ -366,15 +370,20 @@ const Home: React.FC = (props) => {
       return;
     }
 
-    const { amountIn: baseAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
-      getSwapInResult(
-        swapInfo,
-        newTokenFrom,
-        newTokenTo,
-        card.amount ?? "0",
-        parseFloat(swapView.priceImpact),
-        marketPrice,
-      );
+    const {
+      insufficientLiquidity,
+      amountIn: baseAmount,
+      amountOutWithSlippage: quoteAmountWithSlippage,
+    } = getSwapInResult(
+      swapInfo,
+      newTokenFrom,
+      newTokenTo,
+      card.amount ?? "0",
+      parseFloat(swapView.priceImpact),
+      marketPrice,
+    );
+
+    dispatch(swapViewActions.setInsufficientLiquidity({ insufficientLiquidity }));
 
     const amountIn = baseAmount === "NaN" ? "" : baseAmount;
     const amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
@@ -645,14 +654,6 @@ const Home: React.FC = (props) => {
       const sourceAccountNonExist = !sourceBalance;
       // TODO(leqiang): remove this variabe and use a swapView state instead
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount);
-      const isInsufficientLiquidity =
-        swapInfo &&
-        exponentiatedBy(
-          tokenFrom.token.symbol === poolConfig.base
-            ? new BigNumber(swapInfo?.poolState.quoteReserve.toString())
-            : new BigNumber(swapInfo?.poolState.baseReserve.toString()),
-          tokenTo.token.decimals,
-        ).isLessThan(tokenTo.amount);
 
       return (
         <ConnectButton
@@ -662,7 +663,7 @@ const Home: React.FC = (props) => {
             unavailable ||
             sourceAccountNonExist ||
             isInsufficientBalance ||
-            isInsufficientLiquidity ||
+            swapView.insufficientLiquidity ||
             swapView.isProcessing
           }
           onClick={handleSwap}
@@ -676,7 +677,7 @@ const Home: React.FC = (props) => {
             "No " + tokenFrom.token.symbol + " Account in Wallet"
           ) : isInsufficientBalance ? (
             "Insufficient Balance"
-          ) : isInsufficientLiquidity ? (
+          ) : swapView.insufficientLiquidity ? (
             "Insufficient Liquidity"
           ) : swapView.isProcessing ? (
             <CircularProgress color="inherit" />
@@ -692,18 +693,7 @@ const Home: React.FC = (props) => {
         Connect Wallet
       </ConnectButton>
     );
-  }, [
-    isConnectedWallet,
-    handleSwap,
-    setMenu,
-    sourceBalance,
-    swapInfo,
-    poolConfig,
-    tokenFrom,
-    tokenTo.amount,
-    tokenTo.token.decimals,
-    swapView,
-  ]);
+  }, [isConnectedWallet, handleSwap, setMenu, sourceBalance, swapInfo, tokenFrom, swapView]);
 
   const vertical = "top";
   const horizontal = "right";

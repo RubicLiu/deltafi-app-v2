@@ -34,7 +34,7 @@ export function getSwapInResult(
   amountOutWithSlippage: string;
   fee: string;
   priceImpact: string;
-  sufficientReserve: boolean;
+  insufficientLiquidity: boolean;
 } {
   const amountOutBN: BigNumber = new BigNumber(amountOut);
   if (amountOutBN.isNaN()) {
@@ -43,7 +43,7 @@ export function getSwapInResult(
       amountOutWithSlippage: "",
       fee: "",
       priceImpact: "",
-      sufficientReserve: true,
+      insufficientLiquidity: false,
     };
   }
   if (amountOutBN.toNumber() < 0) {
@@ -102,7 +102,7 @@ export function getSwapInResult(
     amountOutWithSlippage,
     fee,
     priceImpact,
-    sufficientReserve,
+    insufficientLiquidity: !sufficientReserve,
   };
 }
 
@@ -133,7 +133,7 @@ export function getSwapOutResult(
   amountOutWithSlippage: string;
   fee: string;
   priceImpact: string;
-  sufficientReserve: boolean;
+  insufficientLiquidity: boolean;
 } {
   const amountInBN: BigNumber = new BigNumber(amountIn);
   if (amountInBN.isNaN()) {
@@ -142,7 +142,7 @@ export function getSwapOutResult(
       amountOutWithSlippage: "",
       fee: "",
       priceImpact: "",
-      sufficientReserve: true,
+      insufficientLiquidity: false,
     };
   }
   if (parseFloat(amountIn) < 0) {
@@ -198,7 +198,7 @@ export function getSwapOutResult(
     amountOutWithSlippage,
     fee,
     priceImpact,
-    sufficientReserve,
+    insufficientLiquidity: !sufficientReserve,
   };
 }
 

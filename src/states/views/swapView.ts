@@ -26,6 +26,7 @@ const initialState = {
   openSettings: false,
   withdrawPercentage: 0,
   openSnackbar: false,
+  insufficientLiquidity: false,
 };
 
 const swapViewSlice = createSlice({
@@ -58,6 +59,10 @@ const swapViewSlice = createSlice({
 
     setOpenSnackbar(state, action: PayloadAction<{ openSnackbar: boolean }>) {
       state.openSnackbar = action.payload.openSnackbar;
+    },
+
+    setInsufficientLiquidity(state, action: PayloadAction<{ insufficientLiquidity: boolean }>) {
+      state.insufficientLiquidity = action.payload.insufficientLiquidity;
     },
   },
 });
