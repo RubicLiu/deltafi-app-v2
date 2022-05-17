@@ -11,15 +11,15 @@
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "92GBqjPxgkEYHHV5VHTbQs9kjPtU9cLWLWFzPc8RaYHo",
-        "farmInfo": "8nc9mRMNwszdv2MwjCyjhV1PhC4GspnQYHNCDjXmWGqs"
+        "swapInfo": "2Kp3Z6Y76abmKLyXqRmts7iKSYKWvp5ogY77auN1gKKv",
+        "farmInfo": "FuHB9NGXQJpg4JcrYxNp2Gxez4G2uLtAXZSUtRR8v7mn"
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "8T8x2dLu3z1WwBiUWv8TPv7zR3qk7Pt21ogXY7xMV8J7",
-        "farmInfo": "HvxFdvxdtz4XFbSSAvjQd2mgc9MWuSjZYAHkTLgHhhFF"
+        "swapInfo": "Cen7VNaicF5Nqe3ZLaP7NBQzE7V5LHX9DiuoVPNqyH1k",
+        "farmInfo": "EjjzMWee7uovVqDrbpDc7g2ux9MukEu3ksP6z9fp9iW9"
       }
     ],
     "tokenInfoList": [
