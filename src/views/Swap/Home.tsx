@@ -43,7 +43,6 @@ import {
   appSelector,
   programSelector,
 } from "states/selectors";
-import BigNumber from "bignumber.js";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
   deployConfigV2,
@@ -694,18 +693,7 @@ const Home: React.FC = (props) => {
         Connect Wallet
       </ConnectButton>
     );
-  }, [
-    isConnectedWallet,
-    handleSwap,
-    setMenu,
-    sourceBalance,
-    swapInfo,
-    poolConfig,
-    tokenFrom,
-    tokenTo.amount,
-    tokenTo.token.decimals,
-    swapView,
-  ]);
+  }, [isConnectedWallet, handleSwap, setMenu, sourceBalance, swapInfo, tokenFrom, swapView]);
 
   const vertical = "top";
   const horizontal = "right";
