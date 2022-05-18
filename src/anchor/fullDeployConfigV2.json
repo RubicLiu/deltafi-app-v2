@@ -63,31 +63,31 @@
   },
   "testnet": {
     "network": "testnet",
-    "deltafiMint": "EkzSXG99ngsVx8SSWCszMYivRXN1SZhhxsWhryzEuHgg",
-    "deltafiToken": "4DTziQrAog2b9x2xqHzryFrsaPCwbkyS1Sq75v1iG5uY",
+    "deltafiMint": "4iefnqUWWcn8nWTyXdyHqYkLwn1UPov18vCyP9T8Fy68",
+    "deltafiToken": "3rH2SGHaiJ3dLR8SSNTQqkvToXehrz3XwYb6amTjQZAF",
     "pythProgramId": "8tfDNiaEyrV6Q1U4DEXrEigs9DoDtkugzFbybENEbCDz",
     "programId": "HcWvS1XyweYMrCvY8TEeDxXgbWJagizUZXxCSLC2E89N",
-    "marketConfig": "s1CNpxquCsCqUPbXHCka18Vofp5XVuahmqAob6SEBBG",
+    "marketConfig": "CeE68twwzTe738PThMbBxx67Drp7HbJMPYwH8THTFNZ8",
     "poolInfoList": [
       {
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "CwqiVWPcELGUdEyqJmqhAjpwc1NSemGEqVJd1iWLczAa",
-        "farmInfo": "J7Sj8HRan9DqQVQyAW4NNmjMqVxCv4wNy3Ef5XjfJ3FW"
+        "swapInfo": "HpFHpvK8AQF5vHoSdynwwYRzp5NH251duTfTVhSVu6L2",
+        "farmInfo": "ERx5Q15GA3u9R4n99XhaMHz9DmhsbDk1CjbgcAMsrM3W"
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "K5bvEZ2rNFP7ynkG7QLTAZa8ztGCikxFXs2mxrzv2XT",
-        "farmInfo": "CiMJAvVTiG3HTzsJVFrogy5yLptuFxaiHyWo4p5bAdBt"
+        "swapInfo": "2urEy2pGnVqUpCZKFLZdik7jVwdMyethmJqHdyMdARen",
+        "farmInfo": "65JC1MAv4o81yWjao4uUsWmG3ZYsvLicMp3XkCgxhFKZ"
       }
     ],
     "tokenInfoList": [
       {
         "name": "USD Coin",
-        "mint": "9ZiQNDXaiC7TQAfKcha4hjiSPdxDJfw7pKKsJT49mjfe",
+        "mint": "3itb8x9GX7bxQ6eFfQT3E7CstkjaESizBpHNWB5wxjYY",
         "symbol": "USDC",
         "decimals": 6,
         "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
@@ -99,7 +99,7 @@
       },
       {
         "name": "USDT",
-        "mint": "44PHKq7n7ymWc2aBj4JS97hZHRT9Uc25Aa4kaLJhaMck",
+        "mint": "Hi4jco598zF6g4VM3uYfDaTvZFoMtX6TaTZZ9QdiVLUq",
         "symbol": "USDT",
         "decimals": 6,
         "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg",
