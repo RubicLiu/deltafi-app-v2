@@ -224,6 +224,14 @@ const PoolCard: React.FC<CardProps> = (props) => {
             {convertDollar(tvl.toFixed(2).toString())}
           </Typography>
         </Box>
+        <Box marginTop={1}>
+          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
+            Total Volume
+          </Typography>
+          <Typography className={classes.label}>
+            {convertDollar(tvl.toFixed(2).toString())}
+          </Typography>
+        </Box>
         <ConnectButton
           className={classes.cardBtn}
           onClick={() => setMenu(true, "deposit", undefined, { poolAddress: poolConfig.swapInfo })}

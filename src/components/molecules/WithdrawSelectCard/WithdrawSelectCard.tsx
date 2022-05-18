@@ -11,9 +11,9 @@ const WithdrawSelectCard = ({ onUpdatePercentage, percentage }) => {
 
   return (
     <Box className={classes.root}>
-      <Typography className={classes.title}>
+      {/* <Typography className={classes.title}>
         Select percentage of your position to withdraw:
-      </Typography>
+      </Typography> */}
       <Box className={classes.content}>
         <Box className={classes.percent}>
           <Typography className="slider-value">

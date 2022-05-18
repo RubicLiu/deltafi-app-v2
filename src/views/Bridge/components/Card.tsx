@@ -4,12 +4,11 @@ import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
 
 import { DropDown } from "components";
 import { CardProps } from "./types";
+import { exponentiatedBy } from "utils/decimal";
 import BigNumber from "bignumber.js";
 import { useSelector } from "react-redux";
-import { selectTokenAccountInfoByMint } from "states/selectors";
+import { selectTokenAccountInfoByMint } from "states";
 import { getTokenConfigBySymbol } from "constants/deployConfigV2";
-import { anchorBnToBn } from "utils/tokenUtils";
-import { BN } from "@project-serum/anchor";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -50,7 +49,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   },
   currencyInput: {
     color: palette.text.primary,
-    textAlign: "right",
+    textAlign: "left",
     border: "none",
     background: "transparent",
     outline: "none",
@@ -58,7 +57,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontWeight: 400,
     width: "100%",
     flex: 1,
-    marginLeft: spacing(3),
     [breakpoints.up("md")]: {
       fontSize: 24,
       fontWeight: 500,
@@ -69,6 +67,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   },
   tokenBalance: {
     color: palette.text.dark,
+    fontFamily: "Inter",
     fontSize: 12,
     fontWeight: 500,
     [breakpoints.up("md")]: {
@@ -89,7 +88,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
 
   const tokenBalance = useMemo(() => {
     if (tokenAccount && card) {
-      return anchorBnToBn(card.token, new BN(tokenAccount.amount.toString()));
+      return exponentiatedBy(tokenAccount.amount, card.token.decimals);
     }
     return null;
   }, [tokenAccount, card]);
@@ -119,22 +118,46 @@ const SwapCard: React.FC<CardProps> = (props) => {
 
   const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.replace(/[^\d.-]/g, "");
-    if (new BigNumber(value).isNaN() && value !== "") {
-      return;
-    } else if (value === "") {
-      handleChangeCard({ ...card, amount: "0" });
-    } else {
-      const valueToFixedDecimal = parseFloat(value).toFixed(card.token.decimals);
-      handleChangeCard({
-        ...card,
-        amount: value.length > valueToFixedDecimal.length ? valueToFixedDecimal : value,
-      });
-    }
+    if (isNaN(parseFloat(value)) && value !== "") return;
+    handleChangeCard({ ...card, amount: value });
   };
+
+  const value = useMemo(() => {
+    const pointIdx = card.amount.indexOf(".");
+    if (pointIdx !== card.amount.length - 1 && card.amount[card.amount.length - 1] === ".") {
+      // if there are more than one decimal points in the number string
+      // we need to remove the extra point
+      // value gets updated every time the user input value
+      // so we only need to check if there is an extra point at theend of string
+      card.amount = card.amount.substring(0, card.amount.length - 1);
+    }
+
+    if (
+      card?.token?.decimals &&
+      pointIdx > 0 &&
+      pointIdx < card.amount.length - 1 - card.token.decimals
+    ) {
+      // if the decimal point exist in the input value
+      // and the input decimals is larger than the card token's decimals
+      // we should fix the decimals to the token's decimals
+      return Number(card.amount).toFixed(card.token.decimals);
+    }
+
+    return card.amount;
+  }, [card]);
 
   return (
     <Paper className={classes.root}>
       <Box className={classes.main}>
+        <Box
+          display="flex"
+          flexDirection="center"
+          alignItems="center"
+          color="#d3d3d3"
+          fontSize={16}
+        >
+          Chain
+        </Box>
         <DropDown
           value={card.token}
           options={tokens}
@@ -142,27 +165,33 @@ const SwapCard: React.FC<CardProps> = (props) => {
           inputProps={{ placeholder: "token name, symbol" }}
           disableDrop={disableDrop}
         />
+      </Box>
+      <Box className={classes.main}>
         <CurrencyInput
           name="currency"
           disabled={isDisabledInput}
           className={classes.currencyInput}
           autoComplete="off"
-          placeholder="0"
+          placeholder="0.00"
           minLength={0}
           maxLength={20}
           decimalsLimit={20}
-          value={card.amount}
+          value={value}
           onChange={inputHandler}
         />
+        <DropDown
+          value={card.token}
+          options={tokens}
+          onChange={handleChangeToken}
+          inputProps={{ placeholder: "token name, symbol" }}
+          disableDrop={disableDrop}
+        />
       </Box>
-      <Box display="flex" justifyContent="flex-start" alignItems="center">
-        <Typography className={classes.tokenBalance}>Balance:</Typography>
-        &nbsp;
-        <Typography className={classes.tokenBalance} style={{ color: "#D4FF00" }}>
-          {tokenBalance?.toString() || 0}
-        </Typography>
-        &nbsp;
-        <Typography className={classes.tokenBalance}>{card?.token?.symbol}</Typography>
+      <Box display="flex" justifyContent="space-between">
+        <Typography className={classes.tokenBalance}>{`Balance: ${
+          tokenBalance?.toString() ?? "--"
+        }`}</Typography>
+        <Typography className={classes.tokenBalance}>--%</Typography>
       </Box>
     </Paper>
   );

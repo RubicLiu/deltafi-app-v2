@@ -70,7 +70,11 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
           </Typography>
           &nbsp;
           <Typography className={clx(classes.tokenBalance, classes.withdrawNumber)} variant="body2">
-            {`${withdrawal || 0} ${card.token?.symbol}`}
+            {withdrawal || 0}
+          </Typography>
+          &nbsp;
+          <Typography className={classes.tokenBalance} variant="body2">
+            {card.token?.symbol}
           </Typography>
         </Box>
       </Box>

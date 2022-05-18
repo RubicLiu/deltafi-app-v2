@@ -84,6 +84,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginBottom: spacing(2.5),
     marginTop: spacing(2),
     fontSize: 16,
+    textTransform: "none",
     "& .MuiButton-text": {
       padding: 0,
     },
@@ -91,6 +92,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
       minWidth: 0,
       borderRadius: 3,
       marginRight: 20,
+    },
+    "& .MuiButton-label": {
+      fontSize: 16,
+      textTransform: "none",
+      fontWeight: 500,
     },
   },
   ratePanel: {
@@ -920,13 +926,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
               percentage={depositView.withdrawPercentage}
               onUpdatePercentage={handleWithdrawSlider}
             />
+            <Box mt={2} />
             <WithdrawCard
               card={depositView.base}
               handleChangeCard={handleBaseTokenInput}
               withdrawal={baseShare?.toFixed(6).toString()}
               disableDrop={true}
             />
-            <Box mt={1} />
+            <Box mt={3} />
             <WithdrawCard
               card={depositView.quote}
               handleChangeCard={handleQuoteTokenInput}
