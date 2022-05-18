@@ -1518,6 +1518,14 @@ export type DeltafiDexV2 = {
             "type": "u64"
           },
           {
+            "name": "totalTradedBase",
+            "type": "u128"
+          },
+          {
+            "name": "totalTradedQuote",
+            "type": "u128"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -3655,6 +3663,14 @@ export const IDL: DeltafiDexV2 = {
           {
             "name": "quoteSupply",
             "type": "u64"
+          },
+          {
+            "name": "totalTradedBase",
+            "type": "u128"
+          },
+          {
+            "name": "totalTradedQuote",
+            "type": "u128"
           },
           {
             "name": "reservedU64",

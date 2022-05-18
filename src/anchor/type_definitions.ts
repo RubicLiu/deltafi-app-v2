@@ -9,6 +9,8 @@ export interface PoolState {
   targetQuoteReserve: anchor.BN;
   baseSupply: anchor.BN;
   quoteSupply: anchor.BN;
+  totalTradedBase: anchor.BN;
+  totalTradedQuote: anchor.BN;
   reservedU64: Array<any>;
 }
 

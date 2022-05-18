@@ -134,7 +134,18 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const swapInfo = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
-  //   const poolTokenAccount = useSelector(selectTokenAccountInfoByMint(pool?.poolMintKey.toBase58()));
+  const totalTradeVolume = useMemo(() => {
+    if (basePrice && quotePrice && swapInfo && baseTokenInfo && quoteTokenInfo) {
+      const baseVolume = getTokenTvl(baseTokenInfo, swapInfo.poolState.totalTradedBase, basePrice);
+      const quoteVolume = getTokenTvl(
+        quoteTokenInfo,
+        swapInfo.poolState.totalTradedQuote,
+        quotePrice,
+      );
+      return baseVolume.plus(quoteVolume);
+    }
+    return new BigNumber(0);
+  }, [basePrice, quotePrice, swapInfo, baseTokenInfo, quoteTokenInfo]);
 
   const baseTvl = useMemo(() => {
     if (basePrice && swapInfo) {
@@ -230,6 +241,14 @@ const PoolCard: React.FC<CardProps> = (props) => {
           </Typography>
           <Typography className={classes.label}>
             {convertDollar(tvl.toFixed(2).toString())}
+          </Typography>
+        </Box>
+        <Box marginTop={1}>
+          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
+            Total trade volume
+          </Typography>
+          <Typography className={classes.label}>
+            {convertDollar(totalTradeVolume.toFixed(2).toString())}
           </Typography>
         </Box>
         <ConnectButton
