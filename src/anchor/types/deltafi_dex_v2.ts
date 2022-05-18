@@ -1046,86 +1046,6 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "depositToFarm",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "swapInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmInfo",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "liquidityProvider",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "baseAmount",
-          "type": "u64"
-        },
-        {
-          "name": "quoteAmount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "withdrawFromFarm",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "swapInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmInfo",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "liquidityProvider",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "baseAmount",
-          "type": "u64"
-        },
-        {
-          "name": "quoteAmount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "claimFarmRewards",
       "accounts": [
         {
@@ -1135,11 +1055,6 @@ export type DeltafiDexV2 = {
         },
         {
           "name": "swapInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmInfo",
           "isMut": false,
           "isSigner": false
         },
@@ -1672,13 +1587,12 @@ export type DeltafiDexV2 = {
             "type": "u32"
           },
           {
-            "name": "reservedU64",
-            "type": {
-              "array": [
-                "u64",
-                16
-              ]
-            }
+            "name": "mintBaseDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "mintQuoteDecimals",
+            "type": "u8"
           }
         ]
       }
@@ -1767,6 +1681,26 @@ export type DeltafiDexV2 = {
           {
             "name": "maxStablePriceDiffDenominator",
             "type": "u64"
+          },
+          {
+            "name": "baseAprNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "baseAprDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "quoteAprNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "quoteAprDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "minClaimPeriod",
+            "type": "u32"
           },
           {
             "name": "reservedU64",
@@ -3251,86 +3185,6 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "depositToFarm",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "swapInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmInfo",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "liquidityProvider",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "baseAmount",
-          "type": "u64"
-        },
-        {
-          "name": "quoteAmount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "withdrawFromFarm",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "swapInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmInfo",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "liquidityProvider",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "baseAmount",
-          "type": "u64"
-        },
-        {
-          "name": "quoteAmount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "claimFarmRewards",
       "accounts": [
         {
@@ -3340,11 +3194,6 @@ export const IDL: DeltafiDexV2 = {
         },
         {
           "name": "swapInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmInfo",
           "isMut": false,
           "isSigner": false
         },
@@ -3877,13 +3726,12 @@ export const IDL: DeltafiDexV2 = {
             "type": "u32"
           },
           {
-            "name": "reservedU64",
-            "type": {
-              "array": [
-                "u64",
-                16
-              ]
-            }
+            "name": "mintBaseDecimals",
+            "type": "u8"
+          },
+          {
+            "name": "mintQuoteDecimals",
+            "type": "u8"
           }
         ]
       }
@@ -3972,6 +3820,26 @@ export const IDL: DeltafiDexV2 = {
           {
             "name": "maxStablePriceDiffDenominator",
             "type": "u64"
+          },
+          {
+            "name": "baseAprNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "baseAprDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "quoteAprNumerator",
+            "type": "u64"
+          },
+          {
+            "name": "quoteAprDenominator",
+            "type": "u64"
+          },
+          {
+            "name": "minClaimPeriod",
+            "type": "u32"
           },
           {
             "name": "reservedU64",
