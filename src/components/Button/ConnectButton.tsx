@@ -62,6 +62,7 @@ const StyledOutlineCt = styled(Box)`
     border-radius: 100px;
     color: #fff;
     background: #1c1c1c;
+    text-transform: none;
     &.MuiButton-root:hover {
       background: #333333;
     }

@@ -43,6 +43,7 @@ const Swap = lazy(() => import("./views/Swap"));
 const Pool = lazy(() => import("./views/Pool"));
 const Reward = lazy(() => import("./views/Reward"));
 const Stake = lazy(() => import("./views/Stake"));
+const Bridge = lazy(() => import("./views/Bridge"));
 const Unavailable = lazy(() => import("./views/Unavailable"));
 const Terms = lazy(() => import("./views/Terms"));
 const Dashboard = lazy(() => import("./views/Dashboard"));
@@ -160,6 +161,7 @@ const App: React.FC = () => {
             <Route path="/stake/:id" exact component={Stake} />
             <Route path="/Dashboard" exact component={Dashboard} />
             <Route path="/terms" exact component={Terms} />
+            <Route path="/bridge" exact component={Bridge} />
             <Redirect from="*" to="/swap" />
           </Switch>
         ) : (

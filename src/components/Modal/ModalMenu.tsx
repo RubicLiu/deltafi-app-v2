@@ -7,6 +7,7 @@ import Fade from "@material-ui/core/Fade";
 import ConnectPanel from "components/BurgerMenu/ConnectPanel";
 import WalletPanel from "components/BurgerMenu/WalletPanel";
 import ConfirmSwapPanel from "components/BurgerMenu/ConfirmSwapPanel";
+import ConnectPanelV2 from "components/BurgerMenu/ConnectPanel_v2";
 import Deposit from "views/Deposit/Deposit";
 import Stake from "views/Stake/Stake";
 import { useModal } from "providers/modal";
@@ -43,6 +44,8 @@ export default function ModalMenu() {
     switch (menu) {
       case "connect":
         return <ConnectPanel />;
+      case "connectV2":
+        return <ConnectPanelV2 />;
       case "wallet":
         return <WalletPanel />;
       case "confirm-swap":

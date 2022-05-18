@@ -1,23 +1,19 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Typography,
   IconButton,
   makeStyles,
   Theme,
   Paper,
+  Container,
   Box,
   Fab,
   Snackbar,
   SnackbarContent,
   Link,
   Avatar,
-  TextField,
-  InputAdornment,
-  Grid,
-  CircularProgress,
 } from "@material-ui/core";
 import { useWallet } from "@solana/wallet-adapter-react";
-import SearchIcon from "@material-ui/icons/Search";
 import SyncAlt from "@material-ui/icons/SyncAlt";
 import CloseIcon from "@material-ui/icons/Close";
 
@@ -30,91 +26,42 @@ import { exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK } from "constants/index";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
-import { getSwapInResult, getSwapOutResult } from "utils/swap";
 import { SwapCard as ISwapCard } from "./components/types";
-import { Line, LineChart, ResponsiveContainer } from "recharts";
+import loadingIcon from "components/gif/loading_white.gif";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  appSelector,
+  selectPoolBySymbols,
   selectMarketPriceByPool,
   selectTokenAccountInfoByMint,
-  swapViewSelector,
   selectSwapBySwapKey,
-  deltafiUserSelector,
-  appSelector,
   programSelector,
+  deltafiUserSelector,
+  swapViewSelector,
 } from "states/selectors";
-import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
   deployConfigV2,
   enableReferral,
   getPoolConfigBySymbols,
   getTokenConfigBySymbol,
-  PoolConfig,
   poolConfigs,
-  TokenConfig,
   tokenConfigs,
 } from "constants/deployConfigV2";
+import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import { swapViewActions } from "states/views/swapView";
-import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { createSwapTransaction } from "utils/transactions/swap";
-import { BN } from "@project-serum/anchor";
-import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 import { anchorBnToString, stringToAnchorBn } from "utils/tokenUtils";
-import { DeltafiUser, SwapInfo } from "anchor/type_definitions";
-import Autocomplete from "@material-ui/lab/Autocomplete/Autocomplete";
-import CompareArrows from "components/Svg/icons/CompareArrows";
-
-const priceMock = [
-  {
-    name: "Page A",
-    uv: 4000,
-    pv: 2400,
-    amt: 2400,
-  },
-  {
-    name: "Page B",
-    uv: 3000,
-    pv: 1398,
-    amt: 2210,
-  },
-  {
-    name: "Page C",
-    uv: 2000,
-    pv: 9800,
-    amt: 2290,
-  },
-  {
-    name: "Page D",
-    uv: 2780,
-    pv: 3908,
-    amt: 2000,
-  },
-  {
-    name: "Page E",
-    uv: 1890,
-    pv: 4800,
-    amt: 2181,
-  },
-  {
-    name: "Page F",
-    uv: 2390,
-    pv: 3800,
-    amt: 2500,
-  },
-  {
-    name: "Page G",
-    uv: 3490,
-    pv: 4300,
-    amt: 2100,
-  },
-];
+import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
+import BN from "bn.js";
+import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
     maxWidth: 550,
     margin: "0 auto",
     flex: 1,
+    marginTop: "56px",
   },
   searchCt: {
     marginTop: 30,
@@ -124,15 +71,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
       marginBottom: 24,
     },
   },
-  title: {
-    textAlign: "start",
-    marginBottom: spacing(4),
-  },
   root: {
-    marginBottom: spacing(2),
     background: palette.background.primary,
     borderRadius: spacing(2),
     padding: `${spacing(3)}px ${spacing(2)}px`,
+    marginBottom: spacing(2),
     [breakpoints.up("sm")]: {
       padding: `${spacing(5)}px ${spacing(4)}px`,
       borderRadius: spacing(3),
@@ -163,7 +106,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontWeight: "bold",
   },
   snackBarContent: {
-    maxWidth: 393,
+    maxWidth: 421,
     backgroundColor: palette.background.lightBlack,
     display: "flex",
     flexWrap: "unset",
@@ -183,6 +126,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   },
   actionLoadingButton: {
     width: 50,
+    height: 50,
     marginTop: 4,
     marginBottom: 4,
   },
@@ -229,13 +173,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
       marginLeft: "48px",
       marginBottom: "12px",
     },
-    "& .MuiAutocomplete-option": {
-      height: 70,
-      "&:hover": {
-        background:
-          "linear-gradient(111.31deg, rgba(212, 255, 0, 0.1) 15.34%, rgba(189, 255, 0, 0.1) 95.74%)",
-      },
-    },
   },
   icon: {
     width: spacing(2.5),
@@ -264,17 +201,13 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     padding: "1px !important",
   },
   currency: {
-    background: palette.background.secondary,
+    background: palette.background.tertiary,
     borderRadius: 20,
     padding: "24px 24px",
     marginTop: 24,
     fontSize: 12,
-    lineHeight: "18px",
+    lineHeight: "24px",
     color: palette.text.dark,
-  },
-  compareArrow: {
-    marginLeft: 3,
-    marginRight: 3,
   },
 }));
 
@@ -296,21 +229,21 @@ const Home: React.FC = (props) => {
   const dispatch = useDispatch();
 
   const classes = useStyles(props);
-  const wallet = useWallet();
-  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
-  const app = useSelector(appSelector);
-  const program = useSelector(programSelector);
-
-  const swapView = useSelector(swapViewSelector);
-  const tokenFrom = swapView.tokenFrom;
-  const tokenTo = swapView.tokenTo;
-
-  const poolConfig: PoolConfig = getPoolConfigBySymbols(
-    tokenFrom.token.symbol,
-    tokenTo.token.symbol,
-  );
-  const swapInfo: SwapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
-  const deltafiUser: DeltafiUser = useSelector(deltafiUserSelector).user;
+  const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = useWallet();
+  const [tokenFrom, setTokenFrom] = useState<ISwapCard>({
+    token: getTokenConfigBySymbol("SOL"),
+    amount: "",
+    amountWithSlippage: "",
+  });
+  const [tokenTo, setTokenTo] = useState<ISwapCard>({
+    token: getTokenConfigBySymbol("USDC"),
+    amount: "",
+    amountWithSlippage: "",
+  });
+  const deltafiUser = useSelector(deltafiUserSelector).user;
+  const poolConfig = getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol);
+  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
+  const pool = useSelector(selectPoolBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol));
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
   const destinationAccount = useSelector(selectTokenAccountInfoByMint(tokenTo.token.mint));
@@ -322,153 +255,108 @@ const Home: React.FC = (props) => {
     return null;
   }, [sourceAccount, tokenFrom]);
 
+  const [priceImpact, setPriceImpact] = useState("2.0");
+  const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
+  const app = useSelector(appSelector);
 
-  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
+  const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(pool));
 
   const exchangeRateLabel = useMemo(() => {
-    if (basePrice && quotePrice && swapInfo) {
-      if (tokenFrom.token.symbol === poolConfig?.base) {
-        return Number(basePrice / quotePrice).toFixed(poolConfig.quoteTokenInfo.decimals);
-      } else if (tokenFrom.token.symbol === poolConfig?.quote) {
-        return Number(quotePrice / basePrice).toFixed(poolConfig.baseTokenInfo.decimals);
+    if (basePrice && quotePrice && pool) {
+      if (tokenFrom.token.symbol === pool?.baseTokenInfo.symbol) {
+        return Number(basePrice / quotePrice).toFixed(pool.quoteTokenInfo.decimals);
+      } else if (tokenFrom.token.symbol === pool?.quoteTokenInfo.symbol) {
+        return Number(quotePrice / basePrice).toFixed(pool.baseTokenInfo.decimals);
       }
     }
     return "-";
-  }, [basePrice, quotePrice, tokenFrom.token.symbol, swapInfo, poolConfig]);
+  }, [basePrice, quotePrice, tokenFrom.token.symbol, pool]);
+  const [state, setState] = useState<{
+    open: boolean;
+    vertical: "bottom" | "top";
+    horizontal: "left" | "center" | "right";
+  }>({
+    open: false,
+    vertical: "top",
+    horizontal: "right",
+  });
+  const program = useSelector(programSelector);
 
-  const network = deployConfigV2.network;
   const possibleTokenToConfigs = useMemo(() => getPossibleTokenToConfigs(tokenFrom), [tokenFrom]);
 
   const handleSwapDirectionChange = () => {
     const temp = Object.assign({}, tokenFrom);
-    dispatch(swapViewActions.setTokenFrom(tokenTo));
-    dispatch(swapViewActions.setTokenTo(temp));
+    setTokenFrom(tokenTo);
+    setTokenTo(temp);
   };
 
   const handleChangeImpact = (value) => {
-    dispatch(swapViewActions.setPriceImpact({ priceImpact: value }));
+    setPriceImpact(value);
   };
 
   const handleOpenSettings = () => {
-    dispatch(swapViewActions.setOpenSettings({ openSettings: !swapView.openSettings }));
+    setOpenSettings(!openSettings);
   };
 
   const handleSnackBarClose = useCallback(() => {
-    dispatch(swapViewActions.setOpenSnackbar({ openSnackbar: false }));
-  }, [dispatch]);
+    setState((_state) => ({ ..._state, open: false }));
+  }, []);
 
   const handleTokenFromInput = (card: ISwapCard) => {
-    let newTokenFrom: TokenConfig = card.token;
-    let newTokenTo: TokenConfig = tokenTo.token;
-    if (tokenTo.token.mint === newTokenFrom.mint) {
-      newTokenTo = Object.assign({}, tokenFrom.token);
-    }
-
-    if (newTokenTo.mint !== tokenTo.token.mint || newTokenFrom.mint !== tokenFrom.token.mint) {
-      // change buy/sell token, clear the input/output to 0
-      dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: "0" }));
-      dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenTo, amount: "0" }));
-      return;
-    }
-
-    const {
-      insufficientLiquidity,
-      amountOut: quoteAmount,
-      amountOutWithSlippage: quoteAmountWithSlippage,
-    } = getSwapOutResult(
-      swapInfo,
-      newTokenFrom,
-      newTokenTo,
-      card.amount ?? "0",
-      parseFloat(swapView.priceImpact),
-      marketPrice,
-    );
-
-    dispatch(swapViewActions.setInsufficientLiquidity({ insufficientLiquidity }));
-
-    const amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
-    const amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
-
-    dispatch(
-      swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: card.amount }),
-    );
-    dispatch(
-      swapViewActions.setTokenTo({
-        token: newTokenTo,
-        amount: amountOut,
-        amountWithSlippage: amountOutWithSlippage,
-      }),
-    );
+    // let newTokenFrom = card.token;
+    // let newTokenTo = tokenTo.token;
+    // let amountOut = "";
+    // let amountOutWithSlippage = "";
+    // if (tokenTo.token.mint === newTokenFrom.mint) {
+    //   newTokenTo = Object.assign({}, tokenFrom.token);
+    // }
+    // if (pool && priceImpact) {
+    //   const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
+    //     getSwapOutAmount(
+    //       pool,
+    //       newTokenFrom.mint,
+    //       newTokenTo.mint,
+    //       card.amount ?? "0",
+    //       parseFloat(priceImpact),
+    //       marketPrice,
+    //     );
+    //   amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
+    //   amountOutWithSlippage = isNaN(quoteAmountWithSlippage)
+    //     ? ""
+    //     : Number(quoteAmountWithSlippage).toString();
+    // }
+    // setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: card.amount });
+    // setTokenTo({ token: newTokenTo, amount: amountOut, amountWithSlippage: amountOutWithSlippage });
   };
 
   const handleTokenToInput = (card: ISwapCard) => {
-    let newTokenFrom = tokenFrom.token;
-    let newTokenTo = card.token;
-    if (tokenFrom.token.mint === newTokenTo.mint) {
-      newTokenFrom = Object.assign({}, tokenTo.token);
-    }
-
-    if (newTokenTo.mint !== tokenTo.token.mint || newTokenFrom.mint !== tokenFrom.token.mint) {
-      // change buy/sell token, clear the input/output to 0
-      dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: "0" }));
-      dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenTo, amount: "0" }));
-      return;
-    }
-
-    const {
-      insufficientLiquidity,
-      amountIn: baseAmount,
-      amountOutWithSlippage: quoteAmountWithSlippage,
-    } = getSwapInResult(
-      swapInfo,
-      newTokenFrom,
-      newTokenTo,
-      card.amount ?? "0",
-      parseFloat(swapView.priceImpact),
-      marketPrice,
-    );
-
-    dispatch(swapViewActions.setInsufficientLiquidity({ insufficientLiquidity }));
-
-    const amountIn = baseAmount === "NaN" ? "" : baseAmount;
-    const amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
-
-    dispatch(
-      swapViewActions.setTokenTo({
-        ...tokenTo,
-        token: newTokenTo,
-        amount: card.amount,
-        amountWithSlippage: amountOutWithSlippage,
-      }),
-    );
-    dispatch(
-      swapViewActions.setTokenFrom({
-        ...tokenFrom,
-        token: newTokenFrom,
-        amount: amountIn,
-      }),
-    );
+    // let newTokenFrom = tokenFrom.token;
+    // let newTokenTo = card.token;
+    // let amountOut = "";
+    // let amountOutWithSlippage = "";
+    // if (tokenFrom.token.mint === newTokenTo.mint) {
+    //   newTokenFrom = Object.assign({}, tokenTo.token);
+    // }
+    // if (pool && priceImpact) {
+    //   const { amountOut: quoteAmount, amountOutWithSlippage: quoteAmountWithSlippage } =
+    //     getSwapOutAmount(
+    //       pool,
+    //       newTokenFrom.mint,
+    //       newTokenTo.mint,
+    //       tokenFrom.amount ?? "0",
+    //       parseFloat(priceImpact),
+    //       marketPrice,
+    //     );
+    //   amountOut = isNaN(quoteAmount) ? "" : Number(quoteAmount).toString();
+    //   amountOutWithSlippage = isNaN(quoteAmountWithSlippage)
+    //     ? ""
+    //     : Number(quoteAmountWithSlippage).toString();
+    // }
+    // setTokenFrom({ ...tokenFrom, token: newTokenFrom });
+    // setTokenTo({ token: newTokenTo, amount: amountOut, amountWithSlippage: amountOutWithSlippage });
   };
-
-  const handleTradePairChange = (event, value) => {
-    if (value) {
-      dispatch(
-        swapViewActions.setTokenFrom({
-          ...tokenFrom,
-          token: getTokenConfigBySymbol(value.tokenFrom),
-          amount: "0",
-        }),
-      );
-      dispatch(
-        swapViewActions.setTokenTo({
-          ...tokenTo,
-          token: getTokenConfigBySymbol(value.tokenTo),
-          amount: "0",
-        }),
-      );
-    }
-  };
+  const swapView = useSelector(swapViewSelector);
 
   const swapCallback = useCallback(async () => {
     if (!swapInfo || !sourceAccount || !walletPubkey || !program) {
@@ -482,7 +370,8 @@ const Home: React.FC = (props) => {
     const connection = program.provider.connection;
     dispatch(swapViewActions.setIsProcessing({ isProcessing: true }));
     try {
-      const referrer = enableReferral ? deltafiUser?.referrer || app.referrer : null;
+      const referrer = enableReferral ? deltafiUser?.referrer : app.referrer;
+
       const amountIn = stringToAnchorBn(tokenFrom.token, tokenFrom.amount);
       const minimumAmountOut = stringToAnchorBn(tokenTo.token, tokenTo.amountWithSlippage);
       const swapDirection =
@@ -624,14 +513,15 @@ const Home: React.FC = (props) => {
       setMenu(true, "confirm-swap", undefined, {
         tokenFrom,
         tokenTo,
-        slippage: parseFloat(swapView.priceImpact),
+        slippage: parseFloat(priceImpact),
         callback: swapCallback,
       });
     }
-  }, [tokenFrom, tokenTo, swapView, swapCallback, setMenu]);
+  }, [tokenFrom, tokenTo, priceImpact, swapCallback, setMenu]);
+  const network = deployConfigV2.network;
 
   const snackMessasge = useMemo(() => {
-    if (!swapView.transactionResult || !swapView.transactionResult.status) {
+    if (!swapView?.transactionResult?.status) {
       return (
         <Box display="flex" alignItems="center">
           <img
@@ -654,6 +544,7 @@ const Home: React.FC = (props) => {
     }
 
     const { base, quote, signature } = swapView.transactionResult;
+
     return (
       <Box display="flex" alignItems="center">
         <img
@@ -684,7 +575,7 @@ const Home: React.FC = (props) => {
         </Box>
       </Box>
     );
-  }, [swapView, classes, network]);
+  }, [swapView.transactionResult, classes, network]);
 
   const snackAction = useMemo(() => {
     return (
@@ -696,21 +587,30 @@ const Home: React.FC = (props) => {
 
   const actionButton = useMemo(() => {
     if (isConnectedWallet) {
-      const unavailable = !swapInfo;
+      const unavailable = !pool;
       const sourceAccountNonExist = !sourceBalance;
-      // TODO(leqiang): remove this variabe and use a swapView state instead
       const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount);
+      const isZeroFromAmount = Number(tokenFrom.amount) === 0;
+      const isInsufficientLiquidity =
+        pool &&
+        exponentiatedBy(
+          tokenFrom.token.symbol === tokenTo.token.symbol
+            ? pool?.poolState.quoteReserve
+            : pool?.poolState.baseReserve,
+          tokenTo.token.decimals,
+        ).isLessThan(tokenTo.amount);
 
       return (
         <ConnectButton
           fullWidth
           size="large"
+          variant="contained"
           disabled={
             unavailable ||
+            isZeroFromAmount ||
             sourceAccountNonExist ||
             isInsufficientBalance ||
-            swapView.insufficientLiquidity ||
-            swapView.isProcessing
+            isInsufficientLiquidity
           }
           onClick={handleSwap}
           data-amp-analytics-on="click"
@@ -723,10 +623,12 @@ const Home: React.FC = (props) => {
             "No " + tokenFrom.token.symbol + " Account in Wallet"
           ) : isInsufficientBalance ? (
             "Insufficient Balance"
-          ) : swapView.insufficientLiquidity ? (
+          ) : isInsufficientLiquidity ? (
             "Insufficient Liquidity"
+          ) : isZeroFromAmount ? (
+            "Please Enter Amount"
           ) : swapView.isProcessing ? (
-            <CircularProgress color="inherit" />
+            <Avatar className={classes.actionLoadingButton} src={loadingIcon} />
           ) : (
             "Swap"
           )}
@@ -735,79 +637,29 @@ const Home: React.FC = (props) => {
     }
 
     return (
-      <ConnectButton fullWidth size="large" onClick={() => setMenu(true, "connect")}>
+      <ConnectButton fullWidth size="large" onClick={() => setMenu(true, "connectV2")}>
         Connect Wallet
       </ConnectButton>
     );
-  }, [isConnectedWallet, handleSwap, setMenu, sourceBalance, swapInfo, tokenFrom, swapView]);
+  }, [
+    isConnectedWallet,
+    handleSwap,
+    setMenu,
+    sourceBalance,
+    pool,
+    tokenFrom,
+    tokenTo.amount,
+    tokenTo.token.decimals,
+    swapView.isProcessing,
+    tokenTo.token.symbol,
+    classes.actionLoadingButton,
+  ]);
 
-  const vertical = "top";
-  const horizontal = "right";
+  const { open, vertical, horizontal } = state;
 
   return (
     <Page>
-      <Box className={classes.container}>
-        <Autocomplete
-          renderInput={(params) => {
-            return (
-              <TextField
-                placeholder="TOP traded pairs"
-                className={classes.textField}
-                {...params}
-                InputProps={Object.assign(params.InputProps, {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon style={{ color: "rgba(255, 255, 255, 0.5)" }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: null,
-                })}
-                margin="normal"
-              />
-            );
-          }}
-          onChange={handleTradePairChange}
-          getOptionLabel={(option) => `${option.tokenFrom} - ${option.tokenTo}`}
-          renderOption={(option) => {
-            const tokenFrom = getTokenConfigBySymbol(option.tokenFrom);
-            const tokenTo = getTokenConfigBySymbol(option.tokenTo);
-            return (
-              <Box display="flex" alignItems="center">
-                <Box display="flex" alignItems="center" marginLeft="30px">
-                  <Avatar
-                    src={tokenFrom?.logoURI}
-                    alt={tokenFrom?.symbol}
-                    className={classes.icon}
-                  />
-                  <Box className={classes.compareArrow}>
-                    <CompareArrows />
-                  </Box>
-                  <Avatar src={tokenTo?.logoURI} alt={tokenTo?.symbol} className={classes.icon} />
-                </Box>
-                <Box marginLeft="20px">
-                  <Typography className={classes.tradePairTitle}>
-                    {option.tokenFrom} - {option.tokenTo}
-                  </Typography>
-                  <Typography className={classes.tradePairName}>
-                    {tokenFrom.name} - {tokenTo.name}
-                  </Typography>
-                </Box>
-              </Box>
-            );
-          }}
-          options={[
-            ...poolConfigs.map((poolConfig) => ({
-              tokenFrom: poolConfig.base,
-              tokenTo: poolConfig.quote,
-            })),
-            ...poolConfigs.map((poolConfig) => ({
-              tokenFrom: poolConfig.quote,
-              tokenTo: poolConfig.base,
-            })),
-          ]}
-          classes={{ paper: classes.optionsPaper }}
-          className={classes.searchCt}
-        ></Autocomplete>
+      <Container className={classes.container}>
         <Paper className={classes.root}>
           <Box className={classes.ratePanel}>
             <Typography color="primary" variant="body1" className={classes.marketCondition}>
@@ -815,14 +667,14 @@ const Home: React.FC = (props) => {
             </Typography>
             <ConnectButton
               onClick={handleOpenSettings}
-              variant={swapView.openSettings ? "contained" : "outlined"}
+              variant={openSettings ? "contained" : "outlined"}
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
               data-amp-analytics-attrs="page: Swap, target: Settings"
-              className={`${classes.priceImpactBtn} ${swapView.openSettings ? "active" : ""}`}
+              className={`${classes.priceImpactBtn} ${openSettings ? "active" : ""}`}
               key="settingBtn"
             >
-              {swapView.priceImpact}%
+              {priceImpact}%
             </ConnectButton>
           </Box>
           <Box display="flex" flexDirection="column" alignItems="flex-end">
@@ -832,7 +684,7 @@ const Home: React.FC = (props) => {
               handleChangeCard={handleTokenFromInput}
             />
             <Fab
-              color="inherit"
+              color="secondary"
               size="small"
               className={classes.swapIcon}
               onClick={handleSwapDirectionChange}
@@ -843,90 +695,25 @@ const Home: React.FC = (props) => {
               card={tokenTo}
               tokens={possibleTokenToConfigs}
               handleChangeCard={handleTokenToInput}
+              disabled={true}
             />
           </Box>
-          {swapView.openSettings && (
+          {openSettings && (
             <SettingsPanel
-              isOpen={swapView.openSettings}
-              priceImpact={swapView.priceImpact}
+              isOpen={openSettings}
+              priceImpact={priceImpact}
               handleChangeImpact={handleChangeImpact}
               handleClose={handleOpenSettings}
             />
           )}
-          <Paper className={`${classes.root} ${classes.currency}`}>
-            <Grid
-              container
-              alignItems="center"
-              style={{ rowGap: "16px" }}
-              spacing={1}
-              justifyContent="center"
-            >
-              <Grid item xs={6} sm={3} style={{ display: "flex", alignItems: "center" }}>
-                <Avatar
-                  src={tokenFrom?.token.logoURI}
-                  alt={tokenFrom?.token.symbol}
-                  className={classes.icon}
-                />
-                <Box marginLeft={0.5}>
-                  <Box sx={{ color: "#fff", fontSize: "16px" }}>{tokenFrom.token.symbol}</Box>
-                  <Box>{tokenFrom.token.name}</Box>
-                </Box>
-              </Grid>
-              <Grid item xs={6} sm={4}>
-                <Box>Price</Box>
-                <Box sx={{ color: "#fff" }}>
-                  {Number(basePrice).toFixed(poolConfig?.baseTokenInfo?.decimals)}
-                </Box>
-              </Grid>
-              <Grid item xs={6} sm={2}>
-                <Box>24h%</Box>
-                <Box sx={{ color: "#F62805" }}>--</Box>
-              </Grid>
-              <Grid item xs={6} sm={3}>
-                <ResponsiveContainer width="100%" height={32}>
-                  <LineChart width={105} height={32} data={priceMock}>
-                    <Line type="monotone" dataKey="uv" stroke="#D4FF00" dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Grid>
-              <Grid item xs={6} sm={3} style={{ display: "flex", alignItems: "center" }}>
-                <Avatar
-                  src={tokenTo?.token.logoURI}
-                  alt={tokenTo?.token.symbol}
-                  className={classes.icon}
-                />
-                <Box marginLeft={0.5}>
-                  <Box sx={{ color: "#fff", fontSize: "16px" }}>{tokenTo.token.symbol}</Box>
-                  <Box>{tokenTo.token.name}</Box>
-                </Box>
-              </Grid>
-              <Grid item xs={6} sm={4}>
-                <Box>Price</Box>
-                <Box sx={{ color: "#fff" }}>
-                  {Number(quotePrice).toFixed(poolConfig?.quoteTokenInfo?.decimals)}
-                </Box>
-              </Grid>
-              <Grid item xs={6} sm={2}>
-                <Box>24h%</Box>
-                <Box sx={{ color: "#F62805" }}>--</Box>
-              </Grid>
-              <Grid item xs={6} sm={3}>
-                <ResponsiveContainer width="100%" height={32}>
-                  <LineChart width={105} height={32} data={priceMock}>
-                    <Line type="monotone" dataKey="pv" stroke="#D4FF00" dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Grid>
-            </Grid>
-          </Paper>
           <Box marginTop={3} width="100%" position="relative" zIndex={1}>
             {actionButton}
           </Box>
         </Paper>
-      </Box>
+      </Container>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
-        open={swapView.openSnackbar}
+        open={open}
         onClose={handleSnackBarClose}
         key={vertical + horizontal}
       >
