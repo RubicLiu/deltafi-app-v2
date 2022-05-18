@@ -217,7 +217,7 @@ const Home: React.FC = (props) => {
                 aria-label="dashboard tabs"
               >
                 <Tab label="My Pools" value="pool" />
-                <Tab label="My Farms" value="farm" />
+                {/* <Tab label="My Farms" value="farm" /> */}
                 <Tab label="Invite & Earn" value="reward" />
               </TabList>
             </Box>
@@ -248,7 +248,7 @@ const Home: React.FC = (props) => {
                 </Grid>
               )}
             </TabPanel>
-            <TabPanel value="farm" className={classes.tabPanel}>
+            {/* <TabPanel value="farm" className={classes.tabPanel}>
               {isConnectedWallet && (
                 <Grid container className={classes.poolCardContainer} justifyContent="center">
                   {poolConfigsWithDeposit.length > 0 &&
@@ -272,7 +272,7 @@ const Home: React.FC = (props) => {
                     ))}
                 </Grid>
               )}
-            </TabPanel>
+            </TabPanel> */}
             <TabPanel value="reward" className={classes.tabPanel}>
               <Reward />
             </TabPanel>

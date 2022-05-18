@@ -156,7 +156,7 @@ const App: React.FC = () => {
             <Route path="/swap" exact component={Swap} />
             <Route path="/pools" exact component={Pool} />
             <Route path="/deposit/:poolAddress" exact component={Pool} />
-            <Route path="/farms" exact component={Farm} />
+            {/* <Route path="/farms" exact component={Farm} /> */}
             <Route path="/rewards" exact component={Reward} />
             <Route path="/stake/:id" exact component={Stake} />
             <Route path="/Dashboard" exact component={Dashboard} />
