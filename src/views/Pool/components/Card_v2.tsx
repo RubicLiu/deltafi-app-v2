@@ -137,7 +137,11 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const totalTradeVolume = useMemo(() => {
     if (basePrice && quotePrice && swapInfo && baseTokenInfo && quoteTokenInfo) {
       const baseVolume = getTokenTvl(baseTokenInfo, swapInfo.poolState.totalTradedBase, basePrice);
-      const quoteVolume = getTokenTvl(quoteTokenInfo, swapInfo.poolState.totalTradedQuote, quotePrice);
+      const quoteVolume = getTokenTvl(
+        quoteTokenInfo,
+        swapInfo.poolState.totalTradedQuote,
+        quotePrice,
+      );
       return baseVolume.plus(quoteVolume);
     }
     return new BigNumber(0);
