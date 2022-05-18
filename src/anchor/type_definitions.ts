@@ -27,7 +27,8 @@ export interface FarmConfig {
   quoteAprNumerator: anchor.BN;
   quoteAprDenominator: anchor.BN;
   minClaimPeriod: number;
-  reservedU64: Array<any>;
+  mintBaseDecimals: number;
+  mintQuoteDecimals: number;
 }
 
 export interface SwapConfig {
@@ -51,6 +52,11 @@ export interface SwapConfig {
   referralRewardDenominator: anchor.BN;
   maxStablePriceDiffNumerator: anchor.BN;
   maxStablePriceDiffDenominator: anchor.BN;
+  baseAprNumerator: anchor.BN;
+  baseAprDenominator: anchor.BN;
+  quoteAprNumerator: anchor.BN;
+  quoteAprDenominator: anchor.BN;
+  minClaimPeriod: number;
   reservedU64: Array<any>;
 }
 
