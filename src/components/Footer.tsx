@@ -18,8 +18,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: spacing(3),
-    paddingBottom: spacing(3),
+    height: 66,
 
     [breakpoints.down("sm")]: {
       flexDirection: "column",

@@ -17,7 +17,7 @@ const useStyles = makeStyles(({ palette, breakpoints }: Theme) => ({
     border: "none",
     textTransform: "capitalize",
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: "IBM Plex Mono",
     fontWeight: 700,
     margin: "0 12px",
