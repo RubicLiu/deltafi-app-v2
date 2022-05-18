@@ -98,7 +98,7 @@ const baseTheme: Theme = createTheme({
   },
   mixins: {
     toolbar: {
-      minHeight: 76,
+      minHeight: 66,
       "@media (max-width: 600px) and (orientation: landscape)": {
         minHeight: 48,
       },
