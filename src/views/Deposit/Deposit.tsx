@@ -596,10 +596,10 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     (value: number) => {
       if (lpUser && basePrice && quotePrice) {
         // TODO(ypeng): Consider price and pool ratio
-        const baseAmount = anchorBnToBn(baseTokenInfo, lpUser.baseShare)
+        const baseAmount = anchorBnToBn(baseTokenInfo, lpUser.basePosition.depositedAmount)
           .multipliedBy(value)
           .dividedBy(100);
-        const quoteAmount = anchorBnToBn(quoteTokenInfo, lpUser.quoteShare)
+        const quoteAmount = anchorBnToBn(quoteTokenInfo, lpUser.basePosition.depositedAmount)
           .multipliedBy(value)
           .dividedBy(100);
         dispatch(
