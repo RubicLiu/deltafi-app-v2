@@ -13,6 +13,8 @@ import {
   selectMarketPriceByPool,
   selectLpUserBySwapKey,
 } from "states/selectors";
+import { SwapInfo } from "anchor/type_definitions";
+import { DELTAFI_TOKEN_DECIMALS } from "constants/index";
 
 const Img = styled.img`
   width: 32px;
@@ -131,7 +133,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
   const baseTokenInfo = poolConfig.baseTokenInfo;
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
-  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
+  const swapInfo: SwapInfo = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const totalTradeVolume = useMemo(() => {
@@ -200,6 +202,32 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const userTvl = userBaseTvl.plus(userQuoteTvl);
 
+  const delfiApr: string = useMemo(() => {
+    const calculateTokenDelfiApr = (
+      tokenAprNumerator: BigNumber,
+      tokenAprDenumerator: BigNumber,
+      tokenPrice: BigNumber,
+    ) => tokenAprNumerator.dividedBy(tokenAprDenumerator).dividedBy(tokenPrice);
+
+    if (!swapInfo?.swapConfig) {
+      return "--";
+    }
+
+    const baseDelfiApr: BigNumber = calculateTokenDelfiApr(
+      new BigNumber(swapInfo.swapConfig.baseAprNumerator.toString()),
+      new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()),
+      basePrice,
+    );
+
+    const quoteDelfiApr: BigNumber = calculateTokenDelfiApr(
+      new BigNumber(swapInfo.swapConfig.quoteAprNumerator.toString()),
+      new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()),
+      quotePrice,
+    );
+
+    return baseDelfiApr.plus(quoteDelfiApr).toFixed(DELTAFI_TOKEN_DECIMALS);
+  }, [swapInfo, basePrice, quotePrice]);
+
   if (!swapInfo) return null;
   return (
     <Box className={classes.container}>
@@ -250,6 +278,12 @@ const PoolCard: React.FC<CardProps> = (props) => {
           <Typography className={classes.label}>
             {convertDollar(totalTradeVolume.toFixed(2).toString())}
           </Typography>
+        </Box>
+        <Box marginTop={1}>
+          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
+            Est. annual reward rate
+          </Typography>
+          <Typography className={classes.label}>{delfiApr} DELFI / USD</Typography>
         </Box>
         <ConnectButton
           className={classes.cardBtn}
