@@ -1,9 +1,10 @@
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
-import { partialSignTransaction } from ".";
+import { createTokenAccountTransaction, mergeTransactions, partialSignTransaction } from ".";
 import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { BN } from "@project-serum/anchor";
 import * as token from "@solana/spl-token";
 import { LiquidityProvider } from "anchor/type_definitions";
+import { DELTAFI_TOKEN_MINT } from "constants/index";
 
 export async function createUpdateStakeTransaction(
   program: any,
@@ -169,25 +170,37 @@ export async function createClaimFarmRewardsTransaction(
     program.programId,
   );
 
-  let transaction = new Transaction();
-  transaction.add(
-    program.transaction.claimFarmRewards({
-      accounts: {
-        marketConfig: new PublicKey(deployConfigV2.marketConfig),
-        farmInfo: new PublicKey(poolConfig.farmInfo),
-        swapInfo: new PublicKey(poolConfig.swapInfo),
-        liquidityProvider: lpPublicKey,
-        userDeltafiToken,
-        swapDeltafiToken: new PublicKey(deployConfigV2.deltafiToken),
-        owner: walletPubkey,
-        tokenProgram: token.TOKEN_PROGRAM_ID,
-      },
-    }),
-  );
+  let transactionCreateDeltafiTokenAccount: Transaction;
+  // if deltafi token does not exist
+  // we create it for the user
+  if (!userDeltafiToken) {
+    const createTokenAccountResult = await createTokenAccountTransaction({
+      walletPubkey,
+      mintPublicKey: new PublicKey(DELTAFI_TOKEN_MINT),
+    });
+    userDeltafiToken = createTokenAccountResult.newAccountPubkey;
+    transactionCreateDeltafiTokenAccount = createTokenAccountResult.transaction;
+  }
+
+  const transactionClaimFarmReward = program.transaction.claimFarmRewards({
+    accounts: {
+      marketConfig: new PublicKey(deployConfigV2.marketConfig),
+      farmInfo: new PublicKey(poolConfig.farmInfo),
+      swapInfo: new PublicKey(poolConfig.swapInfo),
+      liquidityProvider: lpPublicKey,
+      userDeltafiToken,
+      swapDeltafiToken: new PublicKey(deployConfigV2.deltafiToken),
+      owner: walletPubkey,
+      tokenProgram: token.TOKEN_PROGRAM_ID,
+    },
+  });
 
   const signers = [];
   return partialSignTransaction({
-    transaction,
+    transaction: mergeTransactions([
+      transactionCreateDeltafiTokenAccount,
+      transactionClaimFarmReward,
+    ]),
     feePayer: walletPubkey,
     signers,
     connection,

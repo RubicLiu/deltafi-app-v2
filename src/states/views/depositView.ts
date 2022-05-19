@@ -4,7 +4,7 @@ import { TokenConfig } from "constants/deployConfigV2";
 
 interface TransactionResult {
   status: boolean | null;
-  action?: "deposit" | "withdraw";
+  action?: "deposit" | "withdraw" | "claim";
   hash?: string;
   base?: SwapCard;
   quote?: SwapCard;
