@@ -30,7 +30,7 @@ import { SOLSCAN_LINK } from "constants/index";
 import { useHistory } from "react-router-dom";
 // import { PoolInformation } from "./PoolInformation";
 import { useDispatch, useSelector } from "react-redux";
-import { getPoolConfigBySwapKey, deployConfigV2 } from "constants/deployConfigV2";
+import { getPoolConfigBySwapKey, deployConfigV2, DELTAFI_TOKEN_DECIMALS } from "constants/deployConfigV2";
 import {
   selectLpUserBySwapKey,
   selectMarketPriceByPool,
@@ -47,7 +47,9 @@ import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAc
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
 import { createDepositTransaction, createWithdrawTransaction } from "utils/transactions/deposit";
 import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/tokenUtils";
-import { SwapInfo } from "anchor/type_definitions";
+import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
+import { Paper } from "@material-ui/core";
+import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -250,8 +252,9 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
   const baseTokenAccount = useSelector(selectTokenAccountInfoByMint(baseTokenInfo.mint));
   const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(quoteTokenInfo.mint));
+  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
-  const lpUser = useSelector(selectLpUserBySwapKey(poolAddress));
+  const lpUser: LiquidityProvider = useSelector(selectLpUserBySwapKey(poolAddress));
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
   const depositView = useSelector(depositViewSelector);
   const dispatch = useDispatch();
@@ -283,8 +286,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
   const basePercent = useMemo(() => {
     if (lpUser && swapInfo) {
-      return new BigNumber(lpUser.baseShare)
-        .plus(new BigNumber(lpUser.basePosition.depositedAmount))
+      return new BigNumber(lpUser.baseShare.toString())
+        .plus(new BigNumber(lpUser.basePosition.depositedAmount.toString()))
         .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()))
         .multipliedBy(100);
     }
@@ -293,8 +296,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
   const quotePercent = useMemo(() => {
     if (lpUser && swapInfo) {
-      return new BigNumber(lpUser.quoteShare)
-        .plus(new BigNumber(lpUser.quotePosition.depositedAmount))
+      return new BigNumber(lpUser.quoteShare.toString())
+        .plus(new BigNumber(lpUser.quotePosition.depositedAmount.toString()))
         .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()))
 
         .multipliedBy(100);
@@ -353,6 +356,17 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     }
     return new BigNumber(0);
   }, [swapInfo]);
+
+  const cumulativeInterest = useMemo(() => {
+    if (lpUser) {
+      return exponentiatedBy(lpUser.basePosition.cumulativeInterest.add(lpUser.quotePosition.cumulativeInterest).toString(), DELTAFI_TOKEN_DECIMALS);
+    }
+    return new BigNumber(0);
+  }, [lpUser]);
+
+  const unclaimedInterest = useMemo(() => {
+    
+  }, [])
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
   const wallet = useWallet();
@@ -465,11 +479,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, base.amount);
       const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, quote.amount);
 
-      const program = getDeltafiDexV2(
-        new PublicKey(deployConfigV2.programId),
-        makeProvider(connection, wallet),
-      );
-
       transaction = await createWithdrawTransaction(
         program,
         connection,
@@ -533,6 +542,71 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     walletPubkey,
     baseTokenAccount,
     quoteTokenAccount,
+    signTransaction,
+    dispatch,
+    depositView,
+    program,
+  ]);
+
+  const handleClaimInterest = useCallback(async () => {
+    console.log("claim interest");
+    if (!walletPubkey || !program || !lpUser) {
+      return null;
+    }
+    const connection = program.provider.connection;
+
+    try {
+      dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
+
+      const transaction = await createClaimFarmRewardsTransaction (
+        program,
+        connection,
+        poolConfig,
+        walletPubkey,
+        rewardsAccount?.publicKey,
+      );
+      const signedTransaction = await signTransaction(transaction);
+  
+      const hash = await sendSignedTransaction({
+        signedTransaction,
+        connection,
+      });
+  
+      await connection.confirmTransaction(hash, "confirmed");
+
+      dispatch(
+        depositViewActions.setTransactionResult({
+          transactionResult: {
+            status: true,
+            action: "claim",
+            hash,
+          },
+        }),
+      );
+    } catch (e) {
+      console.error("error", e);
+      dispatch(
+        depositViewActions.setTransactionResult({
+          transactionResult: {
+            status: false,
+          },
+        }),
+      );
+    } finally {
+      dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: true }));
+      dispatch(depositViewActions.setIsProcessing({ isProcessing: false }));
+      dispatch(
+        fetchLiquidityProvidersThunk({
+          connection,
+          walletAddress: walletPubkey,
+        }),
+      );
+    }
+  }, [
+    wallet,
+    poolConfig,
+    swapInfo,
+    walletPubkey,
     signTransaction,
     dispatch,
     depositView,
@@ -740,7 +814,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           Deposit
         </ConnectButton>
       );
-    } else {
+    } else if (depositView.method === "withdraw") {
       if (base && quote && baseShare && quoteShare) {
         if (
           baseShare.isLessThan(new BigNumber(base.amount)) ||
@@ -766,7 +840,23 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           Withdraw
         </ConnectButton>
       );
+    } else if (depositView.method === "claim") {
+      return (
+        <ConnectButton
+          fullWidth
+          size="large"
+          variant="contained"
+          onClick={handleClaimInterest}
+          data-amp-analytics-on="click"
+          data-amp-analytics-name="click"
+          data-amp-analytics-attrs="page: Withdraw, target: Withdraw"
+        >
+          Claim Interest
+        </ConnectButton>
+      );
     }
+
+    throw Error("Invalid deposit method: " + depositView.method);
   }, [
     depositView,
     isConnectedWallet,
@@ -917,44 +1007,66 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
               >
                 Withdraw
               </MUIButton>
+              <MUIButton
+                className={method === "claim" ? classes.activeBtn : classes.btn}
+                onClick={() => handleSwitchMethod("claim")}
+              >
+                Claim Interest
+              </MUIButton>
             </Box>
           </Box>
         </Box>
-        {method === "withdraw" ? (
-          <Box display="flex" flexDirection="column" alignItems="flex-end">
-            <WithdrawSelectCard
-              percentage={depositView.withdrawPercentage}
-              onUpdatePercentage={handleWithdrawSlider}
-            />
-            <Box mt={2} />
-            <WithdrawCard
-              card={depositView.base}
-              handleChangeCard={handleBaseTokenInput}
-              withdrawal={baseShare?.toFixed(6).toString()}
-              disableDrop={true}
-            />
-            <Box mt={3} />
-            <WithdrawCard
-              card={depositView.quote}
-              handleChangeCard={handleQuoteTokenInput}
-              withdrawal={quoteShare?.toFixed(6).toString()}
-              disableDrop={true}
-            />
-          </Box>
-        ) : (
-          <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
-            <SwapCard
-              card={depositView.base}
-              handleChangeCard={handleBaseTokenInput}
-              disableDrop={true}
-            />
-            <SwapCard
-              card={depositView.quote}
-              handleChangeCard={handleQuoteTokenInput}
-              disableDrop={true}
-            />
-          </Box>
-        )}
+        {(() => {
+          switch (method) {
+            case "withdraw":
+              return (
+                <Box display="flex" flexDirection="column" alignItems="flex-end">
+                  <WithdrawSelectCard
+                    percentage={depositView.withdrawPercentage}
+                    onUpdatePercentage={handleWithdrawSlider}
+                  />
+                  <Box mt={2} />
+                  <WithdrawCard
+                    card={depositView.base}
+                    handleChangeCard={handleBaseTokenInput}
+                    withdrawal={baseShare?.toFixed(6).toString()}
+                    disableDrop={true}
+                  />
+                  <Box mt={3} />
+                  <WithdrawCard
+                    card={depositView.quote}
+                    handleChangeCard={handleQuoteTokenInput}
+                    withdrawal={quoteShare?.toFixed(6).toString()}
+                    disableDrop={true}
+                  />
+                </Box>
+              );
+            case "deposit":
+              return (
+                <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
+                  <SwapCard
+                    card={depositView.base}
+                    handleChangeCard={handleBaseTokenInput}
+                    disableDrop={true}
+                  />
+                  <SwapCard
+                    card={depositView.quote}
+                    handleChangeCard={handleQuoteTokenInput}
+                    disableDrop={true}
+                  />
+                </Box>
+              );
+            case "claim":
+              return (
+                <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
+                  <Paper>Cumulative interest</Paper>
+                  <Paper>Unclaimed interest</Paper>
+                </Box>
+              );
+            default:
+              throw Error("Invalid deposit card method: " + method);
+          }
+        })()}
         <Box mt={3} width="100%" sx={{ position: "relative", zIndex: 1 }}>
           {actionButton}
         </Box>
