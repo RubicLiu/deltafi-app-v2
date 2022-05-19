@@ -7,6 +7,7 @@ export { DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_SYMBOL } from "./deployConfigV2";
 export const SWAP_PROGRAM_ID = new PublicKey(deployConfigV2.programId);
 export const MARKET_CONFIG_ADDRESS = new PublicKey(deployConfigV2.marketConfig);
 export const DELTAFI_TOKEN_MINT = new PublicKey(deployConfigV2.deltafiMint);
+export const DAYS_PER_YEAR = 365;
 
 export const WAD_LENGTH = 18;
 
