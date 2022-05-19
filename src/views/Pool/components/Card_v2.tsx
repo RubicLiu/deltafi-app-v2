@@ -14,7 +14,8 @@ import {
   selectLpUserBySwapKey,
 } from "states/selectors";
 import { SwapInfo } from "anchor/type_definitions";
-import { DELTAFI_TOKEN_DECIMALS } from "constants/index";
+import { DELTAFI_TOKEN_DECIMALS, DAYS_PER_YEAR } from "constants/index";
+import { anchorBnToBn } from "utils/tokenUtils";
 
 const Img = styled.img`
   width: 32px;
@@ -202,31 +203,44 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const userTvl = userBaseTvl.plus(userQuoteTvl);
 
-  const delfiApr: string = useMemo(() => {
-    const calculateTokenDelfiApr = (
-      tokenAprNumerator: BigNumber,
-      tokenAprDenumerator: BigNumber,
-      tokenPrice: BigNumber,
-    ) => tokenAprNumerator.dividedBy(tokenAprDenumerator).dividedBy(tokenPrice);
+  const { dailyReward, dailyRewardRate } = useMemo(() => {
+    let dailyReward = "--";
+    let dailyRewardRate = "--";
 
-    if (!swapInfo?.swapConfig) {
-      return "--";
+    if (swapInfo?.swapConfig) {
+      const baseRewardPerToken: BigNumber = new BigNumber(
+        swapInfo.swapConfig.baseAprNumerator.toString(),
+      ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
+      const quoteRewardPerToken: BigNumber = new BigNumber(
+        swapInfo.swapConfig.quoteAprNumerator.toString(),
+      ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
+
+      const baseDailyRewardRate: BigNumber = baseRewardPerToken
+        .dividedBy(basePrice)
+        .dividedBy(DAYS_PER_YEAR);
+      const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
+        .dividedBy(quotePrice)
+        .dividedBy(DAYS_PER_YEAR);
+
+      dailyRewardRate = baseDailyRewardRate
+        .plus(quoteDailyRewardRate)
+        .toFixed(DELTAFI_TOKEN_DECIMALS);
+
+      if (swapInfo?.poolState) {
+        const baseDailyReward: BigNumber = baseRewardPerToken
+          .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
+          .dividedBy(DAYS_PER_YEAR);
+        const quoteDailyReward: BigNumber = quoteRewardPerToken
+          .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
+          .dividedBy(DAYS_PER_YEAR);
+        dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
+      }
     }
-
-    const baseDelfiApr: BigNumber = calculateTokenDelfiApr(
-      new BigNumber(swapInfo.swapConfig.baseAprNumerator.toString()),
-      new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()),
-      basePrice,
-    );
-
-    const quoteDelfiApr: BigNumber = calculateTokenDelfiApr(
-      new BigNumber(swapInfo.swapConfig.quoteAprNumerator.toString()),
-      new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()),
-      quotePrice,
-    );
-
-    return baseDelfiApr.plus(quoteDelfiApr).toFixed(DELTAFI_TOKEN_DECIMALS);
-  }, [swapInfo, basePrice, quotePrice]);
+    return {
+      dailyReward,
+      dailyRewardRate,
+    };
+  }, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo]);
 
   if (!swapInfo) return null;
   return (
@@ -279,12 +293,21 @@ const PoolCard: React.FC<CardProps> = (props) => {
             {convertDollar(totalTradeVolume.toFixed(2).toString())}
           </Typography>
         </Box>
-        <Box marginTop={1}>
-          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-            Est. annual reward rate
-          </Typography>
-          <Typography className={classes.label}>{delfiApr} DELFI / USD</Typography>
-        </Box>
+        {props.isUserPool ? (
+          <Box marginTop={1}>
+            <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
+              Daily reward
+            </Typography>
+            <Typography className={classes.label}>{dailyReward} DELFI</Typography>
+          </Box>
+        ) : (
+          <Box marginTop={1}>
+            <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
+              Est. daily reward per USD
+            </Typography>
+            <Typography className={classes.label}>{dailyRewardRate} DELFI/USD</Typography>
+          </Box>
+        )}
         <ConnectButton
           className={classes.cardBtn}
           onClick={() => setMenu(true, "deposit", undefined, { poolAddress: poolConfig.swapInfo })}
