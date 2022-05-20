@@ -26,6 +26,7 @@ const initialState = {
   isProcessing: false,
   withdrawPercentage: 0,
   openSnackbar: false,
+  currentUnixTimestamp: Math.floor(Date.now() / 1000),
 };
 
 const depositViewSlice = createSlice({
@@ -71,6 +72,10 @@ const depositViewSlice = createSlice({
 
     setOpenSnackbar(state, action: PayloadAction<{ openSnackbar: boolean }>) {
       state.openSnackbar = action.payload.openSnackbar;
+    },
+
+    updateCurrentUnixTimestamp(state) {
+      state.currentUnixTimestamp = Math.floor(Date.now() / 1000);
     },
   },
 });

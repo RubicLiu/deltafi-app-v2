@@ -375,26 +375,26 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   }, [lpUser]);
 
   // update reward every 5 seconds
-  const [currentUnixTimestamp, setCurrentUnixTimeStamp] = useState(Math.floor(Date.now() / 1000));
   useEffect(
     () =>
       scheduleWithInterval(() => {
-        setCurrentUnixTimeStamp(Math.floor(Date.now() / 1000));
+        dispatch(depositViewActions.updateCurrentUnixTimestamp());
       }, 5 * 1000),
     [],
   );
 
+  console.log(depositView.currentUnixTimestamp);
   const unclaimedInterest = useMemo(() => {
-    if (lpUser) {
+    if (lpUser && swapInfo?.swapConfig) {
       const totalOwedInterest = exponentiatedBy(
         lpUser.basePosition.rewardsOwed.add(lpUser.quotePosition.rewardsOwed).toString(),
         DELTAFI_TOKEN_DECIMALS,
       );
 
-      const secondsFromBaseLastUpdate = new BN(currentUnixTimestamp).sub(
+      const secondsFromBaseLastUpdate = new BN(depositView.currentUnixTimestamp).sub(
         lpUser.basePosition.lastUpdateTs,
       );
-      const secondsFromQuoteLastUpdate = new BN(currentUnixTimestamp).sub(
+      const secondsFromQuoteLastUpdate = new BN(depositView.currentUnixTimestamp).sub(
         lpUser.quotePosition.lastUpdateTs,
       );
 
@@ -429,7 +429,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     }
 
     return "--";
-  }, [lpUser, swapInfo, currentUnixTimestamp]);
+  }, [lpUser, swapInfo?.swapConfig, depositView.currentUnixTimestamp]);
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
 
@@ -785,13 +785,21 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           className={classes.snackBarIcon}
         />
         <Box>
-          <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
-            {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(base.amount).toFixed(
-              6,
-            )} ${base.token.symbol} and ${Number(quote.amount).toFixed(6)} ${
-              quote.token.symbol
-            } to ${base.token.symbol}-${quote.token.symbol} pool`}
-          </Box>
+          {depositView.method === "claim" ? (
+            <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+              {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(
+                unclaimedInterest,
+              ).toFixed(DELTAFI_TOKEN_DECIMALS)} DELFI`}
+            </Box>
+          ) : (
+            <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+              {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(base.amount).toFixed(
+                6,
+              )} ${base.token.symbol} and ${Number(quote.amount).toFixed(6)} ${
+                quote.token.symbol
+              } to ${base.token.symbol}-${quote.token.symbol} pool`}
+            </Box>
+          )}
           <Box display="flex" alignItems="center">
             <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
               View Transaction:
