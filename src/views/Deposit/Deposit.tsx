@@ -1111,8 +1111,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
             case "claim":
               return (
                 <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
-                  <Paper>Cumulative interest: {cumulativeInterest}</Paper>
-                  <Paper>Unclaimed interest: {unclaimedInterest}</Paper>
+                  <Paper>Cumulative interest: {cumulativeInterest} DELFI</Paper>
+                  <Paper>Unclaimed interest: {unclaimedInterest} DELFI</Paper>
                 </Box>
               );
             default:
