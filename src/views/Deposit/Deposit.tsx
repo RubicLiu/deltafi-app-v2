@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useState } from "react";
+import React, { useMemo, useCallback, useEffect } from "react";
 import {
   Typography,
   IconButton,
@@ -380,10 +380,9 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       scheduleWithInterval(() => {
         dispatch(depositViewActions.updateCurrentUnixTimestamp());
       }, 5 * 1000),
-    [],
+    [dispatch],
   );
 
-  console.log(depositView.currentUnixTimestamp);
   const unclaimedInterest = useMemo(() => {
     if (lpUser && swapInfo?.swapConfig) {
       const totalOwedInterest = exponentiatedBy(
@@ -815,7 +814,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         </Box>
       </Box>
     );
-  }, [depositView, classes, network]);
+  }, [unclaimedInterest, depositView, classes, network]);
 
   const snackAction = useMemo(() => {
     return (
