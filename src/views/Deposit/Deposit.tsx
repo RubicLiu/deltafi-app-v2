@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect } from "react";
+import React, { useMemo, useCallback, useEffect, useState } from "react";
 import {
   Typography,
   IconButton,
@@ -26,7 +26,7 @@ import WithdrawCard from "components/molecules/WithdrawCard";
 import { useModal } from "providers/modal";
 import { exponentiatedBy } from "utils/decimal";
 import { convertDollarSign as convertDollar, getTokenTvl } from "utils/utils";
-import { SOLSCAN_LINK } from "constants/index";
+import { SECONDS_PER_YEAR, SOLSCAN_LINK } from "constants/index";
 import { useHistory } from "react-router-dom";
 // import { PoolInformation } from "./PoolInformation";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,9 +44,8 @@ import {
   programSelector,
 } from "states/selectors";
 import { depositViewActions } from "states/views/depositView";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import { Transaction } from "@solana/web3.js";
 import { sendSignedTransaction } from "utils/transactions";
-import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
 import { createDepositTransaction, createWithdrawTransaction } from "utils/transactions/deposit";
@@ -55,6 +54,7 @@ import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { Paper } from "@material-ui/core";
 import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
 import BN from "bn.js";
+import { scheduleWithInterval } from "utils";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -374,7 +374,15 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return "--";
   }, [lpUser]);
 
-  const currentUnixTimestamp = Math.floor(Date.now() / 1000);
+  // update reward every 5 seconds
+  const [currentUnixTimestamp, setCurrentUnixTimeStamp] = useState(Math.floor(Date.now() / 1000));
+  useEffect(
+    () =>
+      scheduleWithInterval(() => {
+        setCurrentUnixTimeStamp(Math.floor(Date.now() / 1000));
+      }, 5 * 1000),
+    [],
+  );
 
   const unclaimedInterest = useMemo(() => {
     if (lpUser) {
@@ -390,14 +398,38 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         lpUser.quotePosition.lastUpdateTs,
       );
 
-      const extraOwedBaseInterest = new BigNumber(
-        lpUser.basePosition.depositedAmount
-          .mul(swapInfo.swapConfig.baseAprNumerator)
-          .mul(secondsFromBaseLastUpdate)
-          .toString(),
-      ).dividedBy(new BigNumber());
+      const extraOwedBaseInterest = exponentiatedBy(
+        new BigNumber(
+          lpUser.basePosition.depositedAmount
+            .mul(swapInfo.swapConfig.baseAprNumerator)
+            .mul(secondsFromBaseLastUpdate)
+            .toString(),
+        )
+          .dividedBy(swapInfo.swapConfig.baseAprDenominator.toString())
+          .dividedBy(SECONDS_PER_YEAR),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+
+      const extraOwnedQuoteInterest = exponentiatedBy(
+        new BigNumber(
+          lpUser.quotePosition.depositedAmount
+            .mul(swapInfo.swapConfig.quoteAprNumerator)
+            .mul(secondsFromQuoteLastUpdate)
+            .toString(),
+        )
+          .dividedBy(swapInfo.swapConfig.quoteAprDenominator.toString())
+          .dividedBy(new BigNumber(SECONDS_PER_YEAR)),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+
+      return totalOwedInterest
+        .plus(extraOwedBaseInterest)
+        .plus(extraOwnedQuoteInterest)
+        .toFixed(DELTAFI_TOKEN_DECIMALS);
     }
-  }, [currentUnixTimestamp]);
+
+    return "--";
+  }, [lpUser, swapInfo, currentUnixTimestamp]);
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
   const wallet = useWallet();
@@ -580,7 +612,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   ]);
 
   const handleClaimInterest = useCallback(async () => {
-    console.log("claim interest");
     if (!walletPubkey || !program || !lpUser) {
       return null;
     }
@@ -1081,8 +1112,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
             case "claim":
               return (
                 <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
-                  <Paper>Cumulative interest</Paper>
-                  <Paper>Unclaimed interest</Paper>
+                  <Paper>Cumulative interest: {cumulativeInterest}</Paper>
+                  <Paper>Unclaimed interest: {unclaimedInterest}</Paper>
                 </Box>
               );
             default:

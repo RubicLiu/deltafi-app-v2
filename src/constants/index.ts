@@ -8,6 +8,7 @@ export const SWAP_PROGRAM_ID = new PublicKey(deployConfigV2.programId);
 export const MARKET_CONFIG_ADDRESS = new PublicKey(deployConfigV2.marketConfig);
 export const DELTAFI_TOKEN_MINT = new PublicKey(deployConfigV2.deltafiMint);
 export const DAYS_PER_YEAR = 365;
+export const SECONDS_PER_YEAR = 31556926;
 
 export const WAD_LENGTH = 18;
 
