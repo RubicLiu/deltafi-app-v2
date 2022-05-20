@@ -432,7 +432,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   }, [lpUser, swapInfo, currentUnixTimestamp]);
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
-  const wallet = useWallet();
 
   const handleDeposit = useCallback(async () => {
     let transaction: Transaction;
@@ -599,7 +598,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       );
     }
   }, [
-    wallet,
     poolConfig,
     swapInfo,
     walletPubkey,
@@ -664,7 +662,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         }),
       );
     }
-  }, [wallet, poolConfig, swapInfo, walletPubkey, signTransaction, dispatch, depositView, program]);
+  }, [lpUser, poolConfig, walletPubkey, program, rewardsAccount, signTransaction, dispatch]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: false }));
@@ -920,6 +918,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     setMenu,
     handleDeposit,
     handleWithdraw,
+    handleClaimInterest,
   ]);
 
   if (!swapInfo) return null;
