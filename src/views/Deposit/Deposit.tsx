@@ -30,7 +30,11 @@ import { SOLSCAN_LINK } from "constants/index";
 import { useHistory } from "react-router-dom";
 // import { PoolInformation } from "./PoolInformation";
 import { useDispatch, useSelector } from "react-redux";
-import { getPoolConfigBySwapKey, deployConfigV2, DELTAFI_TOKEN_DECIMALS } from "constants/deployConfigV2";
+import {
+  getPoolConfigBySwapKey,
+  deployConfigV2,
+  DELTAFI_TOKEN_DECIMALS,
+} from "constants/deployConfigV2";
 import {
   selectLpUserBySwapKey,
   selectMarketPriceByPool,
@@ -50,6 +54,7 @@ import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/to
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { Paper } from "@material-ui/core";
 import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
+import BN from "bn.js";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -357,16 +362,42 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return new BigNumber(0);
   }, [swapInfo]);
 
-  const cumulativeInterest = useMemo(() => {
+  const cumulativeInterest: string = useMemo(() => {
     if (lpUser) {
-      return exponentiatedBy(lpUser.basePosition.cumulativeInterest.add(lpUser.quotePosition.cumulativeInterest).toString(), DELTAFI_TOKEN_DECIMALS);
+      return exponentiatedBy(
+        lpUser.basePosition.cumulativeInterest
+          .add(lpUser.quotePosition.cumulativeInterest)
+          .toString(),
+        DELTAFI_TOKEN_DECIMALS,
+      ).toFixed(DELTAFI_TOKEN_DECIMALS);
     }
-    return new BigNumber(0);
+    return "--";
   }, [lpUser]);
 
+  const currentUnixTimestamp = Math.floor(Date.now() / 1000);
+
   const unclaimedInterest = useMemo(() => {
-    
-  }, [])
+    if (lpUser) {
+      const totalOwedInterest = exponentiatedBy(
+        lpUser.basePosition.rewardsOwed.add(lpUser.quotePosition.rewardsOwed).toString(),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+
+      const secondsFromBaseLastUpdate = new BN(currentUnixTimestamp).sub(
+        lpUser.basePosition.lastUpdateTs,
+      );
+      const secondsFromQuoteLastUpdate = new BN(currentUnixTimestamp).sub(
+        lpUser.quotePosition.lastUpdateTs,
+      );
+
+      const extraOwedBaseInterest = new BigNumber(
+        lpUser.basePosition.depositedAmount
+          .mul(swapInfo.swapConfig.baseAprNumerator)
+          .mul(secondsFromBaseLastUpdate)
+          .toString(),
+      ).dividedBy(new BigNumber());
+    }
+  }, [currentUnixTimestamp]);
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
   const wallet = useWallet();
@@ -558,7 +589,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     try {
       dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
 
-      const transaction = await createClaimFarmRewardsTransaction (
+      const transaction = await createClaimFarmRewardsTransaction(
         program,
         connection,
         poolConfig,
@@ -566,12 +597,12 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         rewardsAccount?.publicKey,
       );
       const signedTransaction = await signTransaction(transaction);
-  
+
       const hash = await sendSignedTransaction({
         signedTransaction,
         connection,
       });
-  
+
       await connection.confirmTransaction(hash, "confirmed");
 
       dispatch(
@@ -602,16 +633,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         }),
       );
     }
-  }, [
-    wallet,
-    poolConfig,
-    swapInfo,
-    walletPubkey,
-    signTransaction,
-    dispatch,
-    depositView,
-    program,
-  ]);
+  }, [wallet, poolConfig, swapInfo, walletPubkey, signTransaction, dispatch, depositView, program]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: false }));
