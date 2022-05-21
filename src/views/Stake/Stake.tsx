@@ -32,14 +32,11 @@ import {
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfigV2";
 import { stakeViewActions } from "states/views/stakeView";
-import {
-  createClaimFarmRewardsTransaction,
-  createUpdateStakeTransaction,
-} from "utils/transactions/stake";
+import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
-import { anchorBnToBn, bnToString, stringToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToBn, bnToString } from "utils/tokenUtils";
 
 const SECONDS_OF_YEAR = 31556926;
 
@@ -223,66 +220,6 @@ const Stake = (): ReactElement => {
     }
     return "0";
   }, [userBaseStaked, userQuoteStaked, baseApr, quoteApr, lpUser, baseTokenInfo, quoteTokenInfo]);
-
-  const handleStake = useCallback(async () => {
-    if (!walletPubkey || !lpUser || !program) {
-      return null;
-    }
-
-    const connection = program.provider.connection;
-    dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
-    try {
-      const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, staking.baseAmount);
-      const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, staking.quoteAmount);
-      const transaction = await createUpdateStakeTransaction(
-        program,
-        connection,
-        poolConfig,
-        walletPubkey,
-        lpUser,
-        baseAmount,
-        quoteAmount,
-      );
-
-      const signedTransaction = await signTransaction(transaction);
-      const hash = await sendSignedTransaction({
-        signedTransaction,
-        connection,
-      });
-
-      await connection.confirmTransaction(hash, "confirmed");
-
-      dispatch(
-        stakeViewActions.setTransactionResult({
-          transactionResult: {
-            status: true,
-            action: "stake",
-            hash,
-            stake: staking,
-          },
-        }),
-      );
-    } catch (e) {
-      dispatch(
-        stakeViewActions.setTransactionResult({
-          transactionResult: {
-            status: false,
-          },
-        }),
-      );
-    } finally {
-      dispatch(
-        stakeViewActions.setPercentage({
-          percentage: 0,
-          baseAmount: "0",
-          quoteAmount: "0",
-        }),
-      );
-      dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
-      dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
-    }
-  }, [walletPubkey, staking, signTransaction, dispatch, poolConfig, lpUser, program]);
 
   const handleClaim = useCallback(async () => {
     if (!walletPubkey || !lpUser || !rewardsAccount || !program) {
@@ -518,7 +455,7 @@ const Stake = (): ReactElement => {
               fullWidth
               size="large"
               variant="contained"
-              onClick={handleStake}
+              onClick={() => {}}
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
               data-amp-analytics-attrs="page: Deposit, target: Deposit"
