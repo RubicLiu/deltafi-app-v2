@@ -32,13 +32,11 @@ import {
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfigV2";
 import { stakeViewActions } from "states/views/stakeView";
-import {
-  createClaimFarmRewardsTransaction,
-} from "utils/transactions/stake";
+import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
-import { anchorBnToBn, bnToString, stringToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToBn, bnToString } from "utils/tokenUtils";
 
 const SECONDS_OF_YEAR = 31556926;
 
