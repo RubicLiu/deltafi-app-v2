@@ -2,13 +2,11 @@
 
 const express = require('express');
 
-// Constants
 const PORT = 4000;
 const HOST = '0.0.0.0';
 
-// App
 const app = express();
-app.get('/', (req, res) => {
+app.get('/pools', (req, res) => {
   res.send('Hello World ' + new Date().toISOString());
 });
 
