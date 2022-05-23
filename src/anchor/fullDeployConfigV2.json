@@ -18,8 +18,8 @@
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "9c8UsYfWF2ZEzgPAKLLLLSmrhKA5LEhiHiTb8XbjybHq",
-        "farmInfo": "Eu595s4xqfT12YPihjcRuBKvPXiBh44HftY1mxbVqwDp"
+        "swapInfo": "DX9XQ5CYjcaenpbrHtp196MTsxwUgfrKJ6NkP5MDzU6X",
+        "farmInfo": "G2t6x2n2QWFB7KAmsT9cM86kFDFzegDa1bSb9Ct6LkpC"
       }
     ],
     "tokenInfoList": [

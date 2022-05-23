@@ -994,58 +994,6 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "createFarm",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "swapInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmInfo",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "bump",
-          "type": "u8"
-        },
-        {
-          "name": "farmConfig",
-          "type": {
-            "defined": "FarmConfig"
-          }
-        }
-      ]
-    },
-    {
       "name": "claimFarmRewards",
       "accounts": [
         {
@@ -3137,58 +3085,6 @@ export const IDL: DeltafiDexV2 = {
         {
           "name": "minAmountOut",
           "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "createFarm",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "swapInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmInfo",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "bump",
-          "type": "u8"
-        },
-        {
-          "name": "farmConfig",
-          "type": {
-            "defined": "FarmConfig"
-          }
         }
       ]
     },
