@@ -9,7 +9,7 @@ import WalletPanel from "components/BurgerMenu/WalletPanel";
 import ConfirmSwapPanel from "components/BurgerMenu/ConfirmSwapPanel";
 import ConnectPanelV2 from "components/BurgerMenu/ConnectPanel_v2";
 import Deposit from "views/Deposit/Deposit";
-import Stake from "views/Stake/Stake";
+// import Stake from "views/Stake/Stake";
 import { useModal } from "providers/modal";
 
 const useStyles = makeStyles((theme) => ({
@@ -52,8 +52,8 @@ export default function ModalMenu() {
         return <ConfirmSwapPanel />;
       case "deposit":
         return <Deposit />;
-      case "stake":
-        return <Stake />;
+      // case "stake":
+      //   return <Stake />;
       case "withdraw":
         return null; // <WithdrawPanel />
       default:

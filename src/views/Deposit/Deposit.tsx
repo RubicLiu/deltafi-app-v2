@@ -52,7 +52,7 @@ import { createDepositTransaction, createWithdrawTransaction } from "utils/trans
 import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/tokenUtils";
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { Paper } from "@material-ui/core";
-import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
+import { createClaimFarmRewardsTransaction } from "utils/transactions/deposit";
 import BN from "bn.js";
 import { scheduleWithInterval } from "utils";
 

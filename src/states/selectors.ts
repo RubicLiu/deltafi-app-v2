@@ -11,7 +11,6 @@ export const tokenAccountSelector = (state: RootState) => state.accounts.tokenAc
 export const deltafiUserSelector = (state: RootState) => state.accounts.deltafiUserAccount;
 
 export const depositViewSelector = (state: RootState) => state.views.depositView;
-export const stakeViewSelector = (state: RootState) => state.views.stakeView;
 export const swapViewSelector = (state: RootState) => state.views.swapView;
 export const rewardViewSelector = (state: RootState) => state.views.rewardView;
 
