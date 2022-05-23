@@ -5,6 +5,11 @@
   "scripts": {
     "start": "node server.js"
   },
+  "scripts": {
+    "build": "tsc --project ./",
+    "start:dev": "nodemon src/server.ts",
+    "start:prod": "node dist/server.js"
+  },
   "dependencies": {
     "express": "^4.16.1"
   },
