@@ -52,7 +52,7 @@ import { createDepositTransaction, createWithdrawTransaction } from "utils/trans
 import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/tokenUtils";
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { Paper } from "@material-ui/core";
-import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
+import { createClaimFarmRewardsTransaction } from "utils/transactions/deposit";
 import BN from "bn.js";
 import { scheduleWithInterval } from "utils";
 
@@ -390,12 +390,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         DELTAFI_TOKEN_DECIMALS,
       );
 
-      const secondsFromBaseLastUpdate = new BN(depositView.currentUnixTimestamp).sub(
-        lpUser.basePosition.lastUpdateTs,
-      );
-      const secondsFromQuoteLastUpdate = new BN(depositView.currentUnixTimestamp).sub(
-        lpUser.quotePosition.lastUpdateTs,
-      );
+      const secondsFromBaseLastUpdate =
+        lpUser.basePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
+          ? new BN(0)
+          : new BN(depositView.currentUnixTimestamp).sub(lpUser.basePosition.lastUpdateTs);
+      const secondsFromQuoteLastUpdate =
+        lpUser.quotePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
+          ? new BN(0)
+          : new BN(depositView.currentUnixTimestamp).sub(lpUser.quotePosition.lastUpdateTs);
 
       const extraOwedBaseInterest = exponentiatedBy(
         new BigNumber(
@@ -907,7 +909,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           onClick={handleClaimInterest}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"
-          data-amp-analytics-attrs="page: Withdraw, target: Withdraw"
+          data-amp-analytics-attrs="page: Claim, target: Claim"
         >
           Claim Interest
         </ConnectButton>

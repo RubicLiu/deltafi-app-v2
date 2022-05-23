@@ -2,7 +2,7 @@ import { Connection, PublicKey, Transaction, Keypair } from "@solana/web3.js";
 import { AccountLayout } from "@solana/spl-token";
 import { partialSignTransaction, mergeTransactions } from ".";
 import * as token from "@solana/spl-token";
-import { PoolConfig } from "constants/deployConfigV2";
+import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { web3, BN } from "@project-serum/anchor";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
@@ -238,6 +238,47 @@ export async function createWithdrawTransaction(
     signers.push(tempAccountRefKeyPair);
   }
 
+  return partialSignTransaction({
+    transaction,
+    feePayer: walletPubkey,
+    signers,
+    connection,
+  });
+}
+
+export async function createClaimFarmRewardsTransaction(
+  program: any,
+  connection: Connection,
+  poolConfig: PoolConfig,
+  walletPubkey: PublicKey,
+  userDeltafiToken: PublicKey,
+) {
+  const [lpPublicKey] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from("LiquidityProvider"),
+      new PublicKey(poolConfig.swapInfo).toBuffer(),
+      walletPubkey.toBuffer(),
+    ],
+    program.programId,
+  );
+
+  let transaction = new Transaction();
+  transaction.add(
+    program.transaction.claimFarmRewards({
+      accounts: {
+        marketConfig: new PublicKey(deployConfigV2.marketConfig),
+        farmInfo: new PublicKey(poolConfig.farmInfo),
+        swapInfo: new PublicKey(poolConfig.swapInfo),
+        liquidityProvider: lpPublicKey,
+        userDeltafiToken,
+        swapDeltafiToken: new PublicKey(deployConfigV2.deltafiToken),
+        owner: walletPubkey,
+        tokenProgram: token.TOKEN_PROGRAM_ID,
+      },
+    }),
+  );
+
+  const signers = [];
   return partialSignTransaction({
     transaction,
     feePayer: walletPubkey,

@@ -14,7 +14,6 @@ import { TabContext, TabList, TabPanel } from "@material-ui/lab";
 import Page from "components/layout/Page";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import PoolCard from "views/Pool/components/Card_v2";
-import FarmCard from "views/Farm/components/Card_v2";
 import { ChangeEvent, useState } from "react";
 import Reward from "views/Reward";
 import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
@@ -217,7 +216,6 @@ const Home: React.FC = (props) => {
                 aria-label="dashboard tabs"
               >
                 <Tab label="My Pools" value="pool" />
-                <Tab label="My Farms" value="farm" />
                 <Tab label="Invite & Earn" value="reward" />
               </TabList>
             </Box>
@@ -230,31 +228,6 @@ const Home: React.FC = (props) => {
                     poolConfigsWithDeposit.map((poolConfig: PoolConfig, idx) => (
                       <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
                         <PoolCard
-                          isUserPool={true}
-                          color={
-                            idx % 4 === 0
-                              ? "greenYellow"
-                              : idx % 4 === 1
-                              ? "lime"
-                              : idx % 4 === 2
-                              ? "indigo"
-                              : "dodgerBlue"
-                          }
-                          key={poolConfig.farmInfo}
-                          poolConfig={poolConfig}
-                        />
-                      </Grid>
-                    ))}
-                </Grid>
-              )}
-            </TabPanel>
-            <TabPanel value="farm" className={classes.tabPanel}>
-              {isConnectedWallet && (
-                <Grid container className={classes.poolCardContainer} justifyContent="center">
-                  {poolConfigsWithDeposit.length > 0 &&
-                    poolConfigsWithDeposit.map((poolConfig: PoolConfig, idx) => (
-                      <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
-                        <FarmCard
                           isUserPool={true}
                           color={
                             idx % 4 === 0
