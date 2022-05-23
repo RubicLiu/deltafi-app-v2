@@ -16,7 +16,11 @@ interface IConfirmSwapPanelProps {
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
-  header: {},
+  root: {
+    background: palette.background.secondary,
+    width: "100%",
+    margin: "auto",
+  },
   content: {
     marginTop: 32,
   },
@@ -41,10 +45,10 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     borderRadius: "50%",
   },
   bottomText: {
-    marginBottom: 52,
-    marginTop: 52,
+    marginTop: 30,
     maxWidth: 400,
     textAlign: "center",
+    fontSize: 12,
   },
   estimatedAmount: {
     marginBottom: 36,
@@ -55,7 +59,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   success: {
     color: palette.text.success,
   },
-  footer: {},
+  priceImpact: {
+    color: "#D4FF00",
+  },
 }));
 
 const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
@@ -90,11 +96,11 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
   };
 
   return (
-    <Box width="100%">
-      <Box display="flex" justifyContent="space-between" className={classes.header}>
-        <Typography variant="h6" color="textSecondary">
+    <Box width="100%" minWidth={{ md: 400 }}>
+      <Box display="flex" justifyContent="space-between">
+        <Box color="#F6F6F6" fontSize={20} fontWeight={500}>
           Review Swap
-        </Typography>
+        </Box>
         <IconButton size="small" onClick={() => setMenu(false, "")}>
           <CloseIcon />
         </IconButton>
@@ -116,40 +122,52 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
         </Box>
         <Box>
           <Box display="flex" justifyContent="space-between" className={classes.row}>
-            <Typography color="textSecondary">Swap From</Typography>
+            <Typography variant="body2" color="textSecondary">
+              Swap From
+            </Typography>
             <Box display="flex" justifyContent="center" alignItems="center">
               <img
                 src={data?.tokenFrom.token.logoURI}
                 alt={`${data?.tokenFrom.token.symbol} coin`}
                 className={classes.img}
               />
-              <Typography>{`${data?.tokenFrom.amount ?? 0} ${
+              <Box fontSize={16} fontWeight={500}>{`${data?.tokenFrom.amount ?? 0} ${
                 data?.tokenFrom.token.symbol
-              }`}</Typography>
+              }`}</Box>
             </Box>
           </Box>
           <Box display="flex" justifyContent="space-between" className={classes.row}>
-            <Typography color="textSecondary">Transaction Fee</Typography>
+            <Typography variant="body2" color="textSecondary">
+              Transaction Fee
+            </Typography>
             <Box display="flex" justifyContent="center" alignItems="center">
               <img
                 src={data?.tokenTo.token.logoURI}
                 alt={`${data?.tokenFrom.token.symbol} coin`}
                 className={classes.img}
               />
-              <Typography>{`${fixedNumber(swapOut?.fee) ?? 0} ${
+              <Box fontSize={16} fontWeight={500}>{`${fixedNumber(swapOut?.fee) ?? 0} ${
                 data?.tokenTo.token.symbol
-              }`}</Typography>
+              }`}</Box>
+            </Box>
+          </Box>
+          <Box display="flex" justifyContent="space-between" className={classes.row}>
+            <Typography variant="body2" color="textSecondary">
+              Price impact
+            </Typography>
+            <Box fontSize={16} fontWeight={500} className={classes.priceImpact}>
+              {parseFloat(data?.slippage)}%
             </Box>
           </Box>
         </Box>
-        <Typography color="textSecondary" className={classes.bottomText}>
-          You may be asked to confirm the transaction via your wallet.
-        </Typography>
       </Box>
-      <Box className={classes.footer}>
-        <ConnectButton fullWidth onClick={handleConfirm}>
+      <Box>
+        <ConnectButton size="large" fullWidth onClick={handleConfirm}>
           Confirm Swap
         </ConnectButton>
+      </Box>
+      <Box color="#F6F6F6" className={classes.bottomText}>
+        You may be asked to confirm the transaction via your wallet.
       </Box>
     </Box>
   );

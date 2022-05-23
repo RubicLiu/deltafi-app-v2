@@ -70,7 +70,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
     backgroundColor: palette.background.primary,
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
-    height: 200,
+    height: 120,
   },
 }));
 
@@ -113,7 +113,7 @@ const Home: React.FC = () => {
     <Page>
       <Box padding={0} className={classes.container}>
         <Box color="#fff" textAlign="center" className={classes.header}>
-          <Box fontSize={58} color="#D4FF00" fontWeight={600}>
+          <Box fontSize={36} color="#D4FF00" fontWeight={600}>
             {convertDollar(tvl.toFixed(2))}
           </Box>
           <Box marginTop={1} fontSize={18}>

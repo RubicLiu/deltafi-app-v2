@@ -117,11 +117,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     flex: 1,
   },
   searchCt: {
-    marginTop: 30,
-    marginBottom: 12,
+    marginTop: 20,
+    marginBottom: 10,
     [breakpoints.up("md")]: {
-      marginTop: 60,
-      marginBottom: 24,
+      marginTop: 40,
+      marginBottom: 20,
     },
   },
   title: {
@@ -154,9 +154,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing(2.5),
+    marginBottom: spacing(1.5),
     [breakpoints.up("sm")]: {
-      marginBottom: spacing(3.5),
+      marginBottom: spacing(2.5),
     },
   },
   marketCondition: {
@@ -259,7 +259,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     "& span": {
       fontWeight: 400,
       fontSize: 12,
-      lineHeight: 14,
+      lineHeight: "14px",
     },
     padding: "1px !important",
   },
@@ -269,8 +269,14 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     padding: "24px 24px",
     marginTop: 24,
     fontSize: 12,
-    lineHeight: "18px",
     color: palette.text.dark,
+    lineHeight: 1,
+  },
+  currencyCt: {
+    display: "flex",
+    height: "32px",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   compareArrow: {
     marginLeft: 3,
@@ -861,26 +867,30 @@ const Home: React.FC = (props) => {
               spacing={1}
               justifyContent="center"
             >
-              <Grid item xs={6} sm={3} style={{ display: "flex", alignItems: "center" }}>
+              <Grid item xs={6} sm={4} style={{ display: "flex", alignItems: "center" }}>
                 <Avatar
                   src={tokenFrom?.token.logoURI}
                   alt={tokenFrom?.token.symbol}
                   className={classes.icon}
                 />
-                <Box marginLeft={0.5}>
+                <Box marginLeft={0.5} className={classes.currencyCt}>
                   <Box sx={{ color: "#fff", fontSize: "16px" }}>{tokenFrom.token.symbol}</Box>
                   <Box>{tokenFrom.token.name}</Box>
                 </Box>
               </Grid>
-              <Grid item xs={6} sm={4}>
-                <Box>Price</Box>
-                <Box sx={{ color: "#fff" }}>
-                  {Number(basePrice).toFixed(poolConfig?.baseTokenInfo?.decimals)}
+              <Grid item xs={6} sm={3}>
+                <Box className={classes.currencyCt}>
+                  <Box>Price</Box>
+                  <Box sx={{ color: "#fff" }}>
+                    {Number(basePrice).toFixed(poolConfig?.baseTokenInfo?.decimals)}
+                  </Box>
                 </Box>
               </Grid>
               <Grid item xs={6} sm={2}>
-                <Box>24h%</Box>
-                <Box sx={{ color: "#F62805" }}>--</Box>
+                <Box className={classes.currencyCt}>
+                  <Box>24h%</Box>
+                  <Box sx={{ color: "#F62805" }}>--</Box>
+                </Box>
               </Grid>
               <Grid item xs={6} sm={3}>
                 <ResponsiveContainer width="100%" height={32}>
@@ -889,26 +899,30 @@ const Home: React.FC = (props) => {
                   </LineChart>
                 </ResponsiveContainer>
               </Grid>
-              <Grid item xs={6} sm={3} style={{ display: "flex", alignItems: "center" }}>
+              <Grid item xs={6} sm={4} style={{ display: "flex", alignItems: "center" }}>
                 <Avatar
                   src={tokenTo?.token.logoURI}
                   alt={tokenTo?.token.symbol}
                   className={classes.icon}
                 />
-                <Box marginLeft={0.5}>
+                <Box marginLeft={0.5} className={classes.currencyCt}>
                   <Box sx={{ color: "#fff", fontSize: "16px" }}>{tokenTo.token.symbol}</Box>
                   <Box>{tokenTo.token.name}</Box>
                 </Box>
               </Grid>
-              <Grid item xs={6} sm={4}>
-                <Box>Price</Box>
-                <Box sx={{ color: "#fff" }}>
-                  {Number(quotePrice).toFixed(poolConfig?.quoteTokenInfo?.decimals)}
+              <Grid item xs={6} sm={3}>
+                <Box className={classes.currencyCt}>
+                  <Box>Price</Box>
+                  <Box sx={{ color: "#fff" }}>
+                    {Number(quotePrice).toFixed(poolConfig?.quoteTokenInfo?.decimals)}
+                  </Box>
                 </Box>
               </Grid>
               <Grid item xs={6} sm={2}>
-                <Box>24h%</Box>
-                <Box sx={{ color: "#F62805" }}>--</Box>
+                <Box className={classes.currencyCt}>
+                  <Box>24h%</Box>
+                  <Box sx={{ color: "#F62805" }}>--</Box>
+                </Box>
               </Grid>
               <Grid item xs={6} sm={3}>
                 <ResponsiveContainer width="100%" height={32}>

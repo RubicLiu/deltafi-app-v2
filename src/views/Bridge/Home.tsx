@@ -63,14 +63,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     flex: 1,
     marginTop: "56px",
   },
-  searchCt: {
-    marginTop: 30,
-    marginBottom: 12,
-    [breakpoints.up("md")]: {
-      marginTop: 60,
-      marginBottom: 24,
-    },
-  },
   root: {
     background: palette.background.primary,
     borderRadius: spacing(2),

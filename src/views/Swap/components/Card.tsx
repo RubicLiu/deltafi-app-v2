@@ -18,7 +18,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     padding: spacing(2),
     borderRadius: 16,
     [breakpoints.up("md")]: {
-      padding: `${spacing(3)}px ${spacing(2.5)}px`,
+      padding: `${spacing(2.5)}px ${spacing(2)}px`,
     },
   },
   main: {

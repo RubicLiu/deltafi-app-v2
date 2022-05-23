@@ -73,9 +73,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
     },
   },
   content: {
-    marginBottom: spacing(3.5),
+    marginBottom: spacing(2.5),
     [breakpoints.up("sm")]: {
-      marginBottom: spacing(7),
+      marginBottom: spacing(5),
     },
     marginTop: spacing(4.5),
     display: "flex",
