@@ -15,7 +15,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { PublicKey } from "@solana/web3.js";
 import { scheduleWithInterval } from "utils";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
-import { fetchFarmsThunk } from "states/accounts/farmAccount";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
 import { fetchPythDataThunk } from "states/accounts/pythAccount";
@@ -38,11 +37,9 @@ import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 // })
 // Analytics.record({ name: 'App' })
 
-const Farm = lazy(() => import("./views/Farm"));
 const Swap = lazy(() => import("./views/Swap"));
 const Pool = lazy(() => import("./views/Pool"));
 const Reward = lazy(() => import("./views/Reward"));
-const Stake = lazy(() => import("./views/Stake"));
 const Bridge = lazy(() => import("./views/Bridge"));
 const Unavailable = lazy(() => import("./views/Unavailable"));
 const Terms = lazy(() => import("./views/Terms"));
@@ -93,12 +90,7 @@ const App: React.FC = () => {
   }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
-    // Refresh the farm pool every 1 minute.
-    return scheduleWithInterval(() => dispatch(fetchFarmsThunk({ connection })), 60 * 1000);
-  }, [connection, dispatch]);
-
-  useEffect(() => {
-    // Refresh the farm pool every 1 minute.
+    // Refresh the swap pool every 1 minute.
     return scheduleWithInterval(() => dispatch(fetchSwapsThunk({ connection })), 60 * 1000);
   }, [connection, dispatch]);
 
@@ -156,9 +148,7 @@ const App: React.FC = () => {
             <Route path="/swap" exact component={Swap} />
             <Route path="/pools" exact component={Pool} />
             <Route path="/deposit/:poolAddress" exact component={Pool} />
-            <Route path="/farms" exact component={Farm} />
             <Route path="/rewards" exact component={Reward} />
-            <Route path="/stake/:id" exact component={Stake} />
             <Route path="/Dashboard" exact component={Dashboard} />
             <Route path="/terms" exact component={Terms} />
             <Route path="/bridge" exact component={Bridge} />

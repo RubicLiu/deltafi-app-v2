@@ -5,7 +5,6 @@ import { getPoolConfigBySymbols, PoolConfig } from "constants/deployConfigV2";
 
 export const appSelector = (state: RootState) => state.app;
 export const lpUserSelector = (state: RootState) => state.accounts.liquidityProviderAccount;
-export const farmPoolSelector = (state: RootState) => state.accounts.farmAccount;
 export const poolSelector = (state: RootState) => state.accounts.swapAccount;
 export const pythSelector = (state: RootState) => state.accounts.pythAccount;
 export const tokenAccountSelector = (state: RootState) => state.accounts.tokenAccount;
@@ -49,11 +48,5 @@ export function selectSwapBySwapKey(poolKey: string) {
 export function selectLpUserBySwapKey(swapKey: string) {
   return (state: RootState) => {
     return state.accounts.liquidityProviderAccount.swapKeyToLp[swapKey];
-  };
-}
-
-export function selectFarmByFarmKey(farmKey: string) {
-  return (state: RootState) => {
-    return state.accounts.farmAccount.farmKeyToFarmInfo[farmKey];
   };
 }
