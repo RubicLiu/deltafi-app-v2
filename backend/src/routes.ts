@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import * as fs from 'fs';
 
+import fullDeployConfigV2 from "./fullDeployConfigV2.json";
 
-const config = JSON.parse(fs.readFileSync(
-  'src/fullDeployConfigV2.json').toString())['mainnet-test'];
+const config = fullDeployConfigV2['mainnet-test'];
 
 const routes = Router();
 
