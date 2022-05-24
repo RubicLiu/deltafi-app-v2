@@ -11,4 +11,5 @@ RUN yarn build-dev
 
 FROM nginx:latest
 COPY --from=build /usr/app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80

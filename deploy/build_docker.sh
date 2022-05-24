@@ -2,10 +2,10 @@
 
 set -e -x
 
-cp src/anchor/fullDeployConfigV2.json backend/src
+SCRIPT_DIR=$(dirname $(realpath $0))
+cd $SCRIPT_DIR/..
 
-REGISTRY=077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev
-TAG=`git rev-parse --short HEAD`-`date +%Y%m%d-%H%M%S`
+cp src/anchor/fullDeployConfigV2.json backend/src
 
 REPO=deltafi-app-v2/frontend
 docker build -t ${REPO}:${TAG} --platform linux/amd64 .
