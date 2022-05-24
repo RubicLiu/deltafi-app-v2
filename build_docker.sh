@@ -2,6 +2,8 @@
 
 set -e -x
 
+cp src/anchor/fullDeployConfigV2.json backend/src
+
 REGISTRY=077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev
 TAG=`git rev-parse --short HEAD`-`date +%Y%m%d-%H%M%S`
 
