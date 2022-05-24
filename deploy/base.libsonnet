@@ -1,7 +1,9 @@
 {
-  imageTag: error "imageTag is not set",
-  dockerRegistry: error "dockerRegistry is not set",
-  domainName: error "domainName is not set",
+  imageTag:: error "imageTag is not set",
+  dockerRegistry:: error "dockerRegistry is not set",
+  domainName:: error "domainName is not set",
+  frontendReplicas:: 2,
+  backendReplicas:: 2,
 
   local namespace = "deltafi-app-v2",
   local appFrontend = "deltafi-app-v2-frontend",
@@ -23,7 +25,7 @@
             app: appFrontend,
           },
         },
-        replicas: 2,
+        replicas: $.frontendReplicas,
         template: {
           metadata: {
             labels: {
@@ -79,7 +81,7 @@
             app: appBackend,
           },
         },
-        replicas: 2,
+        replicas: $.backendReplicas,
         template: {
           metadata: {
             labels: {
