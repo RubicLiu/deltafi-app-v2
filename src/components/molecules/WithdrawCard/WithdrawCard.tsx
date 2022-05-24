@@ -70,6 +70,9 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
           </Box>
           <Box className={classes.tokenBalance}>{card.token?.symbol}</Box>
         </Box>
+        <Box className={classes.tokenBalance}>
+          Total: {"00.00"} {"Symbol"} ({0}%)
+        </Box>
       </Box>
     </Paper>
   );

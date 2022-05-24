@@ -163,7 +163,7 @@ const PriceItem = styled.li`
   }
 `;
 
-const SettingsPanel = React.forwardRef((props: SettingsProps, ref): JSX.Element => {
+const SettingsPanel = (props: SettingsProps): JSX.Element => {
   const { priceImpact, isSmall, handleChangeImpact } = props;
   const classes = useStyles(props);
   const currencyInputRef = useRef<HTMLInputElement>();
@@ -181,7 +181,7 @@ const SettingsPanel = React.forwardRef((props: SettingsProps, ref): JSX.Element 
   };
 
   return (
-    <Paper className={classes.root} ref={ref}>
+    <Paper className={classes.root}>
       <Box>
         <Typography variant="body1" className={classes.maxImpact} color="textPrimary">
           Max Price Impact
@@ -221,7 +221,7 @@ const SettingsPanel = React.forwardRef((props: SettingsProps, ref): JSX.Element 
       </Box>
     </Paper>
   );
-});
+};
 
 SettingsPanel.defaultProps = {
   priceImpact: "2.0%",

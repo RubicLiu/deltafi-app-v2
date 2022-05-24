@@ -257,7 +257,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const dispatch = useDispatch();
   const network = deployConfigV2.network;
 
-  const wrapper = React.createRef();
+  // const wrapper = React.createRef();
 
   useEffect(() => {
     if (baseTokenInfo && quoteTokenInfo) {
@@ -304,14 +304,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return new BigNumber(0);
   }, [swapInfo, quotePercent, quoteTokenInfo]);
 
-  const swapFee = useMemo(() => {
-    if (swapInfo) {
-      return new BigNumber(swapInfo.swapConfig.tradeFeeNumerator.toString())
-        .dividedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
-        .multipliedBy(100);
-    }
-    return new BigNumber(0);
-  }, [swapInfo]);
+  // const swapFee = useMemo(() => {
+  //   if (swapInfo) {
+  //     return new BigNumber(swapInfo.swapConfig.tradeFeeNumerator.toString())
+  //       .dividedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
+  //       .multipliedBy(100);
+  //   }
+  //   return new BigNumber(0);
+  // }, [swapInfo]);
 
   const withdrawFee = useMemo(() => {
     if (swapInfo) {
