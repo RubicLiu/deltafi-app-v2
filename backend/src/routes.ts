@@ -12,6 +12,8 @@ routes.get('/pools', (_, response) => {
 });
 
 routes.get('/spot/tickers/:currencyPair', (request, response) => {
+  
+
   return response.json({
     currencyPair: request.params.currencyPair
   });
