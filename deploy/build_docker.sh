@@ -2,9 +2,6 @@
 
 set -e -x
 
-REGISTRY=077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev
-TAG=`git rev-parse --short HEAD`-`date +%Y%m%d-%H%M%S`
-
 SCRIPT_DIR=$(dirname $(realpath $0))
 cd $SCRIPT_DIR/..
 
