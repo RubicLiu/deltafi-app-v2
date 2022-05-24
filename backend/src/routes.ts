@@ -5,6 +5,7 @@ import fullDeployConfigV2 from "./fullDeployConfigV2.json";
 
 const config = fullDeployConfigV2['mainnet-test'];
 const gateApiClient = new GateApi.ApiClient();
+const spotApi = new GateApi.SpotApi(gateApiClient);
 
 const routes = Router();
 
@@ -13,16 +14,27 @@ routes.get('/pools', (_, response) => {
 });
 
 routes.get('/spot/tickers/:currencyPair', async (request, response) => {
-  const api = new GateApi.SpotApi(gateApiClient);
   const currencyPair = request.params.currencyPair;
   try {
-    const result = await api.listTickers({ currencyPair });
-    console.info(result);
+    const result = await spotApi.listTickers({ currencyPair });
     return response.json(result.body);
   } catch (e) {
     console.error(e);
+    return response.status(500).send('Failed to fetch data from gate api');
   }
-  return response.json(currencyPair);
+});
+
+routes.get('/spot/candlesticks/:currencyPair', async (request, response) => {
+  const currencyPair = request.params.currencyPair;
+  try {
+    const result = await spotApi.listCandlesticks(currencyPair, {
+      interval: "30m",
+    });
+    return response.json(result.body);
+  } catch (e) {
+    console.error(e);
+    return response.status(500).send('Failed to fetch data from gate api');
+  }
 });
 
 export default routes;
