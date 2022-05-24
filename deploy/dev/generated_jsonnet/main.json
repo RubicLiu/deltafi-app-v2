@@ -8,20 +8,20 @@
          "apiVersion": "apps/v1",
          "kind": "Deployment",
          "metadata": {
-            "name": "deltafi-app-v2",
-            "namespace": "default"
+            "name": "deltafi-app-v2-frontend",
+            "namespace": "deltafi-app-v2"
          },
          "spec": {
             "replicas": 1,
             "selector": {
                "matchLabels": {
-                  "app": "deltafi-app-v2"
+                  "app": "deltafi-app-v2-frontend"
                }
             },
             "template": {
                "metadata": {
                   "labels": {
-                     "app": "deltafi-app-v2"
+                     "app": "deltafi-app-v2-frontend"
                   }
                },
                "spec": {
@@ -44,8 +44,8 @@
          "apiVersion": "v1",
          "kind": "Service",
          "metadata": {
-            "name": "deltafi-app-v2",
-            "namespace": "default"
+            "name": "deltafi-app-v2-frontend",
+            "namespace": "deltafi-app-v2"
          },
          "spec": {
             "ports": [
@@ -56,7 +56,7 @@
                }
             ],
             "selector": {
-               "app": "deltafi-app-v2"
+               "app": "deltafi-app-v2-frontend"
             }
          }
       },
@@ -64,20 +64,20 @@
          "apiVersion": "apps/v1",
          "kind": "Deployment",
          "metadata": {
-            "name": "deltafi-app-v2-nodejs",
-            "namespace": "default"
+            "name": "deltafi-app-v2-backend",
+            "namespace": "deltafi-app-v2"
          },
          "spec": {
             "replicas": 1,
             "selector": {
                "matchLabels": {
-                  "app": "deltafi-app-v2-nodejs"
+                  "app": "deltafi-app-v2-backend"
                }
             },
             "template": {
                "metadata": {
                   "labels": {
-                     "app": "deltafi-app-v2-nodejs"
+                     "app": "deltafi-app-v2-backend"
                   }
                },
                "spec": {
@@ -100,8 +100,8 @@
          "apiVersion": "v1",
          "kind": "Service",
          "metadata": {
-            "name": "deltafi-app-v2-nodejs",
-            "namespace": "default"
+            "name": "deltafi-app-v2-backend",
+            "namespace": "deltafi-app-v2"
          },
          "spec": {
             "ports": [
@@ -112,7 +112,7 @@
                }
             ],
             "selector": {
-               "app": "deltafi-app-v2-nodejs"
+               "app": "deltafi-app-v2-backend"
             }
          }
       },
@@ -125,7 +125,7 @@
                "nginx.ingress.kubernetes.io/rewrite-target": "/$1"
             },
             "name": "deltafi-app-v2",
-            "namespace": "default"
+            "namespace": "deltafi-app-v2"
          },
          "spec": {
             "ingressClassName": "nginx",
@@ -137,7 +137,7 @@
                         {
                            "backend": {
                               "service": {
-                                 "name": "deltafi-app-v2-nodejs",
+                                 "name": "deltafi-app-v2-backend",
                                  "port": {
                                     "number": 4000
                                  }
@@ -149,7 +149,7 @@
                         {
                            "backend": {
                               "service": {
-                                 "name": "deltafi-app-v2",
+                                 "name": "deltafi-app-v2-frontend",
                                  "port": {
                                     "number": 80
                                  }

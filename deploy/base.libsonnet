@@ -3,9 +3,9 @@
   dockerRegistry: error "dockerRegistry is not set",
   domainName: error "domainName is not set",
 
-  local namespace = "default",
-  local appFrontend = "deltafi-app-v2",
-  local appBackend = "deltafi-app-v2-nodejs",
+  local namespace = "deltafi-app-v2",
+  local appFrontend = "deltafi-app-v2-frontend",
+  local appBackend = "deltafi-app-v2-backend",
 
   apiVersion: 'v1',
   kind: 'List',
