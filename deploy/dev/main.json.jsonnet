@@ -1,5 +1,5 @@
 local base = import "../base.libsonnet";
-local tag = import "./tag.txt";
+local tag = importstr "./tag.txt";
 
 base {
   imageTag: tag,
