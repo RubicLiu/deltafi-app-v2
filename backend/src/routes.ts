@@ -11,4 +11,10 @@ routes.get('/pools', (_, response) => {
   return response.json(config.poolInfoList);
 });
 
+routes.get('/spot/tickers/:currencyPair', (request, response) => {
+  return response.json({
+    currencyPair: request.params.currencyPair
+  });
+});
+
 export default routes;
