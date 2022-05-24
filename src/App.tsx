@@ -61,6 +61,22 @@ const App: React.FC = () => {
   const program = useSelector(programSelector);
 
   useEffect(() => {
+    var GateApi = require('gate-api');
+
+var apiInstance = new GateApi.DeliveryApi();
+var settle = "usdt"; // String | Settle currency
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.listDeliveryContracts(settle, callback);
+
+  });
+
+  useEffect(() => {
     if (!walletAddress) {
       return;
     }
