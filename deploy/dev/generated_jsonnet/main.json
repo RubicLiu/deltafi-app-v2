@@ -2,7 +2,7 @@
    "apiVersion": "v1",
    "dockerRegistry": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev",
    "domainName": "app.k8s.deltafi-dev.trade",
-   "imageTag": "7b60a84-20220523-215346\n",
+   "imageTag": "4b115a5-20220523-230050",
    "items": [
       {
          "apiVersion": "apps/v1",
@@ -27,7 +27,7 @@
                "spec": {
                   "containers": [
                      {
-                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/frontend:7b60a84-20220523-215346\n",
+                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/frontend:4b115a5-20220523-230050",
                         "name": "main",
                         "ports": [
                            {
@@ -83,7 +83,7 @@
                "spec": {
                   "containers": [
                      {
-                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/backend:7b60a84-20220523-215346\n",
+                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/backend:4b115a5-20220523-230050",
                         "name": "main",
                         "ports": [
                            {
