@@ -23,7 +23,7 @@
             app: appFrontend,
           },
         },
-        replicas: 1,
+        replicas: 2,
         template: {
           metadata: {
             labels: {
@@ -79,7 +79,7 @@
             app: appBackend,
           },
         },
-        replicas: 1,
+        replicas: 2,
         template: {
           metadata: {
             labels: {
