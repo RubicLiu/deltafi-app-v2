@@ -1,4 +1,12 @@
 {
+  imageTag: error "imageTag is not set",
+  dockerRegistry: error "dockerRegistry is not set",
+  domainName: error "domainName is not set",
+
+  local namespace = "default",
+  local appFrontend = "deltafi-app-v2",
+  local appBackend = "deltafi-app-v2-nodejs",
+
   apiVersion: 'v1',
   kind: 'List',
   items: [
@@ -6,26 +14,26 @@
       apiVersion: 'apps/v1',
       kind: 'Deployment',
       metadata: {
-        name: 'deltafi-app-v2',
-        namespace: 'default',
+        name: appFrontend,
+        namespace: namespace,
       },
       spec: {
         selector: {
           matchLabels: {
-            app: 'deltafi-app-v2',
+            app: appFrontend,
           },
         },
         replicas: 1,
         template: {
           metadata: {
             labels: {
-              app: 'deltafi-app-v2',
+              app: appFrontend,
             },
           },
           spec: {
             containers: [
               {
-                image: '077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/frontend:a22a8ba-20220523-214000',
+                image: std.format('%s/deltafi-app-v2/frontend:%s', [$.dockerRegistry, $.imageTag]),
                 name: 'main',
                 ports: [
                   {
@@ -42,8 +50,8 @@
       apiVersion: 'v1',
       kind: 'Service',
       metadata: {
-        name: 'deltafi-app-v2',
-        namespace: 'default',
+        name: appFrontend,
+        namespace: namespace,
       },
       spec: {
         ports: [
@@ -54,7 +62,7 @@
           },
         ],
         selector: {
-          app: 'deltafi-app-v2',
+          app: appFrontend,
         },
       },
     },
@@ -62,26 +70,26 @@
       apiVersion: 'apps/v1',
       kind: 'Deployment',
       metadata: {
-        name: 'deltafi-app-v2-nodejs',
-        namespace: 'default',
+        name: appBackend,
+        namespace: namespace,
       },
       spec: {
         selector: {
           matchLabels: {
-            app: 'deltafi-app-v2-nodejs',
+            app: appBackend,
           },
         },
         replicas: 1,
         template: {
           metadata: {
             labels: {
-              app: 'deltafi-app-v2-nodejs',
+              app: appBackend
             },
           },
           spec: {
             containers: [
               {
-                image: '077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/backend:a22a8ba-20220523-214000',
+                image: std.format('%s/deltafi-app-v2/backend:%s', [$.dockerRegistry, $.imageTag]),
                 name: 'main',
                 ports: [
                   {
@@ -98,8 +106,8 @@
       apiVersion: 'v1',
       kind: 'Service',
       metadata: {
-        name: 'deltafi-app-v2-nodejs',
-        namespace: 'default',
+        name: appBackend,
+        namespace: namespace,
       },
       spec: {
         ports: [
@@ -110,7 +118,7 @@
           },
         ],
         selector: {
-          app: 'deltafi-app-v2-nodejs',
+          app: appBackend,
         },
       },
     },
@@ -119,7 +127,7 @@
       kind: 'Ingress',
       metadata: {
         name: 'deltafi-app-v2',
-        namespace: 'default',
+        namespace: namespace,
         annotations: {
           'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
           'nginx.ingress.kubernetes.io/rewrite-target': '/$1',
@@ -130,14 +138,14 @@
         tls: [
           {
             hosts: [
-              'app.k8s.deltafi-dev.trade',
+              $.domainName,
             ],
             secretName: 'deltafi-app-v2-tls',
           },
         ],
         rules: [
           {
-            host: 'app.k8s.deltafi-dev.trade',
+            host: $.domainName,
             http: {
               paths: [
                 {
@@ -145,7 +153,7 @@
                   pathType: 'Prefix',
                   backend: {
                     service: {
-                      name: 'deltafi-app-v2-nodejs',
+                      name: appBackend,
                       port: {
                         number: 4000,
                       },
@@ -157,7 +165,7 @@
                   pathType: 'Prefix',
                   backend: {
                     service: {
-                      name: 'deltafi-app-v2',
+                      name: appFrontend,
                       port: {
                         number: 80,
                       },
