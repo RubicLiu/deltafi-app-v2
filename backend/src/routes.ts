@@ -12,18 +12,17 @@ routes.get('/pools', (_, response) => {
   return response.json(config.poolInfoList);
 });
 
-routes.get('/spot/tickers/:currencyPair', (request, response) => {
+routes.get('/spot/tickers/:currencyPair', async (request, response) => {
   const api = new GateApi.SpotApi(gateApiClient);
   const currencyPair = request.params.currencyPair;
-  api.listTickers({ currencyPair })
-   .then(
-     value => {
-      console.log('API called successfully. Returned data: ', value.body);
-      response.json(value.body)
-    },
-    error => {
-      console.error(error);
-    });
+  try {
+    const result = await api.listTickers({ currencyPair });
+    console.info(result);
+    return response.json(result.body);
+  } catch (e) {
+    console.error(e);
+  }
+  return response.json(currencyPair);
 });
 
 export default routes;
