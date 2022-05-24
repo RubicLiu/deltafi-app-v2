@@ -45,6 +45,8 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     borderRadius: "50%",
   },
   bottomText: {
+    marginLeft: "auto",
+    marginRight: "auto",
     marginTop: 30,
     maxWidth: 400,
     textAlign: "center",
@@ -54,7 +56,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginBottom: 36,
   },
   row: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
   success: {
     color: palette.text.success,
@@ -96,7 +98,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
   };
 
   return (
-    <Box width="100%" minWidth={{ md: 400 }}>
+    <Box width="100%" minWidth={{ md: 460 }}>
       <Box display="flex" justifyContent="space-between">
         <Box color="#F6F6F6" fontSize={20} fontWeight={500}>
           Review Swap
@@ -105,7 +107,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
           <CloseIcon />
         </IconButton>
       </Box>
-      <Box className={classes.content}>
+      <Box pb={0.5} className={classes.content}>
         <Box
           display="flex"
           flexDirection="column"
@@ -116,9 +118,9 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
           <Typography color="textSecondary" variant="body2">
             Estimated Received
           </Typography>
-          <Typography>{`${fixedNumber(swapOut.amountOut) ?? 0} ${
+          <Box fontSize={16} fontWeight={500}>{`${fixedNumber(swapOut.amountOut) ?? 0} ${
             data?.tokenTo.token.symbol
-          }`}</Typography>
+          }`}</Box>
         </Box>
         <Box>
           <Box display="flex" justifyContent="space-between" className={classes.row}>
@@ -146,9 +148,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
                 alt={`${data?.tokenFrom.token.symbol} coin`}
                 className={classes.img}
               />
-              <Box fontSize={16} fontWeight={500}>{`${fixedNumber(swapOut?.fee) ?? 0} ${
-                data?.tokenTo.token.symbol
-              }`}</Box>
+              <Box>{`${fixedNumber(swapOut?.fee) ?? 0} ${data?.tokenTo.token.symbol}`}</Box>
             </Box>
           </Box>
           <Box display="flex" justifyContent="space-between" className={classes.row}>
@@ -161,7 +161,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
           </Box>
         </Box>
       </Box>
-      <Box>
+      <Box mt={0.5}>
         <ConnectButton size="large" fullWidth onClick={handleConfirm}>
           Confirm Swap
         </ConnectButton>

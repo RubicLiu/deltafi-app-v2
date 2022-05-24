@@ -1,8 +1,5 @@
-import { ReactElement } from "react";
+import { createRef, ReactElement } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Modal from "@material-ui/core/Modal";
-import Backdrop from "@material-ui/core/Backdrop";
-import Fade from "@material-ui/core/Fade";
 
 import ConnectPanel from "components/BurgerMenu/ConnectPanel";
 import WalletPanel from "components/BurgerMenu/WalletPanel";
@@ -11,6 +8,7 @@ import ConnectPanelV2 from "components/BurgerMenu/ConnectPanel_v2";
 import Deposit from "views/Deposit/Deposit";
 // import Stake from "views/Stake/Stake";
 import { useModal } from "providers/modal";
+import { Modal, Fade, Backdrop } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -32,7 +30,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   backdrop: {
-    background: "rgba(0,0,0,0.8)",
+    background: "rgba(51,51,51,0.8)",
+    zIndex: -1,
   },
 }));
 
@@ -61,25 +60,27 @@ export default function ModalMenu() {
     }
   };
 
+  const wrap = createRef<HTMLDivElement>();
+
   return (
-    <div>
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        className={classes.modal}
-        open={menuOpen}
-        onClose={() => setMenu(false, "")}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-          classes: { root: classes.backdrop },
-        }}
-      >
-        <Fade in={menuOpen}>
-          <div className={classes.paper}>{renderModalContent()}</div>
-        </Fade>
-      </Modal>
-    </div>
+    <Modal
+      aria-labelledby="transition-modal-title"
+      aria-describedby="transition-modal-description"
+      className={classes.modal}
+      open={menuOpen}
+      onClose={() => setMenu(false, "")}
+      closeAfterTransition
+      BackdropComponent={Backdrop}
+      BackdropProps={{
+        timeout: 500,
+        classes: { root: classes.backdrop },
+      }}
+    >
+      <Fade in={menuOpen}>
+        <div ref={wrap} className={classes.paper}>
+          {renderModalContent()}
+        </div>
+      </Fade>
+    </Modal>
   );
 }

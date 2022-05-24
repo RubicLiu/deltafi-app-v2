@@ -5,6 +5,7 @@ import CurrencyInput from "react-currency-input-field";
 
 import { Button } from "components/Button";
 import { SettingsProps } from "./types";
+import React from "react";
 
 const PRICE_LIST = ["0.5", "1.0", "2.0"];
 
@@ -162,7 +163,7 @@ const PriceItem = styled.li`
   }
 `;
 
-const SettingsPanel = (props: SettingsProps): JSX.Element => {
+const SettingsPanel = React.forwardRef((props: SettingsProps, ref): JSX.Element => {
   const { priceImpact, isSmall, handleChangeImpact } = props;
   const classes = useStyles(props);
   const currencyInputRef = useRef<HTMLInputElement>();
@@ -180,7 +181,7 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
   };
 
   return (
-    <Paper className={classes.root}>
+    <Paper className={classes.root} ref={ref}>
       <Box>
         <Typography variant="body1" className={classes.maxImpact} color="textPrimary">
           Max Price Impact
@@ -220,7 +221,7 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
       </Box>
     </Paper>
   );
-};
+});
 
 SettingsPanel.defaultProps = {
   priceImpact: "2.0%",

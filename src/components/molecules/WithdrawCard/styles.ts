@@ -6,7 +6,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     background: palette.background.secondary,
     padding: spacing(2),
     [breakpoints.up("sm")]: {
-      padding: spacing(3),
+      padding: `${spacing(2)}px ${spacing(3)}px`,
     },
     borderRadius: 16,
   },
@@ -52,8 +52,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     color: palette.text.dark,
     fontSize: 12,
     fontWeight: 500,
+    lineHeight: 1,
     [breakpoints.up("md")]: {
-      fontSize: 16,
+      fontSize: 14,
     },
   },
   tokenContainer: {

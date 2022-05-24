@@ -30,7 +30,12 @@ const StyledButton = styled(Button)`
     );
   }
   &.Mui-disabled {
-    color: #88809c;
+    color: #333333;
+    background: linear-gradient(
+      111.31deg,
+      rgba(212, 255, 0, 0.45) 15.34%,
+      rgba(189, 255, 0, 0.45) 95.74%
+    );
   }
   &.MuiButton-outlined {
     border: 2px solid transparent;

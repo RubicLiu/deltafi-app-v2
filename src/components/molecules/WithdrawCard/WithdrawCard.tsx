@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import CurrencyInput from "react-currency-input-field";
 import Box from "@material-ui/core/Box";
 import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
 import clx from "classnames";
 
 import { DropDown } from "components";
@@ -65,17 +64,11 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
       </Box>
       <Box display="flex" justifyContent="space-between">
         <Box display="flex">
-          <Typography color="primary" variant="body2" className={classes.tokenBalance}>
-            Max Withdrawal:
-          </Typography>
-          &nbsp;
-          <Typography className={clx(classes.tokenBalance, classes.withdrawNumber)} variant="body2">
-            {withdrawal || 0}
-          </Typography>
-          &nbsp;
-          <Typography className={classes.tokenBalance} variant="body2">
-            {card.token?.symbol}
-          </Typography>
+          <Box className={classes.tokenBalance}>Max Withdrawal:&nbsp;</Box>
+          <Box className={clx(classes.tokenBalance, classes.withdrawNumber)}>
+            {withdrawal || 0}&nbsp;
+          </Box>
+          <Box className={classes.tokenBalance}>{card.token?.symbol}</Box>
         </Box>
       </Box>
     </Paper>

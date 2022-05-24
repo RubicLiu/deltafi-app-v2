@@ -1,6 +1,5 @@
 import React, { useMemo, useCallback, useEffect } from "react";
 import {
-  Typography,
   IconButton,
   makeStyles,
   Theme,
@@ -14,19 +13,16 @@ import {
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { useWallet } from "@solana/wallet-adapter-react";
-import clx from "classnames";
 import BigNumber from "bignumber.js";
 
 import SwapCard from "views/Swap/components/Card";
 import { ConnectButton } from "components";
 import { SwapCard as ISwapCard } from "views/Swap/components/types";
-import { WithdrawSelectCard } from "components/molecules";
 import WithdrawCard from "components/molecules/WithdrawCard";
 
 import { useModal } from "providers/modal";
 import { exponentiatedBy } from "utils/decimal";
-import { convertDollarSign as convertDollar, getTokenTvl } from "utils/utils";
-import { SECONDS_PER_YEAR, SOLSCAN_LINK } from "constants/index";
+import { DAYS_PER_YEAR, SECONDS_PER_YEAR, SOLSCAN_LINK } from "constants/index";
 import { useHistory } from "react-router-dom";
 // import { PoolInformation } from "./PoolInformation";
 import { useDispatch, useSelector } from "react-redux";
@@ -55,6 +51,7 @@ import { Paper } from "@material-ui/core";
 import { createClaimFarmRewardsTransaction } from "utils/transactions/deposit";
 import BN from "bn.js";
 import { scheduleWithInterval } from "utils";
+import WithdrawSelectCard from "components/molecules/WithdrawSelectCard";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -88,9 +85,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing(2.5),
-    marginTop: spacing(2),
-    fontSize: 16,
+    marginBottom: spacing(2),
     textTransform: "none",
     "& .MuiButton-text": {
       padding: 0,
@@ -101,9 +96,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
       marginRight: 20,
     },
     "& .MuiButton-label": {
-      fontSize: 16,
-      textTransform: "none",
+      fontSize: 20,
       fontWeight: 500,
+      lineHeight: 1,
+      fontFamily: "Rubik",
+      textTransform: "none",
     },
   },
   ratePanel: {
@@ -202,11 +199,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
       lineHeight: 1,
     },
   },
-  actionLoadingButton: {
-    width: 50,
-    marginTop: 4,
-    marginBottom: 4,
-  },
   modalContainer: {
     display: "flex",
     alignItems: "center",
@@ -265,29 +257,13 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const dispatch = useDispatch();
   const network = deployConfigV2.network;
 
+  const wrapper = React.createRef();
+
   useEffect(() => {
     if (baseTokenInfo && quoteTokenInfo) {
       dispatch(depositViewActions.setTokenInfo({ baseTokenInfo, quoteTokenInfo }));
     }
   }, [baseTokenInfo, quoteTokenInfo, dispatch]);
-
-  const baseTvl = useMemo(() => {
-    if (basePrice && swapInfo) {
-      return getTokenTvl(baseTokenInfo, swapInfo.poolState.baseReserve, basePrice);
-    }
-    return new BigNumber(0);
-  }, [basePrice, swapInfo, baseTokenInfo]);
-
-  const quoteTvl = useMemo(() => {
-    if (quotePrice && swapInfo) {
-      return getTokenTvl(quoteTokenInfo, swapInfo.poolState.quoteReserve, quotePrice);
-    }
-    return new BigNumber(0);
-  }, [quotePrice, swapInfo, quoteTokenInfo]);
-
-  const tvl = useMemo(() => {
-    return baseTvl.plus(quoteTvl);
-  }, [baseTvl, quoteTvl]);
 
   const basePercent = useMemo(() => {
     if (lpUser && swapInfo) {
@@ -309,22 +285,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     }
     return new BigNumber(0);
   }, [lpUser, swapInfo]);
-
-  const userBaseTvl = useMemo(() => {
-    if (baseTvl && basePercent) {
-      return baseTvl.multipliedBy(basePercent).dividedBy(100);
-    }
-    return new BigNumber(0);
-  }, [baseTvl, basePercent]);
-
-  const userQuoteTvl = useMemo(() => {
-    if (quoteTvl && quotePercent) {
-      return quoteTvl.multipliedBy(quotePercent).dividedBy(100);
-    }
-    return new BigNumber(0);
-  }, [quoteTvl, quotePercent]);
-
-  const userTvl = userBaseTvl.plus(userQuoteTvl);
 
   const baseShare = useMemo(() => {
     if (swapInfo && basePercent) {
@@ -374,6 +334,45 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return "--";
   }, [lpUser]);
 
+  const { dailyRewardRate } = useMemo(() => {
+    let dailyReward = "--";
+    let dailyRewardRate = "--";
+
+    if (swapInfo?.swapConfig) {
+      const baseRewardPerToken: BigNumber = new BigNumber(
+        swapInfo.swapConfig.baseAprNumerator.toString(),
+      ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
+      const quoteRewardPerToken: BigNumber = new BigNumber(
+        swapInfo.swapConfig.quoteAprNumerator.toString(),
+      ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
+
+      const baseDailyRewardRate: BigNumber = baseRewardPerToken
+        .dividedBy(basePrice)
+        .dividedBy(DAYS_PER_YEAR);
+      const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
+        .dividedBy(quotePrice)
+        .dividedBy(DAYS_PER_YEAR);
+
+      dailyRewardRate = baseDailyRewardRate
+        .plus(quoteDailyRewardRate)
+        .toFixed(DELTAFI_TOKEN_DECIMALS);
+
+      if (swapInfo?.poolState) {
+        const baseDailyReward: BigNumber = baseRewardPerToken
+          .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
+          .dividedBy(DAYS_PER_YEAR);
+        const quoteDailyReward: BigNumber = quoteRewardPerToken
+          .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
+          .dividedBy(DAYS_PER_YEAR);
+        dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
+      }
+    }
+    return {
+      dailyReward,
+      dailyRewardRate,
+    };
+  }, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo]);
+
   // update reward every 5 seconds
   useEffect(
     () =>
@@ -381,6 +380,28 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         dispatch(depositViewActions.updateCurrentUnixTimestamp());
       }, 5 * 1000),
     [dispatch],
+  );
+
+  const handleWithdrawSlider = useCallback(
+    (value: number) => {
+      if (lpUser && basePrice && quotePrice) {
+        // TODO(ypeng): Consider price and pool ratio
+        const baseAmount = anchorBnToBn(baseTokenInfo, lpUser.basePosition.depositedAmount)
+          .multipliedBy(value)
+          .dividedBy(100);
+        const quoteAmount = anchorBnToBn(quoteTokenInfo, lpUser.basePosition.depositedAmount)
+          .multipliedBy(value)
+          .dividedBy(100);
+        dispatch(
+          depositViewActions.setTokenAmount({
+            baseAmount: baseAmount.toString(),
+            quoteAmount: quoteAmount.toString(),
+          }),
+        );
+      }
+      dispatch(depositViewActions.setWithdrawPercentage({ withdrawPercentage: value }));
+    },
+    [dispatch, lpUser, baseTokenInfo, quoteTokenInfo, basePrice, quotePrice],
   );
 
   const unclaimedInterest = useMemo(() => {
@@ -724,28 +745,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     [basePrice, quotePrice, dispatch, swapInfo, baseTokenInfo],
   );
 
-  const handleWithdrawSlider = useCallback(
-    (value: number) => {
-      if (lpUser && basePrice && quotePrice) {
-        // TODO(ypeng): Consider price and pool ratio
-        const baseAmount = anchorBnToBn(baseTokenInfo, lpUser.basePosition.depositedAmount)
-          .multipliedBy(value)
-          .dividedBy(100);
-        const quoteAmount = anchorBnToBn(quoteTokenInfo, lpUser.basePosition.depositedAmount)
-          .multipliedBy(value)
-          .dividedBy(100);
-        dispatch(
-          depositViewActions.setTokenAmount({
-            baseAmount: baseAmount.toString(),
-            quoteAmount: quoteAmount.toString(),
-          }),
-        );
-      }
-      dispatch(depositViewActions.setWithdrawPercentage({ withdrawPercentage: value }));
-    },
-    [dispatch, lpUser, baseTokenInfo, quoteTokenInfo, basePrice, quotePrice],
-  );
-
   const handleSwitchMethod = useCallback(
     (method: string) => {
       dispatch(depositViewActions.setMethod({ method }));
@@ -829,17 +828,23 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const actionButton = useMemo(() => {
     if (!isConnectedWallet) {
       return (
-        <ConnectButton size="large" fullWidth onClick={() => setMenu(true, "connect")}>
-          Connect Wallet
-        </ConnectButton>
+        <>
+          <Box height={16}></Box>
+          <ConnectButton fullWidth onClick={() => setMenu(true, "connect")}>
+            Connect Wallet
+          </ConnectButton>
+        </>
       );
     }
 
     if (depositView.isProcessing) {
       return (
-        <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
-          <CircularProgress color="inherit" />
-        </ConnectButton>
+        <>
+          <Box height={16}></Box>
+          <ConnectButton fullWidth variant="contained" disabled={true}>
+            <CircularProgress size={36} color="inherit" />
+          </ConnectButton>
+        </>
       );
     }
     const base = depositView.base;
@@ -855,24 +860,39 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           );
         if (isInsufficient) {
           return (
-            <ConnectButton size="large" fullWidth disabled>
-              Insufficient balance
-            </ConnectButton>
+            <>
+              <Box
+                marginLeft="auto"
+                marginRight="auto"
+                marginTop={2}
+                marginBottom={2}
+                color="#F60505"
+                textAlign="center"
+              >
+                Insufficient balance
+              </Box>
+              <ConnectButton fullWidth disabled>
+                <Box lineHeight="36px">Deposit</Box>
+              </ConnectButton>
+            </>
           );
         }
       }
       return (
-        <ConnectButton
-          fullWidth
-          size="large"
-          variant="contained"
-          onClick={handleDeposit}
-          data-amp-analytics-on="click"
-          data-amp-analytics-name="click"
-          data-amp-analytics-attrs="page: Deposit, target: Deposit"
-        >
-          Deposit
-        </ConnectButton>
+        <>
+          <Box height={16}></Box>
+
+          <ConnectButton
+            fullWidth
+            variant="contained"
+            onClick={handleDeposit}
+            data-amp-analytics-on="click"
+            data-amp-analytics-name="click"
+            data-amp-analytics-attrs="page: Deposit, target: Deposit"
+          >
+            <Box lineHeight="36px">Deposit</Box>
+          </ConnectButton>
+        </>
       );
     } else if (depositView.method === "withdraw") {
       if (base && quote && baseShare && quoteShare) {
@@ -881,38 +901,55 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           quoteShare.isLessThan(new BigNumber(quote.amount))
         ) {
           return (
-            <ConnectButton size="large" fullWidth disabled>
-              Insufficient balance
-            </ConnectButton>
+            <>
+              <Box
+                marginLeft="auto"
+                marginRight="auto"
+                marginTop={2}
+                marginBottom={2}
+                color="#F60505"
+                textAlign="center"
+              >
+                Insufficient balance
+              </Box>
+              <ConnectButton fullWidth disabled>
+                <Box lineHeight="36px">Withdraw</Box>
+              </ConnectButton>
+            </>
           );
         }
       }
       return (
-        <ConnectButton
-          fullWidth
-          size="large"
-          variant="contained"
-          onClick={handleWithdraw}
-          data-amp-analytics-on="click"
-          data-amp-analytics-name="click"
-          data-amp-analytics-attrs="page: Withdraw, target: Withdraw"
-        >
-          Withdraw
-        </ConnectButton>
+        <>
+          <Box height={16}></Box>
+          <ConnectButton
+            fullWidth
+            variant="contained"
+            onClick={handleWithdraw}
+            data-amp-analytics-on="click"
+            data-amp-analytics-name="click"
+            data-amp-analytics-attrs="page: Withdraw, target: Withdraw"
+          >
+            <Box lineHeight="36px">Withdraw</Box>
+          </ConnectButton>
+        </>
       );
     } else if (depositView.method === "claim") {
       return (
-        <ConnectButton
-          fullWidth
-          size="large"
-          variant="contained"
-          onClick={handleClaimInterest}
-          data-amp-analytics-on="click"
-          data-amp-analytics-name="click"
-          data-amp-analytics-attrs="page: Claim, target: Claim"
-        >
-          Claim Interest
-        </ConnectButton>
+        <>
+          <Box height={16}></Box>
+
+          <ConnectButton
+            fullWidth
+            variant="contained"
+            onClick={handleClaimInterest}
+            data-amp-analytics-on="click"
+            data-amp-analytics-name="click"
+            data-amp-analytics-attrs="page: Claim, target: Claim"
+          >
+            <Box lineHeight="36px">Claim Interest</Box>
+          </ConnectButton>
+        </>
       );
     }
 
@@ -935,126 +972,13 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const vertical = "top";
   const horizontal = "right";
 
-  const reserveDisplay = (reserve: BigNumber, decimals: number): string => {
-    if (!reserve || !decimals) {
-      return "0";
-    }
-
-    const displayThreshold = 1;
-    const value = exponentiatedBy(reserve, decimals);
-    if (value.toNumber() < displayThreshold) {
-      return value.toFormat(decimals);
-    }
-    return value.toFormat(2);
-  };
-
   const method = depositView.method;
 
   return (
     <Box width="100%">
-      <Box display="flex" justifyContent="space-between">
-        <Typography variant="h5">Deposit</Typography>
-        <IconButton
-          size="small"
-          onClick={() => {
-            if (isRouterModal) history.push("/pools");
-            else setMenu(false, "");
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Box>
       <Box className={classes.container}>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          marginTop={3.5}
-          marginBottom={4}
-          fontSize={16}
-          fontWeight={500}
-          lineHeight="28px"
-        >
-          <Box className={classes.iconGroup}>
-            <img
-              src={baseTokenInfo.logoURI}
-              alt={`${baseTokenInfo.symbol} coin`}
-              className={classes.coinIcon}
-            />
-            <img
-              src={quoteTokenInfo.logoURI}
-              alt={`${quoteTokenInfo.symbol} coin`}
-              className={clx(classes.coinIcon, classes.firstCoin)}
-            />
-          </Box>
-          <Box marginLeft={2}>
-            <Box>
-              {`${reserveDisplay(
-                new BigNumber(swapInfo.poolState.baseReserve.toString()),
-                baseTokenInfo.decimals,
-              )} ${baseTokenInfo.symbol}(${basePercent?.toFormat(2) || "-"}%)`}
-            </Box>
-            <Box>
-              {`${reserveDisplay(
-                new BigNumber(swapInfo.poolState.quoteReserve.toString()),
-                quoteTokenInfo.decimals,
-              )} ${quoteTokenInfo.symbol}(${quotePercent?.toFormat(2) || "-"}%)`}
-            </Box>
-          </Box>
-          <Box marginLeft="auto" textAlign="right">
-            <Box sx={{ color: "#D3D3D3", fontSize: 14 }}>Total Share</Box>
-            <Box>{convertDollar(userTvl.toFixed(2).toString()) || "-"}</Box>
-          </Box>
-          <Box marginLeft="auto" textAlign="right">
-            <Box sx={{ color: "#D3D3D3", fontSize: 14 }}>Total Reserves</Box>
-            <Box>{convertDollar(tvl.toFixed(2).toString()) || "-"}</Box>
-          </Box>
-        </Box>
-        {/* <Box className={classes.statsPanel}>
-          <Typography className={classes.marketCondition}>POOL STATS</Typography>
-          <div className={classes.divider} />
-          <Box display="flex" flexDirection="column">
-            <Box display="flex" justifyContent="space-between">
-              <Typography className={classes.label}>Currency Reserves</Typography>
-              <Box marginBottom={2}>
-                <Box display="flex" marginBottom={1} alignItems="center" justifyContent="start">
-                  <img
-                    src={baseTokenInfo.logoURI}
-                    alt={`${baseTokenInfo.symbol} coin`}
-                    className={clx(classes.coinIcon, classes.statsIcon)}
-                  />
-                  <Typography className={classes.label}>
-                    {`${reserveDisplay(
-                      new BigNumber(swapInfo.poolState.baseReserve.toString()),
-                      baseTokenInfo.decimals,
-                    )} ${baseTokenInfo.symbol}(${basePercent?.toFormat(2) || "-"}%)`}
-                  </Typography>
-                </Box>
-                <Box display="flex">
-                  <img
-                    src={quoteTokenInfo.logoURI}
-                    alt={`${quoteTokenInfo.symbol} coin`}
-                    className={clx(classes.coinIcon, classes.statsIcon)}
-                  />
-                  <Typography className={classes.label}>
-                    {`${reserveDisplay(
-                      new BigNumber(swapInfo.poolState.quoteReserve.toString()),
-                      quoteTokenInfo.decimals,
-                    )} ${quoteTokenInfo.symbol}(${quotePercent?.toFormat(2) || "-"}%)`}
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-            <Box display="flex" justifyContent="space-between" marginBottom={2}>
-              <Typography className={classes.label}>Total Reserves</Typography>
-              <Typography className={classes.label}>
-                {convertDollar(tvl?.toFixed(2).toString())}
-              </Typography>
-            </Box>
-          </Box>
-        </Box> */}
-        <Divider />
         <Box className={classes.ratePanel}>
-          <Box className={classes.tabs}>
+          <Box className={classes.tabs} position="relative">
             <Box>
               <MUIButton
                 className={method === "deposit" ? classes.activeBtn : classes.btn}
@@ -1068,71 +992,87 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
               >
                 Withdraw
               </MUIButton>
-              <MUIButton
+              {/* <MUIButton
                 className={method === "claim" ? classes.activeBtn : classes.btn}
                 onClick={() => handleSwitchMethod("claim")}
               >
                 Claim Interest
-              </MUIButton>
+              </MUIButton> */}
+            </Box>
+            <Box position="absolute" right={0}>
+              <IconButton
+                onClick={() => {
+                  if (isRouterModal) history.push("/pools");
+                  else setMenu(false, "");
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
             </Box>
           </Box>
+          <Divider />
         </Box>
-        {(() => {
-          switch (method) {
-            case "withdraw":
-              return (
-                <Box display="flex" flexDirection="column" alignItems="flex-end">
-                  <WithdrawSelectCard
-                    percentage={depositView.withdrawPercentage}
-                    onUpdatePercentage={handleWithdrawSlider}
-                  />
-                  <Box mt={2} />
-                  <WithdrawCard
-                    card={depositView.base}
-                    handleChangeCard={handleBaseTokenInput}
-                    withdrawal={baseShare?.toFixed(6).toString()}
-                    disableDrop={true}
-                  />
-                  <Box mt={3} />
-                  <WithdrawCard
-                    card={depositView.quote}
-                    handleChangeCard={handleQuoteTokenInput}
-                    withdrawal={quoteShare?.toFixed(6).toString()}
-                    disableDrop={true}
-                  />
-                </Box>
-              );
-            case "deposit":
-              return (
-                <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
-                  <SwapCard
-                    card={depositView.base}
-                    handleChangeCard={handleBaseTokenInput}
-                    disableDrop={true}
-                  />
-                  <SwapCard
-                    card={depositView.quote}
-                    handleChangeCard={handleQuoteTokenInput}
-                    disableDrop={true}
-                  />
-                </Box>
-              );
-            case "claim":
-              return (
-                <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
-                  <Paper>Cumulative interest: {cumulativeInterest} DELFI</Paper>
-                  <Paper>Unclaimed interest: {unclaimedInterest} DELFI</Paper>
-                </Box>
-              );
-            default:
-              throw Error("Invalid deposit card method: " + method);
-          }
-        })()}
-        <Box mt={3} width="100%" sx={{ position: "relative", zIndex: 1 }}>
+        <Box textAlign="right" lineHeight={1} mt={2} mb={2}>
+          APR: {dailyRewardRate} DELFI/USD
+        </Box>
+        <div>
+          {(() => {
+            switch (method) {
+              case "withdraw":
+                return (
+                  <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={4}>
+                    <WithdrawSelectCard
+                      percentage={depositView.withdrawPercentage}
+                      onUpdatePercentage={handleWithdrawSlider}
+                    />
+                    <WithdrawCard
+                      card={depositView.base}
+                      handleChangeCard={handleBaseTokenInput}
+                      withdrawal={baseShare?.toFixed(6).toString()}
+                      disableDrop={true}
+                    />
+                    <WithdrawCard
+                      card={depositView.quote}
+                      handleChangeCard={handleQuoteTokenInput}
+                      withdrawal={quoteShare?.toFixed(6).toString()}
+                      disableDrop={true}
+                    />
+                  </Box>
+                );
+              case "deposit":
+                return (
+                  <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={4}>
+                    <SwapCard
+                      card={depositView.base}
+                      handleChangeCard={handleBaseTokenInput}
+                      disableDrop={true}
+                      isDeposit
+                    />
+                    <SwapCard
+                      card={depositView.quote}
+                      handleChangeCard={handleQuoteTokenInput}
+                      disableDrop={true}
+                      isDeposit
+                    />
+                  </Box>
+                );
+              case "claim":
+                return (
+                  <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
+                    <Paper>Cumulative interest: {cumulativeInterest} DELFI</Paper>
+                    <Paper>Unclaimed interest: {unclaimedInterest} DELFI</Paper>
+                  </Box>
+                );
+              default:
+                throw Error("Invalid deposit card method: " + method);
+            }
+          })()}
+        </div>
+        <Box mt={1} width="100%" sx={{ position: "relative", zIndex: 1 }}>
           {actionButton}
         </Box>
         <Box display="flex" justifyContent="center" className={classes.statsBottom}>
-          <Box>{swapFee.toString()}% Swap Fee</Box>
+          {/* <Box>{swapFee.toString()}% Swap Fee</Box> */}
           <Box>{withdrawFee.toString()}% Withdraw Fee</Box>
         </Box>
       </Box>

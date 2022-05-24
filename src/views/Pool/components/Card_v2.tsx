@@ -1,5 +1,5 @@
 import React, { useMemo, memo } from "react";
-import { Box, makeStyles, Typography } from "@material-ui/core";
+import { Box, makeStyles } from "@material-ui/core";
 import BigNumber from "bignumber.js";
 import styled from "styled-components";
 
@@ -47,11 +47,12 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
     [breakpoints.up("sm")]: {
       width: "296px",
     },
+    lineHeight: 1,
   },
   header: {
     background: "url('/images/coin-card-banner.png')",
     backgroundSize: "cover",
-    height: 90,
+    height: 80,
     position: "relative",
     "&.lime": {
       backgroundColor: "#D4FF00",
@@ -69,7 +70,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
       position: "absolute",
       left: "50%",
       top: "100%",
-      transform: "translate(-50%, -50%)",
+      transform: "translate(-50%, -70%)",
     },
   },
   content: {
@@ -77,7 +78,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
     [breakpoints.up("sm")]: {
       marginBottom: spacing(5),
     },
-    marginTop: spacing(4.5),
+    marginTop: spacing(3.5),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -93,6 +94,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   label: {
     color: palette.text.primary,
     fontSize: 14,
+    marginTop: 6,
     [breakpoints.up("sm")]: {
       fontSize: 18,
       fontWeight: 500,
@@ -118,7 +120,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
     },
   },
   cardBtn: {
-    marginTop: "28px",
+    marginTop: "20px",
     height: "48px",
     width: "238px",
   },
@@ -258,54 +260,34 @@ const PoolCard: React.FC<CardProps> = (props) => {
       <Box className={classes.content}>
         <Box display="flex" alignItems="center" mb={2.5}>
           <Box>
-            <Typography className={classes.tokenPair}>{`${poolConfig.name}`}</Typography>
+            <Box className={classes.tokenPair}>{`${poolConfig.name}`}</Box>
           </Box>
         </Box>
         {props.isUserPool && (
-          <Box marginTop={1}>
-            <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-              My Deposit
-            </Typography>
-            <Typography className={classes.label}>{convertDollar(userTvl.toFixed(2))}</Typography>
+          <Box marginBottom={1.25}>
+            <Box className={`${classes.labelTitle} ${props.color || ""}`}>My Deposit</Box>
+            <Box className={classes.label}>{convertDollar(userTvl.toFixed(2))}</Box>
           </Box>
         )}
-        <Box marginTop={1}>
-          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-            Total Deposits
-          </Typography>
-          <Typography className={classes.label}>
-            {convertDollar(tvl.toFixed(2).toString())}
-          </Typography>
-        </Box>
-        <Box marginTop={1}>
-          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-            Total Volume
-          </Typography>
-          <Typography className={classes.label}>
-            {convertDollar(tvl.toFixed(2).toString())}
-          </Typography>
-        </Box>
-        <Box marginTop={1}>
-          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-            Total trade volume
-          </Typography>
-          <Typography className={classes.label}>
+        <Box>
+          <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total Trading Volume</Box>
+          <Box className={classes.label}>
             {convertDollar(totalTradeVolume.toFixed(2).toString())}
-          </Typography>
+          </Box>
+        </Box>
+        <Box marginTop={1.25}>
+          <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total Deposits</Box>
+          <Box className={classes.label}>{convertDollar(tvl.toFixed(2).toString())}</Box>
         </Box>
         {props.isUserPool ? (
-          <Box marginTop={1}>
-            <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-              Daily reward
-            </Typography>
-            <Typography className={classes.label}>{dailyReward} DELFI</Typography>
+          <Box marginTop={1.25}>
+            <Box className={`${classes.labelTitle} ${props.color || ""}`}>Daily reward</Box>
+            <Box className={classes.label}>{dailyReward} DELFI</Box>
           </Box>
         ) : (
-          <Box marginTop={1}>
-            <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-              Est. daily reward per USD
-            </Typography>
-            <Typography className={classes.label}>{dailyRewardRate} DELFI/USD</Typography>
+          <Box marginTop={1.25}>
+            <Box className={`${classes.labelTitle} ${props.color || ""}`}>APR</Box>
+            <Box className={classes.label}>{dailyRewardRate} DELFI/USD</Box>
           </Box>
         )}
         <ConnectButton
