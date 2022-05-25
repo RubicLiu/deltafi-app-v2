@@ -24,6 +24,7 @@ import { fetchSerumDataThunk } from "states/serumState";
 import { appActions } from "states/appState";
 import { programSelector } from "states";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { DELFI_USDT, fetchCandleSticksThunk, fetchTickerThunk } from "states/gateIoState";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -59,6 +60,11 @@ const App: React.FC = () => {
   const { publicKey: walletAddress } = wallet;
   const { connection } = useConnection();
   const program = useSelector(programSelector);
+
+  useEffect(() => {
+    dispatch(fetchTickerThunk(DELFI_USDT));
+    dispatch(fetchCandleSticksThunk(DELFI_USDT));
+  });
 
   useEffect(() => {
     if (!walletAddress) {

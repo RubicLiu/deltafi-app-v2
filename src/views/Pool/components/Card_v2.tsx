@@ -14,8 +14,6 @@ import {
   selectLpUserBySwapKey,
 } from "states/selectors";
 import { SwapInfo } from "anchor/type_definitions";
-import { DELTAFI_TOKEN_DECIMALS, DAYS_PER_YEAR } from "constants/index";
-import { anchorBnToBn } from "utils/tokenUtils";
 
 const Img = styled.img`
   width: 32px;
@@ -205,44 +203,45 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const userTvl = userBaseTvl.plus(userQuoteTvl);
 
-  const { dailyReward, dailyRewardRate } = useMemo(() => {
-    let dailyReward = "--";
-    let dailyRewardRate = "--";
-
-    if (swapInfo?.swapConfig) {
-      const baseRewardPerToken: BigNumber = new BigNumber(
-        swapInfo.swapConfig.baseAprNumerator.toString(),
-      ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
-      const quoteRewardPerToken: BigNumber = new BigNumber(
-        swapInfo.swapConfig.quoteAprNumerator.toString(),
-      ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
-
-      const baseDailyRewardRate: BigNumber = baseRewardPerToken
-        .dividedBy(basePrice)
-        .dividedBy(DAYS_PER_YEAR);
-      const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
-        .dividedBy(quotePrice)
-        .dividedBy(DAYS_PER_YEAR);
-
-      dailyRewardRate = baseDailyRewardRate
-        .plus(quoteDailyRewardRate)
-        .toFixed(DELTAFI_TOKEN_DECIMALS);
-
-      if (swapInfo?.poolState) {
-        const baseDailyReward: BigNumber = baseRewardPerToken
-          .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
-          .dividedBy(DAYS_PER_YEAR);
-        const quoteDailyReward: BigNumber = quoteRewardPerToken
-          .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
-          .dividedBy(DAYS_PER_YEAR);
-        dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
-      }
-    }
-    return {
-      dailyReward,
-      dailyRewardRate,
-    };
-  }, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo]);
+  //const delfiTicker = useSelector(selectGateIoSticker(DELFI_USDT));
+  //const { dailyReward, dailyRewardRate } = useMemo(() => {
+  //  let dailyReward = "--";
+  //  let dailyRewardRate = "--";
+  //      if (swapInfo?.swapConfig && delfiTicker) {
+  //        const baseRewardPerToken: BigNumber = new BigNumber(
+  //          swapInfo.swapConfig.baseAprNumerator.toString(),
+  //        ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
+  //        const quoteRewardPerToken: BigNumber = new BigNumber(
+  //          swapInfo.swapConfig.quoteAprNumerator.toString(),
+  //        ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
+  //
+  //        const baseDailyRewardRate: BigNumber = baseRewardPerToken
+  //          .dividedBy(basePrice)
+  //          .dividedBy(DAYS_PER_YEAR);
+  //        const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
+  //          .dividedBy(quotePrice)
+  //          .dividedBy(DAYS_PER_YEAR);
+  //
+  //        dailyRewardRate = baseDailyRewardRate
+  //          .plus(quoteDailyRewardRate)
+  //          .times(new BigNumber(delfiTicker.last))
+  //          .toFixed(DELTAFI_TOKEN_DECIMALS);
+  //
+  //        if (swapInfo?.poolState) {
+  //          const baseDailyReward: BigNumber = baseRewardPerToken
+  //            .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
+  //            .dividedBy(DAYS_PER_YEAR);
+  //          const quoteDailyReward: BigNumber = quoteRewardPerToken
+  //            .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
+  //            .dividedBy(DAYS_PER_YEAR);
+  //          dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
+  //        }
+  //      }
+  //  return {
+  //    dailyReward,
+  //    dailyRewardRate,
+  //  };
+  //}, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, delfiTicker]);
 
   if (!swapInfo) return null;
   return (
@@ -279,17 +278,6 @@ const PoolCard: React.FC<CardProps> = (props) => {
           <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total Deposits</Box>
           <Box className={classes.label}>{convertDollar(tvl.toFixed(2).toString())}</Box>
         </Box>
-        {props.isUserPool ? (
-          <Box marginTop={1.25}>
-            <Box className={`${classes.labelTitle} ${props.color || ""}`}>Daily reward</Box>
-            <Box className={classes.label}>{dailyReward} DELFI</Box>
-          </Box>
-        ) : (
-          <Box marginTop={1.25}>
-            <Box className={`${classes.labelTitle} ${props.color || ""}`}>APR</Box>
-            <Box className={classes.label}>{dailyRewardRate} DELFI/USD</Box>
-          </Box>
-        )}
         <ConnectButton
           className={classes.cardBtn}
           onClick={() => setMenu(true, "deposit", undefined, { poolAddress: poolConfig.swapInfo })}

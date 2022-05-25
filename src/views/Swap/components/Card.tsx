@@ -164,9 +164,6 @@ const SwapCard: React.FC<CardProps> = (props) => {
           </Typography>
           <Typography className={classes.tokenBalance}>{card?.token?.symbol}</Typography>
         </Box>
-        <Box className={classes.tokenBalance}>
-          Total: {"00.00"} {"Symbol"} ({0}%)
-        </Box>
       </Box>
     </Paper>
   );

@@ -1,13 +1,13 @@
 {
-  imageTag:: error "imageTag is not set",
-  dockerRegistry:: error "dockerRegistry is not set",
-  domainName:: error "domainName is not set",
+  imageTag:: error 'imageTag is not set',
+  dockerRegistry:: error 'dockerRegistry is not set',
+  domainName:: error 'domainName is not set',
   frontendReplicas:: 2,
   backendReplicas:: 2,
 
-  local namespace = "deltafi-app-v2",
-  local appFrontend = "deltafi-app-v2-frontend",
-  local appBackend = "deltafi-app-v2-backend",
+  local namespace = 'deltafi-app-v2',
+  local appFrontend = 'deltafi-app-v2-frontend',
+  local appBackend = 'deltafi-app-v2-backend',
 
   apiVersion: 'v1',
   kind: 'List',
@@ -85,7 +85,7 @@
         template: {
           metadata: {
             labels: {
-              app: appBackend
+              app: appBackend,
             },
           },
           spec: {
@@ -132,7 +132,6 @@
         namespace: namespace,
         annotations: {
           'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
-          'nginx.ingress.kubernetes.io/rewrite-target': '/$1',
         },
       },
       spec: {
@@ -151,7 +150,7 @@
             http: {
               paths: [
                 {
-                  path: '/api/(.*)',
+                  path: '/api/',
                   pathType: 'Prefix',
                   backend: {
                     service: {
@@ -163,7 +162,7 @@
                   },
                 },
                 {
-                  path: '/(.*)',
+                  path: '/',
                   pathType: 'Prefix',
                   backend: {
                     service: {

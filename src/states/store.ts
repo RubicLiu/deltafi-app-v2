@@ -4,6 +4,7 @@ import { serumReducer } from "./serumState";
 import { viewsReducer } from "./views";
 import { accountsReducer } from "./accounts";
 import { appReducer } from "./appState";
+import { gateIoReducer } from "./gateIoState";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     accounts: accountsReducer,
     views: viewsReducer,
     app: appReducer,
+    gateIo: gateIoReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -24,7 +24,7 @@
                "spec": {
                   "containers": [
                      {
-                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/frontend:37cac06-20220524-164713",
+                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/frontend:91fff99-20220524-204512",
                         "name": "main",
                         "ports": [
                            {
@@ -80,7 +80,7 @@
                "spec": {
                   "containers": [
                      {
-                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/backend:37cac06-20220524-164713",
+                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/backend:91fff99-20220524-204512",
                         "name": "main",
                         "ports": [
                            {
@@ -118,8 +118,7 @@
          "kind": "Ingress",
          "metadata": {
             "annotations": {
-               "cert-manager.io/cluster-issuer": "letsencrypt-prod",
-               "nginx.ingress.kubernetes.io/rewrite-target": "/$1"
+               "cert-manager.io/cluster-issuer": "letsencrypt-prod"
             },
             "name": "deltafi-app-v2",
             "namespace": "deltafi-app-v2"
@@ -140,7 +139,7 @@
                                  }
                               }
                            },
-                           "path": "/api/(.*)",
+                           "path": "/api/",
                            "pathType": "Prefix"
                         },
                         {
@@ -152,7 +151,7 @@
                                  }
                               }
                            },
-                           "path": "/(.*)",
+                           "path": "/",
                            "pathType": "Prefix"
                         }
                      ]
