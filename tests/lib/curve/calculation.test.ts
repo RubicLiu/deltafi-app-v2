@@ -204,7 +204,7 @@ describe("calculation", function () {
         new BigNumber("2500000000000000000"),
         new BigNumber(1000),
       ),
-    ).toEqual( {
+    ).toEqual({
       outAmount: new BigNumber(2727),
       priceImpact: new BigNumber("0.00010001000100010001"),
     });
