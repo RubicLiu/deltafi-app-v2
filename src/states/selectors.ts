@@ -14,6 +14,7 @@ export const depositViewSelector = (state: RootState) => state.views.depositView
 export const swapViewSelector = (state: RootState) => state.views.swapView;
 export const rewardViewSelector = (state: RootState) => state.views.rewardView;
 
+export const gateIoSelector = (state: RootState) => state.gateIo;
 export const programSelector = (state: RootState) => state.app.program;
 
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
@@ -47,5 +48,11 @@ export function selectSwapBySwapKey(poolKey: string) {
 export function selectLpUserBySwapKey(swapKey: string) {
   return (state: RootState) => {
     return state.accounts.liquidityProviderAccount.swapKeyToLp[swapKey];
+  };
+}
+
+export function selectGateIoSticker(currencyPair: string) {
+  return (state: RootState) => {
+    return state.gateIo.currencyPairToTicker[currencyPair];
   };
 }
