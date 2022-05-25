@@ -132,7 +132,6 @@
         namespace: namespace,
         annotations: {
           'cert-manager.io/cluster-issuer': 'letsencrypt-prod',
-          'nginx.ingress.kubernetes.io/rewrite-target': '/$1',
         },
       },
       spec: {
@@ -151,7 +150,7 @@
             http: {
               paths: [
                 {
-                  path: '/api/(.*)',
+                  path: '/api/',
                   pathType: 'Prefix',
                   backend: {
                     service: {
@@ -163,7 +162,7 @@
                   },
                 },
                 {
-                  path: '/(.*)',
+                  path: '/',
                   pathType: 'Prefix',
                   backend: {
                     service: {

@@ -15,11 +15,11 @@ const candlesticksCache = new CacheContainer(new MemoryStorage())
 
 const routes = Router();
 
-routes.get('/pools', (_, response) => {
+routes.get('/api/pools', (_, response) => {
   return response.json(config.poolInfoList);
 });
 
-routes.get('/spot/tickers/:currencyPair', async (request, response) => {
+routes.get('/api/spot/tickers/:currencyPair', async (request, response) => {
   const currencyPair = request.params.currencyPair;
   const cachedTickers = await tickersCache.getItem(currencyPair);
   if (cachedTickers) {
@@ -36,7 +36,7 @@ routes.get('/spot/tickers/:currencyPair', async (request, response) => {
   }
 });
 
-routes.get('/spot/candlesticks/:currencyPair', async (request, response) => {
+routes.get('/api/spot/candlesticks/:currencyPair', async (request, response) => {
   const currencyPair = request.params.currencyPair;
   const cachedCandleSticks = await candlesticksCache.getItem(currencyPair);
   if (cachedCandleSticks) {
