@@ -24,7 +24,7 @@
                "spec": {
                   "containers": [
                      {
-                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/frontend:37cac06-20220524-164713",
+                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/frontend:bc7fe8e-20220524-173139",
                         "name": "main",
                         "ports": [
                            {
@@ -80,7 +80,7 @@
                "spec": {
                   "containers": [
                      {
-                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/backend:37cac06-20220524-164713",
+                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev/deltafi-app-v2/backend:bc7fe8e-20220524-173139",
                         "name": "main",
                         "ports": [
                            {
