@@ -37,7 +37,6 @@ import {
   selectTokenAccountInfoByMint,
   depositViewSelector,
   programSelector,
-  selectGateIoSticker,
 } from "states/selectors";
 import { depositViewActions } from "states/views/depositView";
 import { Transaction } from "@solana/web3.js";
@@ -49,10 +48,8 @@ import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/to
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { Paper } from "@material-ui/core";
 import { createClaimFarmRewardsTransaction } from "utils/transactions/deposit";
-import BN from "bn.js";
 import { scheduleWithInterval } from "utils";
 import WithdrawSelectCard from "components/molecules/WithdrawSelectCard";
-import { DELFI_USDT } from "states/gateIoState";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -335,46 +332,46 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return "--";
   }, [lpUser]);
 
-  const delfiTicker = useSelector(selectGateIoSticker(DELFI_USDT));
-  const { dailyRewardRate } = useMemo(() => {
-    let dailyReward = "--";
-    let dailyRewardRate = "--";
-
-    //    if (swapInfo?.swapConfig && delfiTicker) {
-    //      const baseRewardPerToken: BigNumber = new BigNumber(
-    //        swapInfo.swapConfig.baseAprNumerator.toString(),
-    //      ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
-    //      const quoteRewardPerToken: BigNumber = new BigNumber(
-    //        swapInfo.swapConfig.quoteAprNumerator.toString(),
-    //      ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
-    //
-    //      const baseDailyRewardRate: BigNumber = baseRewardPerToken
-    //        .dividedBy(basePrice)
-    //        .dividedBy(DAYS_PER_YEAR);
-    //      const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
-    //        .dividedBy(quotePrice)
-    //        .dividedBy(DAYS_PER_YEAR);
-    //
-    //      dailyRewardRate = baseDailyRewardRate
-    //        .plus(quoteDailyRewardRate)
-    //        .times(new BigNumber(delfiTicker.last))
-    //        .toFixed(DELTAFI_TOKEN_DECIMALS);
-    //
-    //      if (swapInfo?.poolState) {
-    //        const baseDailyReward: BigNumber = baseRewardPerToken
-    //          .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
-    //          .dividedBy(DAYS_PER_YEAR);
-    //        const quoteDailyReward: BigNumber = quoteRewardPerToken
-    //          .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
-    //          .dividedBy(DAYS_PER_YEAR);
-    //        dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
-    //      }
-    //    }
-    return {
-      dailyReward,
-      dailyRewardRate,
-    };
-  }, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, delfiTicker]);
+  //const delfiTicker = useSelector(selectGateIoSticker(DELFI_USDT));
+  //const { dailyRewardRate } = useMemo(() => {
+  //  let dailyReward = "--";
+  //  let dailyRewardRate = "--";
+  //
+  //    if (swapInfo?.swapConfig && delfiTicker) {
+  //      const baseRewardPerToken: BigNumber = new BigNumber(
+  //        swapInfo.swapConfig.baseAprNumerator.toString(),
+  //      ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
+  //      const quoteRewardPerToken: BigNumber = new BigNumber(
+  //        swapInfo.swapConfig.quoteAprNumerator.toString(),
+  //      ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
+  //
+  //      const baseDailyRewardRate: BigNumber = baseRewardPerToken
+  //        .dividedBy(basePrice)
+  //        .dividedBy(DAYS_PER_YEAR);
+  //      const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
+  //        .dividedBy(quotePrice)
+  //        .dividedBy(DAYS_PER_YEAR);
+  //
+  //      dailyRewardRate = baseDailyRewardRate
+  //        .plus(quoteDailyRewardRate)
+  //        .times(new BigNumber(delfiTicker.last))
+  //        .toFixed(DELTAFI_TOKEN_DECIMALS);
+  //
+  //      if (swapInfo?.poolState) {
+  //        const baseDailyReward: BigNumber = baseRewardPerToken
+  //          .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
+  //          .dividedBy(DAYS_PER_YEAR);
+  //        const quoteDailyReward: BigNumber = quoteRewardPerToken
+  //          .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
+  //          .dividedBy(DAYS_PER_YEAR);
+  //        dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
+  //      }
+  //    }
+  //  return {
+  //    dailyReward,
+  //    dailyRewardRate,
+  //  };
+  //}, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, delfiTicker]);
 
   // update reward every 5 seconds
   useEffect(
@@ -414,14 +411,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         DELTAFI_TOKEN_DECIMALS,
       );
 
-      const secondsFromBaseLastUpdate =
-        lpUser.basePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
-          ? new BN(0)
-          : new BN(depositView.currentUnixTimestamp).sub(lpUser.basePosition.lastUpdateTs);
-      const secondsFromQuoteLastUpdate =
-        lpUser.quotePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
-          ? new BN(0)
-          : new BN(depositView.currentUnixTimestamp).sub(lpUser.quotePosition.lastUpdateTs);
+      //const secondsFromBaseLastUpdate =
+      //  lpUser.basePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
+      //    ? new BN(0)
+      //    : new BN(depositView.currentUnixTimestamp).sub(lpUser.basePosition.lastUpdateTs);
+      //const secondsFromQuoteLastUpdate =
+      //  lpUser.quotePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
+      //    ? new BN(0)
+      //    : new BN(depositView.currentUnixTimestamp).sub(lpUser.quotePosition.lastUpdateTs);
 
       const extraOwedBaseInterest = new BigNumber(0);
       const extraOwnedQuoteInterest = new BigNumber(0);
@@ -456,7 +453,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     }
 
     return "--";
-  }, [lpUser, swapInfo?.swapConfig, depositView.currentUnixTimestamp]);
+  }, [lpUser, swapInfo?.swapConfig]);
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
 
