@@ -887,17 +887,8 @@ const Home: React.FC = (props) => {
                 </Box>
               </Grid>
               <Grid item xs={6} sm={2}>
-                <Box className={classes.currencyCt}>
-                  <Box>24h%</Box>
-                  <Box sx={{ color: "#F62805" }}>--</Box>
-                </Box>
               </Grid>
               <Grid item xs={6} sm={3}>
-                <ResponsiveContainer width="100%" height={32}>
-                  <LineChart width={105} height={32} data={priceMock}>
-                    <Line type="monotone" dataKey="uv" stroke="#D4FF00" dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
               </Grid>
               <Grid item xs={6} sm={4} style={{ display: "flex", alignItems: "center" }}>
                 <Avatar
@@ -919,17 +910,8 @@ const Home: React.FC = (props) => {
                 </Box>
               </Grid>
               <Grid item xs={6} sm={2}>
-                <Box className={classes.currencyCt}>
-                  <Box>24h%</Box>
-                  <Box sx={{ color: "#F62805" }}>--</Box>
-                </Box>
               </Grid>
               <Grid item xs={6} sm={3}>
-                <ResponsiveContainer width="100%" height={32}>
-                  <LineChart width={105} height={32} data={priceMock}>
-                    <Line type="monotone" dataKey="pv" stroke="#D4FF00" dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
               </Grid>
             </Grid>
           </Paper>
