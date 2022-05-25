@@ -4,6 +4,7 @@ export const DELFI_USDT = "DELFI_USDT";
 
 const initialState = {
   currencyPairToTicker: {},
+  currencyPairToCandleSticks: {},
 };
 
 export const fetchTickerThunk = createAsyncThunk("fetchTicker", async (currencyPair: string) => {
@@ -17,6 +18,16 @@ export const fetchTickerThunk = createAsyncThunk("fetchTicker", async (currencyP
   };
 });
 
+export const fetchCandleSticksThunk = createAsyncThunk("fetchCandleSticks", async (currencyPair: string) => {
+  const response = await fetch("/api/spot/candlesticks/" + currencyPair);
+  const data = await response.json();
+  console.info(currencyPair, data);
+  return {
+    currencyPair,
+    candleSticks: data,
+  };
+});
+
 const gateIoSlice = createSlice({
   name: "gateIo",
   initialState,
@@ -25,6 +36,12 @@ const gateIoSlice = createSlice({
     builder.addCase(fetchTickerThunk.fulfilled, (state, action) => {
       if (action.payload.ticker) {
         state.currencyPairToTicker[action.payload.currencyPair] = action.payload.ticker;
+      }
+    });
+
+    builder.addCase(fetchCandleSticksThunk.fulfilled, (state, action) => {
+      if (action.payload.candleSticks) {
+        state.currencyPairToTicker[action.payload.currencyPair] = action.payload.candleSticks;
       }
     });
   },

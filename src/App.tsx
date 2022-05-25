@@ -24,7 +24,7 @@ import { fetchSerumDataThunk } from "states/serumState";
 import { appActions } from "states/appState";
 import { programSelector } from "states";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
-import { DELFI_USDT, fetchTickerThunk } from "states/gateIoState";
+import { DELFI_USDT, fetchCandleSticksThunk, fetchTickerThunk } from "states/gateIoState";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -63,6 +63,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchTickerThunk(DELFI_USDT));
+    dispatch(fetchCandleSticksThunk(DELFI_USDT));
   });
 
   useEffect(() => {
