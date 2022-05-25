@@ -8,7 +8,7 @@ export const fetchTickerThunk = createAsyncThunk("fetchTicker", async (currencyP
   const response = await fetch("/api/spot/tickers/DELFI_USDT");
   const data = await response.json();
   console.info(currencyPair, data);
-  const ticker = data && data.length == 1 ? data[0] : null;
+  const ticker = data && data.length === 1 ? data[0] : null;
   return {
     currencyPair,
     ticker,
