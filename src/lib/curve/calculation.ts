@@ -107,17 +107,7 @@ export function calculateOutAmountNormalSwap(
     .dividedBy(currentReserveA)
     .dividedBy(targetReserveB);
   let actualPrice: BigNumber = new BigNumber(outputBAmount).dividedBy(inputAAmount);
-  let priceImpact: BigNumber = impliedPrice.minus(actualPrice).dividedBy(actualPrice);
-  // .multipliedBy(
-  //   currentReserveB.plus(
-  //     balancedReserveB.multipliedBy(new BigNumber(1).minus(slope)).dividedBy(slope),
-  //   ),
-  // )
-  // .dividedBy(
-  //   currentReserveA.plus(
-  //     balancedReserveA.multipliedBy(new BigNumber(1).minus(slope).dividedBy(slope)),
-  //   ),
-  // );
+  let priceImpact: BigNumber = impliedPrice.minus(actualPrice).dividedBy(actualPrice).abs();
 
   return { outAmount: new BigNumber(outputBAmount), priceImpact };
 }
@@ -268,7 +258,7 @@ export function calculateOutAmountStableSwap(
     );
 
   let actualPrice: BigNumber = outputBAmount.dividedBy(inputAAmount);
-  let priceImpact: BigNumber = impliedPrice.minus(actualPrice).dividedBy(actualPrice);
+  let priceImpact: BigNumber = impliedPrice.minus(actualPrice).dividedBy(actualPrice).abs();
 
   return {
     outAmount: outputBAmount,

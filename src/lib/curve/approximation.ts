@@ -24,6 +24,7 @@ export function approximateOutAmount(
   marketPrice: BigNumber,
   inputAAmount: BigNumber,
 ): {
+  // TODO(leqiang): change the output value to BigNumber
   impliedOutAmount: number;
   approximationResult: number;
 } {
