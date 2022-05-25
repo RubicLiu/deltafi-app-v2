@@ -9,4 +9,4 @@ ADD src /usr/app/src
 RUN yarn build
 
 EXPOSE 4000
-ENTRYPOINT [ "node", "dist/server.js" ]
+CMD [ "node", "dist/server.js" ]
