@@ -886,10 +886,8 @@ const Home: React.FC = (props) => {
                   </Box>
                 </Box>
               </Grid>
-              <Grid item xs={6} sm={2}>
-              </Grid>
-              <Grid item xs={6} sm={3}>
-              </Grid>
+              <Grid item xs={6} sm={2}></Grid>
+              <Grid item xs={6} sm={3}></Grid>
               <Grid item xs={6} sm={4} style={{ display: "flex", alignItems: "center" }}>
                 <Avatar
                   src={tokenTo?.token.logoURI}
@@ -909,10 +907,8 @@ const Home: React.FC = (props) => {
                   </Box>
                 </Box>
               </Grid>
-              <Grid item xs={6} sm={2}>
-              </Grid>
-              <Grid item xs={6} sm={3}>
-              </Grid>
+              <Grid item xs={6} sm={2}></Grid>
+              <Grid item xs={6} sm={3}></Grid>
             </Grid>
           </Paper>
           <Box marginTop={3} width="100%" position="relative" zIndex={1}>
