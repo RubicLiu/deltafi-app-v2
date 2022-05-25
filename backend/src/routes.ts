@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Cache, CacheContainer } from 'node-ts-cache';
+import { CacheContainer } from 'node-ts-cache';
 import { MemoryStorage } from 'node-ts-cache-storage-memory';
 import * as GateApi from "gate-api";
 
