@@ -56,7 +56,7 @@ const gateIoSlice = createSlice({
 
     builder.addCase(fetchCandleSticksThunk.fulfilled, (state, action) => {
       if (action.payload.candleSticks) {
-        state.currencyPairToTicker[action.payload.currencyPair] = action.payload.candleSticks;
+        state.currencyPairToCandleSticks[action.payload.currencyPair] = action.payload.candleSticks;
       }
     });
   },

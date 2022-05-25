@@ -38,6 +38,7 @@ import {
   selectTokenAccountInfoByMint,
   depositViewSelector,
   programSelector,
+  selectGateIoSticker,
 } from "states/selectors";
 import { depositViewActions } from "states/views/depositView";
 import { Transaction } from "@solana/web3.js";
@@ -52,6 +53,7 @@ import { createClaimFarmRewardsTransaction } from "utils/transactions/deposit";
 import BN from "bn.js";
 import { scheduleWithInterval } from "utils";
 import WithdrawSelectCard from "components/molecules/WithdrawSelectCard";
+import { DELFI_USDT } from "states/gateIoState";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -334,11 +336,12 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return "--";
   }, [lpUser]);
 
+  const delfiTicker = useSelector(selectGateIoSticker(DELFI_USDT));
   const { dailyRewardRate } = useMemo(() => {
     let dailyReward = "--";
     let dailyRewardRate = "--";
 
-    if (swapInfo?.swapConfig) {
+    if (swapInfo?.swapConfig && delfiTicker) {
       const baseRewardPerToken: BigNumber = new BigNumber(
         swapInfo.swapConfig.baseAprNumerator.toString(),
       ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
@@ -355,6 +358,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
       dailyRewardRate = baseDailyRewardRate
         .plus(quoteDailyRewardRate)
+        .times(new BigNumber(delfiTicker.last))
         .toFixed(DELTAFI_TOKEN_DECIMALS);
 
       if (swapInfo?.poolState) {
@@ -371,7 +375,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       dailyReward,
       dailyRewardRate,
     };
-  }, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo]);
+  }, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, delfiTicker]);
 
   // update reward every 5 seconds
   useEffect(
@@ -1013,7 +1017,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           <Divider />
         </Box>
         <Box textAlign="right" lineHeight={1} mt={2} mb={2}>
-          APR: {dailyRewardRate} DELFI/USD
+          APR: {dailyRewardRate}
         </Box>
         <div>
           {(() => {

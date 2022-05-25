@@ -12,10 +12,12 @@ import {
   selectSwapBySwapKey,
   selectMarketPriceByPool,
   selectLpUserBySwapKey,
+  selectGateIoSticker,
 } from "states/selectors";
 import { SwapInfo } from "anchor/type_definitions";
 import { DELTAFI_TOKEN_DECIMALS, DAYS_PER_YEAR } from "constants/index";
 import { anchorBnToBn } from "utils/tokenUtils";
+import { DELFI_USDT } from "states/gateIoState";
 
 const Img = styled.img`
   width: 32px;
@@ -204,12 +206,13 @@ const PoolCard: React.FC<CardProps> = (props) => {
   }, [quoteTvl, quotePercent]);
 
   const userTvl = userBaseTvl.plus(userQuoteTvl);
+  const delfiTicker = useSelector(selectGateIoSticker(DELFI_USDT));
 
   const { dailyReward, dailyRewardRate } = useMemo(() => {
     let dailyReward = "--";
     let dailyRewardRate = "--";
 
-    if (swapInfo?.swapConfig) {
+    if (swapInfo?.swapConfig && delfiTicker) {
       const baseRewardPerToken: BigNumber = new BigNumber(
         swapInfo.swapConfig.baseAprNumerator.toString(),
       ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
@@ -226,6 +229,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
       dailyRewardRate = baseDailyRewardRate
         .plus(quoteDailyRewardRate)
+        .times(new BigNumber(delfiTicker.last))
         .toFixed(DELTAFI_TOKEN_DECIMALS);
 
       if (swapInfo?.poolState) {
@@ -242,7 +246,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
       dailyReward,
       dailyRewardRate,
     };
-  }, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo]);
+  }, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, delfiTicker]);
 
   if (!swapInfo) return null;
   return (
@@ -287,7 +291,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
         ) : (
           <Box marginTop={1.25}>
             <Box className={`${classes.labelTitle} ${props.color || ""}`}>APR</Box>
-            <Box className={classes.label}>{dailyRewardRate} DELFI/USD</Box>
+            <Box className={classes.label}>{dailyRewardRate}</Box>
           </Box>
         )}
         <ConnectButton
