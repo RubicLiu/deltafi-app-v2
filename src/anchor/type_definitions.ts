@@ -11,6 +11,8 @@ export interface PoolState {
   quoteSupply: anchor.BN;
   totalTradedBase: anchor.BN;
   totalTradedQuote: anchor.BN;
+  accumulatedTradeReward: anchor.BN;
+  lastRewardWindowStartTimestamp: anchor.BN;
   reservedU64: Array<any>;
 }
 
@@ -29,8 +31,7 @@ export interface FarmConfig {
   quoteAprNumerator: anchor.BN;
   quoteAprDenominator: anchor.BN;
   minClaimPeriod: number;
-  mintBaseDecimals: number;
-  mintQuoteDecimals: number;
+  reservedU64: Array<any>;
 }
 
 export interface SwapConfig {
@@ -50,15 +51,11 @@ export interface SwapConfig {
   tradeRewardNumerator: anchor.BN;
   tradeRewardDenominator: anchor.BN;
   tradeRewardCap: anchor.BN;
+  tradeRewardMaxReserve: anchor.BN;
   referralRewardNumerator: anchor.BN;
   referralRewardDenominator: anchor.BN;
   maxStablePriceDiffNumerator: anchor.BN;
   maxStablePriceDiffDenominator: anchor.BN;
-  baseAprNumerator: anchor.BN;
-  baseAprDenominator: anchor.BN;
-  quoteAprNumerator: anchor.BN;
-  quoteAprDenominator: anchor.BN;
-  minClaimPeriod: number;
   reservedU64: Array<any>;
 }
 

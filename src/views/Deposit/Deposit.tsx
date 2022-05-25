@@ -341,36 +341,36 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     let dailyReward = "--";
     let dailyRewardRate = "--";
 
-    if (swapInfo?.swapConfig && delfiTicker) {
-      const baseRewardPerToken: BigNumber = new BigNumber(
-        swapInfo.swapConfig.baseAprNumerator.toString(),
-      ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
-      const quoteRewardPerToken: BigNumber = new BigNumber(
-        swapInfo.swapConfig.quoteAprNumerator.toString(),
-      ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
-
-      const baseDailyRewardRate: BigNumber = baseRewardPerToken
-        .dividedBy(basePrice)
-        .dividedBy(DAYS_PER_YEAR);
-      const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
-        .dividedBy(quotePrice)
-        .dividedBy(DAYS_PER_YEAR);
-
-      dailyRewardRate = baseDailyRewardRate
-        .plus(quoteDailyRewardRate)
-        .times(new BigNumber(delfiTicker.last))
-        .toFixed(DELTAFI_TOKEN_DECIMALS);
-
-      if (swapInfo?.poolState) {
-        const baseDailyReward: BigNumber = baseRewardPerToken
-          .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
-          .dividedBy(DAYS_PER_YEAR);
-        const quoteDailyReward: BigNumber = quoteRewardPerToken
-          .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
-          .dividedBy(DAYS_PER_YEAR);
-        dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
-      }
-    }
+    //    if (swapInfo?.swapConfig && delfiTicker) {
+    //      const baseRewardPerToken: BigNumber = new BigNumber(
+    //        swapInfo.swapConfig.baseAprNumerator.toString(),
+    //      ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
+    //      const quoteRewardPerToken: BigNumber = new BigNumber(
+    //        swapInfo.swapConfig.quoteAprNumerator.toString(),
+    //      ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
+    //
+    //      const baseDailyRewardRate: BigNumber = baseRewardPerToken
+    //        .dividedBy(basePrice)
+    //        .dividedBy(DAYS_PER_YEAR);
+    //      const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
+    //        .dividedBy(quotePrice)
+    //        .dividedBy(DAYS_PER_YEAR);
+    //
+    //      dailyRewardRate = baseDailyRewardRate
+    //        .plus(quoteDailyRewardRate)
+    //        .times(new BigNumber(delfiTicker.last))
+    //        .toFixed(DELTAFI_TOKEN_DECIMALS);
+    //
+    //      if (swapInfo?.poolState) {
+    //        const baseDailyReward: BigNumber = baseRewardPerToken
+    //          .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
+    //          .dividedBy(DAYS_PER_YEAR);
+    //        const quoteDailyReward: BigNumber = quoteRewardPerToken
+    //          .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
+    //          .dividedBy(DAYS_PER_YEAR);
+    //        dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
+    //      }
+    //    }
     return {
       dailyReward,
       dailyRewardRate,
@@ -424,29 +424,31 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           ? new BN(0)
           : new BN(depositView.currentUnixTimestamp).sub(lpUser.quotePosition.lastUpdateTs);
 
-      const extraOwedBaseInterest = exponentiatedBy(
-        new BigNumber(
-          lpUser.basePosition.depositedAmount
-            .mul(swapInfo.swapConfig.baseAprNumerator)
-            .mul(secondsFromBaseLastUpdate)
-            .toString(),
-        )
-          .dividedBy(swapInfo.swapConfig.baseAprDenominator.toString())
-          .dividedBy(SECONDS_PER_YEAR),
-        DELTAFI_TOKEN_DECIMALS,
-      );
-
-      const extraOwnedQuoteInterest = exponentiatedBy(
-        new BigNumber(
-          lpUser.quotePosition.depositedAmount
-            .mul(swapInfo.swapConfig.quoteAprNumerator)
-            .mul(secondsFromQuoteLastUpdate)
-            .toString(),
-        )
-          .dividedBy(swapInfo.swapConfig.quoteAprDenominator.toString())
-          .dividedBy(new BigNumber(SECONDS_PER_YEAR)),
-        DELTAFI_TOKEN_DECIMALS,
-      );
+      const extraOwedBaseInterest = new BigNumber(0);
+      const extraOwnedQuoteInterest = new BigNumber(0);
+      //      const extraOwedBaseInterest = exponentiatedBy(
+      //        new BigNumber(
+      //          lpUser.basePosition.depositedAmount
+      //            .mul(swapInfo.swapConfig.baseAprNumerator)
+      //            .mul(secondsFromBaseLastUpdate)
+      //            .toString(),
+      //        )
+      //          .dividedBy(swapInfo.swapConfig.baseAprDenominator.toString())
+      //          .dividedBy(SECONDS_PER_YEAR),
+      //        DELTAFI_TOKEN_DECIMALS,
+      //      );
+      //
+      //      const extraOwnedQuoteInterest = exponentiatedBy(
+      //        new BigNumber(
+      //          lpUser.quotePosition.depositedAmount
+      //            .mul(swapInfo.swapConfig.quoteAprNumerator)
+      //            .mul(secondsFromQuoteLastUpdate)
+      //            .toString(),
+      //        )
+      //          .dividedBy(swapInfo.swapConfig.quoteAprDenominator.toString())
+      //          .dividedBy(new BigNumber(SECONDS_PER_YEAR)),
+      //        DELTAFI_TOKEN_DECIMALS,
+      //      );
 
       return totalOwedInterest
         .plus(extraOwedBaseInterest)

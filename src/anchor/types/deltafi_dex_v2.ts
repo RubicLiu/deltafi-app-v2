@@ -994,6 +994,138 @@ export type DeltafiDexV2 = {
       ]
     },
     {
+      "name": "createFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "farmConfig",
+          "type": {
+            "defined": "FarmConfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "depositToFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityProvider",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "baseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "quoteAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawFromFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityProvider",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "baseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "quoteAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "claimFarmRewards",
       "accounts": [
         {
@@ -1003,6 +1135,11 @@ export type DeltafiDexV2 = {
         },
         {
           "name": "swapInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
           "isMut": false,
           "isSigner": false
         },
@@ -1474,6 +1611,14 @@ export type DeltafiDexV2 = {
             "type": "u128"
           },
           {
+            "name": "accumulatedTradeReward",
+            "type": "u64"
+          },
+          {
+            "name": "lastRewardWindowStartTimestamp",
+            "type": "u64"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -1543,12 +1688,13 @@ export type DeltafiDexV2 = {
             "type": "u32"
           },
           {
-            "name": "mintBaseDecimals",
-            "type": "u8"
-          },
-          {
-            "name": "mintQuoteDecimals",
-            "type": "u8"
+            "name": "reservedU64",
+            "type": {
+              "array": [
+                "u64",
+                16
+              ]
+            }
           }
         ]
       }
@@ -1623,6 +1769,10 @@ export type DeltafiDexV2 = {
             "type": "u64"
           },
           {
+            "name": "tradeRewardMaxReserve",
+            "type": "u64"
+          },
+          {
             "name": "referralRewardNumerator",
             "type": "u64"
           },
@@ -1637,26 +1787,6 @@ export type DeltafiDexV2 = {
           {
             "name": "maxStablePriceDiffDenominator",
             "type": "u64"
-          },
-          {
-            "name": "baseAprNumerator",
-            "type": "u64"
-          },
-          {
-            "name": "baseAprDenominator",
-            "type": "u64"
-          },
-          {
-            "name": "quoteAprNumerator",
-            "type": "u64"
-          },
-          {
-            "name": "quoteAprDenominator",
-            "type": "u64"
-          },
-          {
-            "name": "minClaimPeriod",
-            "type": "u32"
           },
           {
             "name": "reservedU64",
@@ -2089,6 +2219,11 @@ export type DeltafiDexV2 = {
       "code": 6064,
       "name": "StableSwapPriceDiffLimitExceeded",
       "msg": "stable swap price diff limit exceeded"
+    },
+    {
+      "code": 6065,
+      "name": "InvalidTimestamp",
+      "msg": "Invalid timestamp"
     }
   ]
 };
@@ -3089,6 +3224,138 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
+      "name": "createFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "farmConfig",
+          "type": {
+            "defined": "FarmConfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "depositToFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityProvider",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "baseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "quoteAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawFromFarm",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityProvider",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "baseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "quoteAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "claimFarmRewards",
       "accounts": [
         {
@@ -3098,6 +3365,11 @@ export const IDL: DeltafiDexV2 = {
         },
         {
           "name": "swapInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
           "isMut": false,
           "isSigner": false
         },
@@ -3569,6 +3841,14 @@ export const IDL: DeltafiDexV2 = {
             "type": "u128"
           },
           {
+            "name": "accumulatedTradeReward",
+            "type": "u64"
+          },
+          {
+            "name": "lastRewardWindowStartTimestamp",
+            "type": "u64"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -3638,12 +3918,13 @@ export const IDL: DeltafiDexV2 = {
             "type": "u32"
           },
           {
-            "name": "mintBaseDecimals",
-            "type": "u8"
-          },
-          {
-            "name": "mintQuoteDecimals",
-            "type": "u8"
+            "name": "reservedU64",
+            "type": {
+              "array": [
+                "u64",
+                16
+              ]
+            }
           }
         ]
       }
@@ -3718,6 +3999,10 @@ export const IDL: DeltafiDexV2 = {
             "type": "u64"
           },
           {
+            "name": "tradeRewardMaxReserve",
+            "type": "u64"
+          },
+          {
             "name": "referralRewardNumerator",
             "type": "u64"
           },
@@ -3732,26 +4017,6 @@ export const IDL: DeltafiDexV2 = {
           {
             "name": "maxStablePriceDiffDenominator",
             "type": "u64"
-          },
-          {
-            "name": "baseAprNumerator",
-            "type": "u64"
-          },
-          {
-            "name": "baseAprDenominator",
-            "type": "u64"
-          },
-          {
-            "name": "quoteAprNumerator",
-            "type": "u64"
-          },
-          {
-            "name": "quoteAprDenominator",
-            "type": "u64"
-          },
-          {
-            "name": "minClaimPeriod",
-            "type": "u32"
           },
           {
             "name": "reservedU64",
@@ -4184,6 +4449,11 @@ export const IDL: DeltafiDexV2 = {
       "code": 6064,
       "name": "StableSwapPriceDiffLimitExceeded",
       "msg": "stable swap price diff limit exceeded"
+    },
+    {
+      "code": 6065,
+      "name": "InvalidTimestamp",
+      "msg": "Invalid timestamp"
     }
   ]
 };
