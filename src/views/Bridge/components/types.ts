@@ -4,7 +4,7 @@ export interface SettingsProps {
   priceImpact: string;
   isIncludeDecimal: boolean;
   isSmall?: boolean;
-  handleChangeImpact: any;
+  handleChangeMaxSlippage: any;
   handleChangeInclude: any;
   handleClose: any;
 }

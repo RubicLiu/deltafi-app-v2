@@ -22,7 +22,8 @@ const initialState = {
   },
   transactionResult: null,
   isProcessing: false,
-  priceImpact: "2.0",
+  maxSlippage: "2.0",
+  priceImpact: "--",
   openSettings: false,
   withdrawPercentage: 0,
   openSnackbar: false,
@@ -47,6 +48,10 @@ const swapViewSlice = createSlice({
 
     setIsProcessing(state, action: PayloadAction<{ isProcessing: boolean }>) {
       state.isProcessing = action.payload.isProcessing;
+    },
+
+    setMaxSlippage(state, action: PayloadAction<{ maxSlippage: string }>) {
+      state.maxSlippage = action.payload.maxSlippage;
     },
 
     setPriceImpact(state, action: PayloadAction<{ priceImpact: string }>) {

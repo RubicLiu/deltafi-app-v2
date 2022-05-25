@@ -69,12 +69,9 @@ export function getSwapInResult(
 
   const amountInBN: BigNumber = amountInNegBN.negated();
 
-  const priceImpact: string = amountInBN
-    .dividedBy(grossAmountOutBN)
-    .minus(impliedPrice)
-    .abs()
-    .dividedBy(impliedPrice)
-    .toString();
+  const priceImpact: string = getPriceImpactDisplay(
+    amountInBN.dividedBy(grossAmountOutBN).minus(impliedPrice).abs().dividedBy(impliedPrice),
+  );
 
   const amountIn: string = parseFloat(bnToString(fromToken, amountInBN)).toString();
   const amountOutWithSlippage: string = bnToString(
@@ -170,12 +167,9 @@ export function getSwapOutResult(
     .multipliedBy(100 - maxSlippage)
     .dividedBy(100);
 
-  const priceImpact: string = grossAmountOutBN
-    .dividedBy(amountInBN)
-    .minus(impliedPrice)
-    .abs()
-    .dividedBy(impliedPrice)
-    .toString();
+  const priceImpact: string = getPriceImpactDisplay(
+    grossAmountOutBN.dividedBy(amountInBN).minus(impliedPrice).abs().dividedBy(impliedPrice),
+  );
 
   const amountOut: string = parseFloat(bnToString(toToken, amountOutAfterTradeFeeBN)).toString();
   const amountOutWithSlippage: string = bnToString(toToken, amountOutAfterTradeFeeWithSlippageBN);
@@ -529,4 +523,11 @@ export function checkIfReserveIsSufficient(
       normalizedQuoteReserve.multipliedBy(swapConfig.minReserveLimitPercentage).dividedBy(100),
     )
   );
+}
+
+export function getPriceImpactDisplay(priceImpactBN: BigNumber): string {
+  if (priceImpactBN.isLessThan(new BigNumber("0.001"))) {
+    return "< 0.1%";
+  }
+  return priceImpactBN.multipliedBy(100).toFixed(1) + "%";
 }

@@ -247,7 +247,7 @@ const Home: React.FC = (props) => {
     return null;
   }, [sourceAccount, tokenFrom]);
 
-  const [priceImpact, setPriceImpact] = useState("2.0");
+  const [priceImpact, setMaxSlippage] = useState("2.0");
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
   const app = useSelector(appSelector);
@@ -283,8 +283,8 @@ const Home: React.FC = (props) => {
     setTokenTo(temp);
   };
 
-  const handleChangeImpact = (value) => {
-    setPriceImpact(value);
+  const handleChangeMaxSlippage = (value) => {
+    setMaxSlippage(value);
   };
 
   const handleOpenSettings = () => {
@@ -694,7 +694,7 @@ const Home: React.FC = (props) => {
             <SettingsPanel
               isOpen={openSettings}
               priceImpact={priceImpact}
-              handleChangeImpact={handleChangeImpact}
+              handleChangeMaxSlippage={handleChangeMaxSlippage}
               handleClose={handleOpenSettings}
             />
           )}

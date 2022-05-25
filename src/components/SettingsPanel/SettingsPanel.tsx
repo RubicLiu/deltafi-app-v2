@@ -164,7 +164,7 @@ const PriceItem = styled.li`
 `;
 
 const SettingsPanel = (props: SettingsProps): JSX.Element => {
-  const { priceImpact, isSmall, handleChangeImpact } = props;
+  const { priceImpact, isSmall, handleChangeMaxSlippage } = props;
   const classes = useStyles(props);
   const currencyInputRef = useRef<HTMLInputElement>();
 
@@ -177,7 +177,7 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
   const handleChangeInput = (value: string) => {
     if (isNaN(parseFloat(value)) && value !== "") return;
     if (parseFloat(value) > 100) return;
-    handleChangeImpact(value);
+    handleChangeMaxSlippage(value);
   };
 
   return (
@@ -191,7 +191,7 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
             <PriceItem
               key={`item-${price}`}
               className={`${priceImpact === price ? "active" : ""} ${isSmall ? "small" : ""}`}
-              onClick={() => handleChangeImpact(price)}
+              onClick={() => handleChangeMaxSlippage(price)}
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
               data-amp-analytics-attrs={`page: Settings, target: MaxPriceImpact(${price})}`}
@@ -226,7 +226,7 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
 SettingsPanel.defaultProps = {
   priceImpact: "2.0%",
   isSmall: false,
-  handleChangeImpact: () => {},
+  handleChangeMaxSlippage: () => {},
   handleClose: () => {},
 };
 

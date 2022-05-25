@@ -1,7 +1,7 @@
 export interface SettingsProps {
   priceImpact: string;
   isSmall?: boolean;
-  handleChangeImpact: any;
+  handleChangeMaxSlippage: any;
   handleClose: any;
   isOpen?: boolean;
   forwardedRef?: any;
