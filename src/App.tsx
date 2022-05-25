@@ -24,6 +24,7 @@ import { fetchSerumDataThunk } from "states/serumState";
 import { appActions } from "states/appState";
 import { programSelector } from "states";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { fetchTickerThunk } from "states/gateIoState";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -61,19 +62,7 @@ const App: React.FC = () => {
   const program = useSelector(programSelector);
 
   useEffect(() => {
-    fetch("/api/spot/tickers/DELFI_USDT")
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw response;
-      })
-      .then((data) => {
-        console.info("xx", data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data: ", error);
-      });
+    dispatch(fetchTickerThunk("DELFI_USDT"));
   });
 
   useEffect(() => {
