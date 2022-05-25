@@ -9,7 +9,7 @@ const config = fullDeployConfigV2['mainnet-test'];
 const gateApiClient = new GateApi.ApiClient();
 const spotApi = new GateApi.SpotApi(gateApiClient);
 
-const cacheTTL = 60;
+const cacheTtlInSecs = 60;
 const tickersCache = new CacheContainer(new MemoryStorage())
 const candlesticksCache = new CacheContainer(new MemoryStorage())
 
@@ -28,7 +28,7 @@ routes.get('/spot/tickers/:currencyPair', async (request, response) => {
 
   try {
     const result = await spotApi.listTickers({ currencyPair });
-    tickersCache.setItem(currencyPair, result.body, {ttl: cacheTTL});
+    tickersCache.setItem(currencyPair, result.body, {ttl: cacheTtlInSecs});
     return response.json(result.body);
   } catch (e) {
     console.error(e);
@@ -47,7 +47,7 @@ routes.get('/spot/candlesticks/:currencyPair', async (request, response) => {
     const result = await spotApi.listCandlesticks(currencyPair, {
       interval: "30m",
     });
-    candlesticksCache.setItem(currencyPair, result.body, {ttl: cacheTTL});
+    candlesticksCache.setItem(currencyPair, result.body, {ttl: cacheTtlInSecs});
     return response.json(result.body);
   } catch (e) {
     console.error(e);
