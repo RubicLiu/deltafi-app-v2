@@ -5,6 +5,7 @@ import CurrencyInput from "react-currency-input-field";
 
 import { Button } from "components/Button";
 import { SettingsProps } from "./types";
+import React from "react";
 
 const PRICE_LIST = ["0.5", "1.0", "2.0"];
 

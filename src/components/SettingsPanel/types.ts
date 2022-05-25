@@ -4,4 +4,5 @@ export interface SettingsProps {
   handleChangeImpact: any;
   handleClose: any;
   isOpen?: boolean;
+  forwardedRef?: any;
 }

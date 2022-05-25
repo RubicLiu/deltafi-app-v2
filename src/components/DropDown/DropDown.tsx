@@ -27,11 +27,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     [theme.breakpoints.up("sm")]: {
       fontSize: 16,
       padding: `${theme.spacing(1)}px ${theme.spacing(3)}px`,
+      "&:disabled": {
+        color: theme.palette.primary.main,
+        padding: `${theme.spacing(0.5)}px ${theme.spacing(3)}px`,
+      },
     },
     minWidth: 100,
-    "&:disabled": {
-      color: theme.palette.primary.main,
-    },
   },
   icon: {
     width: theme.spacing(2.5),

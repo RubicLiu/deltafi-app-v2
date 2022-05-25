@@ -16,10 +16,10 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     width: "100%",
     background: palette.background.secondary,
     padding: spacing(2),
-    borderRadius: 16,
-    [breakpoints.up("md")]: {
-      padding: `${spacing(2.5)}px ${spacing(2)}px`,
+    [breakpoints.up("sm")]: {
+      padding: `${spacing(2)}px ${spacing(3)}px`,
     },
+    borderRadius: 16,
   },
   main: {
     display: "flex",
@@ -71,8 +71,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     color: palette.text.dark,
     fontSize: 12,
     fontWeight: 500,
+    lineHeight: 1,
     [breakpoints.up("md")]: {
-      fontSize: 16,
+      fontSize: 14,
     },
   },
   tokenContainer: {
@@ -155,14 +156,17 @@ const SwapCard: React.FC<CardProps> = (props) => {
           onChange={inputHandler}
         />
       </Box>
-      <Box display="flex" justifyContent="flex-start" alignItems="center">
-        <Typography className={classes.tokenBalance}>Balance:</Typography>
-        &nbsp;
-        <Typography className={classes.tokenBalance} style={{ color: "#D4FF00" }}>
-          {tokenBalance?.toString() || 0}
-        </Typography>
-        &nbsp;
-        <Typography className={classes.tokenBalance}>{card?.token?.symbol}</Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Box display="flex">
+          <Typography className={classes.tokenBalance}>Balance:&nbsp;</Typography>
+          <Typography className={classes.tokenBalance} style={{ color: "#D4FF00" }}>
+            {tokenBalance?.toString() || 0}&nbsp;
+          </Typography>
+          <Typography className={classes.tokenBalance}>{card?.token?.symbol}</Typography>
+        </Box>
+        <Box className={classes.tokenBalance}>
+          Total: {"00.00"} {"Symbol"} ({0}%)
+        </Box>
       </Box>
     </Paper>
   );
