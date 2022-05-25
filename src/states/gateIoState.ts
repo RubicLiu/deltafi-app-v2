@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
+export const DELFI_USDT = "DELFI_USDT";
+
 const initialState = {
   currencyPairToTicker: {},
 };
