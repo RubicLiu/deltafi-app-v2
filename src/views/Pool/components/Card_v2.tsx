@@ -15,8 +15,6 @@ import {
   selectGateIoSticker,
 } from "states/selectors";
 import { SwapInfo } from "anchor/type_definitions";
-import { DELTAFI_TOKEN_DECIMALS, DAYS_PER_YEAR } from "constants/index";
-import { anchorBnToBn } from "utils/tokenUtils";
 import { DELFI_USDT } from "states/gateIoState";
 
 const Img = styled.img`

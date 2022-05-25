@@ -22,9 +22,8 @@ import WithdrawCard from "components/molecules/WithdrawCard";
 
 import { useModal } from "providers/modal";
 import { exponentiatedBy } from "utils/decimal";
-import { DAYS_PER_YEAR, SECONDS_PER_YEAR, SOLSCAN_LINK } from "constants/index";
+import { SOLSCAN_LINK } from "constants/index";
 import { useHistory } from "react-router-dom";
-// import { PoolInformation } from "./PoolInformation";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getPoolConfigBySwapKey,
