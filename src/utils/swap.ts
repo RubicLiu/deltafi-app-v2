@@ -527,7 +527,7 @@ export function checkIfReserveIsSufficient(
 
 export function getPriceImpactDisplay(priceImpactBN: BigNumber): string {
   if (priceImpactBN.isLessThan(new BigNumber("0.001"))) {
-    return "< 0.1%";
+    return "<0.1%";
   }
   return priceImpactBN.multipliedBy(100).toFixed(1) + "%";
 }

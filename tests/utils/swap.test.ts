@@ -201,7 +201,7 @@ describe("utils/swap", function () {
       amountOut: "0.324",
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
-      priceImpact: "0.00001840490797546012",
+      priceImpact: "<0.1%",
       insufficientLiquidity: false,
     });
 
@@ -247,7 +247,7 @@ describe("utils/swap", function () {
       amountOut: "0.324",
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
-      priceImpact: "0.00001840490797546012",
+      priceImpact: "<0.1%",
       insufficientLiquidity: false,
     });
 
@@ -291,7 +291,7 @@ describe("utils/swap", function () {
       amountOut: "1.99",
       amountOutWithSlippage: "1.970100",
       fee: "0.009999",
-      priceImpact: "0.00001839438644256218",
+      priceImpact: "<0.1%",
       insufficientLiquidity: false,
     });
 
@@ -358,7 +358,7 @@ describe("utils/swap", function () {
       amountIn: "2",
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
-      priceImpact: "0.00001840524672233231",
+      priceImpact: "<0.1%",
       insufficientLiquidity: false,
     });
 
@@ -404,7 +404,7 @@ describe("utils/swap", function () {
       amountIn: "0.002",
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
-      priceImpact: "0.00001840524672233257",
+      priceImpact: "<0.1%",
       insufficientLiquidity: false,
     });
 
@@ -447,7 +447,7 @@ describe("utils/swap", function () {
       amountIn: "Infinity",
       amountOutWithSlippage: "19900.000000",
       fee: "10.000000",
-      priceImpact: "Infinity",
+      priceImpact: "Infinity%",
       insufficientLiquidity: true,
     });
   });
