@@ -2,6 +2,18 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export const DELFI_USDT = "DELFI_USDT";
 
+export type GateIoTicker = {
+  baseVolume: string;
+  changePercentage: string;
+  currencyPair: string;
+  high24h: string;
+  highestBid: string;
+  last: string;
+  low24h: string;
+  lowestAsk: string;
+  quoteVolume: string;
+};
+
 const initialState = {
   currencyPairToTicker: {},
   currencyPairToCandleSticks: {},
@@ -11,7 +23,7 @@ export const fetchTickerThunk = createAsyncThunk("fetchTicker", async (currencyP
   const response = await fetch("/api/spot/tickers/" + currencyPair);
   const data = await response.json();
   console.info(currencyPair, data);
-  const ticker = data && data.length === 1 ? data[0] : null;
+  const ticker: GateIoTicker | null = data && data.length === 1 ? data[0] : null;
   return {
     currencyPair,
     ticker,
