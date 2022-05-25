@@ -22,7 +22,6 @@ const initialState = {
 export const fetchTickerThunk = createAsyncThunk("fetchTicker", async (currencyPair: string) => {
   const response = await fetch("/api/spot/tickers/" + currencyPair);
   const data = await response.json();
-  console.info(currencyPair, data);
   const ticker: GateIoTicker | null = data && data.length === 1 ? data[0] : null;
   return {
     currencyPair,
@@ -35,7 +34,6 @@ export const fetchCandleSticksThunk = createAsyncThunk(
   async (currencyPair: string) => {
     const response = await fetch("/api/spot/candlesticks/" + currencyPair);
     const data = await response.json();
-    console.info(currencyPair, data);
     return {
       currencyPair,
       candleSticks: data,
