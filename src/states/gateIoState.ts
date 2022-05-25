@@ -18,15 +18,18 @@ export const fetchTickerThunk = createAsyncThunk("fetchTicker", async (currencyP
   };
 });
 
-export const fetchCandleSticksThunk = createAsyncThunk("fetchCandleSticks", async (currencyPair: string) => {
-  const response = await fetch("/api/spot/candlesticks/" + currencyPair);
-  const data = await response.json();
-  console.info(currencyPair, data);
-  return {
-    currencyPair,
-    candleSticks: data,
-  };
-});
+export const fetchCandleSticksThunk = createAsyncThunk(
+  "fetchCandleSticks",
+  async (currencyPair: string) => {
+    const response = await fetch("/api/spot/candlesticks/" + currencyPair);
+    const data = await response.json();
+    console.info(currencyPair, data);
+    return {
+      currencyPair,
+      candleSticks: data,
+    };
+  },
+);
 
 const gateIoSlice = createSlice({
   name: "gateIo",
