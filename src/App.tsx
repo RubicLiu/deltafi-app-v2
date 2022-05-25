@@ -61,6 +61,22 @@ const App: React.FC = () => {
   const program = useSelector(programSelector);
 
   useEffect(() => {
+    fetch("/api/spot/tickers/DELFI_USDT")
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw response;
+    })
+    .then((data) => {
+      console.info("xx", data);
+    })
+    .catch((error) => {
+      console.error("Error fetching data: ", error);
+    });
+  });
+
+  useEffect(() => {
     if (!walletAddress) {
       return;
     }
