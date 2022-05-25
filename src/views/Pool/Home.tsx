@@ -7,11 +7,10 @@ import Card from "./components/Card_v2";
 import { convertDollar, getTokenTvl } from "utils/utils";
 import { poolConfigs } from "constants/deployConfigV2";
 import { useSelector } from "react-redux";
-import { pythSelector, poolSelector, selectGateIoSticker } from "states/selectors";
+import { pythSelector, poolSelector } from "states/selectors";
 import { getPythMarketPrice } from "states/accounts/pythAccount";
 import { useParams } from "react-router";
 import Deposit from "views/Deposit/Deposit";
-import { DELFI_USDT } from "states/gateIoState";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
