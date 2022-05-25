@@ -1,5 +1,5 @@
 export interface SettingsProps {
-  priceImpact: string;
+  maxSlippage: string;
   isSmall?: boolean;
   handleChangeMaxSlippage: any;
   handleClose: any;

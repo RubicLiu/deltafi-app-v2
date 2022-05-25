@@ -58,7 +58,7 @@ export function getSwapInResult(
       swapInfo.swapConfig.tradeFeeDenominator.sub(swapInfo.swapConfig.tradeFeeNumerator).toString(),
     );
 
-  const { amountOut: amountInNegBN, impliedPrice } = getSwappedAmountsAndImpliedPrice(
+  const { amountOut: amountInNegBN, priceImpact: priceImpactBN } = getSwappedAmountsAndPriceImpact(
     swapInfo,
     getOppsiteSwapDirection(swapDirection), // need to use opposite swap direction
     grossAmountOutBN.negated(),
@@ -69,9 +69,7 @@ export function getSwapInResult(
 
   const amountInBN: BigNumber = amountInNegBN.negated();
 
-  const priceImpact: string = getPriceImpactDisplay(
-    amountInBN.dividedBy(grossAmountOutBN).minus(impliedPrice).abs().dividedBy(impliedPrice),
-  );
+  const priceImpact: string = getPriceImpactDisplay(priceImpactBN);
 
   const amountIn: string = parseFloat(bnToString(fromToken, amountInBN)).toString();
   const amountOutWithSlippage: string = bnToString(
@@ -148,14 +146,15 @@ export function getSwapOutResult(
 
   const swapDirection: SWAP_DIRECTION = getSwapDirection(fromToken, toToken, swapInfo);
 
-  const { amountOut: grossAmountOutBN, impliedPrice } = getSwappedAmountsAndImpliedPrice(
-    swapInfo,
-    swapDirection,
-    amountInBN,
-    marketPrice,
-    marketPriceLow,
-    marketPriceHigh,
-  );
+  const { amountOut: grossAmountOutBN, priceImpact: priceImpactBN } =
+    getSwappedAmountsAndPriceImpact(
+      swapInfo,
+      swapDirection,
+      amountInBN,
+      marketPrice,
+      marketPriceLow,
+      marketPriceHigh,
+    );
 
   const tradeFeeBN: BigNumber = grossAmountOutBN
     .multipliedBy(swapInfo.swapConfig.tradeFeeNumerator.toString())
@@ -167,9 +166,7 @@ export function getSwapOutResult(
     .multipliedBy(100 - maxSlippage)
     .dividedBy(100);
 
-  const priceImpact: string = getPriceImpactDisplay(
-    grossAmountOutBN.dividedBy(amountInBN).minus(impliedPrice).abs().dividedBy(impliedPrice),
-  );
+  const priceImpact: string = getPriceImpactDisplay(priceImpactBN);
 
   const amountOut: string = parseFloat(bnToString(toToken, amountOutAfterTradeFeeBN)).toString();
   const amountOutWithSlippage: string = bnToString(toToken, amountOutAfterTradeFeeWithSlippageBN);
@@ -196,7 +193,7 @@ export function getSwapOutResult(
   };
 }
 
-export function getSwappedAmountsAndImpliedPrice(
+export function getSwappedAmountsAndPriceImpact(
   swapInfo: SwapInfo,
   swapDirection: SWAP_DIRECTION,
   amountIn: BigNumber,
@@ -206,7 +203,7 @@ export function getSwappedAmountsAndImpliedPrice(
 ): {
   amountIn: BigNumber;
   amountOut: BigNumber;
-  impliedPrice: BigNumber;
+  priceImpact: BigNumber;
 } {
   if (
     !(marketPriceSellBase && marketPriceSellQuote) ||
@@ -224,20 +221,17 @@ export function getSwappedAmountsAndImpliedPrice(
       swapInfo.mintBaseDecimals,
       swapInfo.mintQuoteDecimals,
     );
-    const rawAmountOut: BigNumber = new BigNumber(
-      getSwapOutAmountSellBase(swapInfo, rawAmountIn, normalizedMaketPrice),
-    );
 
-    const impliedPrice = marketPriceSellBase
-      .multipliedBy(swapInfo.poolState.targetBaseReserve.toString())
-      .multipliedBy(swapInfo.poolState.quoteReserve.toString())
-      .dividedBy(swapInfo.poolState.targetQuoteReserve.toString())
-      .dividedBy(swapInfo.poolState.baseReserve.toString());
+    const { outAmount: rawAmountOut, priceImpact } = getSwapOutAmountSellBase(
+      swapInfo,
+      rawAmountIn,
+      normalizedMaketPrice,
+    );
 
     return {
       amountIn,
       amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintQuoteDecimals),
-      impliedPrice,
+      priceImpact,
     };
   } else if (swapDirection === SWAP_DIRECTION.SellQuote) {
     // sell quote case
@@ -247,22 +241,17 @@ export function getSwappedAmountsAndImpliedPrice(
       swapInfo.mintBaseDecimals,
       swapInfo.mintQuoteDecimals,
     );
-    const rawAmountOut: BigNumber = new BigNumber(
-      getSwapOutAmountSellQuote(swapInfo, rawAmountIn, normalizedMaketPrice),
-    );
 
-    const impliedPrice = new BigNumber(1).dividedBy(
-      marketPriceSellQuote
-        .multipliedBy(swapInfo.poolState.targetBaseReserve.toString())
-        .multipliedBy(swapInfo.poolState.quoteReserve.toString())
-        .dividedBy(swapInfo.poolState.targetQuoteReserve.toString())
-        .dividedBy(swapInfo.poolState.baseReserve.toString()),
+    const { outAmount: rawAmountOut, priceImpact } = getSwapOutAmountSellQuote(
+      swapInfo,
+      rawAmountIn,
+      normalizedMaketPrice,
     );
 
     return {
       amountIn,
       amountOut: exponentiatedBy(rawAmountOut, swapInfo.mintBaseDecimals),
-      impliedPrice,
+      priceImpact,
     };
   }
 
@@ -283,7 +272,7 @@ export function getSwapOutAmountSellBase(
   pool: SwapInfo,
   amountIn: BigNumber,
   marketPrice: BigNumber,
-): number {
+): { outAmount: BigNumber; priceImpact: BigNumber } {
   if (pool.swapType.normalSwap) {
     return calculateOutAmountNormalSwap(
       marketPrice,
@@ -318,7 +307,7 @@ export function getSwapOutAmountSellQuote(
   pool: SwapInfo,
   amountIn: BigNumber,
   marketPrice: BigNumber,
-): number {
+): { outAmount: BigNumber; priceImpact: BigNumber } {
   if (pool.swapType.normalSwap) {
     return calculateOutAmountNormalSwap(
       // the market price for calculation is the reciprocal of the market price input

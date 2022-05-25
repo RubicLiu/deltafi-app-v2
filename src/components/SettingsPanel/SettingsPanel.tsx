@@ -5,7 +5,6 @@ import CurrencyInput from "react-currency-input-field";
 
 import { Button } from "components/Button";
 import { SettingsProps } from "./types";
-import React from "react";
 
 const PRICE_LIST = ["0.5", "1.0", "2.0"];
 
@@ -164,15 +163,15 @@ const PriceItem = styled.li`
 `;
 
 const SettingsPanel = (props: SettingsProps): JSX.Element => {
-  const { priceImpact, isSmall, handleChangeMaxSlippage } = props;
+  const { maxSlippage, isSmall, handleChangeMaxSlippage } = props;
   const classes = useStyles(props);
   const currencyInputRef = useRef<HTMLInputElement>();
 
   useEffect(() => {
-    if (props.isOpen && !PRICE_LIST.includes(priceImpact)) {
+    if (props.isOpen && !PRICE_LIST.includes(maxSlippage)) {
       currencyInputRef.current?.focus();
     }
-  }, [props.isOpen, priceImpact]);
+  }, [props.isOpen, maxSlippage]);
 
   const handleChangeInput = (value: string) => {
     if (isNaN(parseFloat(value)) && value !== "") return;
@@ -184,17 +183,17 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
     <Paper className={classes.root}>
       <Box>
         <Typography variant="body1" className={classes.maxImpact} color="textPrimary">
-          Max Price Impact
+          Max Slippage
         </Typography>
         <PriceList className={isSmall ? "small" : ""}>
           {PRICE_LIST.map((price) => (
             <PriceItem
               key={`item-${price}`}
-              className={`${priceImpact === price ? "active" : ""} ${isSmall ? "small" : ""}`}
+              className={`${maxSlippage === price ? "active" : ""} ${isSmall ? "small" : ""}`}
               onClick={() => handleChangeMaxSlippage(price)}
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
-              data-amp-analytics-attrs={`page: Settings, target: MaxPriceImpact(${price})}`}
+              data-amp-analytics-attrs={`page: Settings, target: maxSlippage(${price})}`}
             >
               <Button variant="text" fullWidth>
                 {`${price}%`}
@@ -214,7 +213,7 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
             suffix="%"
             decimalScale={1}
             decimalsLimit={1}
-            value={priceImpact}
+            value={maxSlippage}
             onValueChange={handleChangeInput}
           />
         </PriceList>
@@ -224,7 +223,7 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
 };
 
 SettingsPanel.defaultProps = {
-  priceImpact: "2.0%",
+  maxSlippage: "2.0%",
   isSmall: false,
   handleChangeMaxSlippage: () => {},
   handleClose: () => {},

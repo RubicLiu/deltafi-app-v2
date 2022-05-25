@@ -182,7 +182,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontSize: 12,
     fontWeight: 400,
   },
-  priceImpactBtn: {
+  maxSlippageBtn: {
     height: 30,
     borderRadius: 50,
     "& span": {
@@ -247,7 +247,7 @@ const Home: React.FC = (props) => {
     return null;
   }, [sourceAccount, tokenFrom]);
 
-  const [priceImpact, setMaxSlippage] = useState("2.0");
+  const [maxSlippage, setMaxSlippage] = useState("2.0");
   const [openSettings, setOpenSettings] = useState(false);
   const { setMenu } = useModal();
   const app = useSelector(appSelector);
@@ -505,11 +505,11 @@ const Home: React.FC = (props) => {
       setMenu(true, "confirm-swap", undefined, {
         tokenFrom,
         tokenTo,
-        slippage: parseFloat(priceImpact),
+        slippage: parseFloat(maxSlippage),
         callback: swapCallback,
       });
     }
-  }, [tokenFrom, tokenTo, priceImpact, swapCallback, setMenu]);
+  }, [tokenFrom, tokenTo, maxSlippage, swapCallback, setMenu]);
   const network = deployConfigV2.network;
 
   const snackMessasge = useMemo(() => {
@@ -663,10 +663,10 @@ const Home: React.FC = (props) => {
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
               data-amp-analytics-attrs="page: Swap, target: Settings"
-              className={`${classes.priceImpactBtn} ${openSettings ? "active" : ""}`}
+              className={`${classes.maxSlippageBtn} ${openSettings ? "active" : ""}`}
               key="settingBtn"
             >
-              {priceImpact}%
+              {maxSlippage}%
             </ConnectButton>
           </Box>
           <Box display="flex" flexDirection="column" alignItems="flex-end">
@@ -693,7 +693,7 @@ const Home: React.FC = (props) => {
           {openSettings && (
             <SettingsPanel
               isOpen={openSettings}
-              priceImpact={priceImpact}
+              maxSlippage={maxSlippage}
               handleChangeMaxSlippage={handleChangeMaxSlippage}
               handleClose={handleOpenSettings}
             />

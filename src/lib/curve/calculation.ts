@@ -65,12 +65,15 @@ export function calculateOutAmountNormalSwap(
   targetReserveA: BigNumber,
   targetReserveB: BigNumber,
   currentReserveA: BigNumber,
-  currentResreveB: BigNumber,
+  currentReserveB: BigNumber,
   inputAAmount: BigNumber,
-): number {
+): {
+  outAmount: BigNumber;
+  priceImpact: BigNumber;
+} {
   const { impliedOutAmount, approximationResult } = approximateOutAmount(
     currentReserveA,
-    currentResreveB,
+    currentReserveB,
     targetReserveA,
     targetReserveB,
     marketPrice,
@@ -83,22 +86,40 @@ export function calculateOutAmountNormalSwap(
       targetReserveA,
       targetReserveB,
       currentReserveA,
-      currentResreveB,
+      currentReserveB,
       inputAAmount,
     ).toNumber(),
   );
 
-  const finalResult =
+  const outputBAmount =
     approximationResult === 0
       ? calculationResult
       : Math.max(approximationResult, calculationResult);
 
   validate(
-    finalResult <= impliedOutAmount,
+    outputBAmount <= impliedOutAmount,
     "final result for swap out amount should not be larger than the implied out amount",
   );
 
-  return finalResult;
+  let impliedPrice: BigNumber = marketPrice
+    .multipliedBy(currentReserveB)
+    .multipliedBy(targetReserveA)
+    .dividedBy(currentReserveA)
+    .dividedBy(targetReserveB);
+  let actualPrice: BigNumber = new BigNumber(outputBAmount).dividedBy(inputAAmount);
+  let priceImpact: BigNumber = impliedPrice.minus(actualPrice).dividedBy(actualPrice);
+  // .multipliedBy(
+  //   currentReserveB.plus(
+  //     balancedReserveB.multipliedBy(new BigNumber(1).minus(slope)).dividedBy(slope),
+  //   ),
+  // )
+  // .dividedBy(
+  //   currentReserveA.plus(
+  //     balancedReserveA.multipliedBy(new BigNumber(1).minus(slope).dividedBy(slope)),
+  //   ),
+  // );
+
+  return { outAmount: new BigNumber(outputBAmount), priceImpact };
 }
 
 /**
@@ -214,7 +235,10 @@ export function calculateOutAmountStableSwap(
   currentReserveB: BigNumber,
   inputAAmount: BigNumber,
   slope: BigNumber,
-): number {
+): {
+  outAmount: BigNumber;
+  priceImpact: BigNumber;
+} {
   let { balancedReserveA, balancedReserveB } = calculateBalancedReservesStableSwap(
     stablePrice,
     currentReserveA,
@@ -222,7 +246,7 @@ export function calculateOutAmountStableSwap(
     slope,
   );
 
-  let result: BigNumber = calculateOutAmountStableSwapInternal(
+  let outputBAmount: BigNumber = calculateOutAmountStableSwapInternal(
     balancedReserveA,
     balancedReserveB,
     currentReserveA,
@@ -231,5 +255,23 @@ export function calculateOutAmountStableSwap(
     slope,
   );
 
-  return Math.floor(result.toNumber());
+  let impliedPrice: BigNumber = stablePrice
+    .multipliedBy(
+      currentReserveB.plus(
+        balancedReserveB.multipliedBy(new BigNumber(1).minus(slope)).dividedBy(slope),
+      ),
+    )
+    .dividedBy(
+      currentReserveA.plus(
+        balancedReserveA.multipliedBy(new BigNumber(1).minus(slope).dividedBy(slope)),
+      ),
+    );
+
+  let actualPrice: BigNumber = outputBAmount.dividedBy(inputAAmount);
+  let priceImpact: BigNumber = impliedPrice.minus(actualPrice).dividedBy(actualPrice);
+
+  return {
+    outAmount: outputBAmount,
+    priceImpact,
+  };
 }
