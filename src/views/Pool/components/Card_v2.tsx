@@ -283,17 +283,6 @@ const PoolCard: React.FC<CardProps> = (props) => {
           <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total Deposits</Box>
           <Box className={classes.label}>{convertDollar(tvl.toFixed(2).toString())}</Box>
         </Box>
-        {props.isUserPool ? (
-          <Box marginTop={1.25}>
-            <Box className={`${classes.labelTitle} ${props.color || ""}`}>Daily reward</Box>
-            <Box className={classes.label}>{dailyReward} DELFI</Box>
-          </Box>
-        ) : (
-          <Box marginTop={1.25}>
-            <Box className={`${classes.labelTitle} ${props.color || ""}`}>APR</Box>
-            <Box className={classes.label}>{dailyRewardRate}</Box>
-          </Box>
-        )}
         <ConnectButton
           className={classes.cardBtn}
           onClick={() => setMenu(true, "deposit", undefined, { poolAddress: poolConfig.swapInfo })}

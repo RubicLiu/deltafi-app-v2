@@ -270,7 +270,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const basePercent = useMemo(() => {
     if (lpUser && swapInfo) {
       return new BigNumber(lpUser.baseShare.toString())
-        .plus(new BigNumber(lpUser.basePosition.depositedAmount.toString()))
+        .plus(new BigNumber(lpUser.baseShare.toString()))
         .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()))
         .multipliedBy(100);
     }
@@ -280,7 +280,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const quotePercent = useMemo(() => {
     if (lpUser && swapInfo) {
       return new BigNumber(lpUser.quoteShare.toString())
-        .plus(new BigNumber(lpUser.quotePosition.depositedAmount.toString()))
+        .plus(new BigNumber(lpUser.quoteShare.toString()))
         .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()))
 
         .multipliedBy(100);
@@ -390,10 +390,10 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     (value: number) => {
       if (lpUser && basePrice && quotePrice) {
         // TODO(ypeng): Consider price and pool ratio
-        const baseAmount = anchorBnToBn(baseTokenInfo, lpUser.basePosition.depositedAmount)
+        const baseAmount = anchorBnToBn(baseTokenInfo, lpUser.baseShare)
           .multipliedBy(value)
           .dividedBy(100);
-        const quoteAmount = anchorBnToBn(quoteTokenInfo, lpUser.basePosition.depositedAmount)
+        const quoteAmount = anchorBnToBn(quoteTokenInfo, lpUser.quoteShare)
           .multipliedBy(value)
           .dividedBy(100);
         dispatch(
@@ -1017,9 +1017,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
             </Box>
           </Box>
           <Divider />
-        </Box>
-        <Box textAlign="right" lineHeight={1} mt={2} mb={2}>
-          APR: {dailyRewardRate}
         </Box>
         <div>
           {(() => {
