@@ -61,7 +61,7 @@ const App: React.FC = () => {
   const program = useSelector(programSelector);
 
   useEffect(() => {
-    fetch("/spot/tickers/DELFI_USDT")
+    fetch("/api/spot/tickers/DELFI_USDT")
     .then((response) => {
       if (response.ok) {
         return response.json();
