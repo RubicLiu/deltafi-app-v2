@@ -31,6 +31,7 @@ export interface FarmConfig {
   quoteAprNumerator: anchor.BN;
   quoteAprDenominator: anchor.BN;
   minClaimPeriod: number;
+  isPaused: boolean;
   reservedU64: Array<any>;
 }
 
