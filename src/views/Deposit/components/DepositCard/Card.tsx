@@ -6,26 +6,10 @@ import clx from "classnames";
 
 import { DropDown } from "components";
 import useStyles from "./styles";
-import { SwapCard } from "views/Swap/components/types";
+import { DepositCardProps } from "./types";
 import { tokenConfigs } from "constants/deployConfigV2";
 
-export interface SettingsProps {
-  priceImpact: string;
-  isIncludeDecimal: boolean;
-  isSmall?: boolean;
-  handleChangeMaxSlippage: any;
-  handleChangeInclude: any;
-  handleClose: any;
-}
-
-export interface CardProps {
-  card: SwapCard;
-  handleChangeCard: any;
-  disableDrop?: boolean;
-  withdrawal?: string;
-}
-
-const WithdrawCard: React.FC<CardProps> = (props) => {
+const DepositCard: React.FC<DepositCardProps> = (props) => {
   const { card, disableDrop, withdrawal } = props;
   const classes = useStyles(props);
 
@@ -78,4 +62,4 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
   );
 };
 
-export default WithdrawCard;
+export default DepositCard;
