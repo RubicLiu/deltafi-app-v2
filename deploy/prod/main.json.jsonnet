@@ -1,0 +1,8 @@
+local base = import '../base.libsonnet';
+local tag = importstr './tag.txt';
+
+base {
+  imageTag: tag,
+  dockerRegistry: '077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-dev',
+  domainName: 'app-v2.k8s.deltafi.trade',
+}
