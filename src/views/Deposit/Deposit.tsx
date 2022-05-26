@@ -246,7 +246,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
   const baseTokenAccount = useSelector(selectTokenAccountInfoByMint(baseTokenInfo.mint));
   const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(quoteTokenInfo.mint));
-  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
   const lpUser: LiquidityProvider = useSelector(selectLpUserBySwapKey(poolAddress));
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));

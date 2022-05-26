@@ -2,7 +2,7 @@ import { Connection, PublicKey, Transaction, Keypair } from "@solana/web3.js";
 import { AccountLayout } from "@solana/spl-token";
 import { partialSignTransaction, mergeTransactions } from ".";
 import * as token from "@solana/spl-token";
-import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
+import { PoolConfig } from "constants/deployConfigV2";
 import { web3, BN } from "@project-serum/anchor";
 
 import { createNativeSOLHandlingTransactions } from "./utils";
