@@ -1,10 +1,10 @@
 {
   imageTag:: error 'imageTag is not set',
-  dockerRegistry:: error 'dockerRegistry is not set',
   domainName:: error 'domainName is not set',
   frontendReplicas:: 2,
   backendReplicas:: 2,
 
+  local dockerRegistry = "077918681028.dkr.ecr.us-west-2.amazonaws.com",
   local namespace = 'deltafi-app-v2',
   local appFrontend = 'deltafi-app-v2-frontend',
   local appBackend = 'deltafi-app-v2-backend',
@@ -35,7 +35,7 @@
           spec: {
             containers: [
               {
-                image: std.format('%s/deltafi-app-v2/frontend:%s', [$.dockerRegistry, $.imageTag]),
+                image: std.format('%s/deltafi-app-v2/frontend:%s', [dockerRegistry, $.imageTag]),
                 name: 'main',
                 ports: [
                   {
@@ -91,7 +91,7 @@
           spec: {
             containers: [
               {
-                image: std.format('%s/deltafi-app-v2/backend:%s', [$.dockerRegistry, $.imageTag]),
+                image: std.format('%s/deltafi-app-v2/backend:%s', [dockerRegistry, $.imageTag]),
                 name: 'main',
                 ports: [
                   {
