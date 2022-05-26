@@ -238,7 +238,7 @@ const Home: React.FC = (props) => {
                               ? "indigo"
                               : "dodgerBlue"
                           }
-                          key={poolConfig.farmInfo}
+                          key={poolConfig.swapInfo}
                           poolConfig={poolConfig}
                         />
                       </Grid>
