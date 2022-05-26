@@ -20,6 +20,13 @@
         "quote": "USDC",
         "swapInfo": "5fswnE8dtRauxdnGQxpRWSoghExMLiTpAVERvAX8MZLB",
         "farmInfo": "D2rYDqaWHf8ajNssPxmPBfLy53CicrZbrXPRqLi9FyYP"
+      },
+      {
+        "name": "GMT-USDC",
+        "base": "GMT",
+        "quote": "USDC",
+        "swapInfo": "EEkh7yKQZTiMSBbptsLVd8ijc4X6Re4coMSk3gebXN3k",
+        "farmInfo": "7gfsiZMS1X54hDgcx93f8Wu77DsZdJuFiWPxpRVKWJaE"
       }
     ],
     "tokenInfoList": [
@@ -58,6 +65,18 @@
           "product": "Av6XyAMJnyi68FdsKSPYgzfXGjYrrt6jcAMwtvzLCqaM",
           "productName": "Crypto.USDT/USD"
         }
+      },
+      {
+        "name": "GMT",
+        "mint": "7i5KKsX2weiTkry7jA4ZwSuXGhs5eJBEjY8vVxR4pfRx",
+        "symbol": "GMT",
+        "decimals": 9,
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7i5KKsX2weiTkry7jA4ZwSuXGhs5eJBEjY8vVxR4pfRx/logo.png",
+        "pyth": {
+          "price": "DZYZkJcFJThN9nZy4nK3hrHra1LaWeiyoZ9SMdLFEFpY",
+          "product": "6Vi1i2rJj23CGxLQYHHVjoMwJm4pNWVGDESdDto7QqTk",
+          "productName": "Crypto.GMT/USD"
+        }
       }
     ]
   },
@@ -82,6 +101,13 @@
         "quote": "USDC",
         "swapInfo": "4MWgwMzZEh1Mz32Lcq2N7kTxPfyYjXmrxLkYLBGF4Qyu",
         "farmInfo": "5GAJSzgAFxcnk7qxPSi9QftFZc8Qhv8cSjLVovBbVfz9"
+      },
+      {
+        "name": "GMT-USDC",
+        "base": "GMT",
+        "quote": "USDC",
+        "swapInfo": "mPHEBmkJd9wxy9ePgxgbqbEmnHRHPC9hGg1JuEcZxd6",
+        "farmInfo": "kDN5gmve3o13P6u4QhCbaZY674vk6pDi8G8hgnX7hsa"
       }
     ],
     "tokenInfoList": [
@@ -119,6 +145,18 @@
           "price": "7VJsBtJzgTftYzEeooSDYyjKXvYRWJHdwvbwfBvTg9K",
           "product": "GcnU8V2WKq5QXLhJwBQdt2ankU6GRGh6b1bLCxdykWnP",
           "productName": "Crypto.SOL/USD"
+        }
+      },
+      {
+        "name": "GMT",
+        "mint": "BjcHCBE8apXxV5Ux5DqxmtYyW7Nc1LS3jRxkRaFsFSDX",
+        "symbol": "GMT",
+        "decimals": 9,
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png",
+        "pyth": {
+          "price": "ANepGpAFeXHCudwgPoikdACvm9zuvJKBingX95kJcUhh",
+          "product": "BQTamaGegNSZ1T5ssquCQkHQi2yB9xtkMZBFczoxwNi8",
+          "productName": "Crypto.GMT/USD"
         }
       }
     ]
