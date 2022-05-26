@@ -18,7 +18,7 @@ export async function createDepositTransaction(
   walletPubkey: PublicKey,
   lpUser: any,
   baseAmount: BN,
-  qouteAmount: BN,
+  quoteAmount: BN,
 ) {
   let baseSourceRef = userTokenBase;
   let quoteSourceRef = userTokenQuote;
@@ -32,7 +32,7 @@ export async function createDepositTransaction(
   const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
 
   if (baseSOL || quoteSOL) {
-    const tmpAccountLamport = (baseSOL ? baseAmount.toNumber() : qouteAmount.toNumber()) + lamports;
+    const tmpAccountLamport = (baseSOL ? baseAmount.toNumber() : quoteAmount.toNumber()) + lamports;
 
     const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(
       tempAccountRefKeyPair.publicKey,
@@ -78,7 +78,7 @@ export async function createDepositTransaction(
         quoteSourceRef,
         userTransferAuthority.publicKey,
         walletPubkey,
-        BigInt(qouteAmount.toString()),
+        BigInt(quoteAmount.toString()),
       ),
     );
 
@@ -98,13 +98,13 @@ export async function createDepositTransaction(
 
   if (swapInfo.swapType.stableSwap) {
     transaction.add(
-      program.transaction.depositToStableSwap(baseAmount, qouteAmount, {
+      program.transaction.depositToStableSwap(baseAmount, quoteAmount, {
         accounts: depositAccounts,
       }),
     );
   } else {
     transaction.add(
-      program.transaction.depositToNormalSwap(baseAmount, qouteAmount, {
+      program.transaction.depositToNormalSwap(baseAmount, quoteAmount, {
         accounts: depositAccounts,
       }),
     );
@@ -153,7 +153,7 @@ export async function createWithdrawTransaction(
   userTokenQuote: PublicKey,
   walletPubkey: PublicKey,
   baseAmount: BN,
-  qouteAmount: BN,
+  quoteAmount: BN,
 ) {
   let baseSourceRef = userTokenBase;
   let quoteSourceRef = userTokenQuote;
@@ -167,7 +167,7 @@ export async function createWithdrawTransaction(
   const lamports = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
 
   if (baseSOL || quoteSOL) {
-    const tmpAccountLamport = (baseSOL ? baseAmount.toNumber() : qouteAmount.toNumber()) + lamports;
+    const tmpAccountLamport = (baseSOL ? baseAmount.toNumber() : quoteAmount.toNumber()) + lamports;
 
     const nativeSOLHandlingTransactions = createNativeSOLHandlingTransactions(
       tempAccountRefKeyPair.publicKey,
@@ -215,13 +215,13 @@ export async function createWithdrawTransaction(
   };
   if (swapInfo.swapType.stableSwap) {
     transaction.add(
-      program.transaction.withdrawFromStableSwap(baseAmount, qouteAmount, {
+      program.transaction.withdrawFromStableSwap(baseAmount, quoteAmount, {
         accounts: withdrawAccounts,
       }),
     );
   } else {
     transaction.add(
-      program.transaction.withdrawFromNormalSwap(baseAmount, qouteAmount, {
+      program.transaction.withdrawFromNormalSwap(baseAmount, quoteAmount, {
         accounts: withdrawAccounts,
       }),
     );

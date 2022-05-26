@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SwapCard } from "views/Swap/components/types";
+
 import { TokenConfig } from "constants/deployConfigV2";
+import { IDepositCard } from "views/Deposit/components/DepositCard/types";
 
 interface TransactionResult {
   status: boolean | null;
   action?: "deposit" | "withdraw" | "claim";
   hash?: string;
-  base?: SwapCard;
-  quote?: SwapCard;
+  base?: IDepositCard;
+  quote?: IDepositCard;
 }
 
 const initialState = {
@@ -15,12 +16,12 @@ const initialState = {
   base: {
     token: null,
     amount: "0",
-    amountWithSlippage: "0",
+    totalAmount: "0",
   },
   quote: {
     token: null,
     amount: "0",
-    amountWithSlippage: "0",
+    maxAmount: "0",
   },
   transactionResult: null,
   isProcessing: false,
@@ -42,10 +43,10 @@ const depositViewSlice = createSlice({
     ) {
       state.base.token = action.payload.baseTokenInfo;
       state.base.amount = "0";
-      state.base.amountWithSlippage = "0";
+      state.base.totalAmount = "0";
       state.quote.token = action.payload.quoteTokenInfo;
       state.quote.amount = "0";
-      state.quote.amountWithSlippage = "0";
+      state.quote.maxAmount = "0";
     },
 
     setTokenAmount(state, action: PayloadAction<{ baseAmount: string; quoteAmount: string }>) {

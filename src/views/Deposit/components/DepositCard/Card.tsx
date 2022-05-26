@@ -8,21 +8,41 @@ import { DropDown } from "components";
 import useStyles from "./styles";
 import { DepositCardProps } from "./types";
 import { tokenConfigs } from "constants/deployConfigV2";
+import BigNumber from "bignumber.js";
+import { useSelector } from "react-redux";
+import { selectTokenAccountInfoByMint } from "states";
+import { anchorBnToBn } from "utils/tokenUtils";
+import BN from "bn.js";
 
 const DepositCard: React.FC<DepositCardProps> = (props) => {
-  const { card, disableDrop, withdrawal } = props;
+  const { card, disableDrop, withdrawal, handleChangeCard, isDeposit } = props;
   const classes = useStyles(props);
 
-  const inputHandler = (_) => {};
+  const tokenAccount = useSelector(selectTokenAccountInfoByMint(card.token?.mint));
+
+  const tokenBalance = useMemo(() => {
+    if (tokenAccount && card) {
+      return anchorBnToBn(card.token, new BN(tokenAccount.amount.toString()));
+    }
+    return null;
+  }, [tokenAccount, card]);
+
   const handleChangeToken = (_) => {};
 
-  const value = useMemo(() => {
-    const pointIdx = card.amount.indexOf(".");
-    if (pointIdx > 0) {
-      return card.amount.slice(0, pointIdx) + card.amount.slice(pointIdx, pointIdx + 7);
+  const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value.replace(/[^\d.-]/g, "");
+    if (new BigNumber(value).isNaN() && value !== "") {
+      return;
+    } else if (value === "") {
+      handleChangeCard({ ...card, amount: "0" });
+    } else {
+      const valueToFixedDecimal = parseFloat(value).toFixed(card.token.decimals);
+      handleChangeCard({
+        ...card,
+        amount: value.length > valueToFixedDecimal.length ? valueToFixedDecimal : value,
+      });
     }
-    return card.amount;
-  }, [card.amount]);
+  };
 
   return (
     <Paper className={classes.root}>
@@ -42,21 +62,28 @@ const DepositCard: React.FC<DepositCardProps> = (props) => {
           minLength={0}
           maxLength={20}
           decimalsLimit={20}
-          value={value}
+          value={card.amount}
           onChange={inputHandler}
         />
       </Box>
       <Box display="flex" justifyContent="space-between">
-        <Box display="flex">
-          <Box className={classes.tokenBalance}>Max Withdrawal:&nbsp;</Box>
-          <Box className={clx(classes.tokenBalance, classes.withdrawNumber)}>
-            {withdrawal || 0}&nbsp;
+        {isDeposit ? (
+          <Box display="flex">
+            <Box className={classes.tokenBalance}>Balance:&nbsp;</Box>
+            <Box className={clx(classes.tokenBalance, classes.withdrawNumber)}>
+              {tokenBalance?.toString() || "--"}&nbsp;
+            </Box>
+            <Box className={classes.tokenBalance}>{card.token?.symbol}</Box>
           </Box>
-          <Box className={classes.tokenBalance}>{card.token?.symbol}</Box>
-        </Box>
-        <Box className={classes.tokenBalance}>
-          Total: {"00.00"} {"Symbol"} ({0}%)
-        </Box>
+        ) : (
+          <Box display="flex">
+            <Box className={classes.tokenBalance}>Max Withdrawal:&nbsp;</Box>
+            <Box className={clx(classes.tokenBalance, classes.withdrawNumber)}>
+              {withdrawal || 0}&nbsp;
+            </Box>
+            <Box className={classes.tokenBalance}>{card.token?.symbol}</Box>
+          </Box>
+        )}
       </Box>
     </Paper>
   );
