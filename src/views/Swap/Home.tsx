@@ -252,7 +252,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontSize: 12,
     fontWeight: 400,
   },
-  priceImpactBtn: {
+  maxSlippageBtn: {
     height: 30,
     borderRadius: 50,
     "& span": {
@@ -351,8 +351,8 @@ const Home: React.FC = (props) => {
     dispatch(swapViewActions.setTokenTo(temp));
   };
 
-  const handleChangeImpact = (value) => {
-    dispatch(swapViewActions.setPriceImpact({ priceImpact: value }));
+  const handleChangeMaxSlippage = (value) => {
+    dispatch(swapViewActions.setMaxSlippage({ maxSlippage: value }));
   };
 
   const handleOpenSettings = () => {
@@ -378,6 +378,7 @@ const Home: React.FC = (props) => {
     }
 
     const {
+      priceImpact,
       insufficientLiquidity,
       amountOut: quoteAmount,
       amountOutWithSlippage: quoteAmountWithSlippage,
@@ -386,11 +387,12 @@ const Home: React.FC = (props) => {
       newTokenFrom,
       newTokenTo,
       card.amount ?? "0",
-      parseFloat(swapView.priceImpact),
+      parseFloat(swapView.maxSlippage),
       marketPrice,
     );
 
     dispatch(swapViewActions.setInsufficientLiquidity({ insufficientLiquidity }));
+    dispatch(swapViewActions.setPriceImpact({ priceImpact }));
 
     const amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
     const amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
@@ -422,6 +424,7 @@ const Home: React.FC = (props) => {
     }
 
     const {
+      priceImpact,
       insufficientLiquidity,
       amountIn: baseAmount,
       amountOutWithSlippage: quoteAmountWithSlippage,
@@ -430,11 +433,12 @@ const Home: React.FC = (props) => {
       newTokenFrom,
       newTokenTo,
       card.amount ?? "0",
-      parseFloat(swapView.priceImpact),
+      parseFloat(swapView.maxSlippage),
       marketPrice,
     );
 
     dispatch(swapViewActions.setInsufficientLiquidity({ insufficientLiquidity }));
+    dispatch(swapViewActions.setPriceImpact({ priceImpact }));
 
     const amountIn = baseAmount === "NaN" ? "" : baseAmount;
     const amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
@@ -629,7 +633,8 @@ const Home: React.FC = (props) => {
       setMenu(true, "confirm-swap", undefined, {
         tokenFrom,
         tokenTo,
-        slippage: parseFloat(swapView.priceImpact),
+        slippage: swapView.maxSlippage,
+        priceImpact: swapView.priceImpact,
         callback: swapCallback,
       });
     }
@@ -824,10 +829,10 @@ const Home: React.FC = (props) => {
               data-amp-analytics-on="click"
               data-amp-analytics-name="click"
               data-amp-analytics-attrs="page: Swap, target: Settings"
-              className={`${classes.priceImpactBtn} ${swapView.openSettings ? "active" : ""}`}
+              className={`${classes.maxSlippageBtn} ${swapView.openSettings ? "active" : ""}`}
               key="settingBtn"
             >
-              {swapView.priceImpact}%
+              {swapView.maxSlippage}%
             </ConnectButton>
           </Box>
           <Box display="flex" flexDirection="column" alignItems="flex-end">
@@ -853,8 +858,8 @@ const Home: React.FC = (props) => {
           {swapView.openSettings && (
             <SettingsPanel
               isOpen={swapView.openSettings}
-              priceImpact={swapView.priceImpact}
-              handleChangeImpact={handleChangeImpact}
+              maxSlippage={swapView.maxSlippage}
+              handleChangeMaxSlippage={handleChangeMaxSlippage}
               handleClose={handleOpenSettings}
             />
           )}

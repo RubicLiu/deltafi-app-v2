@@ -176,7 +176,10 @@ describe("calculation", function () {
         new BigNumber(23_321_001),
         new BigNumber(12_550_000),
       ),
-    ).toEqual(1775380);
+    ).toEqual({
+      outAmount: new BigNumber(1775380),
+      priceImpact: new BigNumber("0.09231665782899391453"),
+    });
 
     expect(
       calculateOutAmountNormalSwap(
@@ -187,7 +190,10 @@ describe("calculation", function () {
         new BigNumber(20_003_000_001),
         new BigNumber(200_000),
       ),
-    ).toEqual(377149571);
+    ).toEqual({
+      outAmount: new BigNumber(377149571),
+      priceImpact: new BigNumber("0.01926802962457854706"),
+    });
 
     expect(
       calculateOutAmountNormalSwap(
@@ -198,6 +204,9 @@ describe("calculation", function () {
         new BigNumber("2500000000000000000"),
         new BigNumber(1000),
       ),
-    ).toEqual(2727);
+    ).toEqual({
+      outAmount: new BigNumber(2727),
+      priceImpact: new BigNumber("0.00010001000100010001"),
+    });
   });
 });

@@ -156,7 +156,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
               Price impact
             </Typography>
             <Box fontSize={16} fontWeight={500} className={classes.priceImpact}>
-              {parseFloat(data?.slippage)}%
+              {data?.priceImpact ?? "--"}
             </Box>
           </Box>
         </Box>

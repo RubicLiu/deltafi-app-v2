@@ -31,7 +31,10 @@ describe("utils/swap", function () {
         new BigNumber(2_000_000),
         new BigNumber(0.163),
       ),
-    ).toEqual(325_994);
+    ).toEqual({
+      outAmount: new BigNumber(325_994),
+      priceImpact: new BigNumber("0.00001840524672233231"),
+    });
 
     expect(
       getSwapOutAmountSellBase(
@@ -47,7 +50,10 @@ describe("utils/swap", function () {
         new BigNumber(12_550_000),
         new BigNumber(0.163),
       ),
-    ).toEqual(1_775_380);
+    ).toEqual({
+      outAmount: new BigNumber(1_775_380),
+      priceImpact: new BigNumber("0.09231665782899391453"),
+    });
 
     expect(
       getSwapOutAmountSellBase(
@@ -63,7 +69,10 @@ describe("utils/swap", function () {
         new BigNumber(200_001_000),
         new BigNumber(0.00523),
       ),
-    ).toEqual(1_189_852);
+    ).toEqual({
+      outAmount: new BigNumber(1_189_852),
+      priceImpact: new BigNumber("0.00000133176632855728"),
+    });
 
     expect(
       getSwapOutAmountSellBase(
@@ -84,7 +93,10 @@ describe("utils/swap", function () {
         new BigNumber(200_000),
         new BigNumber(1),
       ),
-    ).toEqual(199_800);
+    ).toEqual({
+      outAmount: new BigNumber(199_800),
+      priceImpact: new BigNumber("0.00099999999999999098"),
+    });
   });
 
   it("getSwapOutAmountSellQuote", function () {
@@ -102,7 +114,10 @@ describe("utils/swap", function () {
         new BigNumber(325_994),
         new BigNumber(0.163),
       ),
-    ).toEqual(1_999_999); // less than 2_000_000 due to the floorings
+    ).toEqual({
+      outAmount: new BigNumber(1_999_999),
+      priceImpact: new BigNumber("0.00001839472480223871"),
+    }); // less than 2_000_000 due to the floorings
 
     expect(
       getSwapOutAmountSellQuote(
@@ -118,7 +133,10 @@ describe("utils/swap", function () {
         new BigNumber(1_775_380),
         new BigNumber(0.163),
       ),
-    ).toEqual(12_549_997); // less than 12_550_000 due to the floorings
+    ).toEqual({
+      outAmount: new BigNumber(12_549_997),
+      priceImpact: new BigNumber("0.09202807090864354529"),
+    }); // less than 12_550_000 due to the floorings
 
     expect(
       getSwapOutAmountSellQuote(
@@ -134,7 +152,10 @@ describe("utils/swap", function () {
         new BigNumber(1_189_852),
         new BigNumber(0.00523),
       ),
-    ).toEqual(200_000_918); // less than 200_001_000 due to the floorings
+    ).toEqual({
+      outAmount: new BigNumber(200_000_918),
+      priceImpact: new BigNumber("9.231640005002e-7"),
+    }); // less than 200_001_000 due to the floorings
 
     expect(
       getSwapOutAmountSellQuote(
@@ -154,7 +175,10 @@ describe("utils/swap", function () {
         new BigNumber(199_800),
         new BigNumber(1),
       ),
-    ).toEqual(199_999); // less than 200_000 due to the floorings
+    ).toEqual({
+      outAmount: new BigNumber(199_999),
+      priceImpact: new BigNumber("0.00099999899849949212"),
+    }); // less than 200_000 due to the floorings
   });
 
   it("getSwapOutResult", function () {
@@ -201,7 +225,7 @@ describe("utils/swap", function () {
       amountOut: "0.324",
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
-      priceImpact: "0.00001840490797546012",
+      priceImpact: "<0.1%",
       insufficientLiquidity: false,
     });
 
@@ -247,7 +271,7 @@ describe("utils/swap", function () {
       amountOut: "0.324",
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
-      priceImpact: "0.00001840490797546012",
+      priceImpact: "<0.1%",
       insufficientLiquidity: false,
     });
 
@@ -291,7 +315,7 @@ describe("utils/swap", function () {
       amountOut: "1.99",
       amountOutWithSlippage: "1.970100",
       fee: "0.009999",
-      priceImpact: "0.00001839438644256218",
+      priceImpact: "<0.1%",
       insufficientLiquidity: false,
     });
 
@@ -358,7 +382,7 @@ describe("utils/swap", function () {
       amountIn: "2",
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
-      priceImpact: "0.00001840524672233231",
+      priceImpact: "<0.1%",
       insufficientLiquidity: false,
     });
 
@@ -404,7 +428,7 @@ describe("utils/swap", function () {
       amountIn: "0.002",
       amountOutWithSlippage: "0.322380",
       fee: "0.001994",
-      priceImpact: "0.00001840524672233257",
+      priceImpact: "<0.1%",
       insufficientLiquidity: false,
     });
 
@@ -447,7 +471,7 @@ describe("utils/swap", function () {
       amountIn: "Infinity",
       amountOutWithSlippage: "19900.000000",
       fee: "10.000000",
-      priceImpact: "Infinity",
+      priceImpact: "Infinity%",
       insufficientLiquidity: true,
     });
   });
