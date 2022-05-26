@@ -146,12 +146,12 @@ export async function initSwap(
   }
 }
 
-export async function createFarm(program, marketConfig, swapInfo, farmConfig, adminKeypair) {
+export async function createFarm(program, marketConfig, swapInfo, seed, farmConfig, adminKeypair) {
   const [farmInfo, farmBump] = await web3.PublicKey.findProgramAddress(
-    [Buffer.from("FarmInfo", "utf-8"), swapInfo.toBuffer()],
+    [Buffer.from("FarmInfo", "utf-8"), swapInfo.toBuffer(), seed.toBuffer()],
     program.programId,
   );
-  await program.rpc.createFarm(farmBump, farmConfig, {
+  await program.rpc.createFarm(farmBump, seed, farmConfig, {
     accounts: {
       marketConfig,
       farmInfo: farmInfo,

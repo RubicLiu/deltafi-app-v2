@@ -98,6 +98,7 @@ export interface DeltafiUser {
 
 export interface FarmInfo {
   bump: number;
+  seed: PublicKey;
   configKey: PublicKey;
   swapKey: PublicKey;
   stakedBaseShare: anchor.BN;

@@ -1038,6 +1038,10 @@ export type DeltafiDexV2 = {
           "type": "u8"
         },
         {
+          "name": "seed",
+          "type": "publicKey"
+        },
+        {
           "name": "farmConfig",
           "type": {
             "defined": "FarmConfig"
@@ -1343,6 +1347,10 @@ export type DeltafiDexV2 = {
           {
             "name": "bump",
             "type": "u8"
+          },
+          {
+            "name": "seed",
+            "type": "publicKey"
           },
           {
             "name": "configKey",
@@ -3277,6 +3285,10 @@ export const IDL: DeltafiDexV2 = {
           "type": "u8"
         },
         {
+          "name": "seed",
+          "type": "publicKey"
+        },
+        {
           "name": "farmConfig",
           "type": {
             "defined": "FarmConfig"
@@ -3582,6 +3594,10 @@ export const IDL: DeltafiDexV2 = {
           {
             "name": "bump",
             "type": "u8"
+          },
+          {
+            "name": "seed",
+            "type": "publicKey"
           },
           {
             "name": "configKey",
