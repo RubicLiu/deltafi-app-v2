@@ -1688,6 +1688,10 @@ export type DeltafiDexV2 = {
             "type": "u32"
           },
           {
+            "name": "isPaused",
+            "type": "bool"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -2224,6 +2228,11 @@ export type DeltafiDexV2 = {
       "code": 6065,
       "name": "InvalidTimestamp",
       "msg": "Invalid timestamp"
+    },
+    {
+      "code": 6066,
+      "name": "InvalidSerumData",
+      "msg": "InvalidSerumData"
     }
   ]
 };
@@ -3918,6 +3927,10 @@ export const IDL: DeltafiDexV2 = {
             "type": "u32"
           },
           {
+            "name": "isPaused",
+            "type": "bool"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -4454,6 +4467,11 @@ export const IDL: DeltafiDexV2 = {
       "code": 6065,
       "name": "InvalidTimestamp",
       "msg": "Invalid timestamp"
+    },
+    {
+      "code": 6066,
+      "name": "InvalidSerumData",
+      "msg": "InvalidSerumData"
     }
   ]
 };
