@@ -11,15 +11,19 @@
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "DLD5b6JjY9sKjjMUeasrSnRs26EaSTffZkbcE6n5kpRD",
-        "farmInfo": "EpfyCZXwTXfnA5UNvwNGjHJq2TzLqSFU6F7bcgU8YDmy"
+        "swapInfo": "DLD5b6JjY9sKjjMUeasrSnRs26EaSTffZkbcE6n5kpRD"
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "5fswnE8dtRauxdnGQxpRWSoghExMLiTpAVERvAX8MZLB",
-        "farmInfo": "D2rYDqaWHf8ajNssPxmPBfLy53CicrZbrXPRqLi9FyYP"
+        "swapInfo": "5fswnE8dtRauxdnGQxpRWSoghExMLiTpAVERvAX8MZLB"
+      },
+      {
+        "name": "GMT-USDC",
+        "base": "GMT",
+        "quote": "USDC",
+        "swapInfo": "GgQQa1aE5CKAKnddosLqBPExPwiAi2M77Ba8DaUuW7zb"
       }
     ],
     "tokenInfoList": [
@@ -58,6 +62,18 @@
           "product": "Av6XyAMJnyi68FdsKSPYgzfXGjYrrt6jcAMwtvzLCqaM",
           "productName": "Crypto.USDT/USD"
         }
+      },
+      {
+        "name": "GMT",
+        "mint": "7i5KKsX2weiTkry7jA4ZwSuXGhs5eJBEjY8vVxR4pfRx",
+        "symbol": "GMT",
+        "decimals": 9,
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7i5KKsX2weiTkry7jA4ZwSuXGhs5eJBEjY8vVxR4pfRx/logo.png",
+        "pyth": {
+          "price": "DZYZkJcFJThN9nZy4nK3hrHra1LaWeiyoZ9SMdLFEFpY",
+          "product": "6Vi1i2rJj23CGxLQYHHVjoMwJm4pNWVGDESdDto7QqTk",
+          "productName": "Crypto.GMT/USD"
+        }
       }
     ]
   },
@@ -73,15 +89,19 @@
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "6u4ATwzQPTMuMq5g9H5npd2PQiTnQkjHKwPt45j3JiYg",
-        "farmInfo": "GV1RyWvWtimgpwgp7kVD9aYHTCFgq3wUSv8nWHiagvxT"
+        "swapInfo": "6u4ATwzQPTMuMq5g9H5npd2PQiTnQkjHKwPt45j3JiYg"
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "4MWgwMzZEh1Mz32Lcq2N7kTxPfyYjXmrxLkYLBGF4Qyu",
-        "farmInfo": "5GAJSzgAFxcnk7qxPSi9QftFZc8Qhv8cSjLVovBbVfz9"
+        "swapInfo": "4MWgwMzZEh1Mz32Lcq2N7kTxPfyYjXmrxLkYLBGF4Qyu"
+      },
+      {
+        "name": "GMT-USDC",
+        "base": "GMT",
+        "quote": "USDC",
+        "swapInfo": "mPHEBmkJd9wxy9ePgxgbqbEmnHRHPC9hGg1JuEcZxd6"
       }
     ],
     "tokenInfoList": [
@@ -119,6 +139,18 @@
           "price": "7VJsBtJzgTftYzEeooSDYyjKXvYRWJHdwvbwfBvTg9K",
           "product": "GcnU8V2WKq5QXLhJwBQdt2ankU6GRGh6b1bLCxdykWnP",
           "productName": "Crypto.SOL/USD"
+        }
+      },
+      {
+        "name": "GMT",
+        "mint": "BjcHCBE8apXxV5Ux5DqxmtYyW7Nc1LS3jRxkRaFsFSDX",
+        "symbol": "GMT",
+        "decimals": 9,
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt/logo.png",
+        "pyth": {
+          "price": "ANepGpAFeXHCudwgPoikdACvm9zuvJKBingX95kJcUhh",
+          "product": "BQTamaGegNSZ1T5ssquCQkHQi2yB9xtkMZBFczoxwNi8",
+          "productName": "Crypto.GMT/USD"
         }
       }
     ]

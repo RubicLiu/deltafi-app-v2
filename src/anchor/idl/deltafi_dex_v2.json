@@ -1038,6 +1038,10 @@
           "type": "u8"
         },
         {
+          "name": "seed",
+          "type": "publicKey"
+        },
+        {
           "name": "farmConfig",
           "type": {
             "defined": "FarmConfig"
@@ -1343,6 +1347,10 @@
           {
             "name": "bump",
             "type": "u8"
+          },
+          {
+            "name": "seed",
+            "type": "publicKey"
           },
           {
             "name": "configKey",
