@@ -112,7 +112,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
   marketCondition: {
-    fontWeight: "bold",
+    fontWeight: 400,
     marginBottom: spacing(3),
     [breakpoints.up("sm")]: {
       marginBottom: spacing(4),
@@ -831,7 +831,9 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         <>
           <Box height={16}></Box>
           <ConnectButton fullWidth onClick={() => setMenu(true, "connect")}>
-            Connect Wallet
+            <Box fontSize={20} lineHeight="36px">
+              Connect Wallet
+            </Box>
           </ConnectButton>
         </>
       );
@@ -872,7 +874,9 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
                 Insufficient balance
               </Box>
               <ConnectButton fullWidth disabled>
-                <Box lineHeight="36px">Deposit</Box>
+                <Box fontSize={20} lineHeight="36px">
+                  Deposit
+                </Box>
               </ConnectButton>
             </>
           );
@@ -881,7 +885,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       return (
         <>
           <Box height={16}></Box>
-
           <ConnectButton
             fullWidth
             variant="contained"
@@ -890,7 +893,9 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
             data-amp-analytics-name="click"
             data-amp-analytics-attrs="page: Deposit, target: Deposit"
           >
-            <Box lineHeight="36px">Deposit</Box>
+            <Box fontSize={20} lineHeight="36px">
+              Deposit
+            </Box>
           </ConnectButton>
         </>
       );
@@ -913,7 +918,9 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
                 Insufficient balance
               </Box>
               <ConnectButton fullWidth disabled>
-                <Box lineHeight="36px">Withdraw</Box>
+                <Box fontSize={20} lineHeight="36px">
+                  Withdraw
+                </Box>
               </ConnectButton>
             </>
           );
@@ -930,7 +937,9 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
             data-amp-analytics-name="click"
             data-amp-analytics-attrs="page: Withdraw, target: Withdraw"
           >
-            <Box lineHeight="36px">Withdraw</Box>
+            <Box fontSize={20} lineHeight="36px">
+              Withdraw
+            </Box>
           </ConnectButton>
         </>
       );
@@ -993,7 +1002,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           </Box>
           <Divider />
         </Box>
-        <div>
+        <Box mt={2}>
           {(() => {
             switch (method) {
               case "withdraw":
@@ -1045,8 +1054,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
                 throw Error("Invalid deposit card method: " + method);
             }
           })()}
-        </div>
-        <Box mt={1} width="100%" sx={{ position: "relative", zIndex: 1 }}>
+        </Box>
+        <Box width="100%" sx={{ position: "relative", zIndex: 1 }}>
           {actionButton}
         </Box>
         <Box display="flex" justifyContent="center" className={classes.statsBottom}>

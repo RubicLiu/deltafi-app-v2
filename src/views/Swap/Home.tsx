@@ -63,6 +63,7 @@ import { anchorBnToString, stringToAnchorBn } from "utils/tokenUtils";
 import { DeltafiUser, SwapInfo } from "anchor/type_definitions";
 import Autocomplete from "@material-ui/lab/Autocomplete/Autocomplete";
 import CompareArrows from "components/Svg/icons/CompareArrows";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 
 //const priceMock = [
 //  {
@@ -116,11 +117,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     flex: 1,
   },
   searchCt: {
-    marginTop: 20,
     marginBottom: 10,
     [breakpoints.up("md")]: {
-      marginTop: 40,
-      marginBottom: 20,
+      marginBottom: 15,
     },
   },
   title: {
@@ -128,14 +127,13 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginBottom: spacing(4),
   },
   root: {
-    marginBottom: spacing(2),
+    marginBottom: spacing(2.5),
     background: palette.background.primary,
     borderRadius: spacing(2),
-    padding: `${spacing(3)}px ${spacing(2)}px`,
+    padding: `${spacing(2)}px ${spacing(2)}px`,
     [breakpoints.up("sm")]: {
-      padding: `${spacing(5)}px ${spacing(4)}px`,
+      padding: `${spacing(4)}px ${spacing(4)}px`,
       borderRadius: spacing(3),
-      marginBottom: spacing(4),
     },
     position: "relative",
   },
@@ -159,7 +157,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
   marketCondition: {
-    fontWeight: "bold",
+    fontWeight: 400,
   },
   snackBarContent: {
     maxWidth: 393,
@@ -251,6 +249,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   tradePairName: {
     fontSize: 12,
     fontWeight: 400,
+    marginTop: 6,
   },
   maxSlippageBtn: {
     height: 30,
@@ -266,7 +265,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     background: palette.background.secondary,
     borderRadius: 20,
     padding: "24px 24px",
-    marginTop: 24,
+    marginTop: 20,
     fontSize: 12,
     color: palette.text.dark,
     lineHeight: 1,
@@ -357,6 +356,10 @@ const Home: React.FC = (props) => {
 
   const handleOpenSettings = () => {
     dispatch(swapViewActions.setOpenSettings({ openSettings: !swapView.openSettings }));
+  };
+
+  const handleSettingClickAway = () => {
+    dispatch(swapViewActions.setOpenSettings({ openSettings: false }));
   };
 
   const handleSnackBarClose = useCallback(() => {
@@ -856,12 +859,14 @@ const Home: React.FC = (props) => {
             />
           </Box>
           {swapView.openSettings && (
-            <SettingsPanel
-              isOpen={swapView.openSettings}
-              maxSlippage={swapView.maxSlippage}
-              handleChangeMaxSlippage={handleChangeMaxSlippage}
-              handleClose={handleOpenSettings}
-            />
+            <ClickAwayListener onClickAway={handleSettingClickAway}>
+              <SettingsPanel
+                isOpen={swapView.openSettings}
+                maxSlippage={swapView.maxSlippage}
+                handleChangeMaxSlippage={handleChangeMaxSlippage}
+                handleClose={handleOpenSettings}
+              />
+            </ClickAwayListener>
           )}
           <Paper className={`${classes.root} ${classes.currency}`}>
             <Grid
@@ -915,7 +920,7 @@ const Home: React.FC = (props) => {
               <Grid item xs={6} sm={3}></Grid>
             </Grid>
           </Paper>
-          <Box marginTop={3} width="100%" position="relative" zIndex={1}>
+          <Box marginTop={2.25} width="100%" position="relative" zIndex={1}>
             {actionButton}
           </Box>
         </Paper>

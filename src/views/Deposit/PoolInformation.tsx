@@ -31,7 +31,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     // marginBottom: 20,
   },
   marketCondition: {
-    fontWeight: "bold",
+    fontWeight: 400,
     marginBottom: spacing(3),
     [breakpoints.up("sm")]: {
       marginBottom: spacing(4),

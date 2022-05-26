@@ -5,6 +5,7 @@ import CurrencyInput from "react-currency-input-field";
 
 import { Button } from "components/Button";
 import { SettingsProps } from "./types";
+import React from "react";
 
 const PRICE_LIST = ["0.5", "1.0", "2.0"];
 
@@ -14,7 +15,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     [breakpoints.up("sm")]: {
       padding: spacing(3),
     },
-    top: 80,
+    top: 70,
     left: "4%",
     width: "92%",
     position: "absolute",
@@ -31,8 +32,8 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     textAlign: "center",
     outline: "none",
     fontSize: 14,
-    fontWeight: "bold",
-    fontFamily: "Inter",
+    fontWeight: 400,
+    fontFamily: "Rubik",
     width: "100%",
     border: "none",
     backgroundColor: palette.text.crypto,
@@ -162,7 +163,10 @@ const PriceItem = styled.li`
   }
 `;
 
-const SettingsPanel = (props: SettingsProps): JSX.Element => {
+const SettingsPanel = React.forwardRef(function SettingPanel(
+  props: SettingsProps,
+  ref,
+): JSX.Element {
   const { maxSlippage, isSmall, handleChangeMaxSlippage } = props;
   const classes = useStyles(props);
   const currencyInputRef = useRef<HTMLInputElement>();
@@ -180,7 +184,7 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
   };
 
   return (
-    <Paper className={classes.root}>
+    <Paper ref={ref} className={classes.root}>
       <Box>
         <Typography variant="body1" className={classes.maxImpact} color="textPrimary">
           Max Slippage
@@ -195,8 +199,8 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
               data-amp-analytics-name="click"
               data-amp-analytics-attrs={`page: Settings, target: maxSlippage(${price})}`}
             >
-              <Button variant="text" fullWidth>
-                {`${price}%`}
+              <Button fullWidth>
+                <Box fontWeight={400}>{price}%</Box>
               </Button>
               <i />
             </PriceItem>
@@ -220,7 +224,7 @@ const SettingsPanel = (props: SettingsProps): JSX.Element => {
       </Box>
     </Paper>
   );
-};
+});
 
 SettingsPanel.defaultProps = {
   maxSlippage: "2.0%",

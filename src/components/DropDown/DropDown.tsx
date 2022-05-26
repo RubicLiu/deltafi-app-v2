@@ -6,7 +6,6 @@ import {
   makeStyles,
   Box,
   Theme,
-  Typography,
   InputBase,
 } from "@material-ui/core";
 import { SearchOutlined } from "@material-ui/icons";
@@ -21,16 +20,21 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: 28,
     backgroundColor: theme.palette.background.primary,
     padding: `${theme.spacing(0.75)}px ${theme.spacing(2)}px`,
-    fontFamily: "Inter",
     fontSize: 12,
     textTransform: "capitalize",
+    fontWeight: 400,
     [theme.breakpoints.up("sm")]: {
       fontSize: 16,
       padding: `${theme.spacing(1)}px ${theme.spacing(3)}px`,
       "&:disabled": {
+        fontSize: 14,
         color: theme.palette.primary.main,
         padding: `${theme.spacing(0.5)}px ${theme.spacing(3)}px`,
       },
+    },
+    "&:disabled": {
+      color: theme.palette.primary.main,
+      padding: `${theme.spacing(0.5)}px ${theme.spacing(2)}px`,
     },
     minWidth: 100,
   },
@@ -47,8 +51,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: "absolute",
     zIndex: theme.zIndex.modal,
     marginTop: theme.spacing(1),
-    backgroundColor: theme.palette.background.primary,
-    border: "1px solid #3e3e3e",
+    backgroundColor: theme.palette.background.secondary,
     borderRadius: theme.spacing(2),
     padding: `${theme.spacing(3)}px ${theme.spacing(2)}px`,
   },
@@ -75,29 +78,27 @@ const useStyles = makeStyles((theme: Theme) => ({
   searchInput: {
     width: "100%",
     marginLeft: 4,
+    fontWeight: 500,
   },
   optionItem: {
     marginTop: 10,
+    padding: "8px 0",
     textAlign: "left",
   },
   optionItemIcon: {
-    width: theme.spacing(3.5),
-    height: theme.spacing(3.5),
+    width: theme.spacing(4),
+    height: theme.spacing(4),
   },
   symbol: {
-    fontFamily: "Inter",
     fontSize: theme.typography.subtitle1.fontSize,
     lineHeight: 1,
     textTransform: "uppercase",
-    marginBottom: 2,
   },
   optionLabel: {
-    fontFamily: "Inter",
     fontSize: 12,
+    color: "#D3D3D3",
+    fontWeight: 400,
     textTransform: "capitalize",
-    [theme.breakpoints.up("md")]: {
-      fontSize: 16,
-    },
   },
   gradientBorder: {
     content: "''",
@@ -251,18 +252,22 @@ const DropDown = <T extends TokenConfig>(props: DropDownProps<T> & { children?: 
                         justifyContent: "space-between",
                         width: "100%",
                         ml: 1,
+                        lineHeight: 1,
                       }}
                     >
-                      <Box>
-                        {classes.symbol && (
-                          <Typography className={classes.symbol}>{option.symbol}</Typography>
-                        )}
-                        <Typography className={classes.optionLabel}>{option.name}</Typography>
+                      <Box
+                        display="flex"
+                        flexDirection="column"
+                        height={32}
+                        justifyContent="space-between"
+                      >
+                        {classes.symbol && <Box className={classes.symbol}>{option.symbol}</Box>}
+                        <Box className={classes.optionLabel}>{option.name}</Box>
                       </Box>
                       {option.symbol && (
-                        <Typography className={classes.optionLabel}>
+                        <Box className={classes.optionLabel}>
                           {"0"} {option.symbol}
-                        </Typography>
+                        </Box>
                       )}
                     </Box>
                   </Box>

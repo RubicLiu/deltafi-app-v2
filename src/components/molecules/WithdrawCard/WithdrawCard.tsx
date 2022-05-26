@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import CurrencyInput from "react-currency-input-field";
-import Box from "@material-ui/core/Box";
 import Paper from "@material-ui/core/Paper";
 import clx from "classnames";
 
@@ -8,6 +7,7 @@ import { DropDown } from "components";
 import useStyles from "./styles";
 import { SwapCard } from "views/Swap/components/types";
 import { tokenConfigs } from "constants/deployConfigV2";
+import { Box } from "@mui/material";
 
 export interface SettingsProps {
   priceImpact: string;
@@ -62,7 +62,7 @@ const WithdrawCard: React.FC<CardProps> = (props) => {
           onChange={inputHandler}
         />
       </Box>
-      <Box display="flex" justifyContent="space-between">
+      <Box display="flex" justifyContent="space-between" flexWrap="wrap" columnGap={3}>
         <Box display="flex">
           <Box className={classes.tokenBalance}>Max Withdrawal:&nbsp;</Box>
           <Box className={clx(classes.tokenBalance, classes.withdrawNumber)}>
