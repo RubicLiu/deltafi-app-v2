@@ -2,7 +2,8 @@ import { PoolState } from "anchor/type_definitions";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
 import { TokenConfig } from "constants/deployConfigV2";
-import { bnToString } from "utils/tokenUtils";
+import { exponentiatedBy } from "utils/decimal";
+import { anchorBnToBn, bnToString } from "utils/tokenUtils";
 
 export function calculateWithdrawalFromShares(
   baseShare: BN,
@@ -12,28 +13,28 @@ export function calculateWithdrawalFromShares(
   basePrice: BigNumber,
   quotePrice: BigNumber,
   poolState: PoolState,
-): { 
+): {
   baseWithdrawalAmount: string;
-  quoteWithdrawalAmount: string; 
+  quoteWithdrawalAmount: string;
 } {
 
-  let rawBaseWithdrawalAmount: BigNumber;
-  let rawQuoteWithdrawalAmount: BigNumber;
+  let baseWithdrawalAmount: BigNumber;
+  let quoteWithdrawalAmount: BigNumber;
 
   const baseTokenInfo: tokenShareInfo = {
     price: basePrice,
-    share: new BigNumber(baseShare.toString()),
-    shareSupply: new BigNumber(poolState.baseSupply.toString()),
-    reserve: new BigNumber(poolState.baseReserve.toString()),
-    targetReserve: new BigNumber(poolState.targetBaseReserve.toString()),
+    share: anchorBnToBn(baseTokenConfig, baseShare),
+    shareSupply: anchorBnToBn(baseTokenConfig, poolState.baseSupply),
+    reserve: anchorBnToBn(baseTokenConfig, poolState.baseReserve),
+    targetReserve: anchorBnToBn(baseTokenConfig, poolState.targetBaseReserve),
   };
 
   const quoteTokenInfo: tokenShareInfo = {
     price: quotePrice,
-    share: new BigNumber(quoteShare.toString()),
-    shareSupply: new BigNumber(poolState.quoteSupply.toString()),
-    reserve: new BigNumber(poolState.quoteReserve.toString()),
-    targetReserve: new BigNumber(poolState.targetQuoteReserve.toString())
+    share: anchorBnToBn(quoteTokenConfig, quoteShare),
+    shareSupply: anchorBnToBn(quoteTokenConfig, poolState.quoteSupply),
+    reserve: anchorBnToBn(quoteTokenConfig, poolState.quoteReserve),
+    targetReserve: anchorBnToBn(quoteTokenConfig, poolState.targetQuoteReserve),
   };
 
   const baseReserveToTargetRatio: BigNumber = new BigNumber(
@@ -42,25 +43,27 @@ export function calculateWithdrawalFromShares(
   const quoteReserveToTargetRatio: BigNumber = new BigNumber(
     poolState.quoteReserve.toString(),
   ).dividedBy(poolState.targetBaseReserve.toString());
-  
+
   if (baseReserveToTargetRatio.isLessThan(quoteReserveToTargetRatio)) {
-    const {rawLowTokenAmount: rawBaseWithdrawalAmount, rawHighTokenAmount: rawQuoteWithdrawalAmount} = calculateWithdrawFromSharesAndBalances(
+    const { lowTokenAmount, highTokenAmount } = calculateWithdrawFromSharesAndBalances(
       baseTokenInfo,
       quoteTokenInfo,
-    )
-  }
-  else {
-    const {rawLowTokenAmount: rawQuoteWithdrawalAmount, rawHighTokenAmount: rawBaseWithdrawalAmount} = calculateWithdrawFromSharesAndBalances(
+    );
+    baseWithdrawalAmount = lowTokenAmount;
+    quoteWithdrawalAmount = highTokenAmount;
+  } else {
+    const { lowTokenAmount, highTokenAmount } = calculateWithdrawFromSharesAndBalances(
       quoteTokenInfo,
       baseTokenInfo,
-    )
+    );
+    baseWithdrawalAmount = lowTokenAmount;
+    quoteWithdrawalAmount = highTokenAmount;
   }
 
   return {
-    baseWithdrawalAmount: bnToString(baseTokenConfig, rawBaseWithdrawalAmount),
-    quoteWithdrawalAmount: bnToString(quoteTokenConfig, rawQuoteWithdrawalAmount),
-  }
-
+    baseWithdrawalAmount: baseWithdrawalAmount.toFixed(baseTokenConfig.decimals),
+    quoteWithdrawalAmount: baseWithdrawalAmount.toFixed(quoteTokenConfig.decimals),
+  };
 }
 
 interface tokenShareInfo {
@@ -75,16 +78,16 @@ export function calculateWithdrawFromSharesAndBalances(
   lowTokenShareInfo: tokenShareInfo,
   highTokenShareInfo: tokenShareInfo,
 ): {
-  rawLowTokenAmount: BigNumber;
-  rawHighTokenAmount: BigNumber;
+  lowTokenAmount: BigNumber;
+  highTokenAmount: BigNumber;
 } {
-  const rawLowTokenAmount: BigNumber = lowTokenShareInfo.reserve
+  const lowTokenAmount: BigNumber = lowTokenShareInfo.reserve
     .multipliedBy(lowTokenShareInfo.share)
     .dividedBy(lowTokenShareInfo.shareSupply);
   const highTokenReserveBase: BigNumber = lowTokenShareInfo.reserve
     .multipliedBy(highTokenShareInfo.price)
     .dividedBy(lowTokenShareInfo.price);
-  const rawHighTokenAmountBase: BigNumber = highTokenReserveBase
+  const highTokenAmountBase: BigNumber = highTokenReserveBase
     .multipliedBy(highTokenShareInfo.share)
     .dividedBy(highTokenShareInfo.shareSupply);
   const shareTvlRatio = lowTokenShareInfo.share
@@ -96,12 +99,12 @@ export function calculateWithdrawFromSharesAndBalances(
         .plus(highTokenShareInfo.shareSupply.multipliedBy(highTokenShareInfo.price)),
     );
 
-  const rawHighTokenAmountResidual: BigNumber = highTokenShareInfo.reserve
+  const highTokenAmountResidual: BigNumber = highTokenShareInfo.reserve
     .minus(highTokenReserveBase)
     .multipliedBy(shareTvlRatio);
 
   return {
-    rawLowTokenAmount,
-    rawHighTokenAmount: rawHighTokenAmountBase.plus(rawHighTokenAmountResidual),
+    lowTokenAmount,
+    highTokenAmount: highTokenAmountBase.plus(highTokenAmountResidual),
   };
 }

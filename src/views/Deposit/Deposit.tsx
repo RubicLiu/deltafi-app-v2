@@ -16,7 +16,6 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
 
 import { ConnectButton } from "components";
-import { SwapCard as ISwapCard } from "views/Swap/components/types";
 
 import { useModal } from "providers/modal";
 import { exponentiatedBy } from "utils/decimal";
@@ -49,6 +48,8 @@ import { scheduleWithInterval } from "utils";
 import WithdrawSelectCard from "./components/WithdrawSelectCard/Card";
 import DepositCard from "./components/DepositCard/Card";
 import { IDepositCard } from "./components/DepositCard/types";
+import { calculateWithdrawalFromShares } from "lib/calc";
+import BN from "bn.js";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -282,6 +283,40 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return new BigNumber(0);
   }, [lpUser, swapInfo]);
 
+  const { maxBaseWithdrawal, maxQuoteWithdrawal } = useMemo(() => {
+    const baseTokenConfig = depositView?.base?.token;
+    const quoteTokenConfig = depositView?.quote?.token;
+
+    if (
+      !lpUser ||
+      !swapInfo?.poolState ||
+      !baseTokenConfig ||
+      !quoteTokenConfig ||
+      !basePrice ||
+      !quotePrice
+    ) {
+      return {
+        maxBaseWithdrawal: "--",
+        maxQuoteWithdrawal: "--",
+      };
+    }
+
+    const res = calculateWithdrawalFromShares(
+      lpUser.baseShare,
+      lpUser.quoteShare,
+      baseTokenConfig,
+      quoteTokenConfig,
+      basePrice,
+      quotePrice,
+      swapInfo.poolState,
+    );
+
+    return {
+      maxBaseWithdrawal: res.baseWithdrawalAmount,
+      maxQuoteWithdrawal: res.quoteWithdrawalAmount,
+    };
+  }, [lpUser, swapInfo, depositView, basePrice, quotePrice]);
+
   const baseShare = useMemo(() => {
     if (swapInfo && basePercent) {
       return anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve)
@@ -382,22 +417,35 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
   const handleWithdrawSlider = useCallback(
     (value: number) => {
-      console.log("drawing", value);
-      if (lpUser && basePrice && quotePrice) {
+      const baseTokenConfig = depositView?.base?.token;
+      const quoteTokenConfig = depositView?.quote?.token;
+      if (lpUser && swapInfo && baseTokenConfig && quoteTokenConfig && basePrice && quotePrice) {
         // TODO(ypeng): Consider price and pool ratio
-        const baseAmount = anchorBnToBn(baseTokenInfo, lpUser.baseShare)
-          .multipliedBy(value)
-          .dividedBy(100);
-        const quoteAmount = anchorBnToBn(quoteTokenInfo, lpUser.quoteShare)
-          .multipliedBy(value)
-          .dividedBy(100);
 
-        console.log(baseAmount.toString(), lpUser.baseShare);
-        console.log(quoteAmount.toString(), lpUser.quoteShare);
+        const baseInputShare = lpUser.baseShare.mul(new BN(value)).div(new BN(100));
+        const quoteInputShare = lpUser.quoteShare.mul(new BN(value)).div(new BN(100));
+
+        const { baseWithdrawalAmount, quoteWithdrawalAmount } = calculateWithdrawalFromShares(
+          baseInputShare,
+          quoteInputShare,
+          baseTokenConfig,
+          quoteTokenConfig,
+          basePrice,
+          quotePrice,
+          swapInfo?.poolState,
+        );
+
+        dispatch(
+          depositViewActions.setTokenShare({
+            baseShare: baseInputShare.toString(),
+            quoteShare: quoteInputShare.toString(),
+          }),
+        );
+
         dispatch(
           depositViewActions.setTokenAmount({
-            baseAmount: baseAmount.toString(),
-            quoteAmount: quoteAmount.toString(),
+            baseAmount: baseWithdrawalAmount,
+            quoteAmount: quoteWithdrawalAmount,
           }),
         );
       }
@@ -559,13 +607,13 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     const base = depositView.base;
     const quote = depositView.quote;
     try {
-      if (base.amount === "" || quote.amount === "") {
+      if (base.share === "" || quote.share === "") {
         return;
       }
       dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
 
-      const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, base.amount);
-      const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, quote.amount);
+      const baseShare = new BN(base.share);
+      const quoteShare = new BN(quote.share);
 
       transaction = await createWithdrawTransaction(
         program,
@@ -575,8 +623,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         baseTokenAccount.publicKey,
         quoteTokenAccount.publicKey,
         walletPubkey,
-        baseAmount,
-        quoteAmount,
+        baseShare,
+        quoteShare,
       );
 
       transaction = await signTransaction(transaction);
@@ -588,6 +636,9 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       await connection.confirmTransaction(hash, "confirmed");
 
       dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+      dispatch(depositViewActions.setTokenShare({ baseShare: "0", quoteShare: "0" }));
+      dispatch(depositViewActions.setWithdrawPercentage({ withdrawPercentage: 0 }));
+      
       dispatch(
         depositViewActions.setTransactionResult({
           transactionResult: {
@@ -696,7 +747,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
   const handleBaseTokenInput = useCallback(
     (card: IDepositCard) => {
-      console.log(card);
       const baseAmount = card.amount;
       if (baseAmount === "") {
         dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
@@ -713,8 +763,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         quotePrice,
       );
 
-      console.log("quoteAmount 0", quoteAmount);
-      console.log("quoteAmount", stringCutTokenDecimals(quoteTokenInfo, quoteAmount));
       dispatch(
         depositViewActions.setTokenAmount({
           baseAmount,
@@ -1012,13 +1060,13 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
                     />
                     <DepositCard
                       card={depositView.base}
-                      withdrawal={baseShare?.toFixed(6).toString()}
+                      withdrawal={maxBaseWithdrawal}
                       isDeposit={depositView.method === "deposit"}
                       disableDrop={true}
                     />
                     <DepositCard
                       card={depositView.quote}
-                      withdrawal={quoteShare?.toFixed(6).toString()}
+                      withdrawal={maxQuoteWithdrawal}
                       isDeposit={depositView.method === "deposit"}
                       disableDrop={true}
                     />

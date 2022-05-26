@@ -16,11 +16,13 @@ const initialState = {
   base: {
     token: null,
     amount: "0",
-    totalAmount: "0",
+    share: "0",
+    maxAmount: "0",
   },
   quote: {
     token: null,
     amount: "0",
+    share: "0",
     maxAmount: "0",
   },
   transactionResult: null,
@@ -43,15 +45,22 @@ const depositViewSlice = createSlice({
     ) {
       state.base.token = action.payload.baseTokenInfo;
       state.base.amount = "0";
-      state.base.totalAmount = "0";
+      state.base.share = "0";
+      state.base.maxAmount = "0";
       state.quote.token = action.payload.quoteTokenInfo;
       state.quote.amount = "0";
+      state.quote.share = "0";
       state.quote.maxAmount = "0";
     },
 
     setTokenAmount(state, action: PayloadAction<{ baseAmount: string; quoteAmount: string }>) {
       state.base.amount = action.payload.baseAmount;
       state.quote.amount = action.payload.quoteAmount;
+    },
+
+    setTokenShare(state, action: PayloadAction<{ baseShare: string; quoteShare: string }>) {
+      state.base.share = action.payload.baseShare;
+      state.quote.share = action.payload.quoteShare;
     },
 
     setMethod(state, action: PayloadAction<{ method: string }>) {
