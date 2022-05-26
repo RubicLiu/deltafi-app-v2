@@ -17,8 +17,8 @@ export interface IDepositCard {
 
 export interface DepositCardProps {
   card: IDepositCard;
-  handleChangeCard: any;
   isDeposit: boolean;
+  handleChangeCard?: any;
   disableDrop?: boolean;
   withdrawal?: string;
 }

@@ -1012,14 +1012,12 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
                     />
                     <DepositCard
                       card={depositView.base}
-                      handleChangeCard={handleBaseTokenInput}
                       withdrawal={baseShare?.toFixed(6).toString()}
                       isDeposit={depositView.method === "deposit"}
                       disableDrop={true}
                     />
                     <DepositCard
                       card={depositView.quote}
-                      handleChangeCard={handleQuoteTokenInput}
                       withdrawal={quoteShare?.toFixed(6).toString()}
                       isDeposit={depositView.method === "deposit"}
                       disableDrop={true}

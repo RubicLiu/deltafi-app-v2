@@ -63,7 +63,7 @@ const DepositCard: React.FC<DepositCardProps> = (props) => {
           maxLength={20}
           decimalsLimit={20}
           value={card.amount}
-          onChange={inputHandler}
+          onChange={isDeposit ? inputHandler : null}
         />
       </Box>
       <Box display="flex" justifyContent="space-between">
