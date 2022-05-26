@@ -36,5 +36,5 @@ To run test for a specific module, for example, calculate, run `yarn jest -i tes
 ### Build docker image and deploy to k8s
 ```
 bash deploy/build_dev.sh
-kubectl apply -f deploy/dev/generated_jsonnet/main.json --context us-west-2-dev
+k8s-cli apply -f deploy/dev/main.json.jsonnet
 ```
