@@ -45,7 +45,6 @@ import { createDepositTransaction, createWithdrawTransaction } from "utils/trans
 import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/tokenUtils";
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { Paper } from "@material-ui/core";
-import { createClaimFarmRewardsTransaction } from "utils/transactions/deposit";
 import { scheduleWithInterval } from "utils";
 import WithdrawSelectCard from "./components/WithdrawSelectCard/Card";
 import DepositCard from "./components/DepositCard/Card";
@@ -247,7 +246,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
   const baseTokenAccount = useSelector(selectTokenAccountInfoByMint(baseTokenInfo.mint));
   const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(quoteTokenInfo.mint));
-  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
   const lpUser: LiquidityProvider = useSelector(selectLpUserBySwapKey(poolAddress));
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
@@ -637,60 +635,60 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     program,
   ]);
 
-  const handleClaimInterest = useCallback(async () => {
-    if (!walletPubkey || !program || !lpUser) {
-      return null;
-    }
-    const connection = program.provider.connection;
-
-    try {
-      dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
-
-      const transaction = await createClaimFarmRewardsTransaction(
-        program,
-        connection,
-        poolConfig,
-        walletPubkey,
-        rewardsAccount?.publicKey,
-      );
-      const signedTransaction = await signTransaction(transaction);
-
-      const hash = await sendSignedTransaction({
-        signedTransaction,
-        connection,
-      });
-
-      await connection.confirmTransaction(hash, "confirmed");
-
-      dispatch(
-        depositViewActions.setTransactionResult({
-          transactionResult: {
-            status: true,
-            action: "claim",
-            hash,
-          },
-        }),
-      );
-    } catch (e) {
-      console.error("error", e);
-      dispatch(
-        depositViewActions.setTransactionResult({
-          transactionResult: {
-            status: false,
-          },
-        }),
-      );
-    } finally {
-      dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(depositViewActions.setIsProcessing({ isProcessing: false }));
-      dispatch(
-        fetchLiquidityProvidersThunk({
-          connection,
-          walletAddress: walletPubkey,
-        }),
-      );
-    }
-  }, [lpUser, poolConfig, walletPubkey, program, rewardsAccount, signTransaction, dispatch]);
+  //  const handleClaimInterest = useCallback(async () => {
+  //    if (!walletPubkey || !program || !lpUser) {
+  //      return null;
+  //    }
+  //    const connection = program.provider.connection;
+  //
+  //    try {
+  //      dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
+  //
+  //      const transaction = await createClaimFarmRewardsTransaction(
+  //        program,
+  //        connection,
+  //        poolConfig,
+  //        walletPubkey,
+  //        rewardsAccount?.publicKey,
+  //      );
+  //      const signedTransaction = await signTransaction(transaction);
+  //
+  //      const hash = await sendSignedTransaction({
+  //        signedTransaction,
+  //        connection,
+  //      });
+  //
+  //      await connection.confirmTransaction(hash, "confirmed");
+  //
+  //      dispatch(
+  //        depositViewActions.setTransactionResult({
+  //          transactionResult: {
+  //            status: true,
+  //            action: "claim",
+  //            hash,
+  //          },
+  //        }),
+  //      );
+  //    } catch (e) {
+  //      console.error("error", e);
+  //      dispatch(
+  //        depositViewActions.setTransactionResult({
+  //          transactionResult: {
+  //            status: false,
+  //          },
+  //        }),
+  //      );
+  //    } finally {
+  //      dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: true }));
+  //      dispatch(depositViewActions.setIsProcessing({ isProcessing: false }));
+  //      dispatch(
+  //        fetchLiquidityProvidersThunk({
+  //          connection,
+  //          walletAddress: walletPubkey,
+  //        }),
+  //      );
+  //    }
+  //  }, [lpUser, poolConfig, walletPubkey, program, rewardsAccount, signTransaction, dispatch]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: false }));
@@ -943,25 +941,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           </ConnectButton>
         </>
       );
-    } else if (depositView.method === "claim") {
-      return (
-        <>
-          <Box height={16}></Box>
-
-          <ConnectButton
-            fullWidth
-            variant="contained"
-            onClick={handleClaimInterest}
-            data-amp-analytics-on="click"
-            data-amp-analytics-name="click"
-            data-amp-analytics-attrs="page: Claim, target: Claim"
-          >
-            <Box lineHeight="36px">Claim Interest</Box>
-          </ConnectButton>
-        </>
-      );
     }
-
     throw Error("Invalid deposit method: " + depositView.method);
   }, [
     depositView,
@@ -973,7 +953,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     setMenu,
     handleDeposit,
     handleWithdraw,
-    handleClaimInterest,
   ]);
 
   if (!swapInfo) return null;
