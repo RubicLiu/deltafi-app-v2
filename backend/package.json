@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "build-dev": "tsc --project ./",
-    "build-prod": "tsc --project ./",
+    "build": "tsc --project ./",
     "start:dev": "nodemon src/server.ts",
     "start:prod": "node dist/server.js"
   },
