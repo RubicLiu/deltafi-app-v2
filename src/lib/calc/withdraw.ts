@@ -40,7 +40,7 @@ export function calculateWithdrawalFromShares(
   ).dividedBy(poolState.targetBaseReserve.toString());
   const quoteReserveToTargetRatio: BigNumber = new BigNumber(
     poolState.quoteReserve.toString(),
-  ).dividedBy(poolState.targetBaseReserve.toString());
+  ).dividedBy(poolState.targetQuoteReserve.toString());
 
   if (baseReserveToTargetRatio.isLessThan(quoteReserveToTargetRatio)) {
     const { lowTokenAmount, highTokenAmount } = calculateWithdrawFromSharesAndBalances(
@@ -54,8 +54,8 @@ export function calculateWithdrawalFromShares(
       quoteTokenInfo,
       baseTokenInfo,
     );
-    baseWithdrawalAmount = lowTokenAmount;
-    quoteWithdrawalAmount = highTokenAmount;
+    baseWithdrawalAmount = highTokenAmount;
+    quoteWithdrawalAmount = lowTokenAmount;
   }
 
   return {
@@ -82,9 +82,10 @@ export function calculateWithdrawFromSharesAndBalances(
   const lowTokenAmount: BigNumber = lowTokenShareInfo.reserve
     .multipliedBy(lowTokenShareInfo.share)
     .dividedBy(lowTokenShareInfo.shareSupply);
+
   const highTokenReserveBase: BigNumber = lowTokenShareInfo.reserve
-    .multipliedBy(highTokenShareInfo.price)
-    .dividedBy(lowTokenShareInfo.price);
+    .multipliedBy(highTokenShareInfo.targetReserve)
+    .dividedBy(lowTokenShareInfo.targetReserve);
   const highTokenAmountBase: BigNumber = highTokenReserveBase
     .multipliedBy(highTokenShareInfo.share)
     .dividedBy(highTokenShareInfo.shareSupply);
