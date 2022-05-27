@@ -31,6 +31,11 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "serumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -332,6 +337,86 @@ export type DeltafiDexV2 = {
         },
         {
           "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "baseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "quoteAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initSerumSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityProvider",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "serumMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAsks",
           "isMut": false,
           "isSigner": false
         },
@@ -1332,7 +1417,7 @@ export type DeltafiDexV2 = {
             "type": {
               "array": [
                 "u64",
-                16
+                32
               ]
             }
           }
@@ -1420,6 +1505,10 @@ export type DeltafiDexV2 = {
             "type": "publicKey"
           },
           {
+            "name": "serumProgramId",
+            "type": "publicKey"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -1499,6 +1588,18 @@ export type DeltafiDexV2 = {
             "type": "publicKey"
           },
           {
+            "name": "serumMarket",
+            "type": "publicKey"
+          },
+          {
+            "name": "serumBids",
+            "type": "publicKey"
+          },
+          {
+            "name": "serumAsks",
+            "type": "publicKey"
+          },
+          {
             "name": "poolState",
             "type": {
               "defined": "PoolState"
@@ -1568,7 +1669,7 @@ export type DeltafiDexV2 = {
             "type": {
               "array": [
                 "u64",
-                16
+                32
               ]
             }
           }
@@ -1704,7 +1805,7 @@ export type DeltafiDexV2 = {
             "type": {
               "array": [
                 "u64",
-                16
+                32
               ]
             }
           }
@@ -1733,48 +1834,64 @@ export type DeltafiDexV2 = {
             "type": "u8"
           },
           {
-            "name": "slope",
-            "type": "u128"
+            "name": "serumMarketTokenRatioLimitPercentage",
+            "type": "u8"
           },
           {
             "name": "adminTradeFeeNumerator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "adminTradeFeeDenominator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "adminWithdrawFeeNumerator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "adminWithdrawFeeDenominator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "tradeFeeNumerator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "tradeFeeDenominator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "withdrawFeeNumerator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "withdrawFeeDenominator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "tradeRewardNumerator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "tradeRewardDenominator",
-            "type": "u64"
+            "type": "u32"
+          },
+          {
+            "name": "referralRewardNumerator",
+            "type": "u32"
+          },
+          {
+            "name": "referralRewardDenominator",
+            "type": "u32"
+          },
+          {
+            "name": "maxStablePriceDiffNumerator",
+            "type": "u32"
+          },
+          {
+            "name": "maxStablePriceDiffDenominator",
+            "type": "u32"
           },
           {
             "name": "tradeRewardCap",
@@ -1785,20 +1902,8 @@ export type DeltafiDexV2 = {
             "type": "u64"
           },
           {
-            "name": "referralRewardNumerator",
-            "type": "u64"
-          },
-          {
-            "name": "referralRewardDenominator",
-            "type": "u64"
-          },
-          {
-            "name": "maxStablePriceDiffNumerator",
-            "type": "u64"
-          },
-          {
-            "name": "maxStablePriceDiffDenominator",
-            "type": "u64"
+            "name": "slope",
+            "type": "u128"
           },
           {
             "name": "reservedU64",
@@ -1901,6 +2006,9 @@ export type DeltafiDexV2 = {
           },
           {
             "name": "StableSwap"
+          },
+          {
+            "name": "SerumSwap"
           }
         ]
       }
@@ -2278,6 +2386,11 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "serumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "admin",
           "isMut": false,
           "isSigner": true
@@ -2579,6 +2692,86 @@ export const IDL: DeltafiDexV2 = {
         },
         {
           "name": "pythPriceQuote",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "baseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "quoteAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initSerumSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityProvider",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "serumMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAsks",
           "isMut": false,
           "isSigner": false
         },
@@ -3579,7 +3772,7 @@ export const IDL: DeltafiDexV2 = {
             "type": {
               "array": [
                 "u64",
-                16
+                32
               ]
             }
           }
@@ -3667,6 +3860,10 @@ export const IDL: DeltafiDexV2 = {
             "type": "publicKey"
           },
           {
+            "name": "serumProgramId",
+            "type": "publicKey"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -3746,6 +3943,18 @@ export const IDL: DeltafiDexV2 = {
             "type": "publicKey"
           },
           {
+            "name": "serumMarket",
+            "type": "publicKey"
+          },
+          {
+            "name": "serumBids",
+            "type": "publicKey"
+          },
+          {
+            "name": "serumAsks",
+            "type": "publicKey"
+          },
+          {
             "name": "poolState",
             "type": {
               "defined": "PoolState"
@@ -3815,7 +4024,7 @@ export const IDL: DeltafiDexV2 = {
             "type": {
               "array": [
                 "u64",
-                16
+                32
               ]
             }
           }
@@ -3951,7 +4160,7 @@ export const IDL: DeltafiDexV2 = {
             "type": {
               "array": [
                 "u64",
-                16
+                32
               ]
             }
           }
@@ -3980,48 +4189,64 @@ export const IDL: DeltafiDexV2 = {
             "type": "u8"
           },
           {
-            "name": "slope",
-            "type": "u128"
+            "name": "serumMarketTokenRatioLimitPercentage",
+            "type": "u8"
           },
           {
             "name": "adminTradeFeeNumerator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "adminTradeFeeDenominator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "adminWithdrawFeeNumerator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "adminWithdrawFeeDenominator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "tradeFeeNumerator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "tradeFeeDenominator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "withdrawFeeNumerator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "withdrawFeeDenominator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "tradeRewardNumerator",
-            "type": "u64"
+            "type": "u32"
           },
           {
             "name": "tradeRewardDenominator",
-            "type": "u64"
+            "type": "u32"
+          },
+          {
+            "name": "referralRewardNumerator",
+            "type": "u32"
+          },
+          {
+            "name": "referralRewardDenominator",
+            "type": "u32"
+          },
+          {
+            "name": "maxStablePriceDiffNumerator",
+            "type": "u32"
+          },
+          {
+            "name": "maxStablePriceDiffDenominator",
+            "type": "u32"
           },
           {
             "name": "tradeRewardCap",
@@ -4032,20 +4257,8 @@ export const IDL: DeltafiDexV2 = {
             "type": "u64"
           },
           {
-            "name": "referralRewardNumerator",
-            "type": "u64"
-          },
-          {
-            "name": "referralRewardDenominator",
-            "type": "u64"
-          },
-          {
-            "name": "maxStablePriceDiffNumerator",
-            "type": "u64"
-          },
-          {
-            "name": "maxStablePriceDiffDenominator",
-            "type": "u64"
+            "name": "slope",
+            "type": "u128"
           },
           {
             "name": "reservedU64",
@@ -4148,6 +4361,9 @@ export const IDL: DeltafiDexV2 = {
           },
           {
             "name": "StableSwap"
+          },
+          {
+            "name": "SerumSwap"
           }
         ]
       }

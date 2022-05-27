@@ -5,6 +5,8 @@ import { Program, AnchorProvider, web3 } from "@project-serum/anchor";
 import * as token from "@solana/spl-token";
 import { MarketConfig, SwapConfig, SwapType } from "./type_definitions";
 
+const serumProgramId = new web3.PublicKey("9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin");
+
 export function getClusterApiUrl(network: string) {
   if (network === "localhost") {
     return "http://localhost:8899";
@@ -39,6 +41,7 @@ export async function createMarketConfig(program, pythProgramId, deltafiMint, ad
       deltafiMint: deltafiMint,
       deltafiToken: deltafiTokenKeyPair.publicKey,
       pythProgram: pythProgramId,
+      serumProgram: serumProgramId,
       admin: adminKeypair.publicKey,
       payer: program.provider.wallet.publicKey,
       systemProgram: web3.SystemProgram.programId,
@@ -106,6 +109,9 @@ export async function initSwap(
   swapType,
   pythPriceBase,
   pythPriceQuote,
+  serumMarket,
+  serumBids,
+  serumAsks,
   adminKeypair,
 ) {
   const swapInfoData = await program.account.swapInfo.fetch(swapInfo);
@@ -134,11 +140,21 @@ export async function initSwap(
       },
       signers: [adminKeypair],
     });
-  } else {
+  } else if (swapType.stableSwap != null) {
     await program.rpc.initStableSwap(amountA, amountB, {
       accounts: {
         pythPriceBase,
         pythPriceQuote,
+        ...initSwapAccounts,
+      },
+      signers: [adminKeypair],
+    });
+  } else {
+    await program.rpc.initSerumSwap(amountA, amountB, {
+      accounts: {
+        serumMarket,
+        serumBids,
+        serumAsks,
         ...initSwapAccounts,
       },
       signers: [adminKeypair],
