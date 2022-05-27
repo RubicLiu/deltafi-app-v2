@@ -55,9 +55,6 @@ const TabMenu: React.FC = (props) => {
       onChange={(event: React.MouseEvent<HTMLElement>, value: string | null) => handleActive(value)}
       aria-label="Top Menu"
     >
-      <ToggleButton value="dashboard" aria-label="Dashboard" className={classes.button}>
-        Dashboard
-      </ToggleButton>
       <ToggleButton value="swap" aria-label="Swap" className={classes.button}>
         Swap
       </ToggleButton>
