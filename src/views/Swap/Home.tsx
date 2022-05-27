@@ -876,13 +876,15 @@ const Home: React.FC = (props) => {
             >
               <Grid item xs={6} sm={4} style={{ display: "flex", alignItems: "center" }}>
                 <Avatar
-                  src={tokenFrom?.token.logoURI}
-                  alt={tokenFrom?.token.symbol}
+                  src={poolConfig?.baseTokenInfo?.logoURI}
+                  alt={poolConfig?.baseTokenInfo?.symbol}
                   className={classes.icon}
                 />
                 <Box marginLeft={0.5} className={classes.currencyCt}>
-                  <Box sx={{ color: "#fff", fontSize: "16px" }}>{tokenFrom.token.symbol}</Box>
-                  <Box>{tokenFrom.token.name}</Box>
+                  <Box sx={{ color: "#fff", fontSize: "16px" }}>
+                    {poolConfig?.baseTokenInfo?.symbol}
+                  </Box>
+                  <Box>{poolConfig?.baseTokenInfo?.name}</Box>
                 </Box>
               </Grid>
               <Grid item xs={6} sm={3}>
@@ -897,13 +899,15 @@ const Home: React.FC = (props) => {
               <Grid item xs={6} sm={3}></Grid>
               <Grid item xs={6} sm={4} style={{ display: "flex", alignItems: "center" }}>
                 <Avatar
-                  src={tokenTo?.token.logoURI}
-                  alt={tokenTo?.token.symbol}
+                  src={poolConfig?.quoteTokenInfo?.logoURI}
+                  alt={poolConfig?.quoteTokenInfo?.symbol}
                   className={classes.icon}
                 />
                 <Box marginLeft={0.5} className={classes.currencyCt}>
-                  <Box sx={{ color: "#fff", fontSize: "16px" }}>{tokenTo.token.symbol}</Box>
-                  <Box>{tokenTo.token.name}</Box>
+                  <Box sx={{ color: "#fff", fontSize: "16px" }}>
+                    {poolConfig?.quoteTokenInfo?.symbol}
+                  </Box>
+                  <Box>{poolConfig?.quoteTokenInfo?.name}</Box>
                 </Box>
               </Grid>
               <Grid item xs={6} sm={3}>
