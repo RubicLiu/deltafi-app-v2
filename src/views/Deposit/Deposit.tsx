@@ -15,10 +15,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
 
-import SwapCard from "views/Swap/components/Card";
 import { ConnectButton } from "components";
-import { SwapCard as ISwapCard } from "views/Swap/components/types";
-import WithdrawCard from "components/molecules/WithdrawCard";
 
 import { useModal } from "providers/modal";
 import { exponentiatedBy } from "utils/decimal";
@@ -48,7 +45,11 @@ import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/to
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { Paper } from "@material-ui/core";
 import { scheduleWithInterval } from "utils";
-import WithdrawSelectCard from "components/molecules/WithdrawSelectCard";
+import WithdrawSelectCard from "./components/WithdrawSelectCard/Card";
+import DepositCard from "./components/DepositCard/Card";
+import { IDepositCard } from "./components/DepositCard/types";
+import { calculateWithdrawalFromShares } from "lib/calc";
+import BN from "bn.js";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -223,7 +224,7 @@ function getPairedTokenAmount(
   }
 
   if (swapType && swapType.stableSwap) {
-    return amount;
+    return inputAmount.toString();
   }
 
   return inputAmount.multipliedBy(srcPrice).dividedBy(dstPrice).toString();
@@ -281,6 +282,40 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     }
     return new BigNumber(0);
   }, [lpUser, swapInfo]);
+
+  const { maxBaseWithdrawal, maxQuoteWithdrawal } = useMemo(() => {
+    const baseTokenConfig = depositView?.base?.token;
+    const quoteTokenConfig = depositView?.quote?.token;
+
+    if (
+      !lpUser ||
+      !swapInfo?.poolState ||
+      !baseTokenConfig ||
+      !quoteTokenConfig ||
+      !basePrice ||
+      !quotePrice
+    ) {
+      return {
+        maxBaseWithdrawal: "--",
+        maxQuoteWithdrawal: "--",
+      };
+    }
+
+    const res = calculateWithdrawalFromShares(
+      lpUser.baseShare,
+      lpUser.quoteShare,
+      baseTokenConfig,
+      quoteTokenConfig,
+      basePrice,
+      quotePrice,
+      swapInfo.poolState,
+    );
+
+    return {
+      maxBaseWithdrawal: res.baseWithdrawalAmount,
+      maxQuoteWithdrawal: res.quoteWithdrawalAmount,
+    };
+  }, [lpUser, swapInfo, depositView, basePrice, quotePrice]);
 
   const baseShare = useMemo(() => {
     if (swapInfo && basePercent) {
@@ -382,24 +417,36 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
   const handleWithdrawSlider = useCallback(
     (value: number) => {
-      if (lpUser && basePrice && quotePrice) {
+      const baseTokenConfig = depositView?.base?.token;
+      const quoteTokenConfig = depositView?.quote?.token;
+      if (lpUser && swapInfo && baseTokenConfig && quoteTokenConfig && basePrice && quotePrice) {
         // TODO(ypeng): Consider price and pool ratio
-        const baseAmount = anchorBnToBn(baseTokenInfo, lpUser.baseShare)
-          .multipliedBy(value)
-          .dividedBy(100);
-        const quoteAmount = anchorBnToBn(quoteTokenInfo, lpUser.quoteShare)
-          .multipliedBy(value)
-          .dividedBy(100);
+
+        const baseInputShare = lpUser.baseShare.mul(new BN(value)).div(new BN(100));
+        const quoteInputShare = lpUser.quoteShare.mul(new BN(value)).div(new BN(100));
+
+        const { baseWithdrawalAmount, quoteWithdrawalAmount } = calculateWithdrawalFromShares(
+          baseInputShare,
+          quoteInputShare,
+          baseTokenConfig,
+          quoteTokenConfig,
+          basePrice,
+          quotePrice,
+          swapInfo?.poolState,
+        );
+
         dispatch(
           depositViewActions.setTokenAmount({
-            baseAmount: baseAmount.toString(),
-            quoteAmount: quoteAmount.toString(),
+            baseAmount: baseWithdrawalAmount,
+            quoteAmount: quoteWithdrawalAmount,
+            baseShare: baseInputShare.toString(),
+            quoteShare: quoteInputShare.toString(),
           }),
         );
       }
       dispatch(depositViewActions.setWithdrawPercentage({ withdrawPercentage: value }));
     },
-    [dispatch, lpUser, baseTokenInfo, quoteTokenInfo, basePrice, quotePrice],
+    [dispatch, lpUser, basePrice, quotePrice, depositView, swapInfo],
   );
 
   const unclaimedInterest = useMemo(() => {
@@ -495,7 +542,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
       await connection.confirmTransaction(hash, "confirmed");
 
-      dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+      dispatch(
+        depositViewActions.setTokenAmount({
+          baseAmount: "0",
+          quoteAmount: "0",
+          baseShare: "0",
+          quoteShare: "0",
+        }),
+      );
       dispatch(
         depositViewActions.setTransactionResult({
           transactionResult: {
@@ -555,13 +609,13 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     const base = depositView.base;
     const quote = depositView.quote;
     try {
-      if (base.amount === "" || quote.amount === "") {
+      if (base.share === "" || quote.share === "") {
         return;
       }
       dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
 
-      const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, base.amount);
-      const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, quote.amount);
+      const baseShare = new BN(base.share);
+      const quoteShare = new BN(quote.share);
 
       transaction = await createWithdrawTransaction(
         program,
@@ -571,8 +625,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         baseTokenAccount.publicKey,
         quoteTokenAccount.publicKey,
         walletPubkey,
-        baseAmount,
-        quoteAmount,
+        baseShare,
+        quoteShare,
       );
 
       transaction = await signTransaction(transaction);
@@ -583,7 +637,16 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
       await connection.confirmTransaction(hash, "confirmed");
 
-      dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+      dispatch(
+        depositViewActions.setTokenAmount({
+          baseAmount: "0",
+          quoteAmount: "0",
+          baseShare: "0",
+          quoteShare: "0",
+        }),
+      );
+      dispatch(depositViewActions.setWithdrawPercentage({ withdrawPercentage: 0 }));
+
       dispatch(
         depositViewActions.setTransactionResult({
           transactionResult: {
@@ -691,10 +754,17 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   }, [dispatch]);
 
   const handleBaseTokenInput = useCallback(
-    (card: ISwapCard) => {
+    (card: IDepositCard) => {
       const baseAmount = card.amount;
       if (baseAmount === "") {
-        dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+        dispatch(
+          depositViewActions.setTokenAmount({
+            baseAmount: "0",
+            quoteAmount: "0",
+            baseShare: "0",
+            quoteShare: "0",
+          }),
+        );
         return;
       }
       if (new BigNumber(baseAmount).isNaN()) {
@@ -712,6 +782,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         depositViewActions.setTokenAmount({
           baseAmount,
           quoteAmount: stringCutTokenDecimals(quoteTokenInfo, quoteAmount),
+          baseShare: "0",
+          quoteShare: "0",
         }),
       );
     },
@@ -719,10 +791,17 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   );
 
   const handleQuoteTokenInput = useCallback(
-    (card: ISwapCard) => {
+    (card: IDepositCard) => {
       const quoteAmount = card.amount;
       if (quoteAmount === "") {
-        dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+        dispatch(
+          depositViewActions.setTokenAmount({
+            baseAmount: "0",
+            quoteAmount: "0",
+            baseShare: "0",
+            quoteShare: "0",
+          }),
+        );
         return;
       }
       if (new BigNumber(quoteAmount).isNaN()) {
@@ -739,6 +818,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         depositViewActions.setTokenAmount({
           baseAmount: stringCutTokenDecimals(baseTokenInfo, baseAmount),
           quoteAmount,
+          baseShare: "0",
+          quoteShare: "0",
         }),
       );
     },
@@ -1012,16 +1093,16 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
                       percentage={depositView.withdrawPercentage}
                       onUpdatePercentage={handleWithdrawSlider}
                     />
-                    <WithdrawCard
+                    <DepositCard
                       card={depositView.base}
-                      handleChangeCard={handleBaseTokenInput}
-                      withdrawal={baseShare?.toFixed(6).toString()}
+                      withdrawal={maxBaseWithdrawal}
+                      isDeposit={depositView.method === "deposit"}
                       disableDrop={true}
                     />
-                    <WithdrawCard
+                    <DepositCard
                       card={depositView.quote}
-                      handleChangeCard={handleQuoteTokenInput}
-                      withdrawal={quoteShare?.toFixed(6).toString()}
+                      withdrawal={maxQuoteWithdrawal}
+                      isDeposit={depositView.method === "deposit"}
                       disableDrop={true}
                     />
                   </Box>
@@ -1029,17 +1110,17 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
               case "deposit":
                 return (
                   <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={4}>
-                    <SwapCard
+                    <DepositCard
                       card={depositView.base}
                       handleChangeCard={handleBaseTokenInput}
+                      isDeposit={depositView.method === "deposit"}
                       disableDrop={true}
-                      isDeposit
                     />
-                    <SwapCard
+                    <DepositCard
                       card={depositView.quote}
                       handleChangeCard={handleQuoteTokenInput}
+                      isDeposit={depositView.method === "deposit"}
                       disableDrop={true}
-                      isDeposit
                     />
                   </Box>
                 );
