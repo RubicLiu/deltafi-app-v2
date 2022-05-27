@@ -17,7 +17,7 @@ const routes = Router();
 
 routes.get('/api/version', (_, response) => {
   return response.json({
-    tag: "",
+    dockerImageTag: process.env.DOCKER_IMAGE_TAG || "",
   });
 });
 
