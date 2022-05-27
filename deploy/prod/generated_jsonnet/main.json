@@ -24,6 +24,12 @@
                "spec": {
                   "containers": [
                      {
+                        "env": [
+                           {
+                              "name": "DOCKER_IMAGE_TAG",
+                              "value": "prod-4c18e1a-20220526-154031"
+                           }
+                        ],
                         "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/frontend:prod-4c18e1a-20220526-154031",
                         "name": "main",
                         "ports": [
@@ -80,6 +86,12 @@
                "spec": {
                   "containers": [
                      {
+                        "env": [
+                           {
+                              "name": "DOCKER_IMAGE_TAG",
+                              "value": "prod-4c18e1a-20220526-154031"
+                           }
+                        ],
                         "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/backend:prod-4c18e1a-20220526-154031",
                         "name": "main",
                         "ports": [
