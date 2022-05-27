@@ -2,28 +2,28 @@
   "mainnet-test": {
     "network": "mainnet-beta",
     "deltafiMint": "tstpB7nAg8n7ynm5C5mfRkQ73Q8dSTcyxkjNvR2Bspt",
-    "deltafiToken": "AdKy33aEux9bntTLiwiHyWNA8FYpDQf7xFZrLEimmFku",
+    "deltafiToken": "5uDLAo3FZb8shwLWJHPDox1Nz1XLhcqGS1BxQ3eNtCD3",
     "pythProgramId": "FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH",
     "programId": "HcWvS1XyweYMrCvY8TEeDxXgbWJagizUZXxCSLC2E89N",
-    "marketConfig": "GRt3syuNXCPAdWk8tYxG16tkdh2oufj6pQzsa7PhSqNe",
+    "marketConfig": "GffC11hTZ558PaEHuqPoLRKJEQPmC3nNeM1BM2wA24Ct",
     "poolInfoList": [
       {
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "DLD5b6JjY9sKjjMUeasrSnRs26EaSTffZkbcE6n5kpRD"
+        "swapInfo": "9YKLh1e1BUHPD4FtgYa5UCgZzDeuhX7DqcrgCAhyp4Mo"
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "5fswnE8dtRauxdnGQxpRWSoghExMLiTpAVERvAX8MZLB"
+        "swapInfo": "2h5Xs2JmzTQHkT3QAyphSgCCZu8ZqUbsqPqRJVu8R16p"
       },
       {
         "name": "GMT-USDC",
         "base": "GMT",
         "quote": "USDC",
-        "swapInfo": "EEkh7yKQZTiMSBbptsLVd8ijc4X6Re4coMSk3gebXN3k"
+        "swapInfo": "FUPLSTyRDkFvvEYdp7YKnPn121RdTJHyzz9NEM7Sxtgn"
       }
     ],
     "tokenInfoList": [

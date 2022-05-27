@@ -678,9 +678,7 @@ const Home: React.FC = (props) => {
           <Typography variant="body1" color="primary">
             {`Swap ${Number(base.amount).toFixed(base.token.decimals)} ${
               base.token.symbol
-            } to ${Number(quote.amount).toFixed(quote.token.decimals)} ${quote.token.symbol} for ${
-              base.token.symbol
-            }-${quote.token.symbol} Pool`}
+            } to ${Number(quote.amount).toFixed(quote.token.decimals)} ${quote.token.symbol}`}
           </Typography>
           <Box display="flex" alignItems="center">
             <Typography variant="subtitle2" color="primary">

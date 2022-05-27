@@ -40,23 +40,24 @@ export interface SwapConfig {
   enableConfidenceInterval: boolean;
   maxSwapPercentage: number;
   minReserveLimitPercentage: number;
-  slope: anchor.BN;
-  adminTradeFeeNumerator: anchor.BN;
-  adminTradeFeeDenominator: anchor.BN;
-  adminWithdrawFeeNumerator: anchor.BN;
-  adminWithdrawFeeDenominator: anchor.BN;
-  tradeFeeNumerator: anchor.BN;
-  tradeFeeDenominator: anchor.BN;
-  withdrawFeeNumerator: anchor.BN;
-  withdrawFeeDenominator: anchor.BN;
-  tradeRewardNumerator: anchor.BN;
-  tradeRewardDenominator: anchor.BN;
+  serumMarketTokenRatioLimitPercentage: number;
+  adminTradeFeeNumerator: number;
+  adminTradeFeeDenominator: number;
+  adminWithdrawFeeNumerator: number;
+  adminWithdrawFeeDenominator: number;
+  tradeFeeNumerator: number;
+  tradeFeeDenominator: number;
+  withdrawFeeNumerator: number;
+  withdrawFeeDenominator: number;
+  tradeRewardNumerator: number;
+  tradeRewardDenominator: number;
+  referralRewardNumerator: number;
+  referralRewardDenominator: number;
+  maxStablePriceDiffNumerator: number;
+  maxStablePriceDiffDenominator: number;
   tradeRewardCap: anchor.BN;
   tradeRewardMaxReserve: anchor.BN;
-  referralRewardNumerator: anchor.BN;
-  referralRewardDenominator: anchor.BN;
-  maxStablePriceDiffNumerator: anchor.BN;
-  maxStablePriceDiffDenominator: anchor.BN;
+  slope: anchor.BN;
   reservedU64: Array<any>;
 }
 
@@ -81,8 +82,9 @@ export type CorpAction = { noCorpAct?: any };
 export type PriceType = { unknown?: any; price?: never } | { unknown?: never; price?: any };
 
 export type SwapType =
-  | { normalSwap?: any; stableSwap?: never }
-  | { normalSwap?: never; stableSwap?: any };
+  | { normalSwap?: any; stableSwap?: never; serumSwap?: never }
+  | { normalSwap?: never; stableSwap?: any; serumSwap?: never }
+  | { normalSwap?: never; stableSwap?: never; serumSwap?: any };
 
 export interface DeltafiUser {
   bump: number;
@@ -115,6 +117,7 @@ export interface MarketConfig {
   deltafiMint: PublicKey;
   deltafiToken: PublicKey;
   pythProgramId: PublicKey;
+  serumProgramId: PublicKey;
   reservedU64: Array<any>;
 }
 
@@ -134,6 +137,9 @@ export interface SwapInfo {
   mintQuoteDecimals: number;
   pythPriceBase: PublicKey;
   pythPriceQuote: PublicKey;
+  serumMarket: PublicKey;
+  serumBids: PublicKey;
+  serumAsks: PublicKey;
   poolState: PoolState;
   swapConfig: SwapConfig;
   reservedU64: Array<any>;
