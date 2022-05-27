@@ -38,8 +38,10 @@ To run test for a specific module, for example, calculate, run `yarn jest -i tes
 # dev
 bash deploy/build_dev.sh
 k8s-cli apply -f deploy/dev/main.json.jsonnet
+aws cloudfront create-invalidation --distribution-id E1RVY4FKCHDV6E --paths "/*"
 
 # prod
 bash deploy/build_prod.sh
 k8s-cli apply -f deploy/prod/main.json.jsonnet
+aws cloudfront create-invalidation --distribution-id E2031W5GOE0Z74 --paths "/*"
 ```
