@@ -35,12 +35,12 @@ export function calculateWithdrawalFromShares(
     targetReserve: anchorBnToBn(quoteTokenConfig, poolState.targetQuoteReserve),
   };
 
-  const baseReserveToTargetRatio: BigNumber = new BigNumber(
-    poolState.baseReserve.toString(),
-  ).dividedBy(poolState.targetBaseReserve.toString());
-  const quoteReserveToTargetRatio: BigNumber = new BigNumber(
-    poolState.quoteReserve.toString(),
-  ).dividedBy(poolState.targetQuoteReserve.toString());
+  const baseReserveToTargetRatio: BigNumber = baseTokenInfo.reserve.dividedBy(
+    baseTokenInfo.targetReserve,
+  );
+  const quoteReserveToTargetRatio: BigNumber = quoteTokenInfo.reserve.dividedBy(
+    quoteTokenInfo.targetReserve,
+  );
 
   if (baseReserveToTargetRatio.isLessThan(quoteReserveToTargetRatio)) {
     const { lowTokenAmount, highTokenAmount } = calculateWithdrawFromSharesAndBalances(
