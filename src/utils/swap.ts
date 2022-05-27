@@ -55,7 +55,7 @@ export function getSwapInResult(
   const grossAmountOutBN: BigNumber = amountOutBN
     .multipliedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
     .dividedBy(
-      swapInfo.swapConfig.tradeFeeDenominator.sub(swapInfo.swapConfig.tradeFeeNumerator).toString(),
+      (swapInfo.swapConfig.tradeFeeDenominator - swapInfo.swapConfig.tradeFeeNumerator).toString(),
     );
 
   const { amountOut: amountInNegBN, priceImpact: priceImpactBN } = getSwappedAmountsAndPriceImpact(
