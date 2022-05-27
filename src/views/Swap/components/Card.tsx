@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import CurrencyInput from "react-currency-input-field";
-import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
+import { makeStyles, Paper, Theme, Typography } from "@material-ui/core";
 
 import { DropDown } from "components";
 import { CardProps } from "./types";
@@ -10,6 +10,7 @@ import { selectTokenAccountInfoByMint } from "states/selectors";
 import { getTokenConfigBySymbol } from "constants/deployConfigV2";
 import { anchorBnToBn } from "utils/tokenUtils";
 import { BN } from "@project-serum/anchor";
+import { Box } from "@mui/material";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -58,10 +59,13 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontWeight: 400,
     width: "100%",
     flex: 1,
+    fontFamily: "Rubik",
     marginLeft: spacing(3),
     [breakpoints.up("md")]: {
       fontSize: 24,
-      fontWeight: 500,
+      "&.deposit": {
+        fontSize: 20,
+      },
     },
     "&::placeholder": {
       color: palette.text.primary,
@@ -146,7 +150,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
         <CurrencyInput
           name="currency"
           disabled={isDisabledInput}
-          className={classes.currencyInput}
+          className={`${classes.currencyInput} ${props.isDeposit && "deposit"}`}
           autoComplete="off"
           placeholder="0"
           minLength={0}
@@ -156,7 +160,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
           onChange={inputHandler}
         />
       </Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box display="flex" justifyContent="space-between" alignItems="center" columnGap={3}>
         <Box display="flex">
           <Typography className={classes.tokenBalance}>Balance:&nbsp;</Typography>
           <Typography className={classes.tokenBalance} style={{ color: "#D4FF00" }}>
@@ -164,6 +168,11 @@ const SwapCard: React.FC<CardProps> = (props) => {
           </Typography>
           <Typography className={classes.tokenBalance}>{card?.token?.symbol}</Typography>
         </Box>
+        {props.isDeposit && (
+          <Box className={classes.tokenBalance}>
+            Total: {"00.00"} {"Symbol"} ({0}%)
+          </Box>
+        )}
       </Box>
     </Paper>
   );

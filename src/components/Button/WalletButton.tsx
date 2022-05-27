@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ConnectButton } from "components";
 import WalletPanel from "components/BurgerMenu/WalletPanel";
+import { Box } from "@mui/material";
 
 const Img = styled.img`
   width: 24px;
@@ -37,7 +38,10 @@ const WalletButton: React.FC<ButtonProps> = (props) => {
         startIcon={<Img src={wallet.icon} alt={wallet.name} />}
         onClick={() => setOpen(!open)}
       >
-        {accountAddress?.substring(0, 4)}...{accountAddress?.substring(accountAddress?.length - 4)}
+        <Box fontSize={16}>
+          {accountAddress?.substring(0, 4)}...
+          {accountAddress?.substring(accountAddress?.length - 4)}
+        </Box>
       </ConnectButton>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}

@@ -38,11 +38,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontSize: 14,
     fontWeight: 400,
     width: "100%",
+    fontFamily: "Rubik",
     flex: 1,
-    marginLeft: spacing(3),
+    // marginLeft: spacing(3),
     [breakpoints.up("md")]: {
-      fontSize: 24,
-      fontWeight: 500,
+      fontSize: 20,
     },
     "&::placeholder": {
       color: palette.text.primary,
