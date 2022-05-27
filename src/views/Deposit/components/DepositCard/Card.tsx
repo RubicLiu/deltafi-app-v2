@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import CurrencyInput from "react-currency-input-field";
-import Box from "@material-ui/core/Box";
+// import Box from "@material-ui/core/Box";
+import { Box } from "@mui/material";
 import Paper from "@material-ui/core/Paper";
 import clx from "classnames";
 
@@ -66,7 +67,7 @@ const DepositCard: React.FC<DepositCardProps> = (props) => {
           onChange={isDeposit ? inputHandler : null}
         />
       </Box>
-      <Box display="flex" justifyContent="space-between">
+      <Box display="flex" justifyContent="space-between" flexWrap="wrap" columnGap={3}>
         {isDeposit ? (
           <Box display="flex">
             <Box className={classes.tokenBalance}>Balance:&nbsp;</Box>
