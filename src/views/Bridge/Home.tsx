@@ -95,7 +95,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
   marketCondition: {
-    fontWeight: "bold",
+    fontWeight: 400,
   },
   snackBarContent: {
     maxWidth: 421,

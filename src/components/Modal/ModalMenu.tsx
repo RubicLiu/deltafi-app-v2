@@ -9,13 +9,15 @@ import Deposit from "views/Deposit/Deposit";
 // import Stake from "views/Stake/Stake";
 import { useModal } from "providers/modal";
 import { Modal, Fade, Backdrop } from "@mui/material";
+import styled from "styled-components";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
     overflow: "auto",
+    paddingTop: 40,
     flexWrap: "wrap",
   },
   paper: {
@@ -29,11 +31,13 @@ const useStyles = makeStyles((theme) => ({
       minWidth: 380,
     },
   },
-  backdrop: {
-    background: "rgba(51,51,51,0.8)",
-    zIndex: -1,
-  },
 }));
+const StyledBackdrop = styled(Backdrop)`
+  &.MuiBackdrop-root {
+    background-color: rgba(51, 51, 51, 0.9);
+    z-index: -1;
+  }
+`;
 
 export default function ModalMenu() {
   const classes = useStyles();
@@ -70,10 +74,9 @@ export default function ModalMenu() {
       open={menuOpen}
       onClose={() => setMenu(false, "")}
       closeAfterTransition
-      BackdropComponent={Backdrop}
+      BackdropComponent={StyledBackdrop}
       BackdropProps={{
         timeout: 500,
-        classes: { root: classes.backdrop },
       }}
     >
       <Fade in={menuOpen}>

@@ -148,7 +148,9 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
                 alt={`${data?.tokenFrom.token.symbol} coin`}
                 className={classes.img}
               />
-              <Box>{`${fixedNumber(swapOut?.fee) ?? 0} ${data?.tokenTo.token.symbol}`}</Box>
+              <Box fontSize={16} fontWeight={500}>{`${fixedNumber(swapOut?.fee) ?? 0} ${
+                data?.tokenTo.token.symbol
+              }`}</Box>
             </Box>
           </Box>
           <Box display="flex" justifyContent="space-between" className={classes.row}>

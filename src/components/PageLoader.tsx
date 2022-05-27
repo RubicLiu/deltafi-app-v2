@@ -28,7 +28,7 @@ const PageLoader: React.FC = (props) => {
     <Box className={classes.root}>
       <Box className={classes.logo}>
         <img
-          src="/images/logomark 200.svg"
+          src={process.env.PUBLIC_URL + "/images/logomark_200.svg"}
           width={128}
           height={128}
           className={classes.logo}

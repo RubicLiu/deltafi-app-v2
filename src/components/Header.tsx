@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
-import { AppBar, makeStyles, Theme, Container, Toolbar, Link } from "@material-ui/core";
+import { AppBar, makeStyles, Theme, Container, Toolbar } from "@material-ui/core";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ConnectButton, TabMenu, WalletButton } from "components";
 import { useModal } from "providers/modal";
 import { HOMEPAGE_LINK } from "constants/index";
+import { Box, Link } from "@mui/material";
 
 const useStyles = makeStyles(({ breakpoints, palette }: Theme) => ({
   header: {
     background: palette.background.secondary,
     boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.15)",
+    letterSpacing: "0.01em",
   },
   toolbar: {
     display: "flex",
@@ -60,8 +62,13 @@ const Header: React.FC = (props) => {
             data-amp-analytics-on="click"
             data-amp-analytics-name="click"
             data-amp-analytics-attrs="page: Header, target: Logo"
+            sx={{ display: "flex" }}
           >
-            <img src="/horizontal 60.svg" alt="logo" className={classes.logo} />
+            <img
+              src={process.env.PUBLIC_URL + "/images/horizontal_60.svg"}
+              alt="logo"
+              className={classes.logo}
+            />
           </Link>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
@@ -73,7 +80,7 @@ const Header: React.FC = (props) => {
             <WalletButton />
           ) : (
             <ConnectButton size="small" onClick={() => setMenu(true, "connect")}>
-              Connect wallet
+              <Box fontSize={16}>Connect wallet</Box>
             </ConnectButton>
           )}
           {/* <div className={classes.sectionMobile}>

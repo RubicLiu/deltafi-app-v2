@@ -59,7 +59,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     flex: 1,
     [breakpoints.up("md")]: {
       fontSize: 24,
-      fontWeight: 500,
     },
     "&::placeholder": {
       color: palette.text.primary,
