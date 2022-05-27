@@ -22,7 +22,7 @@ const initialState = {
   },
   transactionResult: null,
   isProcessing: false,
-  maxSlippage: "2.0",
+  maxSlippage: "1.0",
   priceImpact: "--",
   openSettings: false,
   withdrawPercentage: 0,
