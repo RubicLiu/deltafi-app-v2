@@ -542,7 +542,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
       await connection.confirmTransaction(hash, "confirmed");
 
-      dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+      dispatch(
+        depositViewActions.setTokenAmount({
+          baseAmount: "0",
+          quoteAmount: "0",
+          baseShare: "0",
+          quoteShare: "0",
+        }),
+      );
       dispatch(
         depositViewActions.setTransactionResult({
           transactionResult: {
@@ -750,7 +757,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     (card: IDepositCard) => {
       const baseAmount = card.amount;
       if (baseAmount === "") {
-        dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+        dispatch(
+          depositViewActions.setTokenAmount({
+            baseAmount: "0",
+            quoteAmount: "0",
+            baseShare: "0",
+            quoteShare: "0",
+          }),
+        );
         return;
       }
       if (new BigNumber(baseAmount).isNaN()) {
@@ -768,6 +782,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         depositViewActions.setTokenAmount({
           baseAmount,
           quoteAmount: stringCutTokenDecimals(quoteTokenInfo, quoteAmount),
+          baseShare: "0",
+          quoteShare: "0",
         }),
       );
     },
@@ -778,7 +794,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     (card: IDepositCard) => {
       const quoteAmount = card.amount;
       if (quoteAmount === "") {
-        dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
+        dispatch(
+          depositViewActions.setTokenAmount({
+            baseAmount: "0",
+            quoteAmount: "0",
+            baseShare: "0",
+            quoteShare: "0",
+          }),
+        );
         return;
       }
       if (new BigNumber(quoteAmount).isNaN()) {
@@ -795,6 +818,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         depositViewActions.setTokenAmount({
           baseAmount: stringCutTokenDecimals(baseTokenInfo, baseAmount),
           quoteAmount,
+          baseShare: "0",
+          quoteShare: "0",
         }),
       );
     },
