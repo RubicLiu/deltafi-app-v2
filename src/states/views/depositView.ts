@@ -53,12 +53,17 @@ const depositViewSlice = createSlice({
       state.quote.maxAmount = "0";
     },
 
-    setTokenAmount(state, action: PayloadAction<{ baseAmount: string; quoteAmount: string }>) {
+    setTokenAmount(
+      state,
+      action: PayloadAction<{
+        baseAmount: string;
+        quoteAmount: string;
+        baseShare: string;
+        quoteShare: string;
+      }>,
+    ) {
       state.base.amount = action.payload.baseAmount;
       state.quote.amount = action.payload.quoteAmount;
-    },
-
-    setTokenShare(state, action: PayloadAction<{ baseShare: string; quoteShare: string }>) {
       state.base.share = action.payload.baseShare;
       state.quote.share = action.payload.quoteShare;
     },

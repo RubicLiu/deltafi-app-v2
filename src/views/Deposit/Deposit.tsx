@@ -436,16 +436,11 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         );
 
         dispatch(
-          depositViewActions.setTokenShare({
-            baseShare: baseInputShare.toString(),
-            quoteShare: quoteInputShare.toString(),
-          }),
-        );
-
-        dispatch(
           depositViewActions.setTokenAmount({
             baseAmount: baseWithdrawalAmount,
             quoteAmount: quoteWithdrawalAmount,
+            baseShare: baseInputShare.toString(),
+            quoteShare: quoteInputShare.toString(),
           }),
         );
       }
@@ -635,8 +630,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
       await connection.confirmTransaction(hash, "confirmed");
 
-      dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
-      dispatch(depositViewActions.setTokenShare({ baseShare: "0", quoteShare: "0" }));
+      dispatch(
+        depositViewActions.setTokenAmount({
+          baseAmount: "0",
+          quoteAmount: "0",
+          baseShare: "0",
+          quoteShare: "0",
+        }),
+      );
       dispatch(depositViewActions.setWithdrawPercentage({ withdrawPercentage: 0 }));
 
       dispatch(
