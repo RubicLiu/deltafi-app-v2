@@ -878,7 +878,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
                 6,
               )} ${base.token.symbol} and ${Number(quote.amount).toFixed(6)} ${
                 quote.token.symbol
-              } to ${base.token.symbol}-${quote.token.symbol} pool`}
+              }`}
             </Box>
           )}
           <Box display="flex" alignItems="center">
