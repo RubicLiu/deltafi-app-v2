@@ -15,6 +15,16 @@ const candlesticksCache = new CacheContainer(new MemoryStorage())
 
 const routes = Router();
 
+routes.get('/api/version', (_, response) => {
+  return response.json({
+    tag: "",
+  });
+});
+
+routes.get('/api/config', (_, response) => {
+  return response.json(config);
+});
+
 routes.get('/api/pools', (_, response) => {
   return response.json(config.poolInfoList);
 });
