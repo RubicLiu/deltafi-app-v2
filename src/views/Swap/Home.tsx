@@ -883,7 +883,9 @@ const Home: React.FC = (props) => {
                   className={classes.icon}
                 />
                 <Box marginLeft={0.5} className={classes.currencyCt}>
-                  <Box sx={{ color: "#fff", fontSize: "16px" }}>{poolConfig?.baseTokenInfo?.symbol}</Box>
+                  <Box sx={{ color: "#fff", fontSize: "16px" }}>
+                    {poolConfig?.baseTokenInfo?.symbol}
+                  </Box>
                   <Box>{poolConfig?.baseTokenInfo?.name}</Box>
                 </Box>
               </Grid>
@@ -904,7 +906,9 @@ const Home: React.FC = (props) => {
                   className={classes.icon}
                 />
                 <Box marginLeft={0.5} className={classes.currencyCt}>
-                  <Box sx={{ color: "#fff", fontSize: "16px" }}>{poolConfig?.quoteTokenInfo?.symbol}</Box>
+                  <Box sx={{ color: "#fff", fontSize: "16px" }}>
+                    {poolConfig?.quoteTokenInfo?.symbol}
+                  </Box>
                   <Box>{poolConfig?.quoteTokenInfo?.name}</Box>
                 </Box>
               </Grid>
