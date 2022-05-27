@@ -451,7 +451,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       }
       dispatch(depositViewActions.setWithdrawPercentage({ withdrawPercentage: value }));
     },
-    [dispatch, lpUser, baseTokenInfo, quoteTokenInfo, basePrice, quotePrice],
+    [dispatch, lpUser, basePrice, quotePrice, depositView, swapInfo],
   );
 
   const unclaimedInterest = useMemo(() => {
@@ -638,7 +638,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       dispatch(depositViewActions.setTokenAmount({ baseAmount: "0", quoteAmount: "0" }));
       dispatch(depositViewActions.setTokenShare({ baseShare: "0", quoteShare: "0" }));
       dispatch(depositViewActions.setWithdrawPercentage({ withdrawPercentage: 0 }));
-      
+
       dispatch(
         depositViewActions.setTransactionResult({
           transactionResult: {
