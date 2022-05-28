@@ -8,6 +8,12 @@
   local namespace = 'deltafi-app-v2',
   local appFrontend = 'deltafi-app-v2-frontend',
   local appBackend = 'deltafi-app-v2-backend',
+  local env = [
+    {
+      name: "DOCKER_IMAGE_TAG",
+      value: $.imageTag,
+    },
+  ],
 
   apiVersion: 'v1',
   kind: 'List',
@@ -42,7 +48,8 @@
                     containerPort: 80,
                   },
                 ],
-              },
+                env: env
+              }
             ],
           },
         },
@@ -98,6 +105,7 @@
                     containerPort: 4000,
                   },
                 ],
+                env: env
               },
             ],
           },
