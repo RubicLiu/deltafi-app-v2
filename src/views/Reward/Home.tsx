@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { Box, makeStyles, Theme, Link, Divider, CircularProgress } from "@material-ui/core";
+import { makeStyles, Theme, Link, Divider, CircularProgress } from "@material-ui/core";
 import { ConnectButton } from "components";
 import { useModal } from "providers/modal";
 import { ShareDiscord, ShareMedium, ShareTelegram, ShareTwitter } from "components";
@@ -28,6 +28,8 @@ import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
 import { deployConfigV2 } from "constants/deployConfigV2";
+import { Box, Button } from "@mui/material";
+import styled from "styled-components";
 
 // /*
 //  * mockup test data for reward page
@@ -54,13 +56,14 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   root: {
     width: "100%",
     margin: "auto",
+    lineHeight: 1,
   },
   defaultWrapper: {
-    marginTop: 30,
+    marginTop: 20,
     textAlign: "center",
     [breakpoints.down("sm")]: {
       maxWidth: 248,
-      margin: "0 auto",
+      margin: "10px auto",
     },
   },
   fontBold: {
@@ -78,9 +81,11 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   },
   sharePanelRow: {
     display: "flex",
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     flexWrap: "wrap",
+    gap: 16,
   },
   shareLabel: {
     marginRight: spacing(3),
@@ -122,10 +127,13 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     borderRadius: 20,
     flex: 1,
     outline: "none",
+    fontFamily: "Rubik",
+    minWidth: 512,
     [breakpoints.down("sm")]: {
       padding: "12px",
       marginRight: "8px",
       fontSize: "10px",
+      minWidth: "auto",
     },
   },
   SettingUpAccountButton: {
@@ -143,31 +151,32 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     margin: "5px 40px",
   },
   rewardBox: {
-    "&.first": {
-      border: "1px solid #D4FF00",
-      color: "#D4FF00",
-    },
-    border: "1px solid #03F2A0",
+    padding: 20,
     background: "#1C1C1C",
     borderRadius: 10,
-    height: 100,
-    width: 200,
+    minWidth: 300,
     justifyContent: "center",
     alignItems: "center",
     display: "flex",
     flexDirection: "column",
-    color: "#03F2A0",
+    fontWeight: 500,
+    fontSize: 14,
     "& .label": {
       fontSize: 20,
       fontWeight: 600,
     },
-    "& .value": {
-      fontSize: 14,
-      fontWeight: 500,
-      color: "#d3d3d3",
-    },
   },
 }));
+
+const StyledButton = styled(Button)`
+  padding: 16px 20px;
+  border-radius: 50px;
+  min-width: 160px;
+  &.Mui-disabled {
+    color: inherit;
+    border-color: inherit;
+  }
+`;
 
 const Home: React.FC = (props) => {
   const classes = useStyles(props);
@@ -188,6 +197,8 @@ const Home: React.FC = (props) => {
     claimedRewardFromReferral: string;
     owedRewardFromSwap: string;
     owedRewardFromReferral: string;
+    totalRewardFromSwap: string;
+    totalRewardFromReferral: string;
   } = useMemo(() => {
     const parseRewardBN = (rewardAmount: BN) =>
       exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
@@ -197,6 +208,12 @@ const Home: React.FC = (props) => {
         claimedRewardFromReferral: parseRewardBN(deltafiUser.user.claimedReferralRewards),
         owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedSwapRewards),
         owedRewardFromReferral: parseRewardBN(deltafiUser.user.owedReferralRewards),
+        totalRewardFromSwap: parseRewardBN(
+          deltafiUser.user.owedSwapRewards.add(deltafiUser.user.claimedSwapRewards),
+        ),
+        totalRewardFromReferral: parseRewardBN(
+          deltafiUser.user.owedReferralRewards.add(deltafiUser.user.claimedReferralRewards),
+        ),
       };
     }
 
@@ -205,6 +222,8 @@ const Home: React.FC = (props) => {
       claimedRewardFromReferral: "--",
       owedRewardFromSwap: "--",
       owedRewardFromReferral: "--",
+      totalRewardFromSwap: "--",
+      totalRewardFromReferral: "--",
     };
   }, [deltafiUser]);
 
@@ -304,13 +323,13 @@ const Home: React.FC = (props) => {
   const refreshButton = useMemo(() => {
     if (rewardView.isRefreshing) {
       return (
-        <ConnectButton variant="contained" disabled={true}>
+        <Button variant="contained" disabled={true}>
           <CircularProgress color="inherit" />
-        </ConnectButton>
+        </Button>
       );
     }
     return (
-      <ConnectButton
+      <Button
         variant="contained"
         onClick={handleRefresh}
         disabled={!deltafiUser?.user}
@@ -319,22 +338,23 @@ const Home: React.FC = (props) => {
         data-amp-analytics-attrs="page: Reward, target: Refresh"
       >
         Refresh
-      </ConnectButton>
+      </Button>
     );
   }, [rewardView, deltafiUser, handleRefresh]);
 
   const claimRewardsButton = useMemo(() => {
     if (rewardView.isClaiming) {
       return (
-        <ConnectButton variant="contained" disabled={true}>
-          <CircularProgress color="inherit" />
-        </ConnectButton>
+        <StyledButton color="inherit" variant="outlined" disabled>
+          <CircularProgress size={16} color="inherit" />
+        </StyledButton>
       );
     }
     return (
-      <ConnectButton
-        variant="contained"
+      <StyledButton
+        variant="outlined"
         onClick={handleClaimRewards}
+        color="inherit"
         disabled={
           !deltafiUser?.user?.owedReferralRewards ||
           !deltafiUser?.user?.owedSwapRewards ||
@@ -344,27 +364,31 @@ const Home: React.FC = (props) => {
         data-amp-analytics-name="click"
         data-amp-analytics-attrs="page: Reward, target: claimRewards"
       >
-        Claim Rewards
-      </ConnectButton>
+        <Box
+          fontFamily="Rubik"
+          sx={{ textTransform: "capitalize" }}
+          lineHeight={1}
+          fontSize={16}
+          fontWeight={600}
+        >
+          Claim Rewards
+        </Box>
+      </StyledButton>
     );
   }, [rewardView, deltafiUser, handleClaimRewards]);
 
   return (
     <Box className={classes.root}>
       <Box className={classes.defaultWrapper}>
-        <Box fontSize={20} fontWeight={700} mt={1}>
+        <Box fontSize={20} fontWeight={700}>
           Invite friends, earn crypto together
         </Box>
-        <Box mt={0.5} fontSize={14} fontWeight={400} color="#f6f6f6">
-          {!isConnectedWallet
-            ? "Before referral, you need to connect your wallet"
-            : "Invite your friends to register via your referral link."}
-        </Box>
-
-        {/* Connect Wallet */}
-        {!isConnectedWallet && (
+        {isConnectedWallet || (
           <>
-            <Box mt={5} mb={7.5} flexDirection="column" display="flex" alignItems="center">
+            <Box mt={1} fontSize={14} fontWeight={400} color="#f6f6f6">
+              Before referral, you need to connect your wallet
+            </Box>
+            <Box mt={2} mb={2.5} flexDirection="column" display="flex" alignItems="center">
               <ConnectButton onClick={() => setMenu(true, "connect")}>Connect Wallet</ConnectButton>
             </Box>
             <Divider className={classes.divider} />
@@ -375,11 +399,11 @@ const Home: React.FC = (props) => {
       {/* Send Invitations */}
       {isConnectedWallet && (
         <>
-          <Box mt={5} mb={7.5}>
+          <Box mt={2} mb={2.5}>
             <Box className={classes.sharePanelRow}>
               {referralLinkState === "Unavailable" ? (
                 <input
-                  disabled={true}
+                  disabled
                   placeholder={"Please Create A DELFI Token Account Before Referring Others!"}
                   className={classes.inputLink}
                 />
@@ -420,7 +444,7 @@ const Home: React.FC = (props) => {
                           );
                         }}
                       >
-                        {"Copy Link"}
+                        {"Copy Link and Share"}
                       </ConnectButton>
                     );
                   }
@@ -436,7 +460,6 @@ const Home: React.FC = (props) => {
                   }
                 }
               })()}
-              <Divider className={classes.verticalDiver} orientation="vertical" flexItem />
               <Box display="flex" className={classes.socialLinks}>
                 <Link
                   href="https://twitter.com/deltafi_ai"
@@ -499,31 +522,42 @@ const Home: React.FC = (props) => {
       {/* How to invite friends */}
       <Box className={classes.defaultWrapper}>
         <Box fontSize={20} mb={2} fontWeight={700}>
-          Rewards Summary
+          My Rewards
         </Box>
         {isConnectedWallet ? (
           <Box>
-            <Box mt={3} fontSize={16} fontWeight={700}>
-              Reward Claimed
-            </Box>
-            <Box mt={2.5} mb={3} display="flex" gridGap={20} justifyContent="center">
-              <Box className={`${classes.rewardBox} first`}>
-                <Box className="label">{rewardDisplayInfo.claimedRewardFromSwap}</Box>
-                <Box className="value" mt={0.5}>
-                  From Swap
+            <Box mt={2} mb={3} display="flex" gap={1.25} justifyContent="center">
+              <Box className={classes.rewardBox} border="1px solid #D4FF00">
+                <Box color="#D4FF00">TRADE FARMING</Box>
+                <Box mt={1.5} color="#D3D3D3">
+                  Unclaimed / Total
+                </Box>
+                <Box mt={2} display="flex" fontSize={20}>
+                  <Box color="#D4FF00">{rewardDisplayInfo.claimedRewardFromSwap}&nbsp;</Box>
+                  <Box>/ {rewardDisplayInfo.totalRewardFromSwap} DELFI</Box>{" "}
+                </Box>
+                <Box color="#D4FF00" mt={1.5}>
+                  {claimRewardsButton}
                 </Box>
               </Box>
-              <Box className={classes.rewardBox}>
-                <Box className="label">{rewardDisplayInfo.claimedRewardFromReferral}</Box>
-                <Box className="value" mt={0.5}>
-                  From Referral
+              <Box className={classes.rewardBox} border="1px solid #693EFF">
+                <Box color="#693EFF">REGERRAL BONUS</Box>
+                <Box mt={1.5} color="#693EFF">
+                  Unclaimed / Total
+                </Box>
+                <Box mt={2} display="flex" fontSize={20}>
+                  <Box color="#693EFF">{rewardDisplayInfo.claimedRewardFromReferral}&nbsp;</Box>
+                  <Box>/ {rewardDisplayInfo.totalRewardFromReferral} DELFI</Box>{" "}
+                </Box>
+                <Box color="#693EFF" mt={1.5}>
+                  {claimRewardsButton}
                 </Box>
               </Box>
             </Box>
             <Box mt={2} fontSize={16} fontWeight={700}>
               Reward Owed
             </Box>
-            <Box mt={2.5} display="flex" gridGap={20} justifyContent="center">
+            <Box mt={2.5} display="flex" gap={20} justifyContent="center">
               <Box className={`${classes.rewardBox} first`}>
                 <Box className="label">{rewardDisplayInfo.owedRewardFromSwap}</Box>
                 <Box className="value" mt={0.5}>
@@ -537,7 +571,7 @@ const Home: React.FC = (props) => {
                 </Box>
               </Box>
             </Box>
-            <Box display="flex" gridGap={20} justifyContent="center" mt={3}>
+            <Box display="flex" gap={20} justifyContent="center" mt={3}>
               <Box>{refreshButton}</Box>
               <Box>{claimRewardsButton}</Box>
             </Box>

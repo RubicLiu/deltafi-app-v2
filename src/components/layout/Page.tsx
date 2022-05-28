@@ -12,7 +12,7 @@ const useStyles = makeStyles(({ breakpoints, mixins, palette, spacing }: Theme) 
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "column",
-    minHeight: "calc(100vh - 66px)",
+    minHeight: "calc(100vh - 60px)",
     paddingTop: mixins.toolbar.minHeight,
     position: "relative",
     backgroundColor: palette.background.secondary,
