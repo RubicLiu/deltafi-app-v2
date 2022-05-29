@@ -5,6 +5,8 @@ const initialState = {
   referralLink: "",
   isRefreshing: false,
   isClaiming: false,
+  openSnackbar: false,
+  claimResult: null,
 };
 
 const rewardViewSlice = createSlice({
@@ -25,6 +27,14 @@ const rewardViewSlice = createSlice({
 
     setIsClaiming(state, action: PayloadAction<{ isClaiming: boolean }>) {
       state.isClaiming = action.payload.isClaiming;
+    },
+
+    setClaimResult(state, action: PayloadAction<{ claimResult: { status: boolean } }>) {
+      state.claimResult = action.payload.claimResult;
+    },
+
+    setOpenSnackbar(state, action: PayloadAction<{ openSnackbar: boolean }>) {
+      state.openSnackbar = action.payload.openSnackbar;
     },
   },
 });

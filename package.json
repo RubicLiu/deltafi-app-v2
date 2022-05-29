@@ -12,6 +12,7 @@
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/styles": "^4.11.4",
     "@mui/core": "^5.0.0-alpha.54",
+    "@mui/icons-material": "^5.8.0",
     "@mui/lab": "^5.0.0-alpha.83",
     "@mui/material": "^5.8.1",
     "@mui/styled-engine": "^5.8.0",

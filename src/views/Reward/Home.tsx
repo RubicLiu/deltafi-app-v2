@@ -5,6 +5,7 @@ import { ConnectButton } from "components";
 import { useModal } from "providers/modal";
 import { ShareDiscord, ShareMedium, ShareTelegram, ShareTwitter } from "components";
 import copy from "copy-to-clipboard";
+import CloseIcon from "@mui/icons-material/Close";
 
 import { sendSignedTransaction } from "utils/transactions";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,7 +29,7 @@ import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
 import { deployConfigV2 } from "constants/deployConfigV2";
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import styled from "styled-components";
 
 // /*
@@ -52,7 +53,7 @@ import styled from "styled-components";
 //   },
 // ];
 
-const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
+const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
   root: {
     width: "100%",
     margin: "auto",
@@ -65,6 +66,14 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
       maxWidth: 248,
       margin: "10px auto",
     },
+  },
+  snackBarContent: {
+    maxWidth: 385,
+    backgroundColor: palette.background.lightBlack,
+    display: "flex",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    flexDirection: "row",
   },
   fontBold: {
     fontWeight: "bold",
@@ -110,11 +119,9 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     },
   },
   socialLinks: {
-    "& a": {
-      marginRight: spacing(3),
-      [breakpoints.down("sm")]: {
-        marginRight: spacing(1.5),
-      },
+    gap: spacing(3),
+    [breakpoints.down("sm")]: {
+      gap: spacing(1.5),
     },
   },
   inputLink: {
@@ -142,6 +149,9 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     width: 24,
     height: 24,
   },
+  snackBarIcon: {
+    marginRight: spacing(2),
+  },
   divider: {
     backgroundColor: "rgba(255, 255, 255, 0.3)",
     width: "100%",
@@ -155,7 +165,9 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     background: "#1C1C1C",
     borderRadius: 10,
     minWidth: 300,
-    justifyContent: "center",
+    gap: 10,
+    lineHeight: 1.5,
+    justifyContent: "space-between",
     alignItems: "center",
     display: "flex",
     flexDirection: "column",
@@ -227,6 +239,10 @@ const Home: React.FC = (props) => {
     };
   }, [deltafiUser]);
 
+  const handleSnackBarClose = useCallback(() => {
+    dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: false }));
+  }, [dispatch]);
+
   useEffect(() => {
     const hasDeltafiUser = deltafiUser?.user != null;
     dispatch(
@@ -283,18 +299,18 @@ const Home: React.FC = (props) => {
   }, [dispatch, walletPubkey, signTransaction, program]);
 
   const connection = program.provider.connection;
-  const handleRefresh = useCallback(async () => {
-    dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: true }));
+  // const handleRefresh = useCallback(async () => {
+  //   dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: true }));
 
-    try {
-      await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
-    } catch (e) {
-      console.error(e);
-      // TODO(leqiang): Add error display her
-    } finally {
-      dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: false }));
-    }
-  }, [connection, walletPubkey, dispatch]);
+  //   try {
+  //     await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
+  //   } catch (e) {
+  //     console.error(e);
+  //     // TODO(leqiang): Add error display her
+  //   } finally {
+  //     dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: false }));
+  //   }
+  // }, [connection, walletPubkey, dispatch]);
 
   const handleClaimRewards = useCallback(async () => {
     dispatch(rewardViewActions.setIsClaiming({ isClaiming: true }));
@@ -312,35 +328,105 @@ const Home: React.FC = (props) => {
       const signature = await sendSignedTransaction({ signedTransaction, connection });
       await connection.confirmTransaction(signature, "confirmed");
       await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
+      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: true } }));
     } catch (e) {
       console.error(e);
+      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
       // TODO(leqiang): Add error display here
     } finally {
+      dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(rewardViewActions.setIsClaiming({ isClaiming: false }));
     }
   }, [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction]);
 
-  const refreshButton = useMemo(() => {
-    if (rewardView.isRefreshing) {
+  // const refreshButton = useMemo(() => {
+  //   if (rewardView.isRefreshing) {
+  //     return (
+  //       <Button variant="contained" disabled={true}>
+  //         <CircularProgress color="inherit" />
+  //       </Button>
+  //     );
+  //   }
+  //   return (
+  //     <Button
+  //       variant="contained"
+  //       onClick={handleRefresh}
+  //       disabled={!deltafiUser?.user}
+  //       data-amp-analytics-on="click"
+  //       data-amp-analytics-name="click"
+  //       data-amp-analytics-attrs="page: Reward, target: Refresh"
+  //     >
+  //       Refresh
+  //     </Button>
+  //   );
+  // }, [rewardView, deltafiUser, handleRefresh]);
+
+  const claimLiquidityRewardsButton = useMemo(() => {
+    return (
+      <StyledButton
+        variant="outlined"
+        onClick={() => setMenu(true, "liquidity-reward")}
+        color="inherit"
+        data-amp-analytics-on="click"
+        data-amp-analytics-name="click"
+        data-amp-analytics-attrs="page: Reward, target: claimRewards"
+      >
+        <Box
+          fontFamily="Rubik"
+          sx={{ textTransform: "capitalize" }}
+          lineHeight={1}
+          fontSize={16}
+          fontWeight={600}
+        >
+          Claim Rewards
+        </Box>
+      </StyledButton>
+    );
+  }, [setMenu]);
+  const snackMessage = useMemo(() => {
+    if (!rewardView || !rewardView.claimResult) {
+      return "";
+    }
+
+    if (!rewardView.claimResult.status) {
       return (
-        <Button variant="contained" disabled={true}>
-          <CircularProgress color="inherit" />
-        </Button>
+        <Box display="flex" alignItems="center">
+          <img
+            src={"/images/snack-fail.svg"}
+            alt="snack-status-icon"
+            className={classes.snackBarIcon}
+          />
+          <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+            Oops, someting went wrong. Please try again or contact us.
+          </Box>
+        </Box>
       );
     }
     return (
-      <Button
-        variant="contained"
-        onClick={handleRefresh}
-        disabled={!deltafiUser?.user}
-        data-amp-analytics-on="click"
-        data-amp-analytics-name="click"
-        data-amp-analytics-attrs="page: Reward, target: Refresh"
-      >
-        Refresh
-      </Button>
+      <Box display="flex" alignItems="center">
+        <img
+          src={"/images/snack-success.svg"}
+          alt="snack-status-icon"
+          className={classes.snackBarIcon}
+        />
+        <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+          Your rewards are claim to your wallet successfully{" "}
+        </Box>
+      </Box>
     );
-  }, [rewardView, deltafiUser, handleRefresh]);
+  }, [rewardView, classes.snackBarIcon]);
+
+  const snackAction = useMemo(() => {
+    return (
+      <IconButton
+        size="small"
+        onClick={handleSnackBarClose}
+        sx={{ margionTop: 0.5, color: "#fff" }}
+      >
+        <CloseIcon color="inherit" />
+      </IconButton>
+    );
+  }, [handleSnackBarClose]);
 
   const claimRewardsButton = useMemo(() => {
     if (rewardView.isClaiming) {
@@ -526,54 +612,35 @@ const Home: React.FC = (props) => {
         </Box>
         {isConnectedWallet ? (
           <Box>
-            <Box mt={2} mb={3} display="flex" gap={1.25} justifyContent="center">
+            <Box mt={2} mb={3} display="flex" gap={1.25} justifyContent="center" flexWrap="wrap">
+              <Box className={classes.rewardBox} border="1px solid #03F2A0">
+                <Box color="#03F2A0">LIQUIDITY MINING</Box>
+                <Box color="#03F2A0">Unclaimed / Total</Box>
+                {/* TODO replace the following value with real LIQUIDITY MINING value  */}
+                <Box lineHeight="24px" display="flex" fontSize={20}>
+                  <Box color="#03F2A0">{rewardDisplayInfo.claimedRewardFromSwap}&nbsp;</Box>
+                  <Box>/ {rewardDisplayInfo.totalRewardFromSwap} DELFI</Box>{" "}
+                </Box>
+                <Box color="#03F2A0">{claimLiquidityRewardsButton}</Box>
+              </Box>
               <Box className={classes.rewardBox} border="1px solid #D4FF00">
                 <Box color="#D4FF00">TRADE FARMING</Box>
-                <Box mt={1.5} color="#D3D3D3">
-                  Unclaimed / Total
-                </Box>
-                <Box mt={2} display="flex" fontSize={20}>
+                <Box color="#D3D3D3">Unclaimed / Total</Box>
+                <Box lineHeight="24px" display="flex" fontSize={20}>
                   <Box color="#D4FF00">{rewardDisplayInfo.claimedRewardFromSwap}&nbsp;</Box>
                   <Box>/ {rewardDisplayInfo.totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
-                <Box color="#D4FF00" mt={1.5}>
-                  {claimRewardsButton}
-                </Box>
+                <Box color="#D4FF00">{claimRewardsButton}</Box>
               </Box>
               <Box className={classes.rewardBox} border="1px solid #693EFF">
                 <Box color="#693EFF">REGERRAL BONUS</Box>
-                <Box mt={1.5} color="#693EFF">
-                  Unclaimed / Total
-                </Box>
-                <Box mt={2} display="flex" fontSize={20}>
+                <Box color="#693EFF">Unclaimed / Total</Box>
+                <Box lineHeight="24px" display="flex" fontSize={20}>
                   <Box color="#693EFF">{rewardDisplayInfo.claimedRewardFromReferral}&nbsp;</Box>
                   <Box>/ {rewardDisplayInfo.totalRewardFromReferral} DELFI</Box>{" "}
                 </Box>
-                <Box color="#693EFF" mt={1.5}>
-                  {claimRewardsButton}
-                </Box>
+                <Box color="#693EFF">{claimRewardsButton}</Box>
               </Box>
-            </Box>
-            <Box mt={2} fontSize={16} fontWeight={700}>
-              Reward Owed
-            </Box>
-            <Box mt={2.5} display="flex" gap={20} justifyContent="center">
-              <Box className={`${classes.rewardBox} first`}>
-                <Box className="label">{rewardDisplayInfo.owedRewardFromSwap}</Box>
-                <Box className="value" mt={0.5}>
-                  From Swap
-                </Box>
-              </Box>
-              <Box className={classes.rewardBox}>
-                <Box className="label">{rewardDisplayInfo.owedRewardFromReferral}</Box>
-                <Box className="value" mt={0.5}>
-                  From Referral
-                </Box>
-              </Box>
-            </Box>
-            <Box display="flex" gap={20} justifyContent="center" mt={3}>
-              <Box>{refreshButton}</Box>
-              <Box>{claimRewardsButton}</Box>
             </Box>
           </Box>
         ) : (
@@ -585,6 +652,23 @@ const Home: React.FC = (props) => {
           </Box>
         )}
       </Box>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={rewardView.openSnackbar}
+        onClose={handleSnackBarClose}
+        key="dashboardSnackbar"
+      >
+        <SnackbarContent
+          aria-describedby="message-id2"
+          className={classes.snackBarContent}
+          message={snackMessage}
+          action={snackAction}
+          sx={{
+            flexWrap: "nowrap",
+            boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.15)",
+          }}
+        />
+      </Snackbar>
     </Box>
   );
 };

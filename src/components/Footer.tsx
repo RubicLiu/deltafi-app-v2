@@ -18,7 +18,8 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    height: 60,
+    paddingBottom: 10,
+    paddingTop: 10,
 
     [breakpoints.down("sm")]: {
       flexDirection: "column",
@@ -40,6 +41,7 @@ const StyledDiv = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 0;
+  height: 40px;
   ${({ theme }) => theme.muibreakpoints.down("sm")} {
     margin-bottom: 10px;
   }

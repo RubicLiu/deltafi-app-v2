@@ -147,7 +147,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     padding: 0,
   },
 }));
-
+// TODO replace value with real data
 const headerData = [
   { label: "Total Holdings", color: "#d4ff00", value: "$2,345" },
   { label: "Total Rewards", color: "#03f2a0", value: "$235" },
@@ -163,14 +163,12 @@ const Home: React.FC = (props) => {
     setTab(newValue);
   };
   const { connected: isConnectedWallet } = useWallet();
-
   const mintToTokenAccountInfo = useSelector(tokenAccountSelector).mintToTokenAccountInfo;
   const swapKeyToLpUser = useSelector(lpUserSelector).swapKeyToLp;
 
   const poolConfigsWithDeposit = poolConfigs.filter((poolConfig) =>
     hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
   );
-
   return (
     <Page>
       <Box padding={0} className={classes.container}>
@@ -250,9 +248,7 @@ const Home: React.FC = (props) => {
               </>
             </TabPanel>
             <TabPanel value="reward" className={classes.tabPanel}>
-              <>
-                <Reward />
-              </>
+              <Reward />
             </TabPanel>
           </TabContext>
         </Box>

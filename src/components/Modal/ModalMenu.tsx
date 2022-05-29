@@ -10,6 +10,7 @@ import Deposit from "views/Deposit/Deposit";
 import { useModal } from "providers/modal";
 import { Modal, Fade, Backdrop } from "@mui/material";
 import styled from "styled-components";
+import LiquidityReward from "components/BurgerMenu/LiquidityReward";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -59,6 +60,8 @@ export default function ModalMenu() {
       //   return <Stake />;
       case "withdraw":
         return null; // <WithdrawPanel />
+      case "liquidity-reward":
+        return <LiquidityReward />;
       default:
         return null;
     }
