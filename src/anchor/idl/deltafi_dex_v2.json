@@ -1728,6 +1728,10 @@
             "type": "u64"
           },
           {
+            "name": "marketPriceLastUpdateSlot",
+            "type": "u64"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [

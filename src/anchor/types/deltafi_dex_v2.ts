@@ -1728,6 +1728,10 @@ export type DeltafiDexV2 = {
             "type": "u64"
           },
           {
+            "name": "marketPriceLastUpdateSlot",
+            "type": "u64"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -4080,6 +4084,10 @@ export const IDL: DeltafiDexV2 = {
           },
           {
             "name": "lastRewardWindowStartTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "marketPriceLastUpdateSlot",
             "type": "u64"
           },
           {

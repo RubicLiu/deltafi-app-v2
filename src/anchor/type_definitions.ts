@@ -13,6 +13,7 @@ export interface PoolState {
   totalTradedQuote: anchor.BN;
   accumulatedTradeReward: anchor.BN;
   lastRewardWindowStartTimestamp: anchor.BN;
+  marketPriceLastUpdateSlot: anchor.BN;
   reservedU64: Array<any>;
 }
 
