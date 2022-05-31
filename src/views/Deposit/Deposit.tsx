@@ -363,7 +363,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     //      ).toFixed(DELTAFI_TOKEN_DECIMALS);
     //    }
     return "--";
-  }, [lpUser]);
+  }, []);
 
   //const delfiTicker = useSelector(selectGateIoSticker(DELFI_USDT));
   //const { dailyRewardRate } = useMemo(() => {
@@ -498,7 +498,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     //    }
 
     return "--";
-  }, [lpUser, swapInfo?.swapConfig]);
+  }, []);
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
 

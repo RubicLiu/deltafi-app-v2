@@ -174,18 +174,17 @@ const PoolCard: React.FC<CardProps> = (props) => {
     //        .multipliedBy(100);
     //    }
     return new BigNumber(0);
-  }, [lpUser, swapInfo]);
+  }, []);
 
   const quotePercent = useMemo(() => {
     //   if (lpUser && swapInfo) {
     //     return new BigNumber(lpUser.quoteShare)
     //       .plus(new BigNumber(lpUser.quotePosition.depositedAmount))
     //       .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()))
-
     //       .multipliedBy(100);
     //   }
     return new BigNumber(0);
-  }, [lpUser, swapInfo]);
+  }, []);
 
   const userBaseTvl = useMemo(() => {
     if (baseTvl && basePercent) {
