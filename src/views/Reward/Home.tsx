@@ -181,9 +181,9 @@ const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
 }));
 
 const StyledButton = styled(Button)`
-  padding: 16px 20px;
+  padding: 12px 24px;
   border-radius: 50px;
-  min-width: 160px;
+  min-width: 180px;
   &.Mui-disabled {
     color: inherit;
     border-color: inherit;
@@ -370,6 +370,7 @@ const Home: React.FC = (props) => {
         data-amp-analytics-on="click"
         data-amp-analytics-name="click"
         data-amp-analytics-attrs="page: Reward, target: claimRewards"
+        fullWidth
       >
         <Box
           fontFamily="Rubik"
@@ -610,12 +611,15 @@ const Home: React.FC = (props) => {
         <Box fontSize={20} mb={2} fontWeight={700}>
           My Rewards
         </Box>
-        {isConnectedWallet ? (
+        {/* TODO please check and set up the true "no reward" condition */}
+        {isConnectedWallet &&
+        rewardDisplayInfo.totalRewardFromReferral !== "--" &&
+        rewardDisplayInfo.totalRewardFromSwap !== "--" ? (
           <Box>
             <Box mt={2} mb={3} display="flex" gap={1.25} justifyContent="center" flexWrap="wrap">
               <Box className={classes.rewardBox} border="1px solid #03F2A0">
                 <Box color="#03F2A0">LIQUIDITY MINING</Box>
-                <Box color="#03F2A0">Unclaimed / Total</Box>
+                <Box>Unclaimed / Total</Box>
                 {/* TODO replace the following value with real LIQUIDITY MINING value  */}
                 <Box lineHeight="24px" display="flex" fontSize={20}>
                   <Box color="#03F2A0">{rewardDisplayInfo.claimedRewardFromSwap}&nbsp;</Box>
@@ -625,21 +629,21 @@ const Home: React.FC = (props) => {
               </Box>
               <Box className={classes.rewardBox} border="1px solid #D4FF00">
                 <Box color="#D4FF00">TRADE FARMING</Box>
-                <Box color="#D3D3D3">Unclaimed / Total</Box>
+                <Box>Unclaimed / Total</Box>
                 <Box lineHeight="24px" display="flex" fontSize={20}>
                   <Box color="#D4FF00">{rewardDisplayInfo.claimedRewardFromSwap}&nbsp;</Box>
                   <Box>/ {rewardDisplayInfo.totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
                 <Box color="#D4FF00">{claimRewardsButton}</Box>
               </Box>
-              <Box className={classes.rewardBox} border="1px solid #693EFF">
-                <Box color="#693EFF">REGERRAL BONUS</Box>
-                <Box color="#693EFF">Unclaimed / Total</Box>
+              <Box className={classes.rewardBox} border="1px solid #905BFF">
+                <Box color="#905BFF">REGERRAL BONUS</Box>
+                <Box>Unclaimed / Total</Box>
                 <Box lineHeight="24px" display="flex" fontSize={20}>
-                  <Box color="#693EFF">{rewardDisplayInfo.claimedRewardFromReferral}&nbsp;</Box>
+                  <Box color="#905BFF">{rewardDisplayInfo.claimedRewardFromReferral}&nbsp;</Box>
                   <Box>/ {rewardDisplayInfo.totalRewardFromReferral} DELFI</Box>{" "}
                 </Box>
-                <Box color="#693EFF">{claimRewardsButton}</Box>
+                <Box color="#905BFF">{claimRewardsButton}</Box>
               </Box>
             </Box>
           </Box>

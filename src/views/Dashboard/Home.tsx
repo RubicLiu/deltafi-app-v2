@@ -144,7 +144,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
   tabPanel: {
-    padding: 0,
+    "&.MuiTabPanel-root": {
+      padding: 0,
+    },
   },
 }));
 // TODO replace value with real data
@@ -177,7 +179,7 @@ const Home: React.FC = (props) => {
           <Box className={classes.valuesCt}>
             <Box className={classes.values}>
               {headerData.map((data, idx) => (
-                <div key={idx}>
+                <Box display="flex" key={idx}>
                   <Box className={classes.value} key={data.label}>
                     <Box fontSize={14} fontWeight={400} lineHeight="18px">
                       {data.label}
@@ -199,7 +201,7 @@ const Home: React.FC = (props) => {
                       className={classes.divider}
                     />
                   )}
-                </div>
+                </Box>
               ))}
             </Box>
           </Box>
