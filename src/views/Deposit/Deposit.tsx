@@ -450,55 +450,56 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   );
 
   const unclaimedInterest = useMemo(() => {
-    //    if (lpUser && swapInfo?.swapConfig) {
-    //      const totalOwedInterest = exponentiatedBy(
-    //        lpUser.basePosition.rewardsOwed.add(lpUser.quotePosition.rewardsOwed).toString(),
-    //        DELTAFI_TOKEN_DECIMALS,
-    //      );
-    //
-    //      //const secondsFromBaseLastUpdate =
-    //      //  lpUser.basePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
-    //      //    ? new BN(0)
-    //      //    : new BN(depositView.currentUnixTimestamp).sub(lpUser.basePosition.lastUpdateTs);
-    //      //const secondsFromQuoteLastUpdate =
-    //      //  lpUser.quotePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
-    //      //    ? new BN(0)
-    //      //    : new BN(depositView.currentUnixTimestamp).sub(lpUser.quotePosition.lastUpdateTs);
-    //
-    //      const extraOwedBaseInterest = new BigNumber(0);
-    //      const extraOwnedQuoteInterest = new BigNumber(0);
-    //      //      const extraOwedBaseInterest = exponentiatedBy(
-    //      //        new BigNumber(
-    //      //          lpUser.basePosition.depositedAmount
-    //      //            .mul(swapInfo.swapConfig.baseAprNumerator)
-    //      //            .mul(secondsFromBaseLastUpdate)
-    //      //            .toString(),
-    //      //        )
-    //      //          .dividedBy(swapInfo.swapConfig.baseAprDenominator.toString())
-    //      //          .dividedBy(SECONDS_PER_YEAR),
-    //      //        DELTAFI_TOKEN_DECIMALS,
-    //      //      );
-    //      //
-    //      //      const extraOwnedQuoteInterest = exponentiatedBy(
-    //      //        new BigNumber(
-    //      //          lpUser.quotePosition.depositedAmount
-    //      //            .mul(swapInfo.swapConfig.quoteAprNumerator)
-    //      //            .mul(secondsFromQuoteLastUpdate)
-    //      //            .toString(),
-    //      //        )
-    //      //          .dividedBy(swapInfo.swapConfig.quoteAprDenominator.toString())
-    //      //          .dividedBy(new BigNumber(SECONDS_PER_YEAR)),
-    //      //        DELTAFI_TOKEN_DECIMALS,
-    //      //      );
-    //
-    //      return totalOwedInterest
-    //        .plus(extraOwedBaseInterest)
-    //        .plus(extraOwnedQuoteInterest)
-    //        .toFixed(DELTAFI_TOKEN_DECIMALS);
-    //    }
+    if (lpUser && swapInfo?.swapConfig) {
+      const totalOwedInterest = new BigNumber(0);
+      //const totalOwedInterest = exponentiatedBy(
+      //  lpUser.basePosition.rewardsOwed.add(lpUser.quotePosition.rewardsOwed).toString(),
+      //  DELTAFI_TOKEN_DECIMALS,
+      //);
+
+      //const secondsFromBaseLastUpdate =
+      //  lpUser.basePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
+      //    ? new BN(0)
+      //    : new BN(depositView.currentUnixTimestamp).sub(lpUser.basePosition.lastUpdateTs);
+      //const secondsFromQuoteLastUpdate =
+      //  lpUser.quotePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
+      //    ? new BN(0)
+      //    : new BN(depositView.currentUnixTimestamp).sub(lpUser.quotePosition.lastUpdateTs);
+
+      const extraOwedBaseInterest = new BigNumber(0);
+      const extraOwnedQuoteInterest = new BigNumber(0);
+      //      const extraOwedBaseInterest = exponentiatedBy(
+      //        new BigNumber(
+      //          lpUser.basePosition.depositedAmount
+      //            .mul(swapInfo.swapConfig.baseAprNumerator)
+      //            .mul(secondsFromBaseLastUpdate)
+      //            .toString(),
+      //        )
+      //          .dividedBy(swapInfo.swapConfig.baseAprDenominator.toString())
+      //          .dividedBy(SECONDS_PER_YEAR),
+      //        DELTAFI_TOKEN_DECIMALS,
+      //      );
+      //
+      //      const extraOwnedQuoteInterest = exponentiatedBy(
+      //        new BigNumber(
+      //          lpUser.quotePosition.depositedAmount
+      //            .mul(swapInfo.swapConfig.quoteAprNumerator)
+      //            .mul(secondsFromQuoteLastUpdate)
+      //            .toString(),
+      //        )
+      //          .dividedBy(swapInfo.swapConfig.quoteAprDenominator.toString())
+      //          .dividedBy(new BigNumber(SECONDS_PER_YEAR)),
+      //        DELTAFI_TOKEN_DECIMALS,
+      //      );
+
+      return totalOwedInterest
+        .plus(extraOwedBaseInterest)
+        .plus(extraOwnedQuoteInterest)
+        .toFixed(DELTAFI_TOKEN_DECIMALS);
+    }
 
     return "--";
-  }, []);
+  }, [lpUser, swapInfo?.swapConfig]);
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
 
