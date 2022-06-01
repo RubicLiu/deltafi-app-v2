@@ -2037,71 +2037,6 @@ export type DeltafiDexV2 = {
       }
     },
     {
-      "name": "AccountType",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Unknown"
-          },
-          {
-            "name": "Mapping"
-          },
-          {
-            "name": "Product"
-          },
-          {
-            "name": "Price"
-          }
-        ]
-      }
-    },
-    {
-      "name": "PriceStatus",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Unknown"
-          },
-          {
-            "name": "Trading"
-          },
-          {
-            "name": "Halted"
-          },
-          {
-            "name": "Auction"
-          }
-        ]
-      }
-    },
-    {
-      "name": "CorpAction",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "NoCorpAct"
-          }
-        ]
-      }
-    },
-    {
-      "name": "PriceType",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Unknown"
-          },
-          {
-            "name": "Price"
-          }
-        ]
-      }
-    },
-    {
       "name": "SwapType",
       "type": {
         "kind": "enum",
@@ -2347,8 +2282,8 @@ export type DeltafiDexV2 = {
     },
     {
       "code": 6045,
-      "name": "StalePythPrice",
-      "msg": "Stale pyth price"
+      "name": "InvalidPythPrice",
+      "msg": "Invalid pyth price"
     },
     {
       "code": 6046,
@@ -2454,6 +2389,11 @@ export type DeltafiDexV2 = {
       "code": 6066,
       "name": "InvalidSerumData",
       "msg": "InvalidSerumData"
+    },
+    {
+      "code": 6067,
+      "name": "InvalidPythPriceAccount",
+      "msg": "Invalid pyth price account"
     }
   ]
 };
@@ -4497,71 +4437,6 @@ export const IDL: DeltafiDexV2 = {
       }
     },
     {
-      "name": "AccountType",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Unknown"
-          },
-          {
-            "name": "Mapping"
-          },
-          {
-            "name": "Product"
-          },
-          {
-            "name": "Price"
-          }
-        ]
-      }
-    },
-    {
-      "name": "PriceStatus",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Unknown"
-          },
-          {
-            "name": "Trading"
-          },
-          {
-            "name": "Halted"
-          },
-          {
-            "name": "Auction"
-          }
-        ]
-      }
-    },
-    {
-      "name": "CorpAction",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "NoCorpAct"
-          }
-        ]
-      }
-    },
-    {
-      "name": "PriceType",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Unknown"
-          },
-          {
-            "name": "Price"
-          }
-        ]
-      }
-    },
-    {
       "name": "SwapType",
       "type": {
         "kind": "enum",
@@ -4807,8 +4682,8 @@ export const IDL: DeltafiDexV2 = {
     },
     {
       "code": 6045,
-      "name": "StalePythPrice",
-      "msg": "Stale pyth price"
+      "name": "InvalidPythPrice",
+      "msg": "Invalid pyth price"
     },
     {
       "code": 6046,
@@ -4914,6 +4789,11 @@ export const IDL: DeltafiDexV2 = {
       "code": 6066,
       "name": "InvalidSerumData",
       "msg": "InvalidSerumData"
+    },
+    {
+      "code": 6067,
+      "name": "InvalidPythPriceAccount",
+      "msg": "Invalid pyth price account"
     }
   ]
 };
