@@ -9,7 +9,7 @@ import { ConnectButton } from "components";
 import { convertDollarSign as convertDollar, getTokenTvl, getUserTokenTvl } from "utils/utils";
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
-
+import { useModal } from "providers/modal";
 import {
   selectMarketPriceByPool,
   selectFarmByFarmKey,
