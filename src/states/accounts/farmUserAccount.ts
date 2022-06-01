@@ -59,7 +59,7 @@ export const fetchFarmUsersThunk = createAsyncThunk(
   },
 );
 
-export const farmUserReducer = createReducer(initialState, (builder) => {
+export const farmUserAccountReducer = createReducer(initialState, (builder) => {
   builder.addCase(fetchFarmUsersThunk.fulfilled, (state, action) => {
     state.farmPoolKeyToFarmUser = action.payload.farmPoolKeyToFarmUser;
   });

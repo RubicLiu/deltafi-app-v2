@@ -64,6 +64,10 @@ const TabMenu: React.FC = (props) => {
       <ToggleButton value="pools" aria-label="Pools" className={classes.button}>
         Pools
       </ToggleButton>
+      {/* TODO: disable farm for first deployment */}
+      <ToggleButton value="farms" aria-label="Farms" className={classes.button}>
+        Farms
+      </ToggleButton>
     </ToggleButtonGroup>
   );
 };

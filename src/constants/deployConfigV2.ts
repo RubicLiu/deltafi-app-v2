@@ -12,6 +12,7 @@ export type PoolConfig = {
   base: string;
   quote: string;
   swapInfo: string;
+  farmInfoList: { name: string; farmInfo: string }[];
   baseTokenInfo: TokenConfig;
   quoteTokenInfo: TokenConfig;
 };

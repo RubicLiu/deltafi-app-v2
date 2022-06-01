@@ -45,6 +45,18 @@ export function selectSwapBySwapKey(poolKey: string) {
   };
 }
 
+export function selectFarmByFarmKey(farmKey: string) {
+  return (state: RootState) => {
+    return state.accounts.farmAccount.farmKeyToFarmInfo[farmKey];
+  };
+}
+
+export function selectFarmUserByFarmKey(farmKey: string) {
+  return (state: RootState) => {
+    return state.accounts.farmUserAccount.farmPoolKeyToFarmUser[farmKey];
+  };
+}
+
 export function selectLpUserBySwapKey(swapKey: string) {
   return (state: RootState) => {
     return state.accounts.liquidityProviderAccount.swapKeyToLp[swapKey];
