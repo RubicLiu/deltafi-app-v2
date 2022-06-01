@@ -135,6 +135,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
   const farmInfo = useSelector(selectFarmByFarmKey(farmInfoAddress));
   const farmUser = useSelector(selectFarmUserByFarmKey(farmInfoAddress));
+  const { setMenu } = useModal();
 
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
