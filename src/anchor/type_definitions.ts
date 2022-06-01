@@ -67,10 +67,9 @@ export type SwapDirection =
 | { sellBase?: never, sellQuote? : any }
 
 export type SwapType =
-| { normalSwap? : any, stableSwap?: never, serumSwap?: never }
-| { normalSwap?: never, stableSwap? : any, serumSwap?: never }
-| { normalSwap?: never, stableSwap?: never, serumSwap? : any }
-
+  | { normalSwap?: any; stableSwap?: never; serumSwap?: never }
+  | { normalSwap?: never; stableSwap?: any; serumSwap?: never }
+  | { normalSwap?: never; stableSwap?: never; serumSwap?: any };
 
 export interface DeltafiUser {
   bump: number;
