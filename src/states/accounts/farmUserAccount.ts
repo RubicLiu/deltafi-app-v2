@@ -19,6 +19,7 @@ type FetchFarmUsersThunkArg = {
   walletAddress: PublicKey;
 };
 
+// TODO: need to test after farm transactions are added
 export const fetchFarmUsersThunk = createAsyncThunk(
   "farmUser/fetchFarmUsers",
   async (arg: FetchFarmUsersThunkArg) => {
@@ -44,7 +45,8 @@ export const fetchFarmUsersThunk = createAsyncThunk(
       farmUserAddressList.push(farmUserPubKey);
     }
 
-    const farmUserList = program.account.farmUser.fetchMultiple(farmUserAddressList);
+    const farmUserList = await program.account.farmUser.fetchMultiple(farmUserAddressList);
+
     for (let i = 0; i < farmAddressList.length; i++) {
       const farmInfoAddress = farmAddressList[i];
       const farmUser = farmUserList[i];
