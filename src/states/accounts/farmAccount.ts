@@ -28,14 +28,11 @@ export const fetchFarmsThunk = createAsyncThunk(
     const farmInfoList = await program.account.farmInfo.fetchMultiple(farmAddressList);
     const farmKeyToFarmInfo = {};
 
-    let i = 0;
-    poolInfoList?.forEach((poolInfo) => {
-      poolInfo.farmInfoList?.foreach((farm) => {
-        const farmInfo = farmInfoList[i];
-        farmKeyToFarmInfo[farm.farmInfo] = farmInfo;
-        i++;
-      });
-    });
+    for (let i = 0; i < farmAddressList.length; i++) {
+      const farmInfo = farmInfoList[i];
+      const farmInfoAddress = farmAddressList[i];
+      farmKeyToFarmInfo[farmInfoAddress] = farmInfo;
+    }
 
     return {
       farmKeyToFarmInfo,
