@@ -11,19 +11,37 @@
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "4Y6z1oYmHHScWLroRjgtLUcJSUXMN9q6ejYJVcwBUkBb"
+        "swapInfo": "4Y6z1oYmHHScWLroRjgtLUcJSUXMN9q6ejYJVcwBUkBb",
+        "farmInfoList": [
+          {
+            "name": "default",
+            "farmInfo": "GhFQtWTRDWp5FhgLAruNTxkQTbpwSDji1ntmNLDEEQqV"
+          }
+        ]
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "B5FQLoi1XaVKcqmfysa5pGLAkc45snauxwfLjDhR7Fs6"
+        "swapInfo": "B5FQLoi1XaVKcqmfysa5pGLAkc45snauxwfLjDhR7Fs6",
+        "farmInfoList": [
+          {
+            "name": "default",
+            "farmInfo": "Fsbir8eNqWRHHQT2FrBmvKHFxK6kL9R9uSvT4f5xeYAh"
+          }
+        ]
       },
       {
         "name": "GMT-USDC",
         "base": "GMT",
         "quote": "USDC",
-        "swapInfo": "HHG45Gh8CwtH3U4GhEkDbFWYr1UxL3rJ3LL9hEy7imU"
+        "swapInfo": "HHG45Gh8CwtH3U4GhEkDbFWYr1UxL3rJ3LL9hEy7imU",
+        "farmInfoList": [
+          {
+            "name": "default",
+            "farmInfo": "HGTxouL2cQ55WMBr5oGeC5zbmFDSJbmAAW6vXJZsA341"
+          }
+        ]
       }
     ],
     "tokenInfoList": [
@@ -89,19 +107,37 @@
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "25eM9bB7FUBXnLEfP2oFFABXtS7ezktPYJpuCbEMq81A"
+        "swapInfo": "25eM9bB7FUBXnLEfP2oFFABXtS7ezktPYJpuCbEMq81A",
+        "farmInfoList": [
+          {
+            "name": "default",
+            "farmInfo": "CCKfEch8hCE8kKd4qSKgioTuhXXLx4Ahr3rgeCQih1iQ"
+          }
+        ]
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "CHm2heK85rMoscJEwMH9qa92eG1hM4HDS9bTQ8SvyvWr"
+        "swapInfo": "CHm2heK85rMoscJEwMH9qa92eG1hM4HDS9bTQ8SvyvWr",
+        "farmInfoList": [
+          {
+            "name": "default",
+            "farmInfo": "FsTAntZoyUTVcVn8P4bWRD3mor4P3V1nC4jvk4rNyvbu"
+          }
+        ]
       },
       {
         "name": "GMT-USDC",
         "base": "GMT",
         "quote": "USDC",
-        "swapInfo": "EeCjuyjUNsLcYTyXGPKoThx8Sasi8vTxJnnAYSACCock"
+        "swapInfo": "EeCjuyjUNsLcYTyXGPKoThx8Sasi8vTxJnnAYSACCock",
+        "farmInfoList": [
+          {
+            "name": "default",
+            "farmInfo": "8DmtYTm2LZbDJhjkwc44GZtgqeNfD6h7YgHPmG2ygTJ4"
+          }
+        ]
       }
     ],
     "tokenInfoList": [
