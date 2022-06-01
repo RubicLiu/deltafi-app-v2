@@ -11,6 +11,7 @@ type FetchFarmsThunkArg = {
   connection: Connection;
 };
 
+// TODO: need to test after farm transactions are added
 export const fetchFarmsThunk = createAsyncThunk(
   "v2/fetchFarms",
   async (arg: FetchFarmsThunkArg) => {

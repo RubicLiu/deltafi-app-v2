@@ -25,6 +25,8 @@ import { appActions } from "states/appState";
 import { programSelector } from "states";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { DELFI_USDT, fetchCandleSticksThunk, fetchTickerThunk } from "states/gateIoState";
+import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
+import { fetchFarmsThunk } from "states/accounts/farmAccount";
 
 // Amplify.configure(awsconfig)
 // Analytics.autoTrack('event', {
@@ -92,12 +94,16 @@ const App: React.FC = () => {
     if (walletAddress) {
       dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress }));
       dispatch(fetchDeltafiUserThunk({ connection, walletAddress }));
+      dispatch(fetchFarmUsersThunk({ connection, walletAddress }));
     }
   }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {
     // Refresh the swap pool every 1 minute.
-    return scheduleWithInterval(() => dispatch(fetchSwapsThunk({ connection })), 60 * 1000);
+    return scheduleWithInterval(() => {
+      dispatch(fetchSwapsThunk({ connection }));
+      dispatch(fetchFarmsThunk({ connection }));
+    }, 60 * 1000);
   }, [connection, dispatch]);
 
   useEffect(() => {
