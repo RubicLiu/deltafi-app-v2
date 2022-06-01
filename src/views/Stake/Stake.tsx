@@ -23,8 +23,9 @@ import { SOLSCAN_LINK, DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_MINT } from "consta
 import Slider from "./components/Slider";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectLpUserBySwapKey,
+  selectFarmUserByFarmKey,
   selectFarmByFarmKey,
+  selectLpUserBySwapKey,
   stakeViewSelector,
   selectTokenAccountInfoByMint,
   programSelector,
@@ -66,14 +67,15 @@ const getUnclaimedReward = (
 
 const Stake = (): ReactElement => {
   const classes = useStyles();
-  const { setMenu, data } = useModal();
-  const farmPoolId = data.farmInfo;
+  const { setMenu } = useModal();
+  const farmPoolId = location.pathname.split("/").pop();
   const farmPool = useSelector(selectFarmByFarmKey(farmPoolId));
   const poolConfig = getPoolConfigByFarmKey(farmPoolId);
+  const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
   const baseTokenInfo = poolConfig.baseTokenInfo;
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
 
-  const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
+  const farmUser = useSelector(selectFarmUserByFarmKey(farmPoolId));
   const program = useSelector(programSelector);
 
   const wallet = useWallet();
@@ -108,18 +110,18 @@ const Stake = (): ReactElement => {
   );
 
   const [userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote] = useMemo(() => {
-    if (lpUser) {
+    if (farmUser) {
       const baseTokenInfo = poolConfig.baseTokenInfo;
       const quoteTokenInfo = poolConfig.quoteTokenInfo;
       return [
-        anchorBnToBn(baseTokenInfo, lpUser.basePosition.depositedAmount),
-        anchorBnToBn(quoteTokenInfo, lpUser.quotePosition.depositedAmount),
-        anchorBnToBn(baseTokenInfo, lpUser.baseShare.add(lpUser.basePosition.depositedAmount)),
-        anchorBnToBn(quoteTokenInfo, lpUser.quoteShare.add(lpUser.quotePosition.depositedAmount)),
+        anchorBnToBn(baseTokenInfo, farmUser.basePosition.depositedAmount),
+        anchorBnToBn(quoteTokenInfo, farmUser.quotePosition.depositedAmount),
+        anchorBnToBn(baseTokenInfo, lpUser.baseShare.add(lpUser.stakedBaseShare)),
+        anchorBnToBn(quoteTokenInfo, lpUser.quoteShare.add(lpUser.stakedQuoteShare)),
       ];
     }
     return [new BigNumber(0), new BigNumber(0), new BigNumber(0), new BigNumber(0)];
-  }, [lpUser, poolConfig]);
+  }, [farmUser, poolConfig]);
 
   useEffect(() => {
     if (poolConfig) {
@@ -161,21 +163,21 @@ const Stake = (): ReactElement => {
   const setStakeAmount = useCallback((value: string) => {}, []);
 
   const unclaimedReward = (() => {
-    if (lpUser) {
+    if (lpUser && farmUser) {
       const baseReward = getUnclaimedReward(
         baseApr,
-        lpUser.basePosition.lastUpdateTs,
-        lpUser.basePosition.nextClaimTs,
-        lpUser.basePosition.rewardsOwed,
-        lpUser.basePosition.depositedAmount,
+        new BigNumber(farmUser.basePosition.lastUpdateTs.toString()),
+        new BigNumber(farmUser.basePosition.nextClaimTs.toString()),
+        new BigNumber(farmUser.basePosition.rewardsOwed.toString()),
+        new BigNumber(farmUser.basePosition.depositedAmount.toString()),
         DELTAFI_TOKEN_DECIMALS,
       );
       const quoteReward = getUnclaimedReward(
         quoteApr,
-        lpUser.quotePosition.lastUpdateTs,
-        lpUser.quotePosition.nextClaimTs,
-        lpUser.quotePosition.rewardsOwed,
-        lpUser.quotePosition.depositedAmount,
+        new BigNumber(farmUser.quotePosition.lastUpdateTs.toString()),
+        new BigNumber(farmUser.quotePosition.nextClaimTs.toString()),
+        new BigNumber(farmUser.quotePosition.rewardsOwed.toString()),
+        new BigNumber(farmUser.quotePosition.depositedAmount.toString()),
         DELTAFI_TOKEN_DECIMALS,
       );
       return baseReward.plus(quoteReward);
@@ -238,8 +240,9 @@ const Stake = (): ReactElement => {
         program,
         connection,
         poolConfig,
+        farmPoolId,
         walletPubkey,
-        lpUser,
+        farmUser,
         baseAmount,
         quoteAmount,
       );
@@ -296,6 +299,7 @@ const Stake = (): ReactElement => {
         program,
         connection,
         poolConfig,
+        farmPoolId,
         walletPubkey,
         rewardsAccount.publicKey,
       );

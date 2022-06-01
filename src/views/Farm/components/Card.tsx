@@ -9,7 +9,6 @@ import { ConnectButton } from "components";
 import { convertDollarSign as convertDollar, getTokenTvl, getUserTokenTvl } from "utils/utils";
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
-import { useModal } from "providers/modal";
 import {
   selectMarketPriceByPool,
   selectFarmByFarmKey,
@@ -17,6 +16,7 @@ import {
   selectFarmUserByFarmKey,
 } from "states/selectors";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
+import { useHistory } from "react-router";
 
 const Img = styled.img`
   width: 32px;
@@ -135,7 +135,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
   const farmInfo = useSelector(selectFarmByFarmKey(farmInfoAddress));
   const farmUser = useSelector(selectFarmUserByFarmKey(farmInfoAddress));
-  const { setMenu } = useModal();
+  const history = useHistory();
 
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
@@ -289,7 +289,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
         <ConnectButton
           className={classes.cardBtn}
           onClick={() => {
-            /* TODO: jump to stake page */
+            history.push(`/stake/${farmInfoAddress}`)
           }}
           variant={"outlined"}
           data-amp-analytics-on="click"
