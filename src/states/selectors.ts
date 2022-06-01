@@ -13,6 +13,7 @@ export const deltafiUserSelector = (state: RootState) => state.accounts.deltafiU
 export const depositViewSelector = (state: RootState) => state.views.depositView;
 export const swapViewSelector = (state: RootState) => state.views.swapView;
 export const rewardViewSelector = (state: RootState) => state.views.rewardView;
+export const stakeViewSelector = (state: RootState) => state.views.stakeView;
 
 export const gateIoSelector = (state: RootState) => state.gateIo;
 export const programSelector = (state: RootState) => state.app.program;

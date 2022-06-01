@@ -58,3 +58,9 @@ export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String):
 export function getPoolConfigBySwapKey(poolKey: String): PoolConfig {
   return poolConfigs.find(({ swapInfo }) => swapInfo === poolKey);
 }
+
+export function getPoolConfigByFarmKey(farmKey: string): PoolConfig {
+  return poolConfigs.find(
+    ({ farmInfoList }) => !!farmInfoList.find(({ farmInfo }) => farmInfo === farmKey),
+  );
+}

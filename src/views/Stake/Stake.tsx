@@ -16,7 +16,7 @@ import BigNumber from "bignumber.js";
 import StakeCard from "views/Stake/components/Card";
 import { ConnectButton } from "components";
 
-import useStyles from "./style"
+import useStyles from "./styles";
 import { useModal } from "providers/modal";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK, DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_MINT } from "constants/index";
