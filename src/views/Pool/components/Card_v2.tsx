@@ -169,7 +169,6 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const basePercent = useMemo(() => {
     if (lpUser && swapInfo) {
       return new BigNumber(lpUser.baseShare)
-        .plus(new BigNumber(lpUser.basePosition.depositedAmount))
         .dividedBy(new BigNumber(swapInfo.poolState.baseSupply.toString()))
         .multipliedBy(100);
     }
@@ -179,7 +178,6 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const quotePercent = useMemo(() => {
     if (lpUser && swapInfo) {
       return new BigNumber(lpUser.quoteShare)
-        .plus(new BigNumber(lpUser.quotePosition.depositedAmount))
         .dividedBy(new BigNumber(swapInfo.poolState.quoteSupply.toString()))
 
         .multipliedBy(100);

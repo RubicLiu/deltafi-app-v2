@@ -13,6 +13,7 @@ export interface PoolState {
   totalTradedQuote: anchor.BN;
   accumulatedTradeReward: anchor.BN;
   lastRewardWindowStartTimestamp: anchor.BN;
+  marketPriceLastUpdateSlot: anchor.BN;
   reservedU64: Array<any>;
 }
 
@@ -98,6 +99,16 @@ export interface DeltafiUser {
   reserved: Array<any>;
 }
 
+export interface FarmUser {
+  bump: number;
+  configKey: PublicKey;
+  farmKey: PublicKey;
+  owner: PublicKey;
+  basePosition: FarmPosition;
+  quotePosition: FarmPosition;
+  reserved: Array<any>;
+}
+
 export interface FarmInfo {
   bump: number;
   seed: PublicKey;
@@ -152,7 +163,8 @@ export interface LiquidityProvider {
   owner: PublicKey;
   baseShare: anchor.BN;
   quoteShare: anchor.BN;
-  basePosition: FarmPosition;
-  quotePosition: FarmPosition;
-  reserved: Array<any>;
+  stakedBaseShare: anchor.BN;
+  stakedQuoteShare: anchor.BN;
+  deprecatedU64: Array<any>;
+  reservedU64: Array<any>;
 }

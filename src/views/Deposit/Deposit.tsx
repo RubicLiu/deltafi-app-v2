@@ -354,16 +354,16 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   }, [swapInfo]);
 
   const cumulativeInterest: string = useMemo(() => {
-    if (lpUser) {
-      return exponentiatedBy(
-        lpUser.basePosition.cumulativeInterest
-          .add(lpUser.quotePosition.cumulativeInterest)
-          .toString(),
-        DELTAFI_TOKEN_DECIMALS,
-      ).toFixed(DELTAFI_TOKEN_DECIMALS);
-    }
+    //    if (lpUser) {
+    //      return exponentiatedBy(
+    //        lpUser.basePosition.cumulativeInterest
+    //          .add(lpUser.quotePosition.cumulativeInterest)
+    //          .toString(),
+    //        DELTAFI_TOKEN_DECIMALS,
+    //      ).toFixed(DELTAFI_TOKEN_DECIMALS);
+    //    }
     return "--";
-  }, [lpUser]);
+  }, []);
 
   //const delfiTicker = useSelector(selectGateIoSticker(DELFI_USDT));
   //const { dailyRewardRate } = useMemo(() => {
@@ -451,10 +451,11 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
   const unclaimedInterest = useMemo(() => {
     if (lpUser && swapInfo?.swapConfig) {
-      const totalOwedInterest = exponentiatedBy(
-        lpUser.basePosition.rewardsOwed.add(lpUser.quotePosition.rewardsOwed).toString(),
-        DELTAFI_TOKEN_DECIMALS,
-      );
+      const totalOwedInterest = new BigNumber(0);
+      //const totalOwedInterest = exponentiatedBy(
+      //  lpUser.basePosition.rewardsOwed.add(lpUser.quotePosition.rewardsOwed).toString(),
+      //  DELTAFI_TOKEN_DECIMALS,
+      //);
 
       //const secondsFromBaseLastUpdate =
       //  lpUser.basePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp

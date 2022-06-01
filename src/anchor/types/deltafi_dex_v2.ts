@@ -1158,6 +1158,11 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true
@@ -1198,6 +1203,11 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true
@@ -1233,7 +1243,7 @@ export type DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "liquidityProvider",
+          "name": "farmUser",
           "isMut": true,
           "isSigner": false
         },
@@ -1372,6 +1382,47 @@ export type DeltafiDexV2 = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "createFarmUser",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -1411,6 +1462,51 @@ export type DeltafiDexV2 = {
           {
             "name": "claimedReferralRewards",
             "type": "u64"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u64",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "farmUser",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "farmKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "basePosition",
+            "type": {
+              "defined": "FarmPosition"
+            }
+          },
+          {
+            "name": "quotePosition",
+            "type": {
+              "defined": "FarmPosition"
+            }
           },
           {
             "name": "reserved",
@@ -1616,7 +1712,7 @@ export type DeltafiDexV2 = {
             "type": {
               "array": [
                 "u64",
-                32
+                24
               ]
             }
           }
@@ -1653,19 +1749,24 @@ export type DeltafiDexV2 = {
             "type": "u64"
           },
           {
-            "name": "basePosition",
+            "name": "stakedBaseShare",
+            "type": "u64"
+          },
+          {
+            "name": "stakedQuoteShare",
+            "type": "u64"
+          },
+          {
+            "name": "deprecatedU64",
             "type": {
-              "defined": "FarmPosition"
+              "array": [
+                "u64",
+                10
+              ]
             }
           },
           {
-            "name": "quotePosition",
-            "type": {
-              "defined": "FarmPosition"
-            }
-          },
-          {
-            "name": "reserved",
+            "name": "reservedU64",
             "type": {
               "array": [
                 "u64",
@@ -1725,6 +1826,10 @@ export type DeltafiDexV2 = {
           },
           {
             "name": "lastRewardWindowStartTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "marketPriceLastUpdateSlot",
             "type": "u64"
           },
           {
@@ -3513,6 +3618,11 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true
@@ -3553,6 +3663,11 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true
@@ -3588,7 +3703,7 @@ export const IDL: DeltafiDexV2 = {
           "isSigner": false
         },
         {
-          "name": "liquidityProvider",
+          "name": "farmUser",
           "isMut": true,
           "isSigner": false
         },
@@ -3727,6 +3842,47 @@ export const IDL: DeltafiDexV2 = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "createFarmUser",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "farmUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -3766,6 +3922,51 @@ export const IDL: DeltafiDexV2 = {
           {
             "name": "claimedReferralRewards",
             "type": "u64"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u64",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "farmUser",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "configKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "farmKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "basePosition",
+            "type": {
+              "defined": "FarmPosition"
+            }
+          },
+          {
+            "name": "quotePosition",
+            "type": {
+              "defined": "FarmPosition"
+            }
           },
           {
             "name": "reserved",
@@ -3971,7 +4172,7 @@ export const IDL: DeltafiDexV2 = {
             "type": {
               "array": [
                 "u64",
-                32
+                24
               ]
             }
           }
@@ -4008,19 +4209,24 @@ export const IDL: DeltafiDexV2 = {
             "type": "u64"
           },
           {
-            "name": "basePosition",
+            "name": "stakedBaseShare",
+            "type": "u64"
+          },
+          {
+            "name": "stakedQuoteShare",
+            "type": "u64"
+          },
+          {
+            "name": "deprecatedU64",
             "type": {
-              "defined": "FarmPosition"
+              "array": [
+                "u64",
+                10
+              ]
             }
           },
           {
-            "name": "quotePosition",
-            "type": {
-              "defined": "FarmPosition"
-            }
-          },
-          {
-            "name": "reserved",
+            "name": "reservedU64",
             "type": {
               "array": [
                 "u64",
@@ -4080,6 +4286,10 @@ export const IDL: DeltafiDexV2 = {
           },
           {
             "name": "lastRewardWindowStartTimestamp",
+            "type": "u64"
+          },
+          {
+            "name": "marketPriceLastUpdateSlot",
             "type": "u64"
           },
           {

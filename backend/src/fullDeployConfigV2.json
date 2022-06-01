@@ -11,19 +11,19 @@
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "EZXCv9tiDmm512kdY41eTGCfaFrwKpnhC3AFpkJiYyDs"
+        "swapInfo": "4Y6z1oYmHHScWLroRjgtLUcJSUXMN9q6ejYJVcwBUkBb"
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "4erhFiwvX4FKfCRhCDvtjhbuVdJRt4ErQhiZcqET3e16"
+        "swapInfo": "B5FQLoi1XaVKcqmfysa5pGLAkc45snauxwfLjDhR7Fs6"
       },
       {
         "name": "GMT-USDC",
         "base": "GMT",
         "quote": "USDC",
-        "swapInfo": "EdZjpSdVVscJGTwHkhpuEmCKWmYW9UNvAsQBRbZKz3gQ"
+        "swapInfo": "HHG45Gh8CwtH3U4GhEkDbFWYr1UxL3rJ3LL9hEy7imU"
       }
     ],
     "tokenInfoList": [
@@ -80,28 +80,28 @@
   "testnet": {
     "network": "testnet",
     "deltafiMint": "4iefnqUWWcn8nWTyXdyHqYkLwn1UPov18vCyP9T8Fy68",
-    "deltafiToken": "6c9gRTJGVhg5BjsEAKg6WgzFt3Lkhy9MaYuquWa7BJod",
+    "deltafiToken": "6JagQBiNFC9njGHTfCo25ezodWnQtWGKdJm5hEZoyHsG",
     "pythProgramId": "8tfDNiaEyrV6Q1U4DEXrEigs9DoDtkugzFbybENEbCDz",
     "programId": "HcWvS1XyweYMrCvY8TEeDxXgbWJagizUZXxCSLC2E89N",
-    "marketConfig": "4AWYfWyiX5dnZUaBQqY3WMdYodbvos6r1Do7YznT6Y5C",
+    "marketConfig": "Att7h8GSQcHsN8Na1Zc4Swp6JAsXUjeNk8Q2DocSMzUK",
     "poolInfoList": [
       {
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "6u4ATwzQPTMuMq5g9H5npd2PQiTnQkjHKwPt45j3JiYg"
+        "swapInfo": "4x1xfJPPdqu3xeDfqNCi2uzvDxzVh4ktk46yZcAogeYC"
       },
       {
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "4MWgwMzZEh1Mz32Lcq2N7kTxPfyYjXmrxLkYLBGF4Qyu"
+        "swapInfo": "5fXVqQUyU6n6H7JSeHtbPqDoUWmELmrTaqpHsPC9EQNF"
       },
       {
         "name": "GMT-USDC",
         "base": "GMT",
         "quote": "USDC",
-        "swapInfo": "mPHEBmkJd9wxy9ePgxgbqbEmnHRHPC9hGg1JuEcZxd6"
+        "swapInfo": "7o639ykkct3UQsKenGR6C9E2f2ta5y3qxogz4fd192vu"
       }
     ],
     "tokenInfoList": [
