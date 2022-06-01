@@ -2,56 +2,63 @@ import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { deployConfigV2 } from "constants/deployConfigV2";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { FarmUser } from "anchor/type_definitions";
 
-export const x = 1;
+export type FarmPoolKeyToFarmUser = Record<string, FarmUser>;
 
-const initialState = {
-  swapkeyToFarmUser: {},
+export interface FarmUserState {
+  farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser;
+}
+
+const initialState: FarmUserState = {
+  farmPoolKeyToFarmUser: {},
 };
 
-type FetchFarmUserThunkArg = {
+type FetchFarmUsersThunkArg = {
   connection: Connection;
   walletAddress: PublicKey;
 };
 
-export const fetchFarmUserThunk = createAsyncThunk(
-  "v2/fetchFarmUser",
-  async (arg: FetchFarmUserThunkArg) => {
+export const fetchFarmUsersThunk = createAsyncThunk(
+  "farmUser/fetchFarmUsers",
+  async (arg: FetchFarmUsersThunkArg) => {
     const program = getDeltafiDexV2(
       new PublicKey(deployConfigV2.programId),
-      makeProvider(arg.connection, arg.walletAddress),
+      makeProvider(arg.connection, {}),
     );
 
     const poolInfoList = deployConfigV2.poolInfoList;
+    const farmAddressList = poolInfoList
+      .map(({ farmInfoList }) => farmInfoList.map(({ farmInfo }) => new PublicKey(farmInfo)))
+      .flat();
+
+    const farmPoolKeyToFarmUser = {};
     const farmUserAddressList = [];
-    for (const poolInfo of poolInfoList) {
-      const [farmUserAddressList] = await PublicKey.findProgramAddress(
-        [
-          Buffer.from("LiquidityProvider"),
-          new PublicKey(poolInfo.swapInfo).toBuffer(),
-          arg.walletAddress.toBuffer(),
-        ],
+
+    for (let i = 0; i < farmAddressList.length; i++) {
+      const farmInfo = farmAddressList[i];
+      const [farmUserPubKey] = await PublicKey.findProgramAddress(
+        [Buffer.from("FarmUser"), farmInfo.toBuffer(), arg.walletAddress.toBuffer()],
         program.programId,
       );
-      lpAddressList.push(lpPublicKey);
+      farmUserAddressList.push(farmUserPubKey);
     }
 
-    const lpList = await program.account.farmUser.fetchMultiple(farmUserAddressList);
-    const swapKeyToLp = {};
-    for (let i = 0; i < poolInfoList.length; ++i) {
-      const poolInfo = poolInfoList[i];
-      const lp = lpList[i];
-      swapKeyToLp[poolInfo.swapInfo] = lp;
+    const farmUserList = program.account.farmUser.fetchMultiple(farmUserAddressList);
+    for (let i = 0; i < farmAddressList.length; i++) {
+      const farmInfoAddress = farmAddressList[i];
+      const farmUser = farmUserList[i];
+      farmPoolKeyToFarmUser[farmInfoAddress] = farmUser;
     }
 
     return {
-      swapkeyToFarmUser,
+      farmPoolKeyToFarmUser,
     };
   },
 );
 
-export const liquidityProviderAccountReducer = createReducer(initialState, (builder) => {
-  builder.addCase(fetchFarmUserThunk.fulfilled, (state, action) => {
-    state.swapkeyToFarmUser = action.payload.swapkeyToFarmUser;
+export const farmUserReducer = createReducer(initialState, (builder) => {
+  builder.addCase(fetchFarmUsersThunk.fulfilled, (state, action) => {
+    state.farmPoolKeyToFarmUser = action.payload.farmPoolKeyToFarmUser;
   });
 });
