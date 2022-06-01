@@ -9,8 +9,9 @@ import {
   useMediaQuery,
   useTheme,
 } from "@material-ui/core";
-import { TabContext, TabList, TabPanel } from "@material-ui/lab";
 // import { useWallet } from "@solana/wallet-adapter-react";
+
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 import Page from "components/layout/Page";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import PoolCard from "views/Pool/components/Card_v2";
@@ -76,7 +77,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     backgroundColor: palette.background.primary,
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
-    minHeight: 200,
+    minHeight: 120,
   },
   values: {
     display: "flex",
@@ -110,7 +111,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    height: 100,
+    height: 80,
     width: 230,
   },
   tabContext: {
@@ -143,12 +144,14 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
   tabPanel: {
-    padding: 0,
+    "&.MuiTabPanel-root": {
+      padding: 0,
+    },
   },
 }));
-
+// TODO replace value with real data
 const headerData = [
-  { label: "Total Holder", color: "#d4ff00", value: "$2,345" },
+  { label: "Total Holdings", color: "#d4ff00", value: "$2,345" },
   { label: "Total Rewards", color: "#03f2a0", value: "$235" },
   { label: "24hr Performance", color: "#693eff", value: "$212(9%)" },
 ];
@@ -162,25 +165,23 @@ const Home: React.FC = (props) => {
     setTab(newValue);
   };
   const { connected: isConnectedWallet } = useWallet();
-
   const mintToTokenAccountInfo = useSelector(tokenAccountSelector).mintToTokenAccountInfo;
   const swapKeyToLpUser = useSelector(lpUserSelector).swapKeyToLp;
 
   const poolConfigsWithDeposit = poolConfigs.filter((poolConfig) =>
     hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
   );
-
   return (
     <Page>
       <Box padding={0} className={classes.container}>
         {/* TODO: header layout only, fillin data and show header(remove 'display="none !important"') */}
-        <Box color="#fff" textAlign="center" className={classes.header} display="none !important">
+        <Box color="#fff" textAlign="center" className={classes.header}>
           <Box className={classes.valuesCt}>
             <Box className={classes.values}>
               {headerData.map((data, idx) => (
-                <>
+                <Box display="flex" key={idx}>
                   <Box className={classes.value} key={data.label}>
-                    <Box fontSize={14} fontWeight={500} lineHeight="18px">
+                    <Box fontSize={14} fontWeight={400} lineHeight="18px">
                       {data.label}
                     </Box>
                     <Box
@@ -200,7 +201,7 @@ const Home: React.FC = (props) => {
                       className={classes.divider}
                     />
                   )}
-                </>
+                </Box>
               ))}
             </Box>
           </Box>
@@ -222,29 +223,31 @@ const Home: React.FC = (props) => {
             <Divider className={classes.tabDivider} />
 
             <TabPanel value="pool" className={classes.tabPanel}>
-              {isConnectedWallet && (
-                <Grid container className={classes.poolCardContainer} justifyContent="center">
-                  {poolConfigsWithDeposit.length > 0 &&
-                    poolConfigsWithDeposit.map((poolConfig: PoolConfig, idx) => (
-                      <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
-                        <PoolCard
-                          isUserPool={true}
-                          color={
-                            idx % 4 === 0
-                              ? "greenYellow"
-                              : idx % 4 === 1
-                              ? "lime"
-                              : idx % 4 === 2
-                              ? "indigo"
-                              : "dodgerBlue"
-                          }
-                          key={poolConfig.swapInfo}
-                          poolConfig={poolConfig}
-                        />
-                      </Grid>
-                    ))}
-                </Grid>
-              )}
+              <>
+                {isConnectedWallet && (
+                  <Grid container className={classes.poolCardContainer} justifyContent="center">
+                    {poolConfigsWithDeposit.length > 0 &&
+                      poolConfigsWithDeposit.map((poolConfig: PoolConfig, idx) => (
+                        <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+                          <PoolCard
+                            isUserPool={true}
+                            color={
+                              idx % 4 === 0
+                                ? "greenYellow"
+                                : idx % 4 === 1
+                                ? "lime"
+                                : idx % 4 === 2
+                                ? "indigo"
+                                : "dodgerBlue"
+                            }
+                            key={poolConfig.swapInfo}
+                            poolConfig={poolConfig}
+                          />
+                        </Grid>
+                      ))}
+                  </Grid>
+                )}
+              </>
             </TabPanel>
             <TabPanel value="reward" className={classes.tabPanel}>
               <Reward />

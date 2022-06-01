@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { Box, makeStyles, Theme, Link, Divider, CircularProgress } from "@material-ui/core";
+import { makeStyles, Theme, Link, Divider, CircularProgress } from "@material-ui/core";
 import { ConnectButton } from "components";
 import { useModal } from "providers/modal";
 import { ShareDiscord, ShareMedium, ShareTelegram, ShareTwitter } from "components";
 import copy from "copy-to-clipboard";
+import CloseIcon from "@mui/icons-material/Close";
 
 import { sendSignedTransaction } from "utils/transactions";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,6 +29,8 @@ import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
 import { deployConfigV2 } from "constants/deployConfigV2";
+import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
+import styled from "styled-components";
 
 // /*
 //  * mockup test data for reward page
@@ -50,18 +53,27 @@ import { deployConfigV2 } from "constants/deployConfigV2";
 //   },
 // ];
 
-const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
+const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
   root: {
     width: "100%",
     margin: "auto",
+    lineHeight: 1,
   },
   defaultWrapper: {
-    marginTop: 30,
+    marginTop: 20,
     textAlign: "center",
     [breakpoints.down("sm")]: {
       maxWidth: 248,
-      margin: "0 auto",
+      margin: "10px auto",
     },
+  },
+  snackBarContent: {
+    maxWidth: 385,
+    backgroundColor: palette.background.lightBlack,
+    display: "flex",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    flexDirection: "row",
   },
   fontBold: {
     fontWeight: "bold",
@@ -78,9 +90,11 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
   },
   sharePanelRow: {
     display: "flex",
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     flexWrap: "wrap",
+    gap: 16,
   },
   shareLabel: {
     marginRight: spacing(3),
@@ -105,11 +119,9 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     },
   },
   socialLinks: {
-    "& a": {
-      marginRight: spacing(3),
-      [breakpoints.down("sm")]: {
-        marginRight: spacing(1.5),
-      },
+    gap: spacing(3),
+    [breakpoints.down("sm")]: {
+      gap: spacing(1.5),
     },
   },
   inputLink: {
@@ -122,10 +134,13 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     borderRadius: 20,
     flex: 1,
     outline: "none",
+    fontFamily: "Rubik",
+    minWidth: 512,
     [breakpoints.down("sm")]: {
       padding: "12px",
       marginRight: "8px",
       fontSize: "10px",
+      minWidth: "auto",
     },
   },
   SettingUpAccountButton: {
@@ -133,6 +148,9 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     marginRight: 45,
     width: 24,
     height: 24,
+  },
+  snackBarIcon: {
+    marginRight: spacing(2),
   },
   divider: {
     backgroundColor: "rgba(255, 255, 255, 0.3)",
@@ -143,31 +161,34 @@ const useStyles = makeStyles(({ breakpoints, spacing }: Theme) => ({
     margin: "5px 40px",
   },
   rewardBox: {
-    "&.first": {
-      border: "1px solid #D4FF00",
-      color: "#D4FF00",
-    },
-    border: "1px solid #03F2A0",
+    padding: 20,
     background: "#1C1C1C",
     borderRadius: 10,
-    height: 100,
-    width: 200,
-    justifyContent: "center",
+    minWidth: 300,
+    gap: 10,
+    lineHeight: 1.5,
+    justifyContent: "space-between",
     alignItems: "center",
     display: "flex",
     flexDirection: "column",
-    color: "#03F2A0",
+    fontWeight: 500,
+    fontSize: 14,
     "& .label": {
       fontSize: 20,
       fontWeight: 600,
     },
-    "& .value": {
-      fontSize: 14,
-      fontWeight: 500,
-      color: "#d3d3d3",
-    },
   },
 }));
+
+const StyledButton = styled(Button)`
+  padding: 12px 24px;
+  border-radius: 50px;
+  min-width: 180px;
+  &.Mui-disabled {
+    color: inherit;
+    border-color: inherit;
+  }
+`;
 
 const Home: React.FC = (props) => {
   const classes = useStyles(props);
@@ -188,6 +209,8 @@ const Home: React.FC = (props) => {
     claimedRewardFromReferral: string;
     owedRewardFromSwap: string;
     owedRewardFromReferral: string;
+    totalRewardFromSwap: string;
+    totalRewardFromReferral: string;
   } = useMemo(() => {
     const parseRewardBN = (rewardAmount: BN) =>
       exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
@@ -197,6 +220,12 @@ const Home: React.FC = (props) => {
         claimedRewardFromReferral: parseRewardBN(deltafiUser.user.claimedReferralRewards),
         owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedSwapRewards),
         owedRewardFromReferral: parseRewardBN(deltafiUser.user.owedReferralRewards),
+        totalRewardFromSwap: parseRewardBN(
+          deltafiUser.user.owedSwapRewards.add(deltafiUser.user.claimedSwapRewards),
+        ),
+        totalRewardFromReferral: parseRewardBN(
+          deltafiUser.user.owedReferralRewards.add(deltafiUser.user.claimedReferralRewards),
+        ),
       };
     }
 
@@ -205,8 +234,14 @@ const Home: React.FC = (props) => {
       claimedRewardFromReferral: "--",
       owedRewardFromSwap: "--",
       owedRewardFromReferral: "--",
+      totalRewardFromSwap: "--",
+      totalRewardFromReferral: "--",
     };
   }, [deltafiUser]);
+
+  const handleSnackBarClose = useCallback(() => {
+    dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: false }));
+  }, [dispatch]);
 
   useEffect(() => {
     const hasDeltafiUser = deltafiUser?.user != null;
@@ -264,18 +299,18 @@ const Home: React.FC = (props) => {
   }, [dispatch, walletPubkey, signTransaction, program]);
 
   const connection = program.provider.connection;
-  const handleRefresh = useCallback(async () => {
-    dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: true }));
+  // const handleRefresh = useCallback(async () => {
+  //   dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: true }));
 
-    try {
-      await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
-    } catch (e) {
-      console.error(e);
-      // TODO(leqiang): Add error display her
-    } finally {
-      dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: false }));
-    }
-  }, [connection, walletPubkey, dispatch]);
+  //   try {
+  //     await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
+  //   } catch (e) {
+  //     console.error(e);
+  //     // TODO(leqiang): Add error display her
+  //   } finally {
+  //     dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: false }));
+  //   }
+  // }, [connection, walletPubkey, dispatch]);
 
   const handleClaimRewards = useCallback(async () => {
     dispatch(rewardViewActions.setIsClaiming({ isClaiming: true }));
@@ -293,48 +328,120 @@ const Home: React.FC = (props) => {
       const signature = await sendSignedTransaction({ signedTransaction, connection });
       await connection.confirmTransaction(signature, "confirmed");
       await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
+      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: true } }));
     } catch (e) {
       console.error(e);
+      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
       // TODO(leqiang): Add error display here
     } finally {
+      dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(rewardViewActions.setIsClaiming({ isClaiming: false }));
     }
   }, [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction]);
 
-  const refreshButton = useMemo(() => {
-    if (rewardView.isRefreshing) {
+  // const refreshButton = useMemo(() => {
+  //   if (rewardView.isRefreshing) {
+  //     return (
+  //       <Button variant="contained" disabled={true}>
+  //         <CircularProgress color="inherit" />
+  //       </Button>
+  //     );
+  //   }
+  //   return (
+  //     <Button
+  //       variant="contained"
+  //       onClick={handleRefresh}
+  //       disabled={!deltafiUser?.user}
+  //       data-amp-analytics-on="click"
+  //       data-amp-analytics-name="click"
+  //       data-amp-analytics-attrs="page: Reward, target: Refresh"
+  //     >
+  //       Refresh
+  //     </Button>
+  //   );
+  // }, [rewardView, deltafiUser, handleRefresh]);
+
+  const claimLiquidityRewardsButton = useMemo(() => {
+    return (
+      <StyledButton
+        variant="outlined"
+        onClick={() => setMenu(true, "liquidity-reward")}
+        color="inherit"
+        data-amp-analytics-on="click"
+        data-amp-analytics-name="click"
+        data-amp-analytics-attrs="page: Reward, target: claimRewards"
+        fullWidth
+      >
+        <Box
+          fontFamily="Rubik"
+          sx={{ textTransform: "capitalize" }}
+          lineHeight={1}
+          fontSize={16}
+          fontWeight={600}
+        >
+          Claim Rewards
+        </Box>
+      </StyledButton>
+    );
+  }, [setMenu]);
+  const snackMessage = useMemo(() => {
+    if (!rewardView || !rewardView.claimResult) {
+      return "";
+    }
+
+    if (!rewardView.claimResult.status) {
       return (
-        <ConnectButton variant="contained" disabled={true}>
-          <CircularProgress color="inherit" />
-        </ConnectButton>
+        <Box display="flex" alignItems="center">
+          <img
+            src={"/images/snack-fail.svg"}
+            alt="snack-status-icon"
+            className={classes.snackBarIcon}
+          />
+          <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+            Oops, someting went wrong. Please try again or contact us.
+          </Box>
+        </Box>
       );
     }
     return (
-      <ConnectButton
-        variant="contained"
-        onClick={handleRefresh}
-        disabled={!deltafiUser?.user}
-        data-amp-analytics-on="click"
-        data-amp-analytics-name="click"
-        data-amp-analytics-attrs="page: Reward, target: Refresh"
-      >
-        Refresh
-      </ConnectButton>
+      <Box display="flex" alignItems="center">
+        <img
+          src={"/images/snack-success.svg"}
+          alt="snack-status-icon"
+          className={classes.snackBarIcon}
+        />
+        <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+          Your rewards are claim to your wallet successfully{" "}
+        </Box>
+      </Box>
     );
-  }, [rewardView, deltafiUser, handleRefresh]);
+  }, [rewardView, classes.snackBarIcon]);
+
+  const snackAction = useMemo(() => {
+    return (
+      <IconButton
+        size="small"
+        onClick={handleSnackBarClose}
+        sx={{ margionTop: 0.5, color: "#fff" }}
+      >
+        <CloseIcon color="inherit" />
+      </IconButton>
+    );
+  }, [handleSnackBarClose]);
 
   const claimRewardsButton = useMemo(() => {
     if (rewardView.isClaiming) {
       return (
-        <ConnectButton variant="contained" disabled={true}>
-          <CircularProgress color="inherit" />
-        </ConnectButton>
+        <StyledButton color="inherit" variant="outlined" disabled>
+          <CircularProgress size={16} color="inherit" />
+        </StyledButton>
       );
     }
     return (
-      <ConnectButton
-        variant="contained"
+      <StyledButton
+        variant="outlined"
         onClick={handleClaimRewards}
+        color="inherit"
         disabled={
           !deltafiUser?.user?.owedReferralRewards ||
           !deltafiUser?.user?.owedSwapRewards ||
@@ -344,27 +451,31 @@ const Home: React.FC = (props) => {
         data-amp-analytics-name="click"
         data-amp-analytics-attrs="page: Reward, target: claimRewards"
       >
-        Claim Rewards
-      </ConnectButton>
+        <Box
+          fontFamily="Rubik"
+          sx={{ textTransform: "capitalize" }}
+          lineHeight={1}
+          fontSize={16}
+          fontWeight={600}
+        >
+          Claim Rewards
+        </Box>
+      </StyledButton>
     );
   }, [rewardView, deltafiUser, handleClaimRewards]);
 
   return (
     <Box className={classes.root}>
       <Box className={classes.defaultWrapper}>
-        <Box fontSize={20} fontWeight={700} mt={1}>
+        <Box fontSize={20} fontWeight={700}>
           Invite friends, earn crypto together
         </Box>
-        <Box mt={0.5} fontSize={14} fontWeight={400} color="#f6f6f6">
-          {!isConnectedWallet
-            ? "Before referral, you need to connect your wallet"
-            : "Invite your friends to register via your referral link."}
-        </Box>
-
-        {/* Connect Wallet */}
-        {!isConnectedWallet && (
+        {isConnectedWallet || (
           <>
-            <Box mt={5} mb={7.5} flexDirection="column" display="flex" alignItems="center">
+            <Box mt={1} fontSize={14} fontWeight={400} color="#f6f6f6">
+              Before referral, you need to connect your wallet
+            </Box>
+            <Box mt={2} mb={2.5} flexDirection="column" display="flex" alignItems="center">
               <ConnectButton onClick={() => setMenu(true, "connect")}>Connect Wallet</ConnectButton>
             </Box>
             <Divider className={classes.divider} />
@@ -375,11 +486,11 @@ const Home: React.FC = (props) => {
       {/* Send Invitations */}
       {isConnectedWallet && (
         <>
-          <Box mt={5} mb={7.5}>
+          <Box mt={2} mb={2.5}>
             <Box className={classes.sharePanelRow}>
               {referralLinkState === "Unavailable" ? (
                 <input
-                  disabled={true}
+                  disabled
                   placeholder={"Please Create A DELFI Token Account Before Referring Others!"}
                   className={classes.inputLink}
                 />
@@ -420,7 +531,7 @@ const Home: React.FC = (props) => {
                           );
                         }}
                       >
-                        {"Copy Link"}
+                        {"Copy Link and Share"}
                       </ConnectButton>
                     );
                   }
@@ -436,7 +547,6 @@ const Home: React.FC = (props) => {
                   }
                 }
               })()}
-              <Divider className={classes.verticalDiver} orientation="vertical" flexItem />
               <Box display="flex" className={classes.socialLinks}>
                 <Link
                   href="https://twitter.com/deltafi_ai"
@@ -499,47 +609,42 @@ const Home: React.FC = (props) => {
       {/* How to invite friends */}
       <Box className={classes.defaultWrapper}>
         <Box fontSize={20} mb={2} fontWeight={700}>
-          Rewards Summary
+          My Rewards
         </Box>
-        {isConnectedWallet ? (
+        {/* TODO please check and set up the true "no reward" condition */}
+        {isConnectedWallet &&
+        rewardDisplayInfo.totalRewardFromReferral !== "--" &&
+        rewardDisplayInfo.totalRewardFromSwap !== "--" ? (
           <Box>
-            <Box mt={3} fontSize={16} fontWeight={700}>
-              Reward Claimed
-            </Box>
-            <Box mt={2.5} mb={3} display="flex" gridGap={20} justifyContent="center">
-              <Box className={`${classes.rewardBox} first`}>
-                <Box className="label">{rewardDisplayInfo.claimedRewardFromSwap}</Box>
-                <Box className="value" mt={0.5}>
-                  From Swap
+            <Box mt={2} mb={3} display="flex" gap={1.25} justifyContent="center" flexWrap="wrap">
+              <Box className={classes.rewardBox} border="1px solid #03F2A0">
+                <Box color="#03F2A0">LIQUIDITY MINING</Box>
+                <Box>Unclaimed / Total</Box>
+                {/* TODO replace the following value with real LIQUIDITY MINING value  */}
+                <Box lineHeight="24px" display="flex" fontSize={20}>
+                  <Box color="#03F2A0">{rewardDisplayInfo.claimedRewardFromSwap}&nbsp;</Box>
+                  <Box>/ {rewardDisplayInfo.totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
+                <Box color="#03F2A0">{claimLiquidityRewardsButton}</Box>
               </Box>
-              <Box className={classes.rewardBox}>
-                <Box className="label">{rewardDisplayInfo.claimedRewardFromReferral}</Box>
-                <Box className="value" mt={0.5}>
-                  From Referral
+              <Box className={classes.rewardBox} border="1px solid #D4FF00">
+                <Box color="#D4FF00">TRADE FARMING</Box>
+                <Box>Unclaimed / Total</Box>
+                <Box lineHeight="24px" display="flex" fontSize={20}>
+                  <Box color="#D4FF00">{rewardDisplayInfo.claimedRewardFromSwap}&nbsp;</Box>
+                  <Box>/ {rewardDisplayInfo.totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
+                <Box color="#D4FF00">{claimRewardsButton}</Box>
               </Box>
-            </Box>
-            <Box mt={2} fontSize={16} fontWeight={700}>
-              Reward Owed
-            </Box>
-            <Box mt={2.5} display="flex" gridGap={20} justifyContent="center">
-              <Box className={`${classes.rewardBox} first`}>
-                <Box className="label">{rewardDisplayInfo.owedRewardFromSwap}</Box>
-                <Box className="value" mt={0.5}>
-                  From Swap
+              <Box className={classes.rewardBox} border="1px solid #905BFF">
+                <Box color="#905BFF">REGERRAL BONUS</Box>
+                <Box>Unclaimed / Total</Box>
+                <Box lineHeight="24px" display="flex" fontSize={20}>
+                  <Box color="#905BFF">{rewardDisplayInfo.claimedRewardFromReferral}&nbsp;</Box>
+                  <Box>/ {rewardDisplayInfo.totalRewardFromReferral} DELFI</Box>{" "}
                 </Box>
+                <Box color="#905BFF">{claimRewardsButton}</Box>
               </Box>
-              <Box className={classes.rewardBox}>
-                <Box className="label">{rewardDisplayInfo.owedRewardFromReferral}</Box>
-                <Box className="value" mt={0.5}>
-                  From Referral
-                </Box>
-              </Box>
-            </Box>
-            <Box display="flex" gridGap={20} justifyContent="center" mt={3}>
-              <Box>{refreshButton}</Box>
-              <Box>{claimRewardsButton}</Box>
             </Box>
           </Box>
         ) : (
@@ -551,6 +656,23 @@ const Home: React.FC = (props) => {
           </Box>
         )}
       </Box>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={rewardView.openSnackbar}
+        onClose={handleSnackBarClose}
+        key="dashboardSnackbar"
+      >
+        <SnackbarContent
+          aria-describedby="message-id2"
+          className={classes.snackBarContent}
+          message={snackMessage}
+          action={snackAction}
+          sx={{
+            flexWrap: "nowrap",
+            boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.15)",
+          }}
+        />
+      </Snackbar>
     </Box>
   );
 };
