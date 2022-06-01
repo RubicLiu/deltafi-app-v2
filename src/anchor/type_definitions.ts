@@ -66,22 +66,6 @@ export type SwapDirection =
   | { sellBase?: any; sellQuote?: never }
   | { sellBase?: never; sellQuote?: any };
 
-export type AccountType =
-  | { unknown?: any; mapping?: never; product?: never; price?: never }
-  | { unknown?: never; mapping?: any; product?: never; price?: never }
-  | { unknown?: never; mapping?: never; product?: any; price?: never }
-  | { unknown?: never; mapping?: never; product?: never; price?: any };
-
-export type PriceStatus =
-  | { unknown?: any; trading?: never; halted?: never; auction?: never }
-  | { unknown?: never; trading?: any; halted?: never; auction?: never }
-  | { unknown?: never; trading?: never; halted?: any; auction?: never }
-  | { unknown?: never; trading?: never; halted?: never; auction?: any };
-
-export type CorpAction = { noCorpAct?: any };
-
-export type PriceType = { unknown?: any; price?: never } | { unknown?: never; price?: any };
-
 export type SwapType =
   | { normalSwap?: any; stableSwap?: never; serumSwap?: never }
   | { normalSwap?: never; stableSwap?: any; serumSwap?: never }
