@@ -63,8 +63,8 @@ export interface SwapConfig {
 }
 
 export type SwapDirection =
-| { sellBase? : any, sellQuote?: never }
-| { sellBase?: never, sellQuote? : any }
+  | { sellBase?: any; sellQuote?: never }
+  | { sellBase?: never; sellQuote?: any };
 
 export type SwapType =
   | { normalSwap?: any; stableSwap?: never; serumSwap?: never }
