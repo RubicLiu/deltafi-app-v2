@@ -63,18 +63,13 @@ export interface SwapConfig {
 }
 
 export type SwapDirection =
-| { sellBase? : any, sellQuote?: never }
-| { sellBase?: never, sellQuote? : any }
+  | { sellBase?: any; sellQuote?: never }
+  | { sellBase?: never; sellQuote?: any };
 
-<<<<<<< HEAD
-=======
-
->>>>>>> bb16104 (x)
 export type SwapType =
-| { normalSwap? : any, stableSwap?: never, serumSwap?: never }
-| { normalSwap?: never, stableSwap? : any, serumSwap?: never }
-| { normalSwap?: never, stableSwap?: never, serumSwap? : any }
-
+  | { normalSwap?: any; stableSwap?: never; serumSwap?: never }
+  | { normalSwap?: never; stableSwap?: any; serumSwap?: never }
+  | { normalSwap?: never; stableSwap?: never; serumSwap?: any };
 
 export interface DeltafiUser {
   bump: number;
