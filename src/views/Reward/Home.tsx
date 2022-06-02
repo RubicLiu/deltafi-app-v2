@@ -24,7 +24,7 @@ import {
   createClaimSwapRewardsTransaction,
   createDeltafiUserTransaction,
 } from "utils/transactions/deltafiUser";
-import { DELTAFI_TOKEN_DECIMALS } from "constants/index";
+import { BLOG_LINK, DELTAFI_TOKEN_DECIMALS, DISCORD_LINK, TWITTER_LINK } from "constants/index";
 import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
@@ -549,7 +549,7 @@ const Home: React.FC = (props) => {
               })()}
               <Box display="flex" className={classes.socialLinks}>
                 <Link
-                  href="https://twitter.com/deltafi_ai"
+                  href={TWITTER_LINK}
                   target="_blank"
                   rel="noreferrer noopener"
                   data-amp-analytics-on="click"
@@ -560,7 +560,7 @@ const Home: React.FC = (props) => {
                 </Link>
 
                 <Link
-                  href="https://discord.gg/deltafi"
+                  href={DISCORD_LINK}
                   target="_blank"
                   rel="noreferrer noopener"
                   data-amp-analytics-on="click"
@@ -580,7 +580,7 @@ const Home: React.FC = (props) => {
                 <ShareGithub className={classes.shareButton} />
               </Link> */}
                 <Link
-                  href="https://medium.com/deltafi"
+                  href={BLOG_LINK}
                   target="_blank"
                   rel="noreferrer noopener"
                   data-amp-analytics-on="click"
@@ -590,7 +590,7 @@ const Home: React.FC = (props) => {
                   <ShareMedium className={classes.shareButton} />
                 </Link>
                 <Link
-                  href="https://t.me/deltafi_ai"
+                  href={TWITTER_LINK}
                   target="_blank"
                   rel="noreferrer noopener"
                   data-amp-analytics-on="click"
