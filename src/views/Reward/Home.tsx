@@ -24,7 +24,7 @@ import {
   createClaimSwapRewardsTransaction,
   createDeltafiUserTransaction,
 } from "utils/transactions/deltafiUser";
-import { BLOG_LINK, DELTAFI_TOKEN_DECIMALS, DISCORD_LINK, TWITTER_LINK } from "constants/index";
+import { BLOG_LINK, DELTAFI_TOKEN_DECIMALS, DISCORD_LINK, TELEGRAM_LINK, TWITTER_LINK } from "constants/index";
 import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
@@ -590,7 +590,7 @@ const Home: React.FC = (props) => {
                   <ShareMedium className={classes.shareButton} />
                 </Link>
                 <Link
-                  href={TWITTER_LINK}
+                  href={TELEGRAM_LINK}
                   target="_blank"
                   rel="noreferrer noopener"
                   data-amp-analytics-on="click"

@@ -1,6 +1,6 @@
 import { Theme, makeStyles, Typography, Box, Link } from "@material-ui/core";
 import Page from "components/layout/Page";
-import { BLOG_LINK, DISCORD_LINK, TWITTER_LINK } from "constants/index";
+import { BLOG_LINK, DISCORD_LINK, TELEGRAM_LINK, TWITTER_LINK } from "constants/index";
 
 import "typeface-rubik";
 
@@ -76,7 +76,7 @@ const Home: React.FC = (props) => {
           <img src={"images/discord.svg"} alt="" />
         </Link>
         <Link
-          href={TWITTER_LINK}
+          href={TELEGRAM_LINK}
           target="_blank"
           rel="noreferrer noopener"
           data-amp-analytics-on="click"
@@ -131,7 +131,7 @@ export const FarmUnavailable: React.FC = (props) => {
           <img src={"images/discord.svg"} alt="" />
         </Link>
         <Link
-          href={TWITTER_LINK}
+          href={TELEGRAM_LINK}
           target="_blank"
           rel="noreferrer noopener"
           data-amp-analytics-on="click"
