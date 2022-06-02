@@ -1,4 +1,10 @@
-import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+import {
+  Connection,
+  PublicKey,
+  SystemProgram,
+  SYSVAR_RENT_PUBKEY,
+  Transaction,
+} from "@solana/web3.js";
 import { partialSignTransaction } from ".";
 import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
 import { BN } from "@project-serum/anchor";
@@ -9,7 +15,7 @@ export async function createUpdateStakeTransaction(
   program: any,
   connection: Connection,
   poolConfig: PoolConfig,
-  farmInfo: string,
+  farmInfoAddress: string,
   walletPubkey: PublicKey,
   farmUser: FarmUser,
   targetBaseAmount: BN,
@@ -24,10 +30,31 @@ export async function createUpdateStakeTransaction(
     program.programId,
   );
 
+  const [farmUserPubKey, bump] = await PublicKey.findProgramAddress(
+    [Buffer.from("FarmUser"), new PublicKey(farmInfoAddress).toBuffer(), walletPubkey.toBuffer()],
+    program.programId,
+  );
+
   let transaction = new Transaction();
 
-  const baseDiff = targetBaseAmount.sub(farmUser.basePosition.depositedAmount);
-  const quoteDiff = targetQuoteAmount.sub(farmUser.quotePosition.depositedAmount);
+  if (!farmUser) {
+    transaction.add(
+      program.transaction.createFarmUser(bump, {
+        accounts: {
+          marketConfig: new PublicKey(deployConfigV2.marketConfig),
+          swapInfo: new PublicKey(poolConfig.swapInfo),
+          farmInfo: new PublicKey(farmInfoAddress),
+          farmUser: farmUserPubKey,
+          owner: walletPubkey,
+          systemProgram: SystemProgram.programId,
+          rent: SYSVAR_RENT_PUBKEY,
+        },
+      }),
+    );
+  }
+
+  const baseDiff = targetBaseAmount.sub(farmUser?.basePosition.depositedAmount || new BN(0));
+  const quoteDiff = targetQuoteAmount.sub(farmUser?.quotePosition.depositedAmount || new BN(0));
 
   const baseDiffPositive = baseDiff.cmp(new BN(0)) > 0;
   const quoteDiffPositive = quoteDiff.cmp(new BN(0)) > 0;
@@ -39,9 +66,10 @@ export async function createUpdateStakeTransaction(
       program.transaction.depositToFarm(baseAmount, quoteAmount, {
         accounts: {
           marketConfig: new PublicKey(deployConfigV2.marketConfig),
-          farmInfo: new PublicKey(farmInfo),
+          farmInfo: new PublicKey(farmInfoAddress),
           swapInfo: new PublicKey(poolConfig.swapInfo),
           liquidityProvider: lpPublicKey,
+          farmUser: farmUserPubKey,
           owner: walletPubkey,
         },
       }),
@@ -58,9 +86,10 @@ export async function createUpdateStakeTransaction(
       program.transaction.withdrawFromFarm(baseAmount, quoteAmount, {
         accounts: {
           marketConfig: new PublicKey(deployConfigV2.marketConfig),
-          farmInfo: new PublicKey(farmInfo),
+          farmInfo: new PublicKey(farmInfoAddress),
           swapInfo: new PublicKey(poolConfig.swapInfo),
           liquidityProvider: lpPublicKey,
+          farmUser: farmUserPubKey,
           owner: walletPubkey,
         },
       }),

@@ -15,6 +15,7 @@ const initialState = {
   transactionResult: null,
   openSnackbar: false,
   stake: {
+    isStake: true,
     baseBalance: new BigNumber("0"),
     quoteBalance: new BigNumber("0"),
     baseStaked: new BigNumber("0"),
@@ -58,6 +59,15 @@ const stakeViewSlice = createSlice({
       state.stake.percentage = 0;
       state.stake.baseAmount = "0";
       state.stake.quoteAmount = "0";
+    },
+
+    setIsStake(
+      state,
+      action: PayloadAction<{ isStake: boolean; baseBalance: BigNumber; quoteBalance: BigNumber }>,
+    ) {
+      state.stake.isStake = action.payload.isStake;
+      state.stake.baseBalance = action.payload.baseBalance;
+      state.stake.quoteBalance = action.payload.quoteBalance;
     },
 
     setTransactionResult(state, action: PayloadAction<{ transactionResult: TransactionResult }>) {

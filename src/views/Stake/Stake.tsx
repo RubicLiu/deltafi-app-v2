@@ -41,6 +41,8 @@ import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { anchorBnToBn, bnToString, stringToAnchorBn } from "utils/tokenUtils";
+import { useLocation } from "react-router";
+import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 
 const SECONDS_OF_YEAR = 31556926;
 
@@ -68,6 +70,7 @@ const getUnclaimedReward = (
 const Stake = (): ReactElement => {
   const classes = useStyles();
   const { setMenu } = useModal();
+  const location = useLocation();
   const farmPoolId = location.pathname.split("/").pop();
   const farmPool = useSelector(selectFarmByFarmKey(farmPoolId));
   const poolConfig = getPoolConfigByFarmKey(farmPoolId);
@@ -109,19 +112,29 @@ const Stake = (): ReactElement => {
     new BigNumber(farmPool?.farmConfig.quoteAprDenominator.toString()),
   );
 
-  const [userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote] = useMemo(() => {
+  const [userBaseStaked, userQuoteStaked] = useMemo(() => {
     if (farmUser) {
       const baseTokenInfo = poolConfig.baseTokenInfo;
       const quoteTokenInfo = poolConfig.quoteTokenInfo;
       return [
         anchorBnToBn(baseTokenInfo, farmUser.basePosition.depositedAmount),
         anchorBnToBn(quoteTokenInfo, farmUser.quotePosition.depositedAmount),
+      ];
+    }
+    return [new BigNumber(0), new BigNumber(0)];
+  }, [farmUser, poolConfig]);
+
+  const [userTotalBase, userTotalQuote] = useMemo(() => {
+    if (lpUser) {
+      const baseTokenInfo = poolConfig.baseTokenInfo;
+      const quoteTokenInfo = poolConfig.quoteTokenInfo;
+      return [
         anchorBnToBn(baseTokenInfo, lpUser.baseShare.add(lpUser.stakedBaseShare)),
         anchorBnToBn(quoteTokenInfo, lpUser.quoteShare.add(lpUser.stakedQuoteShare)),
       ];
     }
-    return [new BigNumber(0), new BigNumber(0), new BigNumber(0), new BigNumber(0)];
-  }, [farmUser, poolConfig]);
+    return [new BigNumber(0), new BigNumber(0)];
+  }, [lpUser, poolConfig]);
 
   useEffect(() => {
     if (poolConfig) {
@@ -252,7 +265,6 @@ const Stake = (): ReactElement => {
         signedTransaction,
         connection,
       });
-
       await connection.confirmTransaction(hash, "confirmed");
 
       dispatch(
@@ -283,9 +295,20 @@ const Stake = (): ReactElement => {
       );
       dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
+      dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
       dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
     }
-  }, [walletPubkey, staking, signTransaction, dispatch, poolConfig, lpUser, program]);
+  }, [
+    walletPubkey,
+    staking,
+    signTransaction,
+    dispatch,
+    poolConfig,
+    lpUser,
+    program,
+    farmPoolId,
+    farmUser,
+  ]);
 
   const handleClaim = useCallback(async () => {
     if (!walletPubkey || !lpUser || !rewardsAccount || !program) {
@@ -333,7 +356,16 @@ const Stake = (): ReactElement => {
       dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: false }));
       dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
     }
-  }, [walletPubkey, signTransaction, dispatch, poolConfig, lpUser, rewardsAccount, program]);
+  }, [
+    walletPubkey,
+    signTransaction,
+    dispatch,
+    poolConfig,
+    lpUser,
+    rewardsAccount,
+    program,
+    farmPoolId,
+  ]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: false }));
@@ -499,7 +531,6 @@ const Stake = (): ReactElement => {
         <Box mb={1}>
           <Slider value={percentage} onChange={setStakePercentage} />
         </Box>
-
         {
           <Box display="flex" flexDirection="column" alignItems="flex-end">
             <StakeCard

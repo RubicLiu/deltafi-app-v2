@@ -11,6 +11,7 @@ export interface SettingsProps {
 }
 
 export interface StakeCard {
+  isStake: boolean;
   baseBalance: BigNumber;
   quoteBalance: BigNumber;
   baseStaked: BigNumber;
