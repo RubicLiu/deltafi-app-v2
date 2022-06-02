@@ -4,7 +4,7 @@ import { deployConfigV2 } from "constants/deployConfigV2";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { LiquidityProvider } from "anchor/type_definitions";
 
-export type SwapPoolKeyToLp = Record<string, LiquidityProvider>;
+type SwapPoolKeyToLp = Record<string, LiquidityProvider>;
 
 export interface LiquidityProviderState {
   swapKeyToLp: SwapPoolKeyToLp;

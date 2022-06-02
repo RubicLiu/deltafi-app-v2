@@ -2,8 +2,15 @@ import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { deployConfigV2 } from "constants/deployConfigV2";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { FarmInfo } from "anchor/type_definitions";
 
-const initialState = {
+type FarmPoolKeyToFarm = Record<string, FarmInfo>;
+
+export interface FarmState {
+  farmKeyToFarmInfo: FarmPoolKeyToFarm;
+}
+
+const initialState: FarmState = {
   farmKeyToFarmInfo: {},
 };
 
