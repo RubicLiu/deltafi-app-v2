@@ -289,7 +289,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
         <ConnectButton
           className={classes.cardBtn}
           onClick={() => {
-            history.push(`/stake/${farmInfoAddress}`)
+            history.push(`/stake/${farmInfoAddress}`);
           }}
           variant={"outlined"}
           data-amp-analytics-on="click"

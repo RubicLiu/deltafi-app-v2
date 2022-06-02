@@ -245,8 +245,8 @@ const Stake = (): ReactElement => {
     }
 
     const connection = program.provider.connection;
-    dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
     try {
+      dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
       const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, staking.baseAmount);
       const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, staking.quoteAmount);
       const transaction = await createUpdateStakeTransaction(
@@ -278,6 +278,7 @@ const Stake = (): ReactElement => {
         }),
       );
     } catch (e) {
+      console.error(e);
       dispatch(
         stakeViewActions.setTransactionResult({
           transactionResult: {
@@ -316,8 +317,8 @@ const Stake = (): ReactElement => {
     }
 
     const connection = program.provider.connection;
+    dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: true }));
     try {
-      dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: true }));
       const transaction = await createClaimFarmRewardsTransaction(
         program,
         connection,
@@ -350,6 +351,7 @@ const Stake = (): ReactElement => {
         }),
       );
     } catch (e) {
+      console.error(e);
       dispatch(stakeViewActions.setTransactionResult({ transactionResult: { status: false } }));
     } finally {
       dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));

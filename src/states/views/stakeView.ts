@@ -79,7 +79,7 @@ const stakeViewSlice = createSlice({
     },
 
     setIsProcessingClaim(state, action: PayloadAction<{ isProcessingClaim: boolean }>) {
-      state.isProcessingStake = action.payload.isProcessingClaim;
+      state.isProcessingClaim = action.payload.isProcessingClaim;
     },
 
     setOpenSnackbar(state, action: PayloadAction<{ openSnackbar: boolean }>) {

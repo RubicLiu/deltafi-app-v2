@@ -15,7 +15,7 @@ export async function createUpdateStakeTransaction(
   program: any,
   connection: Connection,
   poolConfig: PoolConfig,
-  farmInfoAddress: string,
+  farmInfo: string,
   walletPubkey: PublicKey,
   farmUser: FarmUser,
   targetBaseAmount: BN,
@@ -31,7 +31,7 @@ export async function createUpdateStakeTransaction(
   );
 
   const [farmUserPubKey, bump] = await PublicKey.findProgramAddress(
-    [Buffer.from("FarmUser"), new PublicKey(farmInfoAddress).toBuffer(), walletPubkey.toBuffer()],
+    [Buffer.from("FarmUser"), new PublicKey(farmInfo).toBuffer(), walletPubkey.toBuffer()],
     program.programId,
   );
 
@@ -43,7 +43,7 @@ export async function createUpdateStakeTransaction(
         accounts: {
           marketConfig: new PublicKey(deployConfigV2.marketConfig),
           swapInfo: new PublicKey(poolConfig.swapInfo),
-          farmInfo: new PublicKey(farmInfoAddress),
+          farmInfo: new PublicKey(farmInfo),
           farmUser: farmUserPubKey,
           owner: walletPubkey,
           systemProgram: SystemProgram.programId,
@@ -66,7 +66,7 @@ export async function createUpdateStakeTransaction(
       program.transaction.depositToFarm(baseAmount, quoteAmount, {
         accounts: {
           marketConfig: new PublicKey(deployConfigV2.marketConfig),
-          farmInfo: new PublicKey(farmInfoAddress),
+          farmInfo: new PublicKey(farmInfo),
           swapInfo: new PublicKey(poolConfig.swapInfo),
           liquidityProvider: lpPublicKey,
           farmUser: farmUserPubKey,
@@ -86,7 +86,7 @@ export async function createUpdateStakeTransaction(
       program.transaction.withdrawFromFarm(baseAmount, quoteAmount, {
         accounts: {
           marketConfig: new PublicKey(deployConfigV2.marketConfig),
-          farmInfo: new PublicKey(farmInfoAddress),
+          farmInfo: new PublicKey(farmInfo),
           swapInfo: new PublicKey(poolConfig.swapInfo),
           liquidityProvider: lpPublicKey,
           farmUser: farmUserPubKey,
@@ -105,86 +105,6 @@ export async function createUpdateStakeTransaction(
   });
 }
 
-export async function createStakeTransaction(
-  program: any,
-  connection: Connection,
-  poolConfig: PoolConfig,
-  farmInfo: string,
-  walletPubkey: PublicKey,
-  baseAmount: BN,
-  qouteAmount: BN,
-) {
-  const [lpPublicKey] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from("LiquidityProvider"),
-      new PublicKey(poolConfig.swapInfo).toBuffer(),
-      walletPubkey.toBuffer(),
-    ],
-    program.programId,
-  );
-
-  let transaction = new Transaction();
-  transaction.add(
-    program.transaction.depositToFarm(baseAmount, qouteAmount, {
-      accounts: {
-        marketConfig: new PublicKey(deployConfigV2.marketConfig),
-        farmInfo: new PublicKey(farmInfo),
-        swapInfo: new PublicKey(poolConfig.swapInfo),
-        liquidityProvider: lpPublicKey,
-        owner: walletPubkey,
-      },
-    }),
-  );
-
-  const signers = [];
-  return partialSignTransaction({
-    transaction,
-    feePayer: walletPubkey,
-    signers,
-    connection,
-  });
-}
-
-export async function createUnstakeTransaction(
-  program: any,
-  connection: Connection,
-  poolConfig: PoolConfig,
-  farmInfo: string,
-  walletPubkey: PublicKey,
-  baseAmount: BN,
-  qouteAmount: BN,
-) {
-  const [lpPublicKey] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from("LiquidityProvider"),
-      new PublicKey(poolConfig.swapInfo).toBuffer(),
-      walletPubkey.toBuffer(),
-    ],
-    program.programId,
-  );
-
-  let transaction = new Transaction();
-  transaction.add(
-    program.transaction.withdrawFromFarm(baseAmount, qouteAmount, {
-      accounts: {
-        marketConfig: new PublicKey(deployConfigV2.marketConfig),
-        farmInfo: new PublicKey(farmInfo),
-        swapInfo: new PublicKey(poolConfig.swapInfo),
-        liquidityProvider: lpPublicKey,
-        owner: walletPubkey,
-      },
-    }),
-  );
-
-  const signers = [];
-  return partialSignTransaction({
-    transaction,
-    feePayer: walletPubkey,
-    signers,
-    connection,
-  });
-}
-
 export async function createClaimFarmRewardsTransaction(
   program: any,
   connection: Connection,
@@ -193,12 +113,8 @@ export async function createClaimFarmRewardsTransaction(
   walletPubkey: PublicKey,
   userDeltafiToken: PublicKey,
 ) {
-  const [lpPublicKey] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from("LiquidityProvider"),
-      new PublicKey(poolConfig.swapInfo).toBuffer(),
-      walletPubkey.toBuffer(),
-    ],
+  const [farmUserPubKey] = await PublicKey.findProgramAddress(
+    [Buffer.from("FarmUser"), new PublicKey(farmInfo).toBuffer(), walletPubkey.toBuffer()],
     program.programId,
   );
 
@@ -209,7 +125,7 @@ export async function createClaimFarmRewardsTransaction(
         marketConfig: new PublicKey(deployConfigV2.marketConfig),
         farmInfo: new PublicKey(farmInfo),
         swapInfo: new PublicKey(poolConfig.swapInfo),
-        liquidityProvider: lpPublicKey,
+        farmUser: farmUserPubKey,
         userDeltafiToken,
         swapDeltafiToken: new PublicKey(deployConfigV2.deltafiToken),
         owner: walletPubkey,
