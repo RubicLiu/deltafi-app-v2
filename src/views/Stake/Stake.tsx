@@ -356,7 +356,7 @@ const Stake = (): ReactElement => {
     } finally {
       dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: false }));
-      dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
+      dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
     }
   }, [
     walletPubkey,
@@ -453,17 +453,7 @@ const Stake = (): ReactElement => {
             <CloseIcon />
           </IconButton>
         </Box>
-        {/* <Box display="flex" justifyContent="space-between" pb={2}>
-          <Typography variant="h6">{poolConfig.name} LP Token Staking</Typography>
-          <Box className={classes.iconGroup}>
-            <img
-              src={baseTokenInfo.logoURI}
-              alt="staking-coin"
-              className={clx(classes.coinIcon, classes.firstCoin)}
-            />
-            <img src={quoteTokenInfo.logoURI} alt="earning-coin" className={classes.coinIcon} />
-          </Box>
-        </Box> */}
+        ∂
         <Box display="flex" justifyContent="space-between" mt={4} pb={4}>
           <Box>
             <Typography>Total Staked {baseTokenInfo.symbol}</Typography>
