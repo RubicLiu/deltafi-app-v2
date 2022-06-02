@@ -14,6 +14,8 @@ export interface PoolState {
   accumulatedTradeReward: anchor.BN;
   lastRewardWindowStartTimestamp: anchor.BN;
   marketPriceLastUpdateSlot: anchor.BN;
+  lowPrice: anchor.BN;
+  highPrice: anchor.BN;
   reservedU64: Array<any>;
 }
 
@@ -33,6 +35,9 @@ export interface FarmConfig {
   quoteAprDenominator: anchor.BN;
   minClaimPeriod: number;
   isPaused: boolean;
+  maxStakedBaseShare: anchor.BN;
+  maxStakedQuoteShare: anchor.BN;
+  endTimestamp: anchor.BN;
   reservedU64: Array<any>;
 }
 

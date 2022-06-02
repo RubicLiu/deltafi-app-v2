@@ -550,6 +550,14 @@ export type DeltafiDexV2 = {
         {
           "name": "quoteAmount",
           "type": "u64"
+        },
+        {
+          "name": "minBaseShare",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteShare",
+          "type": "u64"
         }
       ]
     },
@@ -614,6 +622,97 @@ export type DeltafiDexV2 = {
         },
         {
           "name": "quoteAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minBaseShare",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteShare",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositToSerumSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityProvider",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "serumMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "baseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "quoteAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minBaseShare",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteShare",
           "type": "u64"
         }
       ]
@@ -690,6 +789,14 @@ export type DeltafiDexV2 = {
         {
           "name": "quoteShare",
           "type": "u64"
+        },
+        {
+          "name": "minBaseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteAmount",
+          "type": "u64"
         }
       ]
     },
@@ -764,6 +871,107 @@ export type DeltafiDexV2 = {
         },
         {
           "name": "quoteShare",
+          "type": "u64"
+        },
+        {
+          "name": "minBaseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawFromSerumSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityProvider",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "serumMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "adminFeeTokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminFeeTokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "baseShare",
+          "type": "u64"
+        },
+        {
+          "name": "quoteShare",
+          "type": "u64"
+        },
+        {
+          "name": "minBaseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteAmount",
           "type": "u64"
         }
       ]
@@ -1833,6 +2041,14 @@ export type DeltafiDexV2 = {
             "type": "u64"
           },
           {
+            "name": "lowPrice",
+            "type": "u128"
+          },
+          {
+            "name": "highPrice",
+            "type": "u128"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -1904,6 +2120,18 @@ export type DeltafiDexV2 = {
           {
             "name": "isPaused",
             "type": "bool"
+          },
+          {
+            "name": "maxStakedBaseShare",
+            "type": "u64"
+          },
+          {
+            "name": "maxStakedQuoteShare",
+            "type": "u64"
+          },
+          {
+            "name": "endTimestamp",
+            "type": "u64"
           },
           {
             "name": "reservedU64",
@@ -2394,6 +2622,11 @@ export type DeltafiDexV2 = {
       "code": 6067,
       "name": "InvalidPythPriceAccount",
       "msg": "Invalid pyth price account"
+    },
+    {
+      "code": 6068,
+      "name": "InvalidSerumMarketTokenRatio",
+      "msg": "InvalidSerumMarketTokenRatio"
     }
   ]
 };
@@ -2950,6 +3183,14 @@ export const IDL: DeltafiDexV2 = {
         {
           "name": "quoteAmount",
           "type": "u64"
+        },
+        {
+          "name": "minBaseShare",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteShare",
+          "type": "u64"
         }
       ]
     },
@@ -3014,6 +3255,97 @@ export const IDL: DeltafiDexV2 = {
         },
         {
           "name": "quoteAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minBaseShare",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteShare",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "depositToSerumSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityProvider",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "serumMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "baseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "quoteAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minBaseShare",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteShare",
           "type": "u64"
         }
       ]
@@ -3090,6 +3422,14 @@ export const IDL: DeltafiDexV2 = {
         {
           "name": "quoteShare",
           "type": "u64"
+        },
+        {
+          "name": "minBaseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteAmount",
+          "type": "u64"
         }
       ]
     },
@@ -3164,6 +3504,107 @@ export const IDL: DeltafiDexV2 = {
         },
         {
           "name": "quoteShare",
+          "type": "u64"
+        },
+        {
+          "name": "minBaseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawFromSerumSwap",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "swapInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityProvider",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "serumMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumBids",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "serumAsks",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "adminFeeTokenBase",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminFeeTokenQuote",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "baseShare",
+          "type": "u64"
+        },
+        {
+          "name": "quoteShare",
+          "type": "u64"
+        },
+        {
+          "name": "minBaseAmount",
+          "type": "u64"
+        },
+        {
+          "name": "minQuoteAmount",
           "type": "u64"
         }
       ]
@@ -4233,6 +4674,14 @@ export const IDL: DeltafiDexV2 = {
             "type": "u64"
           },
           {
+            "name": "lowPrice",
+            "type": "u128"
+          },
+          {
+            "name": "highPrice",
+            "type": "u128"
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
@@ -4304,6 +4753,18 @@ export const IDL: DeltafiDexV2 = {
           {
             "name": "isPaused",
             "type": "bool"
+          },
+          {
+            "name": "maxStakedBaseShare",
+            "type": "u64"
+          },
+          {
+            "name": "maxStakedQuoteShare",
+            "type": "u64"
+          },
+          {
+            "name": "endTimestamp",
+            "type": "u64"
           },
           {
             "name": "reservedU64",
@@ -4794,6 +5255,11 @@ export const IDL: DeltafiDexV2 = {
       "code": 6067,
       "name": "InvalidPythPriceAccount",
       "msg": "Invalid pyth price account"
+    },
+    {
+      "code": 6068,
+      "name": "InvalidSerumMarketTokenRatio",
+      "msg": "InvalidSerumMarketTokenRatio"
     }
   ]
 };
