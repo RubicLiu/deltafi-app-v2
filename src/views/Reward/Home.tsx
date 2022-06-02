@@ -14,6 +14,8 @@ import {
   programSelector,
   rewardViewSelector,
   selectTokenAccountInfoByMint,
+  farmUserSelector,
+  farmSelector,
 } from "states/selectors";
 import { rewardViewActions } from "states/views/rewardView";
 import {
@@ -28,6 +30,7 @@ import {
   BLOG_LINK,
   DELTAFI_TOKEN_DECIMALS,
   DISCORD_LINK,
+  SECONDS_PER_YEAR,
   TELEGRAM_LINK,
   TWITTER_LINK,
 } from "constants/index";
@@ -37,6 +40,8 @@ import { exponentiatedBy } from "utils/decimal";
 import { deployConfigV2 } from "constants/deployConfigV2";
 import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import styled from "styled-components";
+import { FarmUser, FarmInfo } from "anchor/type_definitions";
+import { anchorBnToBn } from "utils/tokenUtils";
 
 // /*
 //  * mockup test data for reward page
@@ -206,9 +211,90 @@ const Home: React.FC = (props) => {
 
   const rewardView = useSelector(rewardViewSelector);
   const deltafiUser = useSelector(deltafiUserSelector);
+
+  const farmPoolKeyToFarmUser = useSelector(farmUserSelector);
+  const farmKeyToFarmInfo = useSelector(farmSelector);
+
   const userDeltafiToken = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
   const referralLinkState = rewardView.referralLinkState;
   const referralLink = rewardView.referralLink;
+
+  const getUntrackedReward = (
+    currentTs: number,
+    lastUpdateTs: number,
+    apr: BigNumber,
+    depositAmount: BigNumber,
+  ) => {
+    if (lastUpdateTs >= currentTs) {
+      return new BigNumber(0);
+    }
+    return depositAmount
+      .multipliedBy(apr)
+      .multipliedBy(currentTs - lastUpdateTs)
+      .dividedBy(SECONDS_PER_YEAR);
+  };
+
+  const { owedFarmReward, totalFarmReward } = useMemo(() => {
+    let owedFarmReward = new BigNumber(0);
+    let claimedFarmReward = new BigNumber(0);
+
+    for (const farmPoolKey in farmPoolKeyToFarmUser) {
+      const farmUser = farmPoolKeyToFarmUser[farmPoolKey];
+      if (!farmUser) {
+        continue;
+      }
+      const farmInfo = farmKeyToFarmInfo[farmPoolKey];
+
+      const baseApr = new BigNumber(farmInfo.farmConfig.baseAprNumerator.toString()).dividedBy(
+        farmInfo.farmConfig.baseAprDenominator.toString(),
+      );
+      const quoteApr = new BigNumber(farmInfo.farmConfig.quoteAprNumerator.toString()).dividedBy(
+        farmInfo.farmConfig.quoteAprDenominator.toString(),
+      );
+
+      const owedBaseReward = exponentiatedBy(
+        farmUser.basePosition.rewardsOwed.toString(),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+      const unTrackedBaseReward = getUntrackedReward(
+        rewardView.rewardRefreshTs,
+        farmUser.basePosition.lastUpdateTs.toNumber(),
+        baseApr,
+        exponentiatedBy(farmUser.basePosition.depositedAmount.toString(), DELTAFI_TOKEN_DECIMALS),
+      );
+      const claimedBaseReward = exponentiatedBy(
+        farmUser.basePosition.cumulativeInterest.toString(),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+
+      const owedQuoteReward = exponentiatedBy(
+        farmUser.quotePosition.rewardsOwed.toString(),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+      const unTrackedQuoteReward = getUntrackedReward(
+        rewardView.rewardRefreshTs,
+        farmUser.quotePosition.lastUpdateTs.toNumber(),
+        quoteApr,
+        exponentiatedBy(farmUser.quotePosition.depositedAmount.toString(), DELTAFI_TOKEN_DECIMALS),
+      );
+      const claimedQuoteReward = exponentiatedBy(
+        farmUser.quotePosition.cumulativeInterest.toString(),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+
+      owedFarmReward = owedFarmReward
+        .plus(owedBaseReward)
+        .plus(owedQuoteReward)
+        .plus(unTrackedBaseReward)
+        .plus(unTrackedQuoteReward);
+      claimedFarmReward = claimedFarmReward.plus(claimedBaseReward).plus(claimedQuoteReward);
+    }
+
+    return {
+      owedFarmReward,
+      totalFarmReward: owedFarmReward.plus(claimedFarmReward)
+    }
+  }, [farmPoolKeyToFarmUser]);
 
   const rewardDisplayInfo: {
     claimedRewardFromSwap: string;

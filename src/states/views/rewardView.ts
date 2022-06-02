@@ -7,6 +7,7 @@ const initialState = {
   isClaiming: false,
   openSnackbar: false,
   claimResult: null,
+  rewardRefreshTs: Math.floor(Date.now() / 1000),
 };
 
 const rewardViewSlice = createSlice({
@@ -35,6 +36,10 @@ const rewardViewSlice = createSlice({
 
     setOpenSnackbar(state, action: PayloadAction<{ openSnackbar: boolean }>) {
       state.openSnackbar = action.payload.openSnackbar;
+    },
+
+    updateRefreshTs(state) {
+      state.rewardRefreshTs = Math.floor(Date.now() / 1000);
     },
   },
 });
