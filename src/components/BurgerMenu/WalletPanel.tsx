@@ -1,13 +1,16 @@
-import { useCallback } from "react";
+import { forwardRef, useCallback, useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { /*Avatar,*/ Box, /*Divider,*/ makeStyles, Theme } from "@material-ui/core";
+import { Divider, makeStyles, Theme } from "@material-ui/core";
 import styled from "styled-components";
 import { CopyAddressIcon } from "components";
 import { useModal } from "providers/modal";
 import { CheckOutlined } from "@material-ui/icons";
-import Reset from "components/Svg/icons/Reset";
-// import CompareArrows from "components/Svg/icons/CompareArrows";
-// import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+// import Reset from "components/Svg/icons/Reset";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
+import { Avatar, Box, Fade } from "@mui/material";
+import CompareArrows from "components/Svg/icons/CompareArrows";
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   sectionDesktop: {
@@ -40,6 +43,10 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     width: "22px",
     marginRight: 16,
     marginLeft: "auto",
+    color: "#D4FF00",
+    "&:hover": {
+      cursor: "pointer",
+    },
   },
   root: {
     backgroundColor: "#3c3c3c",
@@ -49,10 +56,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   },
   check: {
     color: "#D4FF00",
-  },
-  avatar: {
-    width: 14,
-    height: 14,
   },
 }));
 
@@ -71,20 +74,44 @@ const Img = styled.img`
   }
 `;
 
-// const StyledDivider = styled(Divider)`
-//   margin: 16px 0;
-//   background: #313131;
-// `;
+const StyledDivider = styled(Divider)`
+  margin: 16px 0;
+  background: #313131;
+`;
+
+const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
+  return (
+    <MuiAlert
+      elevation={6}
+      ref={ref}
+      variant="filled"
+      {...props}
+      sx={{ position: "fixed", top: 20, backgroundColor: "#d4ff00", color: "#333" }}
+    />
+  );
+});
+
+const swapHistory = [{}, {}];
 
 const WalletPanel: React.FC = (props) => {
   const { wallet, disconnect, publicKey } = useWallet();
   const { setMenu } = useModal();
+  const [copyMessageOpen, setCopyMessageOpen] = useState(false);
   const classes = useStyles(props);
 
   const accountAddress = publicKey ? publicKey.toString() : "";
+  const timer = { current: null };
+
+  useEffect(() => {
+    return () => {
+      clearInterval(timer.current);
+    };
+  }, []);
 
   const onCopyAddress = () => {
     navigator.clipboard.writeText(publicKey.toString());
+    setCopyMessageOpen(true);
+    timer.current = setTimeout(() => setCopyMessageOpen(false), 2000);
     setMenu(false);
   };
 
@@ -94,7 +121,7 @@ const WalletPanel: React.FC = (props) => {
   }, [disconnect, setMenu]);
 
   return (
-    <Box width={300} className={classes.root}>
+    <Box className={classes.root}>
       <ConnectList>
         <Box display="flex" width="100%" textAlign="center" alignItems="center">
           <CheckOutlined className={classes.check} />
@@ -106,68 +133,94 @@ const WalletPanel: React.FC = (props) => {
             {accountAddress?.substring(accountAddress?.length - 4)}
           </Box>
           <CopyAddressIcon height={22} className={classes.icon} onClick={onCopyAddress} />
-          <Reset width={22} onClick={onDisconnectWallet} />
+          {/* <Reset width={22} onClick={onDisconnectWallet} /> */}
+        </Box>
+        <StyledDivider />
+        <Box display="flex" width="100%" textAlign="center" alignItems="center">
+          <Box width={24} />
+          <Box marginLeft={1.2} marginRight={2}>
+            <Img src={wallet.icon} alt={wallet.name} />
+          </Box>
+          <Box color="#fff">
+            {accountAddress?.substring(0, 4)}...
+            {accountAddress?.substring(accountAddress?.length - 4)}
+          </Box>
+          {/* <Reset width={22} onClick={onDisconnectWallet} /> */}
         </Box>
         {/* dump style, could be displayed when the data is ready */}
-        {/* <StyledDivider />
-        <Box>
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            fontWeight={400}
-            fontSize={16}
-            color="#F6F6F6"
-          >
-            <Box>100.00 USDC</Box>
-            <Box display="flex" alignItems="center">
-              <Avatar
-                className={classes.avatar}
-                src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
-              ></Avatar>
-              <Box marginLeft={0.5} marginRight={0.5}>
-                <CompareArrows></CompareArrows>
+        {swapHistory.map(() => (
+          <>
+            <StyledDivider />
+            <Box>
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                fontWeight={400}
+                fontSize={16}
+                color="#F6F6F6"
+                whiteSpace="nowrap"
+                gap={1}
+              >
+                <Box>100.00 USDC</Box>
+                <Box display="flex" alignItems="center">
+                  <Avatar
+                    sx={{ width: 20, height: 20 }}
+                    src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
+                  ></Avatar>
+                  <Box marginLeft={0.5} marginRight={0.5}>
+                    <CompareArrows></CompareArrows>
+                  </Box>
+                  <Avatar
+                    sx={{ width: 20, height: 20 }}
+                    src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
+                  ></Avatar>
+                </Box>
+                <Box>100.00 USDC</Box>
               </Box>
-              <Avatar
-                className={classes.avatar}
-                src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
-              ></Avatar>
             </Box>
-            <Box>100.00 USDC</Box>
-          </Box>
-        </Box>
-        <Box>
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            fontWeight={400}
-            fontSize={16}
-            color="#F6F6F6"
-          >
-            <Box display="flex" flexDirection="column">
-              <Box>UUID: De4H...qFHK</Box>
-              <Box>Mar 30 2022 12:00</Box>
+            <Box>
+              {}
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                fontWeight={400}
+                fontSize={12}
+                color="#F6F6F6"
+                mt={0.5}
+              >
+                <Box display="flex" flexDirection="column">
+                  <Box>UUID: De4H...qFHK</Box>
+                  <Box>Mar 30 2022 12:00</Box>
+                </Box>
+                <Box color="#D4FF00" display="flex" alignItems="center">
+                  <CheckCircleOutlineIcon />
+                  <Box ml={0.5}>Swap Successful</Box>
+                </Box>
+              </Box>
             </Box>
-            <Box color="#D4FF00" display="flex" alignItems="center">
-              <CheckCircleOutlineIcon />
-              <Box ml={0.5}>Swap Successful</Box>
-            </Box>
-          </Box>
-        </Box>
+          </>
+        ))}
+
         <StyledDivider />
         <Box
           display="flex"
           color="#D4FF00"
-          onClick={() => setMenu(true, "connect")}
+          onClick={onDisconnectWallet}
           justifyContent="center"
           alignItems="center"
+          sx={{ cursor: "pointer" }}
         >
-          <AddCircleOutline fontSize="large" />
+          <AddCircleOutlineOutlinedIcon />
           <Box ml={1.5} fontSize={18} fontWeight={600}>
-            Connect Wallet
+            Disconnect Wallet
           </Box>
-        </Box> */}
+        </Box>
+
+        <Fade in={copyMessageOpen} easing={{ exit: "3000" }}>
+          <Alert>Wallet Address Copied!</Alert>
+        </Fade>
       </ConnectList>
     </Box>
   );

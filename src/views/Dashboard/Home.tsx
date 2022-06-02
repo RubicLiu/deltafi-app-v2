@@ -179,7 +179,7 @@ const Home: React.FC = (props) => {
           <Box className={classes.valuesCt}>
             <Box className={classes.values}>
               {headerData.map((data, idx) => (
-                <Box display="flex" key={idx}>
+                <Box display="flex" key={idx} flexDirection={matches ? "column" : "row"}>
                   <Box className={classes.value} key={data.label}>
                     <Box fontSize={14} fontWeight={400} lineHeight="18px">
                       {data.label}
@@ -197,7 +197,7 @@ const Home: React.FC = (props) => {
                   {idx === headerData.length - 1 || (
                     <Divider
                       orientation={matches ? "horizontal" : "vertical"}
-                      flexItem={!matches}
+                      flexItem
                       className={classes.divider}
                     />
                   )}
