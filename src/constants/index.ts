@@ -21,7 +21,9 @@ export const TWITTER_LINK = "https://twitter.com/deltafi_ai";
 export const DISCORD_LINK = "https://discord.com/invite/6maaM2cYqr";
 export const GITHUB_LINK = "https://github.com/delta-fi";
 export const TELEGRAM_LINK = "https://t.me/deltafi_ai";
+// TODO updated youtube and spotify link
 export const YOUTUBE_LINK = "https://youtube.com";
+export const SPOTIFY_LINK = "https://www.spotify.com/";
 export const SOLSCAN_LINK = "https://solscan.io";
 
 export const MAINNET_CHAIN_ID = 1;

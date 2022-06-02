@@ -2,9 +2,25 @@ import React from "react";
 import styled from "styled-components";
 import { Box, Container, makeStyles, Theme, IconButton } from "@material-ui/core";
 
-import { BLOG_LINK, TWITTER_LINK, TELEGRAM_LINK, DISCORD_LINK, GITHUB_LINK } from "constants/index";
-import { TwitterIcon, TelegramIcon, MediumIcon, GithubIcon, DiscordIcon } from "components";
+import {
+  BLOG_LINK,
+  TWITTER_LINK,
+  TELEGRAM_LINK,
+  DISCORD_LINK,
+  GITHUB_LINK,
+  YOUTUBE_LINK,
+  SPOTIFY_LINK,
+} from "constants/index";
+import {
+  TwitterIcon,
+  TelegramIcon,
+  MediumIcon,
+  GithubIcon,
+  DiscordIcon,
+  YoutubeIcon,
+} from "components";
 import { useDarkMode } from "providers/theme";
+import Spotify from "./Svg/icons/Spotify";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -137,6 +153,34 @@ const Footer: React.FC = (props) => {
               className={classes.iconButton}
             >
               <TelegramIcon isDark={isDark} />
+            </IconButton>
+          </IconWrapper>
+          <IconWrapper>
+            <IconButton
+              component="a"
+              href={YOUTUBE_LINK}
+              target="_blank"
+              rel="noreferrer noopener"
+              data-amp-analytics-on="click"
+              data-amp-analytics-name="click"
+              data-amp-analytics-attrs="page: Footer, target: Medium"
+              className={classes.iconButton}
+            >
+              <YoutubeIcon isDark={isDark} />
+            </IconButton>
+          </IconWrapper>
+          <IconWrapper>
+            <IconButton
+              component="a"
+              href={SPOTIFY_LINK}
+              target="_blank"
+              rel="noreferrer noopener"
+              data-amp-analytics-on="click"
+              data-amp-analytics-name="click"
+              data-amp-analytics-attrs="page: Footer, target: Medium"
+              className={classes.iconButton}
+            >
+              <Spotify />
             </IconButton>
           </IconWrapper>
         </StyledDiv>
