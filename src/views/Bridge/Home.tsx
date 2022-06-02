@@ -252,18 +252,18 @@ const Home: React.FC = (props) => {
   const { setMenu } = useModal();
   const app = useSelector(appSelector);
 
-  const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(pool));
+  const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const exchangeRateLabel = useMemo(() => {
-    if (basePrice && quotePrice && pool) {
-      if (tokenFrom.token.symbol === pool?.baseTokenInfo.symbol) {
-        return Number(basePrice / quotePrice).toFixed(pool.quoteTokenInfo.decimals);
-      } else if (tokenFrom.token.symbol === pool?.quoteTokenInfo.symbol) {
-        return Number(quotePrice / basePrice).toFixed(pool.baseTokenInfo.decimals);
+    if (basePrice && quotePrice && poolConfig) {
+      if (tokenFrom.token.symbol === poolConfig.baseTokenInfo.symbol) {
+        return Number(basePrice / quotePrice).toFixed(poolConfig.quoteTokenInfo.decimals);
+      } else if (tokenFrom.token.symbol === poolConfig.quoteTokenInfo.symbol) {
+        return Number(quotePrice / basePrice).toFixed(poolConfig.baseTokenInfo.decimals);
       }
     }
     return "-";
-  }, [basePrice, quotePrice, tokenFrom.token.symbol, pool]);
+  }, [basePrice, quotePrice, tokenFrom.token.symbol, poolConfig]);
   const [state, setState] = useState<{
     open: boolean;
     vertical: "bottom" | "top";
@@ -587,8 +587,8 @@ const Home: React.FC = (props) => {
         pool &&
         exponentiatedBy(
           tokenFrom.token.symbol === tokenTo.token.symbol
-            ? pool?.poolState.quoteReserve
-            : pool?.poolState.baseReserve,
+            ? pool?.poolState.quoteReserve.toString()
+            : pool?.poolState.baseReserve.toString(),
           tokenTo.token.decimals,
         ).isLessThan(tokenTo.amount);
 

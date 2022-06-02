@@ -2,8 +2,15 @@ import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { deployConfigV2 } from "constants/deployConfigV2";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
+import { SwapInfo } from "anchor/type_definitions";
 
-const initialState = {
+type SwapPoolKeyToSwap = Record<string, SwapInfo>;
+
+export interface SwapState {
+  swapKeyToSwapInfo: SwapPoolKeyToSwap;
+}
+
+const initialState: SwapState = {
   swapKeyToSwapInfo: {},
 };
 

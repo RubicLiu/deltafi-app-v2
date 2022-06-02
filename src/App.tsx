@@ -48,6 +48,7 @@ const Unavailable = lazy(() => import("./views/Unavailable"));
 const Terms = lazy(() => import("./views/Terms"));
 const Dashboard = lazy(() => import("./views/Dashboard"));
 const Farm = lazy(() => import("./views/Farm"));
+const Stake = lazy(() => import("./views/Stake"));
 
 // This is hack is needed to resolve the bigint json serialization in redux.
 // eslint-disable-next-line
@@ -167,6 +168,7 @@ const App: React.FC = () => {
             <Route path="/terms" exact component={Terms} />
             <Route path="/bridge" exact component={Bridge} />
             <Route path="/farms" exact component={Farm} />
+            <Route path="/stake/:id" exact component={Stake} />
             <Redirect from="*" to="/swap" />
           </Switch>
         ) : (
