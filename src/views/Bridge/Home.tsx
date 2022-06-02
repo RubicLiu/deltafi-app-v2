@@ -255,15 +255,15 @@ const Home: React.FC = (props) => {
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const exchangeRateLabel = useMemo(() => {
-    if (basePrice && quotePrice && pool) {
-      if (tokenFrom.token.symbol === poolConfig?.baseTokenInfo.symbol) {
-        return Number(basePrice / quotePrice).toFixed(poolConfig?.quoteTokenInfo.decimals);
-      } else if (tokenFrom.token.symbol === poolConfig?.quoteTokenInfo.symbol) {
-        return Number(quotePrice / basePrice).toFixed(poolConfig?.baseTokenInfo.decimals);
+    if (basePrice && quotePrice && poolConfig) {
+      if (tokenFrom.token.symbol === poolConfig.baseTokenInfo.symbol) {
+        return Number(basePrice / quotePrice).toFixed(poolConfig.quoteTokenInfo.decimals);
+      } else if (tokenFrom.token.symbol === poolConfig.quoteTokenInfo.symbol) {
+        return Number(quotePrice / basePrice).toFixed(poolConfig.baseTokenInfo.decimals);
       }
     }
     return "-";
-  }, [basePrice, quotePrice, tokenFrom.token.symbol, pool]);
+  }, [basePrice, quotePrice, tokenFrom.token.symbol, poolConfig]);
   const [state, setState] = useState<{
     open: boolean;
     vertical: "bottom" | "top";
