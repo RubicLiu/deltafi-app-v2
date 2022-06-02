@@ -1,5 +1,6 @@
 import { Theme, makeStyles, Typography, Box, Link } from "@material-ui/core";
 import Page from "components/layout/Page";
+import { BLOG_LINK, DISCORD_LINK, TELEGRAM_LINK, TWITTER_LINK } from "constants/index";
 
 import "typeface-rubik";
 
@@ -54,7 +55,7 @@ const Home: React.FC = (props) => {
       </Typography>
       <Box display="flex" className={classes.socialLinks}>
         <Link
-          href="https://twitter.com/deltafi_ai"
+          href={TWITTER_LINK}
           target="_blank"
           rel="noreferrer noopener"
           data-amp-analytics-on="click"
@@ -65,7 +66,7 @@ const Home: React.FC = (props) => {
         </Link>
 
         <Link
-          href="https://discord.gg/deltafi"
+          href={DISCORD_LINK}
           target="_blank"
           rel="noreferrer noopener"
           data-amp-analytics-on="click"
@@ -75,7 +76,7 @@ const Home: React.FC = (props) => {
           <img src={"images/discord.svg"} alt="" />
         </Link>
         <Link
-          href="https://t.me/deltafi_ai"
+          href={TELEGRAM_LINK}
           target="_blank"
           rel="noreferrer noopener"
           data-amp-analytics-on="click"
@@ -85,7 +86,7 @@ const Home: React.FC = (props) => {
           <img src={"images/telegram.svg"} alt="" />
         </Link>
         <Link
-          href="https://medium.com/deltafi"
+          href={BLOG_LINK}
           target="_blank"
           rel="noreferrer noopener"
           data-amp-analytics-on="click"
@@ -109,7 +110,7 @@ export const FarmUnavailable: React.FC = (props) => {
       </Typography>
       <Box display="flex" className={classes.socialLinks}>
         <Link
-          href="https://twitter.com/deltafi_ai"
+          href={TWITTER_LINK}
           target="_blank"
           rel="noreferrer noopener"
           data-amp-analytics-on="click"
@@ -120,7 +121,7 @@ export const FarmUnavailable: React.FC = (props) => {
         </Link>
 
         <Link
-          href="https://discord.gg/deltafi"
+          href={DISCORD_LINK}
           target="_blank"
           rel="noreferrer noopener"
           data-amp-analytics-on="click"
@@ -130,7 +131,7 @@ export const FarmUnavailable: React.FC = (props) => {
           <img src={"images/discord.svg"} alt="" />
         </Link>
         <Link
-          href="https://t.me/deltafi_ai"
+          href={TELEGRAM_LINK}
           target="_blank"
           rel="noreferrer noopener"
           data-amp-analytics-on="click"
@@ -140,7 +141,7 @@ export const FarmUnavailable: React.FC = (props) => {
           <img src={"images/telegram.svg"} alt="" />
         </Link>
         <Link
-          href="https://medium.com/deltafi"
+          href={BLOG_LINK}
           target="_blank"
           rel="noreferrer noopener"
           data-amp-analytics-on="click"
