@@ -453,7 +453,6 @@ const Stake = (): ReactElement => {
             <CloseIcon />
           </IconButton>
         </Box>
-        ∂
         <Box display="flex" justifyContent="space-between" mt={4} pb={4}>
           <Box>
             <Typography>Total Staked {baseTokenInfo.symbol}</Typography>
