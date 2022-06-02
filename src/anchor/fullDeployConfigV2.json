@@ -11,11 +11,11 @@
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
-        "swapInfo": "4Y6z1oYmHHScWLroRjgtLUcJSUXMN9q6ejYJVcwBUkBb",
+        "swapInfo": "HaEkMzDR5BFcVAjKT35f2gWwPvAt1TwwAq9yuQtqRLQ5",
         "farmInfoList": [
           {
             "name": "default",
-            "farmInfo": "GhFQtWTRDWp5FhgLAruNTxkQTbpwSDji1ntmNLDEEQqV"
+            "farmInfo": "ErsicHXH46vnt9KLnaGAm8Dv97yKsNtC56aTVmsLejsZ"
           }
         ]
       },
@@ -23,11 +23,11 @@
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
-        "swapInfo": "B5FQLoi1XaVKcqmfysa5pGLAkc45snauxwfLjDhR7Fs6",
+        "swapInfo": "HPnmHPyFJR1n4t1H7ophxSftkfM3nKnrEGm5uvsTSSFV",
         "farmInfoList": [
           {
             "name": "default",
-            "farmInfo": "Fsbir8eNqWRHHQT2FrBmvKHFxK6kL9R9uSvT4f5xeYAh"
+            "farmInfo": "BpcJQN7wDXe5NJrhLdEUeJVgZ8Kdrfr3cPbZWiXqJa2a"
           }
         ]
       },
@@ -35,11 +35,11 @@
         "name": "GMT-USDC",
         "base": "GMT",
         "quote": "USDC",
-        "swapInfo": "HHG45Gh8CwtH3U4GhEkDbFWYr1UxL3rJ3LL9hEy7imU",
+        "swapInfo": "2og8uyTCpR2rKzweQhJmBAoscX1e6WFCZhRrSTKbQ2ur",
         "farmInfoList": [
           {
             "name": "default",
-            "farmInfo": "HGTxouL2cQ55WMBr5oGeC5zbmFDSJbmAAW6vXJZsA341"
+            "farmInfo": "FNUPc2bZb9hVjhmcLq9C7iUhFq8WWE2HtdaRgf96B9tX"
           }
         ]
       }

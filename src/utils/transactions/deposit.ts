@@ -98,13 +98,13 @@ export async function createDepositTransaction(
 
   if (swapInfo.swapType.stableSwap) {
     transaction.add(
-      program.transaction.depositToStableSwap(baseShare, quoteShare, {
+      program.transaction.depositToStableSwap(baseShare, quoteShare, new BN(0), new BN(0), {
         accounts: depositAccounts,
       }),
     );
   } else {
     transaction.add(
-      program.transaction.depositToNormalSwap(baseShare, quoteShare, {
+      program.transaction.depositToNormalSwap(baseShare, quoteShare, new BN(0), new BN(0), {
         accounts: depositAccounts,
       }),
     );
@@ -215,13 +215,13 @@ export async function createWithdrawTransaction(
   };
   if (swapInfo.swapType.stableSwap) {
     transaction.add(
-      program.transaction.withdrawFromStableSwap(baseShare, quoteShare, {
+      program.transaction.withdrawFromStableSwap(baseShare, quoteShare, new BN(0), new BN(0), {
         accounts: withdrawAccounts,
       }),
     );
   } else {
     transaction.add(
-      program.transaction.withdrawFromNormalSwap(baseShare, quoteShare, {
+      program.transaction.withdrawFromNormalSwap(baseShare, quoteShare, new BN(0), new BN(0), {
         accounts: withdrawAccounts,
       }),
     );
