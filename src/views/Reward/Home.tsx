@@ -248,12 +248,14 @@ const Home: React.FC = (props) => {
     let userUnclaimedFarmRewards = new BigNumber(0);
     let userTotalFarmRewards = new BigNumber(0);
 
+    let hasFarmUser = false;
     for (const farmPoolKey in farmPoolKeyToFarmUser) {
       const farmUser = farmPoolKeyToFarmUser[farmPoolKey];
       if (!farmUser) {
         farmPoolToRewards[farmPoolKey] = { unclaimedFarmRewards: "--", totalFarmRewards: "--" };
         continue;
       }
+      hasFarmUser = true;
       const farmInfo = farmKeyToFarmInfo[farmPoolKey];
 
       const baseApr = new BigNumber(farmInfo.farmConfig.baseAprNumerator.toString()).dividedBy(
@@ -313,18 +315,20 @@ const Home: React.FC = (props) => {
     console.log(farmPoolToRewards);
     return {
       farmPoolToRewards,
-      userUnclaimedFarmRewards: userUnclaimedFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS),
-      userTotalFarmRewards: userTotalFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS),
+      userUnclaimedFarmRewards: hasFarmUser
+        ? userUnclaimedFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
+        : "--",
+      userTotalFarmRewards: hasFarmUser
+        ? userTotalFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
+        : "--",
     };
   }, [farmPoolKeyToFarmUser, farmPoolKeyToFarmUser]);
 
-  const rewardDisplayInfo: {
-    claimedRewardFromSwap: string;
-    claimedRewardFromReferral: string;
-    owedRewardFromSwap: string;
-    owedRewardFromReferral: string;
-    totalRewardFromSwap: string;
-    totalRewardFromReferral: string;
+  const {
+    claimedRewardFromSwap,
+    claimedRewardFromReferral,
+    totalRewardFromSwap,
+    totalRewardFromReferral,
   } = useMemo(() => {
     const parseRewardBN = (rewardAmount: BN) =>
       exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
@@ -346,8 +350,6 @@ const Home: React.FC = (props) => {
     return {
       claimedRewardFromSwap: "--",
       claimedRewardFromReferral: "--",
-      owedRewardFromSwap: "--",
-      owedRewardFromReferral: "--",
       totalRewardFromSwap: "--",
       totalRewardFromReferral: "--",
     };
@@ -727,18 +729,18 @@ const Home: React.FC = (props) => {
           My Rewards
         </Box>
         {/* TODO please check and set up the true "no reward" condition */}
-        {isConnectedWallet &&
-        rewardDisplayInfo.totalRewardFromReferral !== "--" &&
-        rewardDisplayInfo.totalRewardFromSwap !== "--" ? (
+        {(isConnectedWallet && totalRewardFromReferral !== "--") ||
+        totalRewardFromSwap !== "--" ||
+        userUnclaimedFarmRewards !== "--" ||
+        userTotalFarmRewards !== "--" ? (
           <Box>
             <Box mt={2} mb={3} display="flex" gap={1.25} justifyContent="center" flexWrap="wrap">
               <Box className={classes.rewardBox} border="1px solid #03F2A0">
                 <Box color="#03F2A0">LIQUIDITY MINING</Box>
                 <Box>Unclaimed / Total</Box>
-                {/* TODO replace the following value with real LIQUIDITY MINING value  */}
                 <Box lineHeight="24px" display="flex" fontSize={20}>
-                  <Box color="#03F2A0">{rewardDisplayInfo.claimedRewardFromSwap}&nbsp;</Box>
-                  <Box>/ {rewardDisplayInfo.totalRewardFromSwap} DELFI</Box>{" "}
+                  <Box color="#03F2A0">{userUnclaimedFarmRewards}&nbsp;</Box>
+                  <Box>/ {userTotalFarmRewards} DELFI</Box>{" "}
                 </Box>
                 <Box color="#03F2A0">{claimLiquidityRewardsButton}</Box>
               </Box>
@@ -746,8 +748,8 @@ const Home: React.FC = (props) => {
                 <Box color="#D4FF00">TRADE FARMING</Box>
                 <Box>Unclaimed / Total</Box>
                 <Box lineHeight="24px" display="flex" fontSize={20}>
-                  <Box color="#D4FF00">{rewardDisplayInfo.claimedRewardFromSwap}&nbsp;</Box>
-                  <Box>/ {rewardDisplayInfo.totalRewardFromSwap} DELFI</Box>{" "}
+                  <Box color="#D4FF00">{claimedRewardFromSwap}&nbsp;</Box>
+                  <Box>/ {totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
                 <Box color="#D4FF00">{claimRewardsButton}</Box>
               </Box>
@@ -755,8 +757,8 @@ const Home: React.FC = (props) => {
                 <Box color="#905BFF">REGERRAL BONUS</Box>
                 <Box>Unclaimed / Total</Box>
                 <Box lineHeight="24px" display="flex" fontSize={20}>
-                  <Box color="#905BFF">{rewardDisplayInfo.claimedRewardFromReferral}&nbsp;</Box>
-                  <Box>/ {rewardDisplayInfo.totalRewardFromReferral} DELFI</Box>{" "}
+                  <Box color="#905BFF">{claimedRewardFromReferral}&nbsp;</Box>
+                  <Box>/ {totalRewardFromReferral} DELFI</Box>{" "}
                 </Box>
                 <Box color="#905BFF">{claimRewardsButton}</Box>
               </Box>
