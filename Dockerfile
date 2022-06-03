@@ -5,6 +5,7 @@ ARG build_command
 WORKDIR /usr/app
 
 ADD package.json tsconfig.json yarn.lock /usr/app
+RUN yarn config set network-timeout 300000
 RUN yarn install
 
 ADD src /usr/app/src
