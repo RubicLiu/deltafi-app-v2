@@ -2793,8 +2793,5 @@
       "name": "InvalidSerumMarketTokenRatio",
       "msg": "InvalidSerumMarketTokenRatio"
     }
-  ],
-  "metadata": {
-    "address": "HcWvS1XyweYMrCvY8TEeDxXgbWJagizUZXxCSLC2E89N"
-  }
+  ]
 }
