@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
 import { makeStyles, Theme } from "@material-ui/core";
+import { deployMode } from "constants/deployConfigV2";
 
 const useStyles = makeStyles(({ palette, breakpoints }: Theme) => ({
   button: {
@@ -55,19 +56,22 @@ const TabMenu: React.FC = (props) => {
       onChange={(event: React.MouseEvent<HTMLElement>, value: string | null) => handleActive(value)}
       aria-label="Top Menu"
     >
-      <ToggleButton value="dashboard" aria-label="Dashboard" className={classes.button}>
-        Dashboard
-      </ToggleButton>
+      {deployMode === "testnet" ? (
+        <ToggleButton value="dashboard" aria-label="Dashboard" className={classes.button}>
+          Dashboard
+        </ToggleButton>
+      ) : null}
       <ToggleButton value="swap" aria-label="Swap" className={classes.button}>
         Swap
       </ToggleButton>
       <ToggleButton value="pools" aria-label="Pools" className={classes.button}>
         Pools
       </ToggleButton>
-      {/* TODO: disable farm for first deployment */}
-      <ToggleButton value="farms" aria-label="Farms" className={classes.button}>
-        Farms
-      </ToggleButton>
+      {deployMode === "testnet" ? (
+        <ToggleButton value="farms" aria-label="Farms" className={classes.button}>
+          Farms
+        </ToggleButton>
+      ) : null}
     </ToggleButtonGroup>
   );
 };
