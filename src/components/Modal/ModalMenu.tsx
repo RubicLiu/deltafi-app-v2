@@ -42,7 +42,7 @@ const StyledBackdrop = styled(Backdrop)`
 
 export default function ModalMenu() {
   const classes = useStyles();
-  const { menuOpen, menu, setMenu } = useModal();
+  const { menuOpen, menu, setMenu, data } = useModal();
 
   const renderModalContent = (): ReactElement => {
     switch (menu) {
@@ -61,7 +61,7 @@ export default function ModalMenu() {
       case "withdraw":
         return null; // <WithdrawPanel />
       case "liquidity-reward":
-        return <LiquidityReward />;
+        return <LiquidityReward farmPoolToRewards={data?.farmPoolToRewards} />;
       default:
         return null;
     }

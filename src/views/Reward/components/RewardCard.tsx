@@ -30,6 +30,8 @@ import CloseIcon from "@mui/icons-material/Close";
 
 interface CardProps {
   poolConfig: PoolConfig;
+  unclaimedReward: string;
+  totalReward: string;
 }
 
 const StyledConnectButton = styled(ConnectButton)`
@@ -50,7 +52,7 @@ const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
 }));
 
 const Card: React.FC<CardProps> = (props) => {
-  const { poolConfig } = props;
+  const { poolConfig, unclaimedReward, totalReward } = props;
   const { baseTokenInfo, quoteTokenInfo } = poolConfig;
   const rewardView = useSelector(rewardViewSelector);
   const dispatch = useDispatch();
@@ -222,8 +224,8 @@ const Card: React.FC<CardProps> = (props) => {
                 flexWrap: "nowrap",
               }}
             >
-              <Box color="#D4FF00">{200}&nbsp;</Box>
-              <Box>/ {999} DELFI</Box>
+              <Box color="#D4FF00">{unclaimedReward || "0"}&nbsp;</Box>
+              <Box>/ {totalReward || "0"} DELFI</Box>
             </Box>
           </Box>
         </Grid>

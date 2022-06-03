@@ -42,6 +42,7 @@ import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/materia
 import styled from "styled-components";
 import { FarmUser, FarmInfo } from "anchor/type_definitions";
 import { anchorBnToBn } from "utils/tokenUtils";
+import { stringify } from "querystring";
 
 // /*
 //  * mockup test data for reward page
@@ -222,10 +223,11 @@ const Home: React.FC = (props) => {
   const getUntrackedReward = (
     currentTs: number,
     lastUpdateTs: number,
+    nextClaimTs: number,
     apr: BigNumber,
     depositAmount: BigNumber,
   ) => {
-    if (lastUpdateTs >= currentTs) {
+    if (lastUpdateTs >= currentTs || currentTs <= nextClaimTs) {
       return new BigNumber(0);
     }
     return depositAmount
@@ -234,13 +236,22 @@ const Home: React.FC = (props) => {
       .dividedBy(SECONDS_PER_YEAR);
   };
 
-  const { owedFarmReward, totalFarmReward } = useMemo(() => {
-    let owedFarmReward = new BigNumber(0);
-    let claimedFarmReward = new BigNumber(0);
+  // farmPoolToReward records user's rewards in each pool
+  // userUnclaimedFarmRewards is user's unclaimed rewards up till now
+  // userTotalFarmRewards is the rewards amount that have been claimed by the user
+  const { farmPoolToRewards, userUnclaimedFarmRewards, userTotalFarmRewards } = useMemo(() => {
+    const farmPoolToRewards: Record<
+      string,
+      { unclaimedFarmRewards: string; totalFarmRewards: string }
+    > = {};
+
+    let userUnclaimedFarmRewards = new BigNumber(0);
+    let userTotalFarmRewards = new BigNumber(0);
 
     for (const farmPoolKey in farmPoolKeyToFarmUser) {
       const farmUser = farmPoolKeyToFarmUser[farmPoolKey];
       if (!farmUser) {
+        farmPoolToRewards[farmPoolKey] = { unclaimedFarmRewards: "--", totalFarmRewards: "--" };
         continue;
       }
       const farmInfo = farmKeyToFarmInfo[farmPoolKey];
@@ -252,49 +263,60 @@ const Home: React.FC = (props) => {
         farmInfo.farmConfig.quoteAprDenominator.toString(),
       );
 
-      const owedBaseReward = exponentiatedBy(
+      const owedBaseRewards = exponentiatedBy(
         farmUser.basePosition.rewardsOwed.toString(),
         DELTAFI_TOKEN_DECIMALS,
       );
-      const unTrackedBaseReward = getUntrackedReward(
+      const unTrackedBaseRewards = getUntrackedReward(
         rewardView.rewardRefreshTs,
         farmUser.basePosition.lastUpdateTs.toNumber(),
+        farmUser.basePosition.nextClaimTs.toNumber(),
         baseApr,
         exponentiatedBy(farmUser.basePosition.depositedAmount.toString(), DELTAFI_TOKEN_DECIMALS),
       );
-      const claimedBaseReward = exponentiatedBy(
+      const claimedBaseRewards = exponentiatedBy(
         farmUser.basePosition.cumulativeInterest.toString(),
         DELTAFI_TOKEN_DECIMALS,
       );
 
-      const owedQuoteReward = exponentiatedBy(
+      const owedQuoteRewards = exponentiatedBy(
         farmUser.quotePosition.rewardsOwed.toString(),
         DELTAFI_TOKEN_DECIMALS,
       );
-      const unTrackedQuoteReward = getUntrackedReward(
+      const unTrackedQuoteRewards = getUntrackedReward(
         rewardView.rewardRefreshTs,
         farmUser.quotePosition.lastUpdateTs.toNumber(),
+        farmUser.quotePosition.nextClaimTs.toNumber(),
         quoteApr,
         exponentiatedBy(farmUser.quotePosition.depositedAmount.toString(), DELTAFI_TOKEN_DECIMALS),
       );
-      const claimedQuoteReward = exponentiatedBy(
+      const claimedQuoteRewards = exponentiatedBy(
         farmUser.quotePosition.cumulativeInterest.toString(),
         DELTAFI_TOKEN_DECIMALS,
       );
 
-      owedFarmReward = owedFarmReward
-        .plus(owedBaseReward)
-        .plus(owedQuoteReward)
-        .plus(unTrackedBaseReward)
-        .plus(unTrackedQuoteReward);
-      claimedFarmReward = claimedFarmReward.plus(claimedBaseReward).plus(claimedQuoteReward);
+      const unclaimedFarmRewards = owedBaseRewards
+        .plus(owedQuoteRewards)
+        .plus(unTrackedBaseRewards)
+        .plus(unTrackedQuoteRewards)
+        .toFixed(DELTAFI_TOKEN_DECIMALS);
+      const totalFarmRewards = claimedBaseRewards
+        .plus(claimedQuoteRewards)
+        .toFixed(DELTAFI_TOKEN_DECIMALS);
+
+      userUnclaimedFarmRewards = userUnclaimedFarmRewards.plus(unclaimedFarmRewards);
+      userTotalFarmRewards = userTotalFarmRewards.plus(totalFarmRewards);
+
+      farmPoolToRewards[farmPoolKey] = { unclaimedFarmRewards, totalFarmRewards };
     }
 
+    console.log(farmPoolToRewards);
     return {
-      owedFarmReward,
-      totalFarmReward: owedFarmReward.plus(claimedFarmReward)
-    }
-  }, [farmPoolKeyToFarmUser]);
+      farmPoolToRewards,
+      userUnclaimedFarmRewards: userUnclaimedFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS),
+      userTotalFarmRewards: userTotalFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS),
+    };
+  }, [farmPoolKeyToFarmUser, farmPoolKeyToFarmUser]);
 
   const rewardDisplayInfo: {
     claimedRewardFromSwap: string;
@@ -457,7 +479,7 @@ const Home: React.FC = (props) => {
     return (
       <StyledButton
         variant="outlined"
-        onClick={() => setMenu(true, "liquidity-reward")}
+        onClick={() => setMenu(true, "liquidity-reward", null, { farmPoolToRewards })}
         color="inherit"
         data-amp-analytics-on="click"
         data-amp-analytics-name="click"
@@ -475,7 +497,8 @@ const Home: React.FC = (props) => {
         </Box>
       </StyledButton>
     );
-  }, [setMenu]);
+  }, [setMenu, farmPoolToRewards]);
+
   const snackMessage = useMemo(() => {
     if (!rewardView || !rewardView.claimResult) {
       return "";
