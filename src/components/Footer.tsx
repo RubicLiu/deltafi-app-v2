@@ -2,25 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import { Box, Container, makeStyles, Theme, IconButton } from "@material-ui/core";
 
-import {
-  BLOG_LINK,
-  TWITTER_LINK,
-  TELEGRAM_LINK,
-  DISCORD_LINK,
-  GITHUB_LINK,
-  YOUTUBE_LINK,
-  SPOTIFY_LINK,
-} from "constants/index";
-import {
-  TwitterIcon,
-  TelegramIcon,
-  MediumIcon,
-  GithubIcon,
-  DiscordIcon,
-  YoutubeIcon,
-} from "components";
+import { BLOG_LINK, TWITTER_LINK, TELEGRAM_LINK, DISCORD_LINK, GITHUB_LINK } from "constants/index";
+import { TwitterIcon, TelegramIcon, MediumIcon, GithubIcon, DiscordIcon } from "components";
 import { useDarkMode } from "providers/theme";
-import Spotify from "./Svg/icons/Spotify";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
