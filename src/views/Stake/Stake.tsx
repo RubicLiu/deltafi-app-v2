@@ -19,7 +19,7 @@ import { ConnectButton } from "components";
 import useStyles from "./styles";
 import { useModal } from "providers/modal";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
-import { SOLSCAN_LINK, DELTAFI_TOKEN_DECIMALS, DELTAFI_TOKEN_MINT } from "constants/index";
+import { SOLSCAN_LINK, DELTAFI_TOKEN_DECIMALS } from "constants/index";
 import Slider from "./components/Slider";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -27,19 +27,14 @@ import {
   selectFarmByFarmKey,
   selectLpUserBySwapKey,
   stakeViewSelector,
-  selectTokenAccountInfoByMint,
   programSelector,
 } from "states/selectors";
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfigV2";
 import { stakeViewActions } from "states/views/stakeView";
-import {
-  createClaimFarmRewardsTransaction,
-  createUpdateStakeTransaction,
-} from "utils/transactions/stake";
+import { createUpdateStakeTransaction } from "utils/transactions/stake";
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
-import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { anchorBnToBn, bnToString, stringToAnchorBn } from "utils/tokenUtils";
 import { useLocation } from "react-router";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
@@ -84,8 +79,6 @@ const Stake = (): ReactElement => {
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const network = deployConfigV2.network;
-
-  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
   const dispatch = useDispatch();
   const stakeView = useSelector(stakeViewSelector);
@@ -311,64 +304,6 @@ const Stake = (): ReactElement => {
     farmUser,
   ]);
 
-  const handleClaim = useCallback(async () => {
-    if (!walletPubkey || !lpUser || !rewardsAccount || !program) {
-      return null;
-    }
-
-    const connection = program.provider.connection;
-    dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: true }));
-    try {
-      const transaction = await createClaimFarmRewardsTransaction(
-        program,
-        connection,
-        poolConfig,
-        farmPoolId,
-        walletPubkey,
-        rewardsAccount.publicKey,
-      );
-      const signedTransaction = await signTransaction(transaction);
-
-      const hash = await sendSignedTransaction({
-        signedTransaction,
-        connection,
-      });
-
-      await connection.confirmTransaction(hash, "confirmed");
-      await fecthTokenAccountInfoList(
-        [DELTAFI_TOKEN_MINT.toBase58()],
-        walletPubkey,
-        connection,
-        dispatch,
-      );
-      dispatch(
-        stakeViewActions.setTransactionResult({
-          transactionResult: {
-            status: true,
-            action: "claim",
-            hash,
-          },
-        }),
-      );
-    } catch (e) {
-      console.error(e);
-      dispatch(stakeViewActions.setTransactionResult({ transactionResult: { status: false } }));
-    } finally {
-      dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: false }));
-      dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
-    }
-  }, [
-    walletPubkey,
-    signTransaction,
-    dispatch,
-    poolConfig,
-    lpUser,
-    rewardsAccount,
-    program,
-    farmPoolId,
-  ]);
-
   const handleSnackBarClose = useCallback(() => {
     dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: false }));
   }, [dispatch]);
@@ -491,22 +426,6 @@ const Stake = (): ReactElement => {
         <Box className={classes.unclaimedToken}>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography className={classes.title}>Your Unclaimed Token</Typography>
-            {stakeView.isProcessingClaim ? (
-              <ConnectButton variant="contained" disabled={true}>
-                <CircularProgress color="inherit" />
-              </ConnectButton>
-            ) : (
-              <ConnectButton
-                variant="contained"
-                onClick={handleClaim}
-                disabled={!unclaimedReward.gt(0)}
-                data-amp-analytics-on="click"
-                data-amp-analytics-name="click"
-                data-amp-analytics-attrs="page: Farms, target: Claim"
-              >
-                CLAIM
-              </ConnectButton>
-            )}
           </Box>
           <Box className={classes.cardBottom}>
             <Typography className={classes.amount}>

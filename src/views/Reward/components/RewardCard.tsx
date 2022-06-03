@@ -8,28 +8,21 @@ import {
   Theme,
   IconButton,
 } from "@mui/material";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
+import { PoolConfig } from "constants/deployConfigV2";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDeltafiUserManually } from "states/accounts/deltafiUserAccount";
 import BN from "bn.js";
-import {
-  deltafiUserSelector,
-  programSelector,
-  rewardViewSelector,
-  selectTokenAccountInfoByMint,
-} from "states/selectors";
+import { deltafiUserSelector, rewardViewSelector } from "states/selectors";
 import { rewardViewActions } from "states/views/rewardView";
 import styled from "styled-components";
-import { sendSignedTransaction } from "utils/transactions";
-import { createClaimSwapRewardsTransaction } from "utils/transactions/deltafiUser";
 import { ConnectButton } from "components";
 import { makeStyles } from "@mui/styles";
 import CloseIcon from "@mui/icons-material/Close";
 
 interface CardProps {
   poolConfig: PoolConfig;
+  farmPoolAddress: string;
+  handleClaimFarmRewards: () => any;
 }
 
 const StyledConnectButton = styled(ConnectButton)`
@@ -50,45 +43,15 @@ const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
 }));
 
 const Card: React.FC<CardProps> = (props) => {
-  const { poolConfig } = props;
+  const { poolConfig, farmPoolAddress, handleClaimFarmRewards } = props;
   const { baseTokenInfo, quoteTokenInfo } = poolConfig;
   const rewardView = useSelector(rewardViewSelector);
+  const { unclaimedFarmRewards, totalFarmRewards } = rewardView.farmPoolToRewards[
+    farmPoolAddress
+  ] || { unclaimedFarmRewards: "--", totalFarmRewards: "--" };
   const dispatch = useDispatch();
-  const wallet = useWallet();
-  const { publicKey: walletPubkey, signTransaction } = wallet;
-  const userDeltafiToken = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
-  const program = useSelector(programSelector);
   const deltafiUser = useSelector(deltafiUserSelector);
-  const connection = program.provider.connection;
   const classes = useStyles(props);
-
-  //TODO: please update with correct handler
-  const handleClaimRewards = useCallback(async () => {
-    dispatch(rewardViewActions.setIsClaiming({ isClaiming: true }));
-
-    try {
-      const partialSignedTransaction = await createClaimSwapRewardsTransaction(
-        program,
-        connection,
-        walletPubkey,
-        userDeltafiToken?.publicKey,
-        deltafiUser.user,
-      );
-
-      const signedTransaction = await signTransaction(partialSignedTransaction);
-      const signature = await sendSignedTransaction({ signedTransaction, connection });
-      await connection.confirmTransaction(signature, "confirmed");
-      await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
-      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: true } }));
-    } catch (e) {
-      console.error(e);
-      // TODO(leqiang): Add error display here
-      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
-    } finally {
-      dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(rewardViewActions.setIsClaiming({ isClaiming: false }));
-    }
-  }, [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: false }));
@@ -131,7 +94,7 @@ const Card: React.FC<CardProps> = (props) => {
     );
   }, [handleSnackBarClose]);
   const claimRewardsButton = useMemo(() => {
-    if (rewardView.isClaiming) {
+    if (rewardView.isClaimingFarmRewards) {
       return (
         <StyledConnectButton variant="outlined" disabled>
           <CircularProgress size={24} color="inherit" />
@@ -141,7 +104,10 @@ const Card: React.FC<CardProps> = (props) => {
     return (
       <StyledConnectButton
         variant="outlined"
-        onClick={handleClaimRewards}
+        onClick={(e) => {
+          e.stopPropagation(); // need this to prevent onclick callback from being called twice
+          handleClaimFarmRewards();
+        }}
         color="inherit"
         disabled={
           !deltafiUser?.user?.owedReferralRewards ||
@@ -164,7 +130,7 @@ const Card: React.FC<CardProps> = (props) => {
         </Box>
       </StyledConnectButton>
     );
-  }, [rewardView, deltafiUser, handleClaimRewards]);
+  }, [rewardView, deltafiUser, handleClaimFarmRewards]);
 
   return (
     <Box
@@ -222,8 +188,8 @@ const Card: React.FC<CardProps> = (props) => {
                 flexWrap: "nowrap",
               }}
             >
-              <Box color="#D4FF00">{200}&nbsp;</Box>
-              <Box>/ {999} DELFI</Box>
+              <Box color="#D4FF00">{unclaimedFarmRewards || "0"}&nbsp;</Box>
+              <Box>/ {totalFarmRewards || "0"} DELFI</Box>
             </Box>
           </Box>
         </Grid>

@@ -1,12 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+type FarmPoolToRewards = Record<
+  string,
+  {
+    unclaimedFarmRewards: string;
+    totalFarmRewards: string;
+  }
+>;
+
 const initialState = {
   referralLinkState: "Unavailable",
   referralLink: "",
   isRefreshing: false,
-  isClaiming: false,
+  isClaimingFarmRewards: false,
+  isClaimingSwapRewards: false,
   openSnackbar: false,
   claimResult: null,
+  farmPoolToRewards: {},
+  rewardRefreshTs: Math.floor(Date.now() / 1000),
 };
 
 const rewardViewSlice = createSlice({
@@ -25,8 +36,12 @@ const rewardViewSlice = createSlice({
       state.isRefreshing = action.payload.isRefreshing;
     },
 
-    setIsClaiming(state, action: PayloadAction<{ isClaiming: boolean }>) {
-      state.isClaiming = action.payload.isClaiming;
+    setIsClaimingFarmRewards(state, action: PayloadAction<{ isClaimingFarmRewards: boolean }>) {
+      state.isClaimingFarmRewards = action.payload.isClaimingFarmRewards;
+    },
+
+    setIsClaimingSwapRewards(state, action: PayloadAction<{ isClaimingSwapRewards: boolean }>) {
+      state.isClaimingSwapRewards = action.payload.isClaimingSwapRewards;
     },
 
     setClaimResult(state, action: PayloadAction<{ claimResult: { status: boolean } }>) {
@@ -35,6 +50,14 @@ const rewardViewSlice = createSlice({
 
     setOpenSnackbar(state, action: PayloadAction<{ openSnackbar: boolean }>) {
       state.openSnackbar = action.payload.openSnackbar;
+    },
+
+    setFarmPoolRewardsInfo(state, action: PayloadAction<{ farmPoolToRewards: FarmPoolToRewards }>) {
+      state.farmPoolToRewards = action.payload.farmPoolToRewards;
+    },
+
+    updateRefreshTs(state) {
+      state.rewardRefreshTs = Math.floor(Date.now() / 1000);
     },
   },
 });

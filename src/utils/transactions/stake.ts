@@ -108,31 +108,35 @@ export async function createUpdateStakeTransaction(
 export async function createClaimFarmRewardsTransaction(
   program: any,
   connection: Connection,
-  poolConfig: PoolConfig,
-  farmInfo: string,
+  farmPoolInfoList: { poolConfig: PoolConfig; farmInfo: string }[],
   walletPubkey: PublicKey,
   userDeltafiToken: PublicKey,
 ) {
-  const [farmUserPubKey] = await PublicKey.findProgramAddress(
-    [Buffer.from("FarmUser"), new PublicKey(farmInfo).toBuffer(), walletPubkey.toBuffer()],
-    program.programId,
-  );
-
   let transaction = new Transaction();
-  transaction.add(
-    program.transaction.claimFarmRewards({
-      accounts: {
-        marketConfig: new PublicKey(deployConfigV2.marketConfig),
-        farmInfo: new PublicKey(farmInfo),
-        swapInfo: new PublicKey(poolConfig.swapInfo),
-        farmUser: farmUserPubKey,
-        userDeltafiToken,
-        swapDeltafiToken: new PublicKey(deployConfigV2.deltafiToken),
-        owner: walletPubkey,
-        tokenProgram: token.TOKEN_PROGRAM_ID,
-      },
-    }),
-  );
+
+  for (let i = 0; i < farmPoolInfoList.length; i++) {
+    const poolConfig = farmPoolInfoList[i].poolConfig;
+    const farmInfo = farmPoolInfoList[i].farmInfo;
+    const [farmUserPubKey] = await PublicKey.findProgramAddress(
+      [Buffer.from("FarmUser"), new PublicKey(farmInfo).toBuffer(), walletPubkey.toBuffer()],
+      program.programId,
+    );
+
+    transaction.add(
+      program.transaction.claimFarmRewards({
+        accounts: {
+          marketConfig: new PublicKey(deployConfigV2.marketConfig),
+          farmInfo: new PublicKey(farmInfo),
+          swapInfo: new PublicKey(poolConfig.swapInfo),
+          farmUser: farmUserPubKey,
+          userDeltafiToken,
+          swapDeltafiToken: new PublicKey(deployConfigV2.deltafiToken),
+          owner: walletPubkey,
+          tokenProgram: token.TOKEN_PROGRAM_ID,
+        },
+      }),
+    );
+  }
 
   const signers = [];
   return partialSignTransaction({

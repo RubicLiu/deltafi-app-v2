@@ -5,7 +5,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import RewardCard from "views/Reward/components/RewardCard";
 
-const LiquidityReward = (): ReactElement => {
+const LiquidityReward = (props): ReactElement => {
+  const { handleClaimFarmRewards } = props;
   const { setMenu } = useModal();
   return (
     <Box width="100%" minWidth={{ md: 460 }}>
@@ -18,9 +19,16 @@ const LiquidityReward = (): ReactElement => {
         </IconButton>
       </Box>
       <Box maxHeight={500} sx={{ overflow: "auto" }}>
-        {poolConfigs.map((poolConfig: PoolConfig) => (
-          <RewardCard key={poolConfig.name + "-reward"} poolConfig={poolConfig} />
-        ))}
+        {poolConfigs.map((poolConfig: PoolConfig) =>
+          poolConfig.farmInfoList?.map((farm) => (
+            <RewardCard
+              key={poolConfig.name + "-reward"}
+              poolConfig={poolConfig}
+              farmPoolAddress={farm.farmInfo}
+              handleClaimFarmRewards={handleClaimFarmRewards}
+            />
+          )),
+        )}
       </Box>
     </Box>
   );
