@@ -325,8 +325,8 @@ const Home: React.FC = (props) => {
   }, [farmPoolKeyToFarmUser, farmPoolKeyToFarmUser]);
 
   const {
-    claimedRewardFromSwap,
-    claimedRewardFromReferral,
+    owedRewardFromSwap,
+    owedRewardFromReferral,
     totalRewardFromSwap,
     totalRewardFromReferral,
   } = useMemo(() => {
@@ -334,8 +334,6 @@ const Home: React.FC = (props) => {
       exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
     if (deltafiUser?.user) {
       return {
-        claimedRewardFromSwap: parseRewardBN(deltafiUser.user.claimedSwapRewards),
-        claimedRewardFromReferral: parseRewardBN(deltafiUser.user.claimedReferralRewards),
         owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedSwapRewards),
         owedRewardFromReferral: parseRewardBN(deltafiUser.user.owedReferralRewards),
         totalRewardFromSwap: parseRewardBN(
@@ -348,8 +346,8 @@ const Home: React.FC = (props) => {
     }
 
     return {
-      claimedRewardFromSwap: "--",
-      claimedRewardFromReferral: "--",
+      owedRewardFromSwap: "--",
+      owedRewardFromReferral: "--",
       totalRewardFromSwap: "--",
       totalRewardFromReferral: "--",
     };
@@ -748,7 +746,7 @@ const Home: React.FC = (props) => {
                 <Box color="#D4FF00">TRADE FARMING</Box>
                 <Box>Unclaimed / Total</Box>
                 <Box lineHeight="24px" display="flex" fontSize={20}>
-                  <Box color="#D4FF00">{claimedRewardFromSwap}&nbsp;</Box>
+                  <Box color="#D4FF00">{owedRewardFromSwap}&nbsp;</Box>
                   <Box>/ {totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
                 <Box color="#D4FF00">{claimRewardsButton}</Box>
@@ -757,7 +755,7 @@ const Home: React.FC = (props) => {
                 <Box color="#905BFF">REGERRAL BONUS</Box>
                 <Box>Unclaimed / Total</Box>
                 <Box lineHeight="24px" display="flex" fontSize={20}>
-                  <Box color="#905BFF">{claimedRewardFromReferral}&nbsp;</Box>
+                  <Box color="#905BFF">{owedRewardFromReferral}&nbsp;</Box>
                   <Box>/ {totalRewardFromReferral} DELFI</Box>{" "}
                 </Box>
                 <Box color="#905BFF">{claimRewardsButton}</Box>
