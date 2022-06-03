@@ -8,7 +8,6 @@ import RewardCard from "views/Reward/components/RewardCard";
 const LiquidityReward = (props): ReactElement => {
   const { handleClaimFarmRewards } = props;
   const { setMenu } = useModal();
-
   return (
     <Box width="100%" minWidth={{ md: 460 }}>
       <Box display="flex" justifyContent="space-between">

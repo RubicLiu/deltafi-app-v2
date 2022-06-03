@@ -474,7 +474,6 @@ const Home: React.FC = (props) => {
     if (!walletPubkey || !program) {
       return null;
     }
-
     const connection = program.provider.connection;
     dispatch(rewardViewActions.setIsClaimingFarmRewards({ isClaimingFarmRewards: true }));
     try {
@@ -509,7 +508,7 @@ const Home: React.FC = (props) => {
       dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
     } finally {
       dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: false }));
+      dispatch(rewardViewActions.setIsClaimingFarmRewards({ isClaimingFarmRewards: false }));
       dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
     }
   }, [dispatch, farmPoolKeyToFarmUser, program, signTransaction, userDeltafiToken, walletPubkey]);

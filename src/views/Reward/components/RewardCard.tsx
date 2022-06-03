@@ -94,7 +94,7 @@ const Card: React.FC<CardProps> = (props) => {
     );
   }, [handleSnackBarClose]);
   const claimRewardsButton = useMemo(() => {
-    if (rewardView.isClaimingSwapRewards) {
+    if (rewardView.isClaimingFarmRewards) {
       return (
         <StyledConnectButton variant="outlined" disabled>
           <CircularProgress size={24} color="inherit" />
@@ -104,7 +104,10 @@ const Card: React.FC<CardProps> = (props) => {
     return (
       <StyledConnectButton
         variant="outlined"
-        onClick={handleClaimFarmRewards}
+        onClick={(e) => {
+          e.stopPropagation(); // need this to prevent onclick callback from being called twice
+          handleClaimFarmRewards();
+        }}
         color="inherit"
         disabled={
           !deltafiUser?.user?.owedReferralRewards ||
