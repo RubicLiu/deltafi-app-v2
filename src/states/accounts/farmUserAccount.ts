@@ -5,7 +5,6 @@ import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { FarmUser } from "anchor/type_definitions";
 
 type FarmPoolKeyToFarmUser = Record<string, FarmUser>;
-
 export interface FarmUserState {
   farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser;
 }

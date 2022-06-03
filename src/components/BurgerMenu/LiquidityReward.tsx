@@ -6,8 +6,9 @@ import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import RewardCard from "views/Reward/components/RewardCard";
 
 const LiquidityReward = (props): ReactElement => {
-  const { farmPoolToRewards, handleClaimFarmRewards } = props;
+  const { handleClaimFarmRewards } = props;
   const { setMenu } = useModal();
+
   return (
     <Box width="100%" minWidth={{ md: 460 }}>
       <Box display="flex" justifyContent="space-between">
@@ -24,8 +25,7 @@ const LiquidityReward = (props): ReactElement => {
             <RewardCard
               key={poolConfig.name + "-reward"}
               poolConfig={poolConfig}
-              unclaimedReward={farmPoolToRewards[farm.farmInfo]?.unclaimedFarmRewards}
-              totalReward={farmPoolToRewards[farm.farmInfo]?.totalFarmRewards}
+              farmPoolAddress={farm.farmInfo}
               handleClaimFarmRewards={handleClaimFarmRewards}
             />
           )),

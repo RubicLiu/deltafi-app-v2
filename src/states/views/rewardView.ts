@@ -1,5 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+type FarmPoolToRewards = Record<
+  string,
+  {
+    unclaimedFarmRewards: string;
+    totalFarmRewards: string;
+  }
+>;
+
 const initialState = {
   referralLinkState: "Unavailable",
   referralLink: "",
@@ -8,6 +16,7 @@ const initialState = {
   isClaimingSwapRewards: false,
   openSnackbar: false,
   claimResult: null,
+  farmPoolToRewards: {},
   rewardRefreshTs: Math.floor(Date.now() / 1000),
 };
 
@@ -41,6 +50,10 @@ const rewardViewSlice = createSlice({
 
     setOpenSnackbar(state, action: PayloadAction<{ openSnackbar: boolean }>) {
       state.openSnackbar = action.payload.openSnackbar;
+    },
+
+    setFarmPoolRewardsInfo(state, action: PayloadAction<{ farmPoolToRewards: FarmPoolToRewards }>) {
+      state.farmPoolToRewards = action.payload.farmPoolToRewards;
     },
 
     updateRefreshTs(state) {

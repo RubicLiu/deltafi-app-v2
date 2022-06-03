@@ -239,13 +239,13 @@ const Home: React.FC = (props) => {
 
   useEffect(() => {
     // Refresh the pyth data every 5 seconds.
-    return scheduleWithInterval(() => dispatch(rewardViewActions.updateRefreshTs()), 2 * 5000);
+    return scheduleWithInterval(() => dispatch(rewardViewActions.updateRefreshTs()), 1 * 5000);
   }, [dispatch]);
 
   // farmPoolToReward records user's rewards in each pool
   // userUnclaimedFarmRewards is user's unclaimed rewards up till now
   // userTotalFarmRewards is the rewards amount that have been claimed by the user
-  const { farmPoolToRewards, userUnclaimedFarmRewards, userTotalFarmRewards } = useMemo(() => {
+  const farmPoolRewardsInfo = useMemo(() => {
     const farmPoolToRewards: Record<
       string,
       { unclaimedFarmRewards: string; totalFarmRewards: string }
@@ -254,15 +254,23 @@ const Home: React.FC = (props) => {
     let userUnclaimedFarmRewards = new BigNumber(0);
     let userTotalFarmRewards = new BigNumber(0);
 
+    if (!farmKeyToFarmInfo || !farmPoolKeyToFarmUser) {
+      return {
+        farmPoolToRewards,
+        userUnclaimedFarmRewards: "--",
+        userTotalFarmRewards: "--",
+      };
+    }
+
     let hasFarmUser = false;
     for (const farmPoolKey in farmPoolKeyToFarmUser) {
       const farmUser = farmPoolKeyToFarmUser[farmPoolKey];
-      if (!farmUser) {
+      const farmInfo = farmKeyToFarmInfo[farmPoolKey];
+      if (!farmUser || !farmInfo) {
         farmPoolToRewards[farmPoolKey] = { unclaimedFarmRewards: "--", totalFarmRewards: "--" };
         continue;
       }
       hasFarmUser = true;
-      const farmInfo = farmKeyToFarmInfo[farmPoolKey];
 
       const baseApr = new BigNumber(farmInfo.farmConfig.baseAprNumerator.toString()).dividedBy(
         farmInfo.farmConfig.baseAprDenominator.toString(),
@@ -318,6 +326,7 @@ const Home: React.FC = (props) => {
       farmPoolToRewards[farmPoolKey] = { unclaimedFarmRewards, totalFarmRewards };
     }
 
+    dispatch(rewardViewActions.setFarmPoolRewardsInfo({ farmPoolToRewards }));
     return {
       farmPoolToRewards,
       userUnclaimedFarmRewards: hasFarmUser
@@ -327,7 +336,7 @@ const Home: React.FC = (props) => {
         ? userTotalFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
         : "--",
     };
-  }, [farmPoolKeyToFarmUser, farmKeyToFarmInfo, rewardView.rewardRefreshTs]);
+  }, [farmPoolKeyToFarmUser, farmKeyToFarmInfo, rewardView.rewardRefreshTs, dispatch]);
 
   const {
     owedRewardFromSwap,
@@ -531,12 +540,12 @@ const Home: React.FC = (props) => {
       <StyledButton
         variant="outlined"
         disabled={
-          userUnclaimedFarmRewards === "--" ||
-          userTotalFarmRewards === "--" ||
-          parseFloat(userUnclaimedFarmRewards) === 0
+          farmPoolRewardsInfo.userUnclaimedFarmRewards === "--" ||
+          farmPoolRewardsInfo.userTotalFarmRewards === "--" ||
+          parseFloat(farmPoolRewardsInfo.userUnclaimedFarmRewards) === 0
         }
         onClick={() =>
-          setMenu(true, "liquidity-reward", null, { farmPoolToRewards, handleClaimFarmRewards })
+          setMenu(true, "liquidity-reward", null, { farmPoolRewardsInfo, handleClaimFarmRewards })
         }
         color="inherit"
         data-amp-analytics-on="click"
@@ -555,13 +564,7 @@ const Home: React.FC = (props) => {
         </Box>
       </StyledButton>
     );
-  }, [
-    setMenu,
-    farmPoolToRewards,
-    handleClaimFarmRewards,
-    userTotalFarmRewards,
-    userUnclaimedFarmRewards,
-  ]);
+  }, [setMenu, farmPoolRewardsInfo, handleClaimFarmRewards]);
 
   const snackMessage = useMemo(() => {
     if (!rewardView || !rewardView.claimResult) {
@@ -793,16 +796,16 @@ const Home: React.FC = (props) => {
         {/* TODO please check and set up the true "no reward" condition */}
         {(isConnectedWallet && totalRewardFromReferral !== "--") ||
         totalRewardFromSwap !== "--" ||
-        userUnclaimedFarmRewards !== "--" ||
-        userTotalFarmRewards !== "--" ? (
+        farmPoolRewardsInfo.userUnclaimedFarmRewards !== "--" ||
+        farmPoolRewardsInfo.userTotalFarmRewards !== "--" ? (
           <Box>
             <Box mt={2} mb={3} display="flex" gap={1.25} justifyContent="center" flexWrap="wrap">
               <Box className={classes.rewardBox} border="1px solid #03F2A0">
                 <Box color="#03F2A0">LIQUIDITY MINING</Box>
                 <Box>Unclaimed / Total</Box>
                 <Box lineHeight="24px" display="flex" fontSize={20}>
-                  <Box color="#03F2A0">{userUnclaimedFarmRewards}&nbsp;</Box>
-                  <Box>/ {userTotalFarmRewards} DELFI</Box>{" "}
+                  <Box color="#03F2A0">{farmPoolRewardsInfo.userUnclaimedFarmRewards}&nbsp;</Box>
+                  <Box>/ {farmPoolRewardsInfo.userTotalFarmRewards} DELFI</Box>{" "}
                 </Box>
                 <Box color="#03F2A0">{claimFarmRewardsButton}</Box>
               </Box>

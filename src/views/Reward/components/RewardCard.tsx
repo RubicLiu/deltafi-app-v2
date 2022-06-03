@@ -21,8 +21,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 interface CardProps {
   poolConfig: PoolConfig;
-  unclaimedReward: string;
-  totalReward: string;
+  farmPoolAddress: string;
   handleClaimFarmRewards: () => any;
 }
 
@@ -44,9 +43,12 @@ const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
 }));
 
 const Card: React.FC<CardProps> = (props) => {
-  const { poolConfig, unclaimedReward, totalReward, handleClaimFarmRewards } = props;
+  const { poolConfig, farmPoolAddress, handleClaimFarmRewards } = props;
   const { baseTokenInfo, quoteTokenInfo } = poolConfig;
   const rewardView = useSelector(rewardViewSelector);
+  const { unclaimedFarmRewards, totalFarmRewards } = rewardView.farmPoolToRewards[
+    farmPoolAddress
+  ] || { unclaimedFarmRewards: "--", totalFarmRewards: "--" };
   const dispatch = useDispatch();
   const deltafiUser = useSelector(deltafiUserSelector);
   const classes = useStyles(props);
@@ -183,8 +185,8 @@ const Card: React.FC<CardProps> = (props) => {
                 flexWrap: "nowrap",
               }}
             >
-              <Box color="#D4FF00">{unclaimedReward || "0"}&nbsp;</Box>
-              <Box>/ {totalReward || "0"} DELFI</Box>
+              <Box color="#D4FF00">{unclaimedFarmRewards || "0"}&nbsp;</Box>
+              <Box>/ {totalFarmRewards || "0"} DELFI</Box>
             </Box>
           </Box>
         </Grid>
