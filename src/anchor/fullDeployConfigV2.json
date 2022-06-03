@@ -11,6 +11,8 @@
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
+        "mintBase": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "mintQuote": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
         "swapInfo": "HaEkMzDR5BFcVAjKT35f2gWwPvAt1TwwAq9yuQtqRLQ5",
         "farmInfoList": [
           {
@@ -23,6 +25,8 @@
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
+        "mintBase": "So11111111111111111111111111111111111111112",
+        "mintQuote": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
         "swapInfo": "HPnmHPyFJR1n4t1H7ophxSftkfM3nKnrEGm5uvsTSSFV",
         "farmInfoList": [
           {
@@ -35,6 +39,8 @@
         "name": "GMT-USDC",
         "base": "GMT",
         "quote": "USDC",
+        "mintBase": "7i5KKsX2weiTkry7jA4ZwSuXGhs5eJBEjY8vVxR4pfRx",
+        "mintQuote": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
         "swapInfo": "2og8uyTCpR2rKzweQhJmBAoscX1e6WFCZhRrSTKbQ2ur",
         "farmInfoList": [
           {
@@ -107,6 +113,8 @@
         "name": "USDC-USDT",
         "base": "USDC",
         "quote": "USDT",
+        "mintBase": "3itb8x9GX7bxQ6eFfQT3E7CstkjaESizBpHNWB5wxjYY",
+        "mintQuote": "Hi4jco598zF6g4VM3uYfDaTvZFoMtX6TaTZZ9QdiVLUq",
         "swapInfo": "12yxxrDG1ttGb9Df4dx5bmMf75x3ZkcaEApJCb2DimmJ",
         "farmInfoList": [
           {
@@ -119,6 +127,8 @@
         "name": "SOL-USDC",
         "base": "SOL",
         "quote": "USDC",
+        "mintBase": "So11111111111111111111111111111111111111112",
+        "mintQuote": "3itb8x9GX7bxQ6eFfQT3E7CstkjaESizBpHNWB5wxjYY",
         "swapInfo": "5e6G2GXihu4kztteM8jv7Qobq95quc7PCqFowG1SKA7u",
         "farmInfoList": [
           {
@@ -131,6 +141,8 @@
         "name": "GMT-USDC",
         "base": "GMT",
         "quote": "USDC",
+        "mintBase": "BjcHCBE8apXxV5Ux5DqxmtYyW7Nc1LS3jRxkRaFsFSDX",
+        "mintQuote": "3itb8x9GX7bxQ6eFfQT3E7CstkjaESizBpHNWB5wxjYY",
         "swapInfo": "6xY1qiSr5QSkRpEu6q5uAn7ZQbZNRYpGJPyFueNUXTaY",
         "farmInfoList": [
           {

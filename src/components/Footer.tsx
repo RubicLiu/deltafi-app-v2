@@ -155,34 +155,6 @@ const Footer: React.FC = (props) => {
               <TelegramIcon isDark={isDark} />
             </IconButton>
           </IconWrapper>
-          <IconWrapper>
-            <IconButton
-              component="a"
-              href={YOUTUBE_LINK}
-              target="_blank"
-              rel="noreferrer noopener"
-              data-amp-analytics-on="click"
-              data-amp-analytics-name="click"
-              data-amp-analytics-attrs="page: Footer, target: Medium"
-              className={classes.iconButton}
-            >
-              <YoutubeIcon isDark={isDark} />
-            </IconButton>
-          </IconWrapper>
-          <IconWrapper>
-            <IconButton
-              component="a"
-              href={SPOTIFY_LINK}
-              target="_blank"
-              rel="noreferrer noopener"
-              data-amp-analytics-on="click"
-              data-amp-analytics-name="click"
-              data-amp-analytics-attrs="page: Footer, target: Medium"
-              className={classes.iconButton}
-            >
-              <Spotify />
-            </IconButton>
-          </IconWrapper>
         </StyledDiv>
         <Box fontSize={14} fontWeight={500} color="#F2F2F2">
           © 2022 DeltaFi. All rights reserved
