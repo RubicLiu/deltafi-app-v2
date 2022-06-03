@@ -6,7 +6,6 @@ import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import RewardCard from "views/Reward/components/RewardCard";
 
 const LiquidityReward = (props): ReactElement => {
-  console.log(props);
   const { farmPoolToRewards, handleClaimFarmRewards } = props;
   const { setMenu } = useModal();
   return (

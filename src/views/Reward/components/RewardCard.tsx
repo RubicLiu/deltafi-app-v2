@@ -8,22 +8,13 @@ import {
   Theme,
   IconButton,
 } from "@mui/material";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
+import { PoolConfig } from "constants/deployConfigV2";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDeltafiUserManually } from "states/accounts/deltafiUserAccount";
 import BN from "bn.js";
-import {
-  deltafiUserSelector,
-  programSelector,
-  rewardViewSelector,
-  selectTokenAccountInfoByMint,
-} from "states/selectors";
+import { deltafiUserSelector, rewardViewSelector } from "states/selectors";
 import { rewardViewActions } from "states/views/rewardView";
 import styled from "styled-components";
-import { sendSignedTransaction } from "utils/transactions";
-import { createClaimSwapRewardsTransaction } from "utils/transactions/deltafiUser";
 import { ConnectButton } from "components";
 import { makeStyles } from "@mui/styles";
 import CloseIcon from "@mui/icons-material/Close";
@@ -57,47 +48,12 @@ const Card: React.FC<CardProps> = (props) => {
   const { baseTokenInfo, quoteTokenInfo } = poolConfig;
   const rewardView = useSelector(rewardViewSelector);
   const dispatch = useDispatch();
-  const wallet = useWallet();
-  const { publicKey: walletPubkey, signTransaction } = wallet;
-  const userDeltafiToken = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
-  const program = useSelector(programSelector);
   const deltafiUser = useSelector(deltafiUserSelector);
-  const connection = program.provider.connection;
   const classes = useStyles(props);
-
-  //TODO: please update with correct handler
-  const handleClaimRewards = useCallback(async () => {
-    dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: true }));
-
-    try {
-      const partialSignedTransaction = await createClaimSwapRewardsTransaction(
-        program,
-        connection,
-        walletPubkey,
-        userDeltafiToken?.publicKey,
-        deltafiUser.user,
-      );
-
-      const signedTransaction = await signTransaction(partialSignedTransaction);
-      const signature = await sendSignedTransaction({ signedTransaction, connection });
-      await connection.confirmTransaction(signature, "confirmed");
-      await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
-      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: true } }));
-    } catch (e) {
-      console.error(e);
-      // TODO(leqiang): Add error display here
-      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
-    } finally {
-      dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: false }));
-    }
-  }, [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: false }));
   }, [dispatch]);
-
-  console.log(handleClaimFarmRewards);
 
   const snackMessage = useMemo(() => {
     if (!rewardView || !rewardView.claimResult) {

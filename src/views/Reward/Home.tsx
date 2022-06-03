@@ -42,11 +42,8 @@ import { exponentiatedBy } from "utils/decimal";
 import { deployConfigV2, PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import styled from "styled-components";
-import { FarmUser, FarmInfo } from "anchor/type_definitions";
-import { anchorBnToBn } from "utils/tokenUtils";
-import { stringify } from "querystring";
-import { Transaction } from "@solana/web3.js";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
+import { scheduleWithInterval } from "utils";
 
 // /*
 //  * mockup test data for reward page
@@ -240,6 +237,11 @@ const Home: React.FC = (props) => {
       .dividedBy(SECONDS_PER_YEAR);
   };
 
+  useEffect(() => {
+    // Refresh the pyth data every 5 seconds.
+    return scheduleWithInterval(() => dispatch(rewardViewActions.updateRefreshTs()), 2 * 5000);
+  }, [dispatch]);
+
   // farmPoolToReward records user's rewards in each pool
   // userUnclaimedFarmRewards is user's unclaimed rewards up till now
   // userTotalFarmRewards is the rewards amount that have been claimed by the user
@@ -316,7 +318,6 @@ const Home: React.FC = (props) => {
       farmPoolToRewards[farmPoolKey] = { unclaimedFarmRewards, totalFarmRewards };
     }
 
-    console.log(farmPoolToRewards);
     return {
       farmPoolToRewards,
       userUnclaimedFarmRewards: hasFarmUser
@@ -326,7 +327,7 @@ const Home: React.FC = (props) => {
         ? userTotalFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
         : "--",
     };
-  }, [farmPoolKeyToFarmUser, farmPoolKeyToFarmUser]);
+  }, [farmPoolKeyToFarmUser, farmKeyToFarmInfo, rewardView.rewardRefreshTs]);
 
   const {
     owedRewardFromSwap,
@@ -476,7 +477,6 @@ const Home: React.FC = (props) => {
         )
         .flat();
 
-      console.log(farmPoolInfoList);
       const transaction = await createClaimFarmRewardsTransaction(
         program,
         connection,
@@ -495,21 +495,6 @@ const Home: React.FC = (props) => {
       await connection.confirmTransaction(hash, "confirmed");
       await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
       dispatch(rewardViewActions.setClaimResult({ claimResult: { status: true } }));
-      // await fecthTokenAccountInfoList(
-      //   [DELTAFI_TOKEN_MINT.toBase58()],
-      //   walletPubkey,
-      //   connection,
-      //   dispatch,
-      // );
-      // dispatch(
-      //   stakeViewActions.setTransactionResult({
-      //     transactionResult: {
-      //       status: true,
-      //       action: "claim",
-      //       hash,
-      //     },
-      //   }),
-      // );
     } catch (e) {
       console.error(e);
       dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
@@ -518,7 +503,7 @@ const Home: React.FC = (props) => {
       dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: false }));
       dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
     }
-  }, []);
+  }, [dispatch, farmPoolKeyToFarmUser, program, signTransaction, userDeltafiToken, walletPubkey]);
   // const refreshButton = useMemo(() => {
   //   if (rewardView.isRefreshing) {
   //     return (
@@ -570,7 +555,13 @@ const Home: React.FC = (props) => {
         </Box>
       </StyledButton>
     );
-  }, [setMenu, farmPoolToRewards]);
+  }, [
+    setMenu,
+    farmPoolToRewards,
+    handleClaimFarmRewards,
+    userTotalFarmRewards,
+    userUnclaimedFarmRewards,
+  ]);
 
   const snackMessage = useMemo(() => {
     if (!rewardView || !rewardView.claimResult) {
