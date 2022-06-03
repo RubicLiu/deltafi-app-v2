@@ -23,6 +23,7 @@ export const GITHUB_LINK = "https://github.com/deltafi-trade";
 export const TELEGRAM_LINK = "https://t.me/deltafi_labs";
 export const YOUTUBE_LINK = "https://www.youtube.com/channel/UCVs_ZIdnPKdxy30eWrAeBLQ";
 export const SOLSCAN_LINK = "https://solscan.io/token/de1QJkP1qDCk5JYCCXCeq27bQQUdCaiv7xVKFrhPSzF";
+export const SPOTIFY_LINK = "https://www.spotify.com/";
 
 export const MAINNET_CHAIN_ID = 1;
 export const connectorLocalStorageKey = "connectorId";
