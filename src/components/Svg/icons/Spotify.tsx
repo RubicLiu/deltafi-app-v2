@@ -5,8 +5,8 @@ const Icon: React.FC = () => {
     <svg width="40" height="41" viewBox="0 0 40 41" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         opacity="0.1"
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M0.333252 19.916C0.333252 9.42261 8.83984 0.916016 19.3333 0.916016C29.8267 0.916016 38.3333 9.42261 38.3333 19.916C38.3333 30.4094 29.8267 38.916 19.3333 38.916C8.83984 38.916 0.333252 30.4094 0.333252 19.916Z"
         fill="#F2F2F2"
       />
@@ -23,8 +23,8 @@ const Icon: React.FC = () => {
           y2="23.8235"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#D4FF00" />
-          <stop offset="1" stop-color="#BDFF00" />
+          <stop stopColor="#D4FF00" />
+          <stop offset="1" stopColor="#BDFF00" />
         </linearGradient>
       </defs>
     </svg>

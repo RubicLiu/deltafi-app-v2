@@ -25,7 +25,6 @@ export const YOUTUBE_LINK = "https://www.youtube.com/channel/UCVs_ZIdnPKdxy30eWr
 export const SOLSCAN_LINK = "https://solscan.io/token/de1QJkP1qDCk5JYCCXCeq27bQQUdCaiv7xVKFrhPSzF";
 export const SPOTIFY_LINK = "https://www.spotify.com/";
 
-
 export const MAINNET_CHAIN_ID = 1;
 export const connectorLocalStorageKey = "connectorId";
 

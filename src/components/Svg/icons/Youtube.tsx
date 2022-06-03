@@ -10,8 +10,8 @@ const Icon: React.FC<YoutubeProps> = ({ isDark, ...props }) => {
     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         opacity="0.1"
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M1.16663 19.916C1.16663 9.42261 9.67322 0.916016 20.1666 0.916016C30.66 0.916016 39.1666 9.42261 39.1666 19.916C39.1666 30.4094 30.66 38.916 20.1666 38.916C9.67322 38.916 1.16663 30.4094 1.16663 19.916Z"
         fill="#F2F2F2"
       />
@@ -28,8 +28,8 @@ const Icon: React.FC<YoutubeProps> = ({ isDark, ...props }) => {
           y2="23.2569"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#D4FF00" />
-          <stop offset="1" stop-color="#BDFF00" />
+          <stop stopColor="#D4FF00" />
+          <stop offset="1" stopColor="#BDFF00" />
         </linearGradient>
       </defs>
     </svg>

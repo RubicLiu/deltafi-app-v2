@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useState } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Divider, makeStyles, Theme } from "@material-ui/core";
 import styled from "styled-components";
@@ -100,18 +100,21 @@ const WalletPanel: React.FC = (props) => {
   const classes = useStyles(props);
 
   const accountAddress = publicKey ? publicKey.toString() : "";
-  const timer = { current: null };
-
+  const mounted = useRef(false);
   useEffect(() => {
+    mounted.current = true;
+
     return () => {
-      clearInterval(timer.current);
+      mounted.current = false;
     };
   }, []);
 
   const onCopyAddress = () => {
     navigator.clipboard.writeText(publicKey.toString());
     setCopyMessageOpen(true);
-    timer.current = setTimeout(() => setCopyMessageOpen(false), 2000);
+    setTimeout(() => {
+      if (mounted.current) setCopyMessageOpen(false);
+    }, 2000);
     setMenu(false);
   };
 
@@ -135,21 +138,9 @@ const WalletPanel: React.FC = (props) => {
           <CopyAddressIcon height={22} className={classes.icon} onClick={onCopyAddress} />
           {/* <Reset width={22} onClick={onDisconnectWallet} /> */}
         </Box>
-        <StyledDivider />
-        <Box display="flex" width="100%" textAlign="center" alignItems="center">
-          <Box width={24} />
-          <Box marginLeft={1.2} marginRight={2}>
-            <Img src={wallet.icon} alt={wallet.name} />
-          </Box>
-          <Box color="#fff">
-            {accountAddress?.substring(0, 4)}...
-            {accountAddress?.substring(accountAddress?.length - 4)}
-          </Box>
-          {/* <Reset width={22} onClick={onDisconnectWallet} /> */}
-        </Box>
         {/* dump style, could be displayed when the data is ready */}
-        {swapHistory.map(() => (
-          <>
+        {swapHistory.map((it, idx) => (
+          <Box key={idx}>
             <StyledDivider />
             <Box>
               <Box
@@ -200,7 +191,7 @@ const WalletPanel: React.FC = (props) => {
                 </Box>
               </Box>
             </Box>
-          </>
+          </Box>
         ))}
 
         <StyledDivider />
