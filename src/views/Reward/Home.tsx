@@ -26,6 +26,8 @@ import {
   createClaimSwapRewardsTransaction,
   createDeltafiUserTransaction,
 } from "utils/transactions/deltafiUser";
+import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
+
 import {
   BLOG_LINK,
   DELTAFI_TOKEN_DECIMALS,
@@ -37,12 +39,14 @@ import {
 import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
-import { deployConfigV2 } from "constants/deployConfigV2";
+import { deployConfigV2, PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import styled from "styled-components";
 import { FarmUser, FarmInfo } from "anchor/type_definitions";
 import { anchorBnToBn } from "utils/tokenUtils";
 import { stringify } from "querystring";
+import { Transaction } from "@solana/web3.js";
+import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 
 // /*
 //  * mockup test data for reward page
@@ -426,9 +430,12 @@ const Home: React.FC = (props) => {
   //   }
   // }, [connection, walletPubkey, dispatch]);
 
-  const handleClaimRewards = useCallback(async () => {
-    dispatch(rewardViewActions.setIsClaiming({ isClaiming: true }));
+  const handleClaimSwapRewards = useCallback(async () => {
+    if (!walletPubkey || !program) {
+      return null;
+    }
 
+    dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: true }));
     try {
       const partialSignedTransaction = await createClaimSwapRewardsTransaction(
         program,
@@ -449,10 +456,69 @@ const Home: React.FC = (props) => {
       // TODO(leqiang): Add error display here
     } finally {
       dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(rewardViewActions.setIsClaiming({ isClaiming: false }));
+      dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: false }));
     }
   }, [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction]);
 
+  const handleClaimFarmRewards = useCallback(async () => {
+    if (!walletPubkey || !program) {
+      return null;
+    }
+
+    const connection = program.provider.connection;
+    dispatch(rewardViewActions.setIsClaimingFarmRewards({ isClaimingFarmRewards: true }));
+    try {
+      const farmPoolInfoList = poolConfigs
+        .map((poolConfig: PoolConfig) =>
+          poolConfig.farmInfoList
+            .filter((farm) => !!farmPoolKeyToFarmUser[farm.farmInfo])
+            .map((farm) => ({ poolConfig, farmInfo: farm.farmInfo })),
+        )
+        .flat();
+
+      console.log(farmPoolInfoList);
+      const transaction = await createClaimFarmRewardsTransaction(
+        program,
+        connection,
+        farmPoolInfoList,
+        walletPubkey,
+        userDeltafiToken?.publicKey,
+      );
+
+      const signedTransaction = await signTransaction(transaction);
+
+      const hash = await sendSignedTransaction({
+        signedTransaction,
+        connection,
+      });
+
+      await connection.confirmTransaction(hash, "confirmed");
+      await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
+      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: true } }));
+      // await fecthTokenAccountInfoList(
+      //   [DELTAFI_TOKEN_MINT.toBase58()],
+      //   walletPubkey,
+      //   connection,
+      //   dispatch,
+      // );
+      // dispatch(
+      //   stakeViewActions.setTransactionResult({
+      //     transactionResult: {
+      //       status: true,
+      //       action: "claim",
+      //       hash,
+      //     },
+      //   }),
+      // );
+    } catch (e) {
+      console.error(e);
+      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
+    } finally {
+      dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
+      dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: false }));
+      dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
+    }
+  }, []);
   // const refreshButton = useMemo(() => {
   //   if (rewardView.isRefreshing) {
   //     return (
@@ -475,11 +541,18 @@ const Home: React.FC = (props) => {
   //   );
   // }, [rewardView, deltafiUser, handleRefresh]);
 
-  const claimLiquidityRewardsButton = useMemo(() => {
+  const claimFarmRewardsButton = useMemo(() => {
     return (
       <StyledButton
         variant="outlined"
-        onClick={() => setMenu(true, "liquidity-reward", null, { farmPoolToRewards })}
+        disabled={
+          userUnclaimedFarmRewards === "--" ||
+          userTotalFarmRewards === "--" ||
+          parseFloat(userUnclaimedFarmRewards) === 0
+        }
+        onClick={() =>
+          setMenu(true, "liquidity-reward", null, { farmPoolToRewards, handleClaimFarmRewards })
+        }
         color="inherit"
         data-amp-analytics-on="click"
         data-amp-analytics-name="click"
@@ -544,8 +617,8 @@ const Home: React.FC = (props) => {
     );
   }, [handleSnackBarClose]);
 
-  const claimRewardsButton = useMemo(() => {
-    if (rewardView.isClaiming) {
+  const claimSwapRewardsButton = useMemo(() => {
+    if (rewardView.isClaimingSwapRewards) {
       return (
         <StyledButton color="inherit" variant="outlined" disabled>
           <CircularProgress size={16} color="inherit" />
@@ -555,7 +628,7 @@ const Home: React.FC = (props) => {
     return (
       <StyledButton
         variant="outlined"
-        onClick={handleClaimRewards}
+        onClick={handleClaimSwapRewards}
         color="inherit"
         disabled={
           !deltafiUser?.user?.owedReferralRewards ||
@@ -577,7 +650,7 @@ const Home: React.FC = (props) => {
         </Box>
       </StyledButton>
     );
-  }, [rewardView, deltafiUser, handleClaimRewards]);
+  }, [rewardView, deltafiUser, handleClaimSwapRewards]);
 
   return (
     <Box className={classes.root}>
@@ -740,7 +813,7 @@ const Home: React.FC = (props) => {
                   <Box color="#03F2A0">{userUnclaimedFarmRewards}&nbsp;</Box>
                   <Box>/ {userTotalFarmRewards} DELFI</Box>{" "}
                 </Box>
-                <Box color="#03F2A0">{claimLiquidityRewardsButton}</Box>
+                <Box color="#03F2A0">{claimFarmRewardsButton}</Box>
               </Box>
               <Box className={classes.rewardBox} border="1px solid #D4FF00">
                 <Box color="#D4FF00">TRADE FARMING</Box>
@@ -749,7 +822,7 @@ const Home: React.FC = (props) => {
                   <Box color="#D4FF00">{owedRewardFromSwap}&nbsp;</Box>
                   <Box>/ {totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
-                <Box color="#D4FF00">{claimRewardsButton}</Box>
+                <Box color="#D4FF00">{claimSwapRewardsButton}</Box>
               </Box>
               <Box className={classes.rewardBox} border="1px solid #905BFF">
                 <Box color="#905BFF">REGERRAL BONUS</Box>
@@ -758,7 +831,7 @@ const Home: React.FC = (props) => {
                   <Box color="#905BFF">{owedRewardFromReferral}&nbsp;</Box>
                   <Box>/ {totalRewardFromReferral} DELFI</Box>{" "}
                 </Box>
-                <Box color="#905BFF">{claimRewardsButton}</Box>
+                <Box color="#905BFF">{claimSwapRewardsButton}</Box>
               </Box>
             </Box>
           </Box>

@@ -32,6 +32,7 @@ interface CardProps {
   poolConfig: PoolConfig;
   unclaimedReward: string;
   totalReward: string;
+  handleClaimFarmRewards: () => any;
 }
 
 const StyledConnectButton = styled(ConnectButton)`
@@ -52,7 +53,7 @@ const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
 }));
 
 const Card: React.FC<CardProps> = (props) => {
-  const { poolConfig, unclaimedReward, totalReward } = props;
+  const { poolConfig, unclaimedReward, totalReward, handleClaimFarmRewards } = props;
   const { baseTokenInfo, quoteTokenInfo } = poolConfig;
   const rewardView = useSelector(rewardViewSelector);
   const dispatch = useDispatch();
@@ -66,7 +67,7 @@ const Card: React.FC<CardProps> = (props) => {
 
   //TODO: please update with correct handler
   const handleClaimRewards = useCallback(async () => {
-    dispatch(rewardViewActions.setIsClaiming({ isClaiming: true }));
+    dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: true }));
 
     try {
       const partialSignedTransaction = await createClaimSwapRewardsTransaction(
@@ -88,13 +89,15 @@ const Card: React.FC<CardProps> = (props) => {
       dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
     } finally {
       dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(rewardViewActions.setIsClaiming({ isClaiming: false }));
+      dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: false }));
     }
   }, [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: false }));
   }, [dispatch]);
+
+  console.log(handleClaimFarmRewards);
 
   const snackMessage = useMemo(() => {
     if (!rewardView || !rewardView.claimResult) {
@@ -133,7 +136,7 @@ const Card: React.FC<CardProps> = (props) => {
     );
   }, [handleSnackBarClose]);
   const claimRewardsButton = useMemo(() => {
-    if (rewardView.isClaiming) {
+    if (rewardView.isClaimingSwapRewards) {
       return (
         <StyledConnectButton variant="outlined" disabled>
           <CircularProgress size={24} color="inherit" />
@@ -143,7 +146,7 @@ const Card: React.FC<CardProps> = (props) => {
     return (
       <StyledConnectButton
         variant="outlined"
-        onClick={handleClaimRewards}
+        onClick={handleClaimFarmRewards}
         color="inherit"
         disabled={
           !deltafiUser?.user?.owedReferralRewards ||
@@ -166,7 +169,7 @@ const Card: React.FC<CardProps> = (props) => {
         </Box>
       </StyledConnectButton>
     );
-  }, [rewardView, deltafiUser, handleClaimRewards]);
+  }, [rewardView, deltafiUser, handleClaimFarmRewards]);
 
   return (
     <Box

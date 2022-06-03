@@ -7,7 +7,7 @@ import RewardCard from "views/Reward/components/RewardCard";
 
 const LiquidityReward = (props): ReactElement => {
   console.log(props);
-  const { farmPoolToRewards } = props;
+  const { farmPoolToRewards, handleClaimFarmRewards } = props;
   const { setMenu } = useModal();
   return (
     <Box width="100%" minWidth={{ md: 460 }}>
@@ -27,6 +27,7 @@ const LiquidityReward = (props): ReactElement => {
               poolConfig={poolConfig}
               unclaimedReward={farmPoolToRewards[farm.farmInfo]?.unclaimedFarmRewards}
               totalReward={farmPoolToRewards[farm.farmInfo]?.totalFarmRewards}
+              handleClaimFarmRewards={handleClaimFarmRewards}
             />
           )),
         )}

@@ -61,7 +61,14 @@ export default function ModalMenu() {
       case "withdraw":
         return null; // <WithdrawPanel />
       case "liquidity-reward":
-        return <LiquidityReward farmPoolToRewards={data?.farmPoolToRewards} />;
+        return (
+          <LiquidityReward
+            farmPoolToRewards={data?.farmPoolToRewards}
+            handleClaimFarmRewards={
+              data?.handleClaimFarmRewards || (() => console.error("no handler"))
+            }
+          />
+        );
       default:
         return null;
     }

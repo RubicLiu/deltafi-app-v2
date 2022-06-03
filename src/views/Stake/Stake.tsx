@@ -312,52 +312,49 @@ const Stake = (): ReactElement => {
   ]);
 
   const handleClaim = useCallback(async () => {
-    if (!walletPubkey || !lpUser || !rewardsAccount || !program) {
-      return null;
-    }
-
-    const connection = program.provider.connection;
-    dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: true }));
-    try {
-      const transaction = await createClaimFarmRewardsTransaction(
-        program,
-        connection,
-        poolConfig,
-        farmPoolId,
-        walletPubkey,
-        rewardsAccount.publicKey,
-      );
-      const signedTransaction = await signTransaction(transaction);
-
-      const hash = await sendSignedTransaction({
-        signedTransaction,
-        connection,
-      });
-
-      await connection.confirmTransaction(hash, "confirmed");
-      await fecthTokenAccountInfoList(
-        [DELTAFI_TOKEN_MINT.toBase58()],
-        walletPubkey,
-        connection,
-        dispatch,
-      );
-      dispatch(
-        stakeViewActions.setTransactionResult({
-          transactionResult: {
-            status: true,
-            action: "claim",
-            hash,
-          },
-        }),
-      );
-    } catch (e) {
-      console.error(e);
-      dispatch(stakeViewActions.setTransactionResult({ transactionResult: { status: false } }));
-    } finally {
-      dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: false }));
-      dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
-    }
+    // if (!walletPubkey || !lpUser || !rewardsAccount || !program) {
+    //   return null;
+    // }
+    // const connection = program.provider.connection;
+    // dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: true }));
+    // try {
+    //   const transaction = await createClaimFarmRewardsTransaction(
+    //     program,
+    //     connection,
+    //     poolConfig,
+    //     farmPoolId,
+    //     walletPubkey,
+    //     rewardsAccount.publicKey,
+    //   );
+    //   const signedTransaction = await signTransaction(transaction);
+    //   const hash = await sendSignedTransaction({
+    //     signedTransaction,
+    //     connection,
+    //   });
+    //   await connection.confirmTransaction(hash, "confirmed");
+    //   await fecthTokenAccountInfoList(
+    //     [DELTAFI_TOKEN_MINT.toBase58()],
+    //     walletPubkey,
+    //     connection,
+    //     dispatch,
+    //   );
+    //   dispatch(
+    //     stakeViewActions.setTransactionResult({
+    //       transactionResult: {
+    //         status: true,
+    //         action: "claim",
+    //         hash,
+    //       },
+    //     }),
+    //   );
+    // } catch (e) {
+    //   console.error(e);
+    //   dispatch(stakeViewActions.setTransactionResult({ transactionResult: { status: false } }));
+    // } finally {
+    //   dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
+    //   dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: false }));
+    //   dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
+    // }
   }, [
     walletPubkey,
     signTransaction,
