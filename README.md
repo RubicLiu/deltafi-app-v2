@@ -46,5 +46,5 @@ aws cloudfront create-invalidation --distribution-id E1RVY4FKCHDV6E --paths "/*"
 # prod
 bash deploy/build_prod.sh
 k8s-cli apply -f deploy/prod/main.json.jsonnet
-aws cloudfront create-invalidation --distribution-id E2031W5GOE0Z74 --paths "/*"
+aws cloudfront create-invalidation --distribution-id EIGCOL5NJN4HY --paths "/*"
 ```
