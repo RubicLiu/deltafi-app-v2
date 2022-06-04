@@ -27,20 +27,31 @@
                         "env": [
                            {
                               "name": "DOCKER_IMAGE_TAG",
-                              "value": "prod-b3e2968-20220604-122244"
+                              "value": "prod-5bbecd3-20220604-140244"
                            },
                            {
                               "name": "DEPLOYMENT_MODE",
                               "value": "mainnet-prod"
                            }
                         ],
-                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/frontend:prod-b3e2968-20220604-122244",
+                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/frontend:prod-5bbecd3-20220604-140244",
                         "name": "main",
                         "ports": [
                            {
                               "containerPort": 80
                            }
                         ]
+                     }
+                  ],
+                  "nodeSelector": {
+                     "kubernetes.io/arch": "arm64"
+                  },
+                  "tolerations": [
+                     {
+                        "effect": "NoSchedule",
+                        "key": "arch",
+                        "operator": "Equal",
+                        "value": "arm64"
                      }
                   ]
                }
@@ -93,20 +104,31 @@
                         "env": [
                            {
                               "name": "DOCKER_IMAGE_TAG",
-                              "value": "prod-b3e2968-20220604-122244"
+                              "value": "prod-5bbecd3-20220604-140244"
                            },
                            {
                               "name": "DEPLOYMENT_MODE",
                               "value": "mainnet-prod"
                            }
                         ],
-                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/backend:prod-b3e2968-20220604-122244",
+                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/backend:prod-5bbecd3-20220604-140244",
                         "name": "main",
                         "ports": [
                            {
                               "containerPort": 4000
                            }
                         ]
+                     }
+                  ],
+                  "nodeSelector": {
+                     "kubernetes.io/arch": "arm64"
+                  },
+                  "tolerations": [
+                     {
+                        "effect": "NoSchedule",
+                        "key": "arch",
+                        "operator": "Equal",
+                        "value": "arm64"
                      }
                   ]
                }
