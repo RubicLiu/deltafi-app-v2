@@ -42,6 +42,19 @@
                            }
                         ]
                      }
+                  ],
+                  "nodeSelector": [
+                     {
+                        "beta.kubernetes.io/arch": "arm64"
+                     }
+                  ],
+                  "tolerations": [
+                     {
+                        "effect": "NoSchedule",
+                        "key": "arch",
+                        "operator": "Equal",
+                        "value": "arm64"
+                     }
                   ]
                }
             }
@@ -107,6 +120,19 @@
                               "containerPort": 4000
                            }
                         ]
+                     }
+                  ],
+                  "nodeSelector": [
+                     {
+                        "beta.kubernetes.io/arch": "arm64"
+                     }
+                  ],
+                  "tolerations": [
+                     {
+                        "effect": "NoSchedule",
+                        "key": "arch",
+                        "operator": "Equal",
+                        "value": "arm64"
                      }
                   ]
                }

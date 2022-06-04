@@ -21,6 +21,21 @@
     },
   ],
 
+  local tolerations = [
+    {
+      key: 'arch',
+      operator: 'Equal',
+      value: 'arm64',
+      effect: 'NoSchedule',
+    },
+  ],
+
+  local nodeSelector = [
+    {
+      'beta.kubernetes.io/arch': 'arm64',
+    },
+  ],
+
   apiVersion: 'v1',
   kind: 'List',
   items: [
@@ -57,6 +72,8 @@
                 env: env,
               },
             ],
+            tolerations: tolerations,
+            nodeSelector: nodeSelector,
           },
         },
       },
@@ -114,6 +131,8 @@
                 env: env,
               },
             ],
+            tolerations: tolerations,
+            nodeSelector: nodeSelector,
           },
         },
       },
