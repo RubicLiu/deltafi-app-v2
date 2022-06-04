@@ -30,11 +30,9 @@
     },
   ],
 
-  local nodeSelector = [
-    {
-      'beta.kubernetes.io/arch': 'arm64',
-    },
-  ],
+  local nodeSelector = {
+    'kubernetes.io/arch': 'arm64',
+  },
 
   apiVersion: 'v1',
   kind: 'List',

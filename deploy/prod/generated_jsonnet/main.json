@@ -43,11 +43,9 @@
                         ]
                      }
                   ],
-                  "nodeSelector": [
-                     {
-                        "beta.kubernetes.io/arch": "arm64"
-                     }
-                  ],
+                  "nodeSelector": {
+                     "kubernetes.io/arch": "arm64"
+                  },
                   "tolerations": [
                      {
                         "effect": "NoSchedule",
@@ -122,11 +120,9 @@
                         ]
                      }
                   ],
-                  "nodeSelector": [
-                     {
-                        "beta.kubernetes.io/arch": "arm64"
-                     }
-                  ],
+                  "nodeSelector": {
+                     "kubernetes.io/arch": "arm64"
+                  },
                   "tolerations": [
                      {
                         "effect": "NoSchedule",
