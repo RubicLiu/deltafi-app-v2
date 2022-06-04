@@ -28,6 +28,10 @@
                            {
                               "name": "DOCKER_IMAGE_TAG",
                               "value": "dev-1d15002-20220603-162105"
+                           },
+                           {
+                              "name": "DEPLOYMENT_MODE",
+                              "value": "mainnet-test"
                            }
                         ],
                         "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/frontend:dev-1d15002-20220603-162105",
@@ -90,6 +94,10 @@
                            {
                               "name": "DOCKER_IMAGE_TAG",
                               "value": "dev-1d15002-20220603-162105"
+                           },
+                           {
+                              "name": "DEPLOYMENT_MODE",
+                              "value": "mainnet-test"
                            }
                         ],
                         "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/backend:dev-1d15002-20220603-162105",

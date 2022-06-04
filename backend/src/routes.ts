@@ -5,8 +5,7 @@ import * as GateApi from "gate-api";
 
 import fullDeployConfigV2 from "./fullDeployConfigV2.json";
 
-
-const deployMode = process.env.REACT_APP_DEPLOYMENT_MODE || "mainnet-test";
+const deployMode = process.env.DEPLOYMENT_MODE || "mainnet-test";
 const config = deployMode == "mainnet-prod" ? fullDeployConfigV2['mainnet-prod'] : fullDeployConfigV2["mainnet-test"];
 const gateApiClient = new GateApi.ApiClient();
 const spotApi = new GateApi.SpotApi(gateApiClient);

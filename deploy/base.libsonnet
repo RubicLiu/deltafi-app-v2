@@ -1,17 +1,23 @@
 {
   imageTag:: error 'imageTag is not set',
   domainName:: error 'domainName is not set',
+  deployMode:: error 'deployMode is not set',
+
   frontendReplicas:: 2,
   backendReplicas:: 2,
 
-  local dockerRegistry = "077918681028.dkr.ecr.us-west-2.amazonaws.com",
+  local dockerRegistry = '077918681028.dkr.ecr.us-west-2.amazonaws.com',
   local namespace = 'deltafi-app-v2',
   local appFrontend = 'deltafi-app-v2-frontend',
   local appBackend = 'deltafi-app-v2-backend',
   local env = [
     {
-      name: "DOCKER_IMAGE_TAG",
+      name: 'DOCKER_IMAGE_TAG',
       value: $.imageTag,
+    },
+    {
+      name: 'DEPLOYMENT_MODE',
+      value: $.deployMode,
     },
   ],
 
@@ -48,8 +54,8 @@
                     containerPort: 80,
                   },
                 ],
-                env: env
-              }
+                env: env,
+              },
             ],
           },
         },
@@ -105,7 +111,7 @@
                     containerPort: 4000,
                   },
                 ],
-                env: env
+                env: env,
               },
             ],
           },
