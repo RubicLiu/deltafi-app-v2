@@ -56,7 +56,7 @@ const TabMenu: React.FC = (props) => {
       onChange={(event: React.MouseEvent<HTMLElement>, value: string | null) => handleActive(value)}
       aria-label="Top Menu"
     >
-      {deployMode === "testnet" ? (
+      {deployMode === "testnet" || deployMode === "mainnet-test" ? (
         <ToggleButton value="dashboard" aria-label="Dashboard" className={classes.button}>
           Dashboard
         </ToggleButton>
