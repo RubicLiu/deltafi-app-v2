@@ -78,23 +78,74 @@ describe("utils/swap", function () {
       getSwapOutAmountSellBase(
         {
           swapType: { stableSwap: {} } as SwapType,
+          mintBaseDecimals: 6,
+          mintQuoteDecimals: 6,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(100_000_000),
             baseReserve: new anchor.BN(100_000_000),
             quoteReserve: new anchor.BN(100_000_000),
-            marketPrice: new anchor.BN("1000000000000000000"), // 1
+            marketPrice: new anchor.BN("1000000000000000000"), //
           } as PoolState,
           swapConfig: {
             slope: new anchor.BN("500000000000000000"), // 0.5
           } as SwapConfig,
         } as SwapInfo,
-
         new BigNumber(200_000),
-        new BigNumber(1),
+        new BigNumber(0), // this should have no effect
       ),
     ).toEqual({
       outAmount: new BigNumber(199_800),
+      priceImpact: new BigNumber("0.00099999999999999098"),
+    });
+
+    expect(
+      getSwapOutAmountSellBase(
+        {
+          swapType: { stableSwap: {} } as SwapType,
+          mintBaseDecimals: 9,
+          mintQuoteDecimals: 6,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000_000),
+            targetQuoteReserve: new anchor.BN(100_000_000),
+            baseReserve: new anchor.BN(100_000_000_000),
+            quoteReserve: new anchor.BN(100_000_000),
+            marketPrice: new anchor.BN("1000000000000000000"), //
+          } as PoolState,
+          swapConfig: {
+            slope: new anchor.BN("500000000000000000"), // 0.5
+          } as SwapConfig,
+        } as SwapInfo,
+        new BigNumber(200_000_000),
+        new BigNumber(0), // this should have no effect
+      ),
+    ).toEqual({
+      outAmount: new BigNumber(199_800),
+      priceImpact: new BigNumber("0.00099999999999999098"),
+    });
+
+    expect(
+      getSwapOutAmountSellBase(
+        {
+          swapType: { stableSwap: {} } as SwapType,
+          mintBaseDecimals: 6,
+          mintQuoteDecimals: 9,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(100_000_000_000),
+            baseReserve: new anchor.BN(100_000_000),
+            quoteReserve: new anchor.BN(100_000_000_000),
+            marketPrice: new anchor.BN("1000000000000000000"), //
+          } as PoolState,
+          swapConfig: {
+            slope: new anchor.BN("500000000000000000"), // 0.5
+          } as SwapConfig,
+        } as SwapInfo,
+        new BigNumber(200_000),
+        new BigNumber(0), // this should have no effect
+      ),
+    ).toEqual({
+      outAmount: new BigNumber(199_800_199),
       priceImpact: new BigNumber("0.00099999999999999098"),
     });
   });
@@ -161,6 +212,8 @@ describe("utils/swap", function () {
       getSwapOutAmountSellQuote(
         {
           swapType: { stableSwap: {} } as SwapType,
+          mintBaseDecimals: 6,
+          mintQuoteDecimals: 6,
           poolState: {
             targetBaseReserve: new anchor.BN(100_000_000),
             targetQuoteReserve: new anchor.BN(100_000_000),
@@ -173,11 +226,36 @@ describe("utils/swap", function () {
           } as SwapConfig,
         } as SwapInfo,
         new BigNumber(199_800),
-        new BigNumber(1),
+        new BigNumber(0), // this should have no effect
       ),
     ).toEqual({
       outAmount: new BigNumber(199_999),
       priceImpact: new BigNumber("0.00099999899849949212"),
+    }); // less than 200_000 due to the floorings
+
+    expect(
+      getSwapOutAmountSellQuote(
+        {
+          swapType: { stableSwap: {} } as SwapType,
+          mintBaseDecimals: 6,
+          mintQuoteDecimals: 9,
+          poolState: {
+            targetBaseReserve: new anchor.BN(100_000_000),
+            targetQuoteReserve: new anchor.BN(100_000_000_000),
+            baseReserve: new anchor.BN(100_000_000 + 200_000),
+            quoteReserve: new anchor.BN(100_000_000_000 - 199_800_000),
+            marketPrice: new anchor.BN(0), // this should have no effect
+          } as PoolState,
+          swapConfig: {
+            slope: new anchor.BN("500000000000000000"), // 0.5
+          } as SwapConfig,
+        } as SwapInfo,
+        new BigNumber(199_800_000),
+        new BigNumber(0), // this should have no effect
+      ),
+    ).toEqual({
+      outAmount: new BigNumber(199_999),
+      priceImpact: new BigNumber("0.0009999989984995005"),
     }); // less than 200_000 due to the floorings
   });
 

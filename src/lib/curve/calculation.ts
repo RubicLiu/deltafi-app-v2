@@ -259,16 +259,8 @@ export function calculateOutAmountStableSwap(
       ),
     );
 
-  console.log("stable price", stablePrice.toString());
-  console.log("balanced A", balancedReserveA.toString());
-  console.log("current B", currentReserveB.toString());
-  console.log("current A", currentReserveA.toString());
-  console.log("balanced B", balancedReserveB.toString());
   let actualPrice: BigNumber = outputBAmount.dividedBy(inputAAmount);
   let priceImpact: BigNumber = impliedPrice.minus(actualPrice).dividedBy(actualPrice).abs();
-
-  console.log("actual", actualPrice.toString());
-  console.log("implied", impliedPrice.toString());
 
   return {
     outAmount: new BigNumber(outputBAmount.toFixed(0)),
