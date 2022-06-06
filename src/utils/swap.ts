@@ -519,6 +519,8 @@ export function getPriceImpactDisplay(priceImpactBN: BigNumber): string {
   return priceImpactBN.multipliedBy(100).toFixed(1) + "%";
 }
 
+// get the stable price normalized by base and quote decimals
+// stable price itself is 1 by default
 export function getStableMarketPrice(swapInfo: SwapInfo): BigNumber {
   return new BigNumber(10).pow(swapInfo.mintQuoteDecimals - swapInfo.mintBaseDecimals);
 }
