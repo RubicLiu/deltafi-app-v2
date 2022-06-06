@@ -85,7 +85,7 @@ describe("utils/swap", function () {
             targetQuoteReserve: new anchor.BN(100_000_000),
             baseReserve: new anchor.BN(100_000_000),
             quoteReserve: new anchor.BN(100_000_000),
-            marketPrice: new anchor.BN("1000000000000000000"), //
+            marketPrice: new anchor.BN(0), // this should have no effect
           } as PoolState,
           swapConfig: {
             slope: new anchor.BN("500000000000000000"), // 0.5
@@ -110,7 +110,7 @@ describe("utils/swap", function () {
             targetQuoteReserve: new anchor.BN(100_000_000),
             baseReserve: new anchor.BN(100_000_000_000),
             quoteReserve: new anchor.BN(100_000_000),
-            marketPrice: new anchor.BN("1000000000000000000"), //
+            marketPrice: new anchor.BN(0), // this should have no effect
           } as PoolState,
           swapConfig: {
             slope: new anchor.BN("500000000000000000"), // 0.5
@@ -135,7 +135,7 @@ describe("utils/swap", function () {
             targetQuoteReserve: new anchor.BN(100_000_000_000),
             baseReserve: new anchor.BN(100_000_000),
             quoteReserve: new anchor.BN(100_000_000_000),
-            marketPrice: new anchor.BN("1000000000000000000"), //
+            marketPrice: new anchor.BN(0), // this should have no effect
           } as PoolState,
           swapConfig: {
             slope: new anchor.BN("500000000000000000"), // 0.5
@@ -219,7 +219,7 @@ describe("utils/swap", function () {
             targetQuoteReserve: new anchor.BN(100_000_000),
             baseReserve: new anchor.BN(100_000_000 + 200_000),
             quoteReserve: new anchor.BN(100_000_000 - 199_800),
-            marketPrice: new anchor.BN("1000000000000000000"), // 1
+            marketPrice: new anchor.BN(0), // this should have no effect
           } as PoolState,
           swapConfig: {
             slope: new anchor.BN("500000000000000000"), // 0.5
