@@ -284,7 +284,7 @@ export function getSwapOutAmountSellBase(
     );
   } else if (pool.swapType.stableSwap) {
     return calculateOutAmountStableSwap(
-      new BigNumber(pool.poolState.marketPrice.toString()).dividedBy(WAD),
+      new BigNumber(1), // stable price is 1 by default
       new BigNumber(pool.poolState.baseReserve.toString()),
       new BigNumber(pool.poolState.quoteReserve.toString()),
       amountIn,
@@ -320,9 +320,7 @@ export function getSwapOutAmountSellQuote(
     );
   } else if (pool.swapType.stableSwap) {
     return calculateOutAmountStableSwap(
-      new BigNumber(1).dividedBy(
-        new BigNumber(pool.poolState.marketPrice.toString()).dividedBy(WAD),
-      ),
+      new BigNumber(1), // stable price is 1 by default
       new BigNumber(pool.poolState.quoteReserve.toString()),
       new BigNumber(pool.poolState.baseReserve.toString()),
       amountIn,
