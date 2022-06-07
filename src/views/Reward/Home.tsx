@@ -440,7 +440,7 @@ const Home: React.FC = (props) => {
   //   }
   // }, [connection, walletPubkey, dispatch]);
 
-  const generateHandleClaimSwapRewards = useCallback(
+  const handleClaimSwapRewardsGenerator = useCallback(
     (isFromReferral: boolean) => async () => {
       if (!walletPubkey || !program) {
         return null;
@@ -638,7 +638,7 @@ const Home: React.FC = (props) => {
     );
   }, [handleSnackBarClose]);
 
-  const claimSwapRewardsButton = useMemo(
+  const claimSwapRewardsButtonGenerator = useMemo(
     () =>
       function generator(owedAmount: string, isFromReferral: boolean) {
         const isClaiming = isFromReferral
@@ -655,7 +655,7 @@ const Home: React.FC = (props) => {
         return (
           <StyledButton
             variant="outlined"
-            onClick={generateHandleClaimSwapRewards(isFromReferral)}
+            onClick={handleClaimSwapRewardsGenerator(isFromReferral)}
             color="inherit"
             disabled={!(parseFloat(owedAmount) > 0)} // in case the result can be NaN
             data-amp-analytics-on="click"
@@ -674,7 +674,7 @@ const Home: React.FC = (props) => {
           </StyledButton>
         );
       },
-    [rewardView, generateHandleClaimSwapRewards],
+    [rewardView, handleClaimSwapRewardsGenerator],
   );
 
   return (
@@ -850,7 +850,9 @@ const Home: React.FC = (props) => {
                   <Box color="#D4FF00">{owedRewardFromSwap}&nbsp;</Box>
                   <Box>/ {totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
-                <Box color="#D4FF00">{claimSwapRewardsButton(owedRewardFromSwap, false)}</Box>
+                <Box color="#D4FF00">
+                  {claimSwapRewardsButtonGenerator(owedRewardFromSwap, false)}
+                </Box>
               </Box>
               <Box className={classes.rewardBox} border="1px solid #905BFF">
                 <Box color="#905BFF">REGERRAL BONUS</Box>
@@ -859,7 +861,9 @@ const Home: React.FC = (props) => {
                   <Box color="#905BFF">{owedRewardFromReferral}&nbsp;</Box>
                   <Box>/ {totalRewardFromReferral} DELFI</Box>{" "}
                 </Box>
-                <Box color="#905BFF">{claimSwapRewardsButton(owedRewardFromReferral, true)}</Box>
+                <Box color="#905BFF">
+                  {claimSwapRewardsButtonGenerator(owedRewardFromReferral, true)}
+                </Box>
               </Box>
             </Box>
           </Box>
