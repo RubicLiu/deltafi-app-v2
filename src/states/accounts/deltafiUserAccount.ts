@@ -26,6 +26,12 @@ export const setDeltafiUserAction = createAction<{
 }>("v2/setDeltafiUser");
 
 export async function getDeltafiUserData(arg: FetchDeltafiUserThunkArg) {
+  if (!arg.walletAddress || !arg.connection) {
+    return {
+      user: null,
+      publicKey: null,
+    };
+  }
   const program = getDeltafiDexV2(
     new PublicKey(deployConfigV2.programId),
     makeProvider(arg.connection, arg.walletAddress),

@@ -22,6 +22,10 @@ type FetchFarmUsersThunkArg = {
 export const fetchFarmUsersThunk = createAsyncThunk(
   "farmUser/fetchFarmUsers",
   async (arg: FetchFarmUsersThunkArg) => {
+    if (!arg.connection || !arg.walletAddress) {
+      return { farmPoolKeyToFarmUser: {} };
+    }
+
     const program = getDeltafiDexV2(
       new PublicKey(deployConfigV2.programId),
       makeProvider(arg.connection, {}),

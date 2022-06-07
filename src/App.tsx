@@ -94,11 +94,9 @@ const App: React.FC = () => {
   }, [connection, dispatch]);
 
   useEffect(() => {
-    if (walletAddress) {
-      dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress }));
-      dispatch(fetchDeltafiUserThunk({ connection, walletAddress }));
-      dispatch(fetchFarmUsersThunk({ connection, walletAddress }));
-    }
+    dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress }));
+    dispatch(fetchDeltafiUserThunk({ connection, walletAddress }));
+    dispatch(fetchFarmUsersThunk({ connection, walletAddress }));
   }, [connection, walletAddress, dispatch]);
 
   useEffect(() => {

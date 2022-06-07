@@ -39,7 +39,7 @@ import {
 import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
-import { deployConfigV2, PoolConfig, poolConfigs } from "constants/deployConfigV2";
+import { deployConfigV2, deployMode, PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import styled from "styled-components";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
@@ -245,7 +245,7 @@ const Home: React.FC = (props) => {
   // farmPoolToReward records user's rewards in each pool
   // userUnclaimedFarmRewards is user's unclaimed rewards up till now
   // userTotalFarmRewards is the rewards amount that have been claimed by the user
-  const farmPoolRewardsInfo = useMemo(() => {
+  const { farmPoolToRewards, userUnclaimedFarmRewards, userTotalFarmRewards } = useMemo(() => {
     const farmPoolToRewards: Record<
       string,
       { unclaimedFarmRewards: string; totalFarmRewards: string }
@@ -539,12 +539,19 @@ const Home: React.FC = (props) => {
       <StyledButton
         variant="outlined"
         disabled={
-          farmPoolRewardsInfo.userUnclaimedFarmRewards === "--" ||
-          farmPoolRewardsInfo.userTotalFarmRewards === "--" ||
-          parseFloat(farmPoolRewardsInfo.userUnclaimedFarmRewards) === 0
+          userUnclaimedFarmRewards === "--" ||
+          userTotalFarmRewards === "--" ||
+          parseFloat(userUnclaimedFarmRewards) === 0
         }
         onClick={() =>
-          setMenu(true, "liquidity-reward", null, { farmPoolRewardsInfo, handleClaimFarmRewards })
+          setMenu(true, "liquidity-reward", null, {
+            farmPoolRewardsInfo: {
+              userUnclaimedFarmRewards,
+              userTotalFarmRewards,
+              farmPoolToRewards,
+            },
+            handleClaimFarmRewards,
+          })
         }
         color="inherit"
         data-amp-analytics-on="click"
@@ -563,7 +570,13 @@ const Home: React.FC = (props) => {
         </Box>
       </StyledButton>
     );
-  }, [setMenu, farmPoolRewardsInfo, handleClaimFarmRewards]);
+  }, [
+    setMenu,
+    userUnclaimedFarmRewards,
+    userTotalFarmRewards,
+    farmPoolToRewards,
+    handleClaimFarmRewards,
+  ]);
 
   const snackMessage = useMemo(() => {
     if (!rewardView || !rewardView.claimResult) {
@@ -610,40 +623,40 @@ const Home: React.FC = (props) => {
     );
   }, [handleSnackBarClose]);
 
-  const claimSwapRewardsButton = useMemo(() => {
-    if (rewardView.isClaimingSwapRewards) {
-      return (
-        <StyledButton color="inherit" variant="outlined" disabled>
-          <CircularProgress size={16} color="inherit" />
-        </StyledButton>
-      );
-    }
-    return (
-      <StyledButton
-        variant="outlined"
-        onClick={handleClaimSwapRewards}
-        color="inherit"
-        disabled={
-          !deltafiUser?.user?.owedReferralRewards ||
-          !deltafiUser?.user?.owedSwapRewards ||
-          deltafiUser?.user.owedReferralRewards.add(deltafiUser?.user.owedSwapRewards).eq(new BN(0))
+  const claimSwapRewardsButton = useMemo(
+    () =>
+      function generator(owedAmount: string) {
+        if (rewardView.isClaimingSwapRewards && parseFloat(owedAmount) > 0) {
+          return (
+            <StyledButton color="inherit" variant="outlined" disabled>
+              <CircularProgress size={16} color="inherit" />
+            </StyledButton>
+          );
         }
-        data-amp-analytics-on="click"
-        data-amp-analytics-name="click"
-        data-amp-analytics-attrs="page: Reward, target: claimRewards"
-      >
-        <Box
-          fontFamily="Rubik"
-          sx={{ textTransform: "capitalize" }}
-          lineHeight={1}
-          fontSize={16}
-          fontWeight={600}
-        >
-          Claim Rewards
-        </Box>
-      </StyledButton>
-    );
-  }, [rewardView, deltafiUser, handleClaimSwapRewards]);
+        return (
+          <StyledButton
+            variant="outlined"
+            onClick={handleClaimSwapRewards}
+            color="inherit"
+            disabled={!(parseFloat(owedAmount) > 0)} // in case the result can be NaN
+            data-amp-analytics-on="click"
+            data-amp-analytics-name="click"
+            data-amp-analytics-attrs="page: Reward, target: claimRewards"
+          >
+            <Box
+              fontFamily="Rubik"
+              sx={{ textTransform: "capitalize" }}
+              lineHeight={1}
+              fontSize={16}
+              fontWeight={600}
+            >
+              Claim Rewards
+            </Box>
+          </StyledButton>
+        );
+      },
+    [rewardView, handleClaimSwapRewards],
+  );
 
   return (
     <Box className={classes.root}>
@@ -793,21 +806,24 @@ const Home: React.FC = (props) => {
           My Rewards
         </Box>
         {/* TODO please check and set up the true "no reward" condition */}
-        {(isConnectedWallet && totalRewardFromReferral !== "--") ||
-        totalRewardFromSwap !== "--" ||
-        farmPoolRewardsInfo.userUnclaimedFarmRewards !== "--" ||
-        farmPoolRewardsInfo.userTotalFarmRewards !== "--" ? (
+        {isConnectedWallet &&
+        (totalRewardFromReferral !== "--" ||
+          totalRewardFromSwap !== "--" ||
+          userUnclaimedFarmRewards !== "--" ||
+          userTotalFarmRewards !== "--") ? (
           <Box>
             <Box mt={2} mb={3} display="flex" gap={1.25} justifyContent="center" flexWrap="wrap">
-              <Box className={classes.rewardBox} border="1px solid #03F2A0">
-                <Box color="#03F2A0">LIQUIDITY MINING</Box>
-                <Box>Unclaimed / Total</Box>
-                <Box lineHeight="24px" display="flex" fontSize={20}>
-                  <Box color="#03F2A0">{farmPoolRewardsInfo.userUnclaimedFarmRewards}&nbsp;</Box>
-                  <Box>/ {farmPoolRewardsInfo.userTotalFarmRewards} DELFI</Box>{" "}
+              {deployMode === "mainnet-prod" || (
+                <Box className={classes.rewardBox} border="1px solid #03F2A0">
+                  <Box color="#03F2A0">LIQUIDITY MINING</Box>
+                  <Box>Unclaimed / Total</Box>
+                  <Box lineHeight="24px" display="flex" fontSize={20}>
+                    <Box color="#03F2A0">{userUnclaimedFarmRewards}&nbsp;</Box>
+                    <Box>/ {userTotalFarmRewards} DELFI</Box>{" "}
+                  </Box>
+                  <Box color="#03F2A0">{claimFarmRewardsButton}</Box>
                 </Box>
-                <Box color="#03F2A0">{claimFarmRewardsButton}</Box>
-              </Box>
+              )}
               <Box className={classes.rewardBox} border="1px solid #D4FF00">
                 <Box color="#D4FF00">TRADE FARMING</Box>
                 <Box>Unclaimed / Total</Box>
@@ -815,7 +831,7 @@ const Home: React.FC = (props) => {
                   <Box color="#D4FF00">{owedRewardFromSwap}&nbsp;</Box>
                   <Box>/ {totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
-                <Box color="#D4FF00">{claimSwapRewardsButton}</Box>
+                <Box color="#D4FF00">{claimSwapRewardsButton(owedRewardFromSwap)}</Box>
               </Box>
               <Box className={classes.rewardBox} border="1px solid #905BFF">
                 <Box color="#905BFF">REGERRAL BONUS</Box>
@@ -824,7 +840,7 @@ const Home: React.FC = (props) => {
                   <Box color="#905BFF">{owedRewardFromReferral}&nbsp;</Box>
                   <Box>/ {totalRewardFromReferral} DELFI</Box>{" "}
                 </Box>
-                <Box color="#905BFF">{claimSwapRewardsButton}</Box>
+                <Box color="#905BFF">{claimSwapRewardsButton(owedRewardFromReferral)}</Box>
               </Box>
             </Box>
           </Box>
