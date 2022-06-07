@@ -1757,6 +1757,42 @@ export type DeltafiDexV2 = {
       "args": []
     },
     {
+      "name": "claimReferralRewards",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "createFarmUser",
       "accounts": [
         {
@@ -4525,6 +4561,42 @@ export const IDL: DeltafiDexV2 = {
     },
     {
       "name": "claimSwapRewards",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claimReferralRewards",
       "accounts": [
         {
           "name": "marketConfig",
