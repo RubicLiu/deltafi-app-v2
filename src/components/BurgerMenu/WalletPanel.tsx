@@ -53,6 +53,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     padding: "20px 20px",
     boxShadow: "0px 5px 20px rgba(0, 0, 0, 0.15)",
     borderRadius: 10,
+    minWidth: 300, // 300 looks ok, maybe adjust further based on the design
   },
   check: {
     color: "#D4FF00",
@@ -91,7 +92,8 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) 
   );
 });
 
-const swapHistory = [{}, {}];
+// TODO: generate real swap history
+const swapHistory = [];
 
 const WalletPanel: React.FC = (props) => {
   const { wallet, disconnect, publicKey } = useWallet();
