@@ -375,8 +375,8 @@ const Home: React.FC = (props) => {
 
     if (newTokenTo.mint !== tokenTo.token.mint || newTokenFrom.mint !== tokenFrom.token.mint) {
       // change buy/sell token, clear the input/output to 0
-      dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: "0" }));
-      dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenTo, amount: "0" }));
+      dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: "" }));
+      dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenTo, amount: "" }));
       return;
     }
 

@@ -21,6 +21,4 @@ export interface CardProps {
   disabled?: boolean;
   tokens?: TokenConfig[];
   disableDrop?: boolean;
-  percentage?: number;
-  isDeposit?: boolean;
 }

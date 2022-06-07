@@ -88,7 +88,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 }));
 
 const SwapCard: React.FC<CardProps> = (props) => {
-  const { card, handleChangeCard, disabled, tokens, disableDrop, percentage } = props;
+  const { card, handleChangeCard, disabled, tokens, disableDrop } = props;
   const classes = useStyles(props);
   const tokenAccount = useSelector(selectTokenAccountInfoByMint(card.token?.mint));
 
@@ -98,20 +98,6 @@ const SwapCard: React.FC<CardProps> = (props) => {
     }
     return null;
   }, [tokenAccount, card]);
-
-  useEffect(() => {
-    if (percentage && tokenBalance && card?.token?.decimals) {
-      const minAmount: number = Number(`1e-${card.token.decimals}`);
-      const zeroWithDecimals = `0.${"0".repeat(card.token.decimals)}`;
-      const realAmount = tokenBalance
-        .multipliedBy(new BigNumber(percentage))
-        .dividedBy(new BigNumber(100));
-      handleChangeCard({
-        ...card,
-        amount: realAmount.toNumber() < minAmount ? zeroWithDecimals : realAmount.toString(),
-      });
-    }
-  }, [card, handleChangeCard, percentage, tokenBalance]);
 
   const isDisabledInput = useMemo(() => {
     return disabled || card.token === null;
@@ -127,7 +113,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
     if (new BigNumber(value).isNaN() && value !== "") {
       return;
     } else if (value === "") {
-      handleChangeCard({ ...card, amount: "0" });
+      handleChangeCard({ ...card, amount: "" });
     } else {
       const valueToFixedDecimal = parseFloat(value).toFixed(card.token.decimals);
       handleChangeCard({
@@ -150,7 +136,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
         <CurrencyInput
           name="currency"
           disabled={isDisabledInput}
-          className={`${classes.currencyInput} ${props.isDeposit && "deposit"}`}
+          className={`${classes.currencyInput}`}
           autoComplete="off"
           placeholder="0"
           minLength={0}
@@ -168,11 +154,6 @@ const SwapCard: React.FC<CardProps> = (props) => {
           </Typography>
           <Typography className={classes.tokenBalance}>{card?.token?.symbol}</Typography>
         </Box>
-        {props.isDeposit && (
-          <Box className={classes.tokenBalance}>
-            Total: {"00.00"} {"Symbol"} ({0}%)
-          </Box>
-        )}
       </Box>
     </Paper>
   );
