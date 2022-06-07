@@ -284,7 +284,7 @@ export function getSwapOutAmountSellBase(
     );
   } else if (pool.swapType.stableSwap) {
     return calculateOutAmountStableSwap(
-      new BigNumber(pool.poolState.marketPrice.toString()).dividedBy(WAD),
+      getStableMarketPrice(pool),
       new BigNumber(pool.poolState.baseReserve.toString()),
       new BigNumber(pool.poolState.quoteReserve.toString()),
       amountIn,
@@ -320,9 +320,7 @@ export function getSwapOutAmountSellQuote(
     );
   } else if (pool.swapType.stableSwap) {
     return calculateOutAmountStableSwap(
-      new BigNumber(1).dividedBy(
-        new BigNumber(pool.poolState.marketPrice.toString()).dividedBy(WAD),
-      ),
+      new BigNumber(1).dividedBy(getStableMarketPrice(pool)),
       new BigNumber(pool.poolState.quoteReserve.toString()),
       new BigNumber(pool.poolState.baseReserve.toString()),
       amountIn,
@@ -519,4 +517,10 @@ export function getPriceImpactDisplay(priceImpactBN: BigNumber): string {
     return "<0.1%";
   }
   return priceImpactBN.multipliedBy(100).toFixed(1) + "%";
+}
+
+// get the stable price normalized by base and quote decimals
+// stable price itself is 1 by default
+export function getStableMarketPrice(swapInfo: SwapInfo): BigNumber {
+  return new BigNumber(10).pow(swapInfo.mintQuoteDecimals - swapInfo.mintBaseDecimals);
 }

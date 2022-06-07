@@ -248,12 +248,11 @@ export function calculateOutAmountStableSwap(
     slope,
   );
 
-  let impliedPrice: BigNumber = stablePrice
-    .multipliedBy(
-      currentReserveB.plus(
-        balancedReserveB.multipliedBy(new BigNumber(1).minus(slope)).dividedBy(slope),
-      ),
-    )
+  // in theory: impliedPrice = stablePrice * balancedReserveA/balancedReserveB * currentReserveB/currentReserveA
+  // in stable swap we have guaranteed that stablePrice * balancedReserveA/balancedReserveB = 1
+  // therefore: impliedPrice = currentReserveB/currentReserveA
+  let impliedPrice: BigNumber = currentReserveB
+    .plus(balancedReserveB.multipliedBy(new BigNumber(1).minus(slope)).dividedBy(slope))
     .dividedBy(
       currentReserveA.plus(
         balancedReserveA.multipliedBy(new BigNumber(1).minus(slope).dividedBy(slope)),
