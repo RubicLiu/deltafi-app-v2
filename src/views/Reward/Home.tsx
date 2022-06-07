@@ -441,12 +441,12 @@ const Home: React.FC = (props) => {
   // }, [connection, walletPubkey, dispatch]);
 
   const handleClaimSwapRewards = useCallback(
-    (isFromReferral: boolean) => async () => {
+    (isFromReferral: boolean, setIsClaimingState) => async () => {
       if (!walletPubkey || !program) {
         return null;
       }
 
-      dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: true }));
+      dispatch(setIsClaimingState(true));
       try {
         const partialSignedTransaction = await createClaimSwapRewardsTransaction(
           program,
@@ -468,7 +468,7 @@ const Home: React.FC = (props) => {
         // TODO(leqiang): Add error display here
       } finally {
         dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
-        dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: false }));
+        dispatch(setIsClaimingState(false));
       }
     },
     [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction],
@@ -631,17 +631,33 @@ const Home: React.FC = (props) => {
   const claimSwapRewardsButton = useMemo(
     () =>
       function generator(owedAmount: string, isFromReferral: boolean) {
-        if (rewardView.isClaimingSwapRewards && parseFloat(owedAmount) > 0) {
-          return (
-            <StyledButton color="inherit" variant="outlined" disabled>
-              <CircularProgress size={16} color="inherit" />
-            </StyledButton>
-          );
-        }
+        const { isClaiming, setIsClaimingState } = isFromReferral
+          ? {
+              isClaiming: rewardView.isClaimingFarmTradingRewards,
+              setIsClaimingState: (isClaiming: boolean) =>
+                rewardViewActions.setIsClaimingFarmTradingRewards({
+                  isClaimingFarmTradingRewards: isClaiming,
+                }),
+            }
+          : {
+              isClaiming: rewardView.isClaimingReferralRewards,
+              setIsClaimingState: (isClaiming: boolean) =>
+                rewardViewActions.setIsClaimingReferralRewards({
+                  isClaimingReferralRewards: isClaiming,
+                }),
+            };
+        if (isFromReferral)
+          if (isClaiming) {
+            return (
+              <StyledButton color="inherit" variant="outlined" disabled>
+                <CircularProgress size={16} color="inherit" />
+              </StyledButton>
+            );
+          }
         return (
           <StyledButton
             variant="outlined"
-            onClick={() => handleClaimSwapRewards(isFromReferral)}
+            onClick={handleClaimSwapRewards(isFromReferral, setIsClaimingState)}
             color="inherit"
             disabled={!(parseFloat(owedAmount) > 0)} // in case the result can be NaN
             data-amp-analytics-on="click"

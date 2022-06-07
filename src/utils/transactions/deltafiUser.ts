@@ -71,11 +71,13 @@ export async function createClaimSwapRewardsTransaction(
     throw Error("Deltafi user context does not exist");
   }
 
+  // select which claim reward request to use
+  // both requests have the same input parameters
   const claimRequest = isFromReferral
     ? program.transaction.claimReferralRewards
-    : program.transaction.claimSwapRewards;
+    : program.transaction.claimTradeFarmingRewards;
 
-  const transactionClaimRewards = program.transaction.claimRequest({
+  const transactionClaimRewards = claimRequest({
     accounts: {
       marketConfig,
       deltafiUser: deltafiUserPubkey,
