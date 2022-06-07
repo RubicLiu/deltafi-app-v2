@@ -1757,7 +1757,7 @@ export type DeltafiDexV2 = {
       "args": []
     },
     {
-      "name": "claimTradeFarmingRewards",
+      "name": "claimTradeRewards",
       "accounts": [
         {
           "name": "marketConfig",
@@ -1893,11 +1893,11 @@ export type DeltafiDexV2 = {
             "type": "publicKey"
           },
           {
-            "name": "owedSwapRewards",
+            "name": "owedTradeRewards",
             "type": "u64"
           },
           {
-            "name": "claimedSwapRewards",
+            "name": "claimedTradeRewards",
             "type": "u64"
           },
           {
@@ -4632,7 +4632,7 @@ export const IDL: DeltafiDexV2 = {
       "args": []
     },
     {
-      "name": "claimTradeFarmingRewards",
+      "name": "claimTradeRewards",
       "accounts": [
         {
           "name": "marketConfig",
@@ -4768,11 +4768,11 @@ export const IDL: DeltafiDexV2 = {
             "type": "publicKey"
           },
           {
-            "name": "owedSwapRewards",
+            "name": "owedTradeRewards",
             "type": "u64"
           },
           {
-            "name": "claimedSwapRewards",
+            "name": "claimedTradeRewards",
             "type": "u64"
           },
           {

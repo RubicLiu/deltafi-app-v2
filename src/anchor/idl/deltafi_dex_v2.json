@@ -1757,7 +1757,7 @@
       "args": []
     },
     {
-      "name": "claimTradeFarmingRewards",
+      "name": "claimTradeRewards",
       "accounts": [
         {
           "name": "marketConfig",
@@ -1893,11 +1893,11 @@
             "type": "publicKey"
           },
           {
-            "name": "owedSwapRewards",
+            "name": "owedTradeRewards",
             "type": "u64"
           },
           {
-            "name": "claimedSwapRewards",
+            "name": "claimedTradeRewards",
             "type": "u64"
           },
           {
