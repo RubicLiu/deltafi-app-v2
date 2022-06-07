@@ -22,6 +22,11 @@ type FetchLiquidityProvidersThunkArg = {
 export const fetchLiquidityProvidersThunk = createAsyncThunk(
   "v2/fetchLiquidityProviders",
   async (arg: FetchLiquidityProvidersThunkArg) => {
+    if (!arg.connection || !arg.walletAddress) {
+      return {
+        swapKeyToLp: {},
+      };
+    }
     const program = getDeltafiDexV2(
       new PublicKey(deployConfigV2.programId),
       makeProvider(arg.connection, arg.walletAddress),
