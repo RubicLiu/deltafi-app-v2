@@ -441,12 +441,24 @@ const Home: React.FC = (props) => {
   // }, [connection, walletPubkey, dispatch]);
 
   const handleClaimSwapRewards = useCallback(
-    (isFromReferral: boolean, setIsClaimingState) => async () => {
+    (isFromReferral: boolean) => async () => {
       if (!walletPubkey || !program) {
         return null;
       }
 
+      const setIsClaimingState = isFromReferral
+        ? (isClaiming: boolean) =>
+            rewardViewActions.setIsClaimingReferralRewards({
+              isClaimingReferralRewards: isClaiming,
+            })
+        : (isClaiming: boolean) =>
+            rewardViewActions.setIsClaimingFarmTradingRewards({
+              isClaimingFarmTradingRewards: isClaiming,
+            });
+
+      console.log(setIsClaimingState.toString());
       dispatch(setIsClaimingState(true));
+      console.log(rewardView.isClaimingFarmTradingRewards);
       try {
         const partialSignedTransaction = await createClaimSwapRewardsTransaction(
           program,
@@ -471,7 +483,16 @@ const Home: React.FC = (props) => {
         dispatch(setIsClaimingState(false));
       }
     },
-    [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction],
+    [
+      connection,
+      program,
+      walletPubkey,
+      userDeltafiToken,
+      deltafiUser,
+      dispatch,
+      signTransaction,
+      rewardViewActions,
+    ],
   );
 
   // claim from multiple farms at the same time
@@ -631,33 +652,21 @@ const Home: React.FC = (props) => {
   const claimSwapRewardsButton = useMemo(
     () =>
       function generator(owedAmount: string, isFromReferral: boolean) {
-        const { isClaiming, setIsClaimingState } = isFromReferral
-          ? {
-              isClaiming: rewardView.isClaimingFarmTradingRewards,
-              setIsClaimingState: (isClaiming: boolean) =>
-                rewardViewActions.setIsClaimingFarmTradingRewards({
-                  isClaimingFarmTradingRewards: isClaiming,
-                }),
-            }
-          : {
-              isClaiming: rewardView.isClaimingReferralRewards,
-              setIsClaimingState: (isClaiming: boolean) =>
-                rewardViewActions.setIsClaimingReferralRewards({
-                  isClaimingReferralRewards: isClaiming,
-                }),
-            };
-        if (isFromReferral)
-          if (isClaiming) {
-            return (
-              <StyledButton color="inherit" variant="outlined" disabled>
-                <CircularProgress size={16} color="inherit" />
-              </StyledButton>
-            );
-          }
+        const isClaiming = isFromReferral
+          ? rewardView.isClaimingReferralRewards
+          : rewardView.isClaimingFarmTradingRewards;
+
+        if (isClaiming) {
+          return (
+            <StyledButton color="inherit" variant="outlined" disabled>
+              <CircularProgress size={16} color="inherit" />
+            </StyledButton>
+          );
+        }
         return (
           <StyledButton
             variant="outlined"
-            onClick={handleClaimSwapRewards(isFromReferral, setIsClaimingState)}
+            onClick={handleClaimSwapRewards(isFromReferral)}
             color="inherit"
             disabled={!(parseFloat(owedAmount) > 0)} // in case the result can be NaN
             data-amp-analytics-on="click"
