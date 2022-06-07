@@ -440,7 +440,7 @@ const Home: React.FC = (props) => {
   //   }
   // }, [connection, walletPubkey, dispatch]);
 
-  const handleClaimSwapRewards = useCallback(
+  const generateHandleClaimSwapRewards = useCallback(
     (isFromReferral: boolean) => async () => {
       if (!walletPubkey || !program) {
         return null;
@@ -655,7 +655,7 @@ const Home: React.FC = (props) => {
         return (
           <StyledButton
             variant="outlined"
-            onClick={handleClaimSwapRewards(isFromReferral)}
+            onClick={generateHandleClaimSwapRewards(isFromReferral)}
             color="inherit"
             disabled={!(parseFloat(owedAmount) > 0)} // in case the result can be NaN
             data-amp-analytics-on="click"
@@ -674,7 +674,7 @@ const Home: React.FC = (props) => {
           </StyledButton>
         );
       },
-    [rewardView, handleClaimSwapRewards],
+    [rewardView, generateHandleClaimSwapRewards],
   );
 
   return (
