@@ -456,9 +456,7 @@ const Home: React.FC = (props) => {
               isClaimingFarmTradingRewards: isClaiming,
             });
 
-      console.log(setIsClaimingState.toString());
       dispatch(setIsClaimingState(true));
-      console.log(rewardView.isClaimingFarmTradingRewards);
       try {
         const partialSignedTransaction = await createClaimSwapRewardsTransaction(
           program,
@@ -483,16 +481,7 @@ const Home: React.FC = (props) => {
         dispatch(setIsClaimingState(false));
       }
     },
-    [
-      connection,
-      program,
-      walletPubkey,
-      userDeltafiToken,
-      deltafiUser,
-      dispatch,
-      signTransaction,
-      rewardViewActions,
-    ],
+    [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction],
   );
 
   // claim from multiple farms at the same time
