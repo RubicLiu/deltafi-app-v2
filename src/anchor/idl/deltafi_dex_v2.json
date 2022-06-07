@@ -1757,6 +1757,42 @@
       "args": []
     },
     {
+      "name": "claimTradeFarmingRewards",
+      "accounts": [
+        {
+          "name": "marketConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "deltafiUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "swapDeltafiToken",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "claimReferralRewards",
       "accounts": [
         {
@@ -2834,5 +2870,8 @@
       "name": "DepeggedQuotePrice",
       "msg": "DepeggedQuotePrice"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "HcWvS1XyweYMrCvY8TEeDxXgbWJagizUZXxCSLC2E89N"
+  }
 }

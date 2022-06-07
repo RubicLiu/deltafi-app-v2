@@ -440,36 +440,41 @@ const Home: React.FC = (props) => {
   //   }
   // }, [connection, walletPubkey, dispatch]);
 
-  const handleClaimSwapRewards = useCallback(async () => {
-    if (!walletPubkey || !program) {
-      return null;
-    }
+  const handleClaimSwapRewards = useCallback(
+    (isFromReferral: boolean) => async () => {
+      if (!walletPubkey || !program) {
+        return null;
+      }
 
-    dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: true }));
-    try {
-      const partialSignedTransaction = await createClaimSwapRewardsTransaction(
-        program,
-        connection,
-        walletPubkey,
-        userDeltafiToken?.publicKey,
-        deltafiUser.user,
-      );
+      dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: true }));
+      try {
+        const partialSignedTransaction = await createClaimSwapRewardsTransaction(
+          program,
+          connection,
+          walletPubkey,
+          userDeltafiToken?.publicKey,
+          deltafiUser.user,
+          isFromReferral,
+        );
 
-      const signedTransaction = await signTransaction(partialSignedTransaction);
-      const signature = await sendSignedTransaction({ signedTransaction, connection });
-      await connection.confirmTransaction(signature, "confirmed");
-      await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
-      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: true } }));
-    } catch (e) {
-      console.error(e);
-      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
-      // TODO(leqiang): Add error display here
-    } finally {
-      dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: false }));
-    }
-  }, [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction]);
+        const signedTransaction = await signTransaction(partialSignedTransaction);
+        const signature = await sendSignedTransaction({ signedTransaction, connection });
+        await connection.confirmTransaction(signature, "confirmed");
+        await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
+        dispatch(rewardViewActions.setClaimResult({ claimResult: { status: true } }));
+      } catch (e) {
+        console.error(e);
+        dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
+        // TODO(leqiang): Add error display here
+      } finally {
+        dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
+        dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: false }));
+      }
+    },
+    [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction],
+  );
 
+  // claim from multiple farms at the same time
   const handleClaimFarmRewards = useCallback(async () => {
     if (!walletPubkey || !program) {
       return null;
@@ -625,7 +630,7 @@ const Home: React.FC = (props) => {
 
   const claimSwapRewardsButton = useMemo(
     () =>
-      function generator(owedAmount: string) {
+      function generator(owedAmount: string, isFromReferral: boolean) {
         if (rewardView.isClaimingSwapRewards && parseFloat(owedAmount) > 0) {
           return (
             <StyledButton color="inherit" variant="outlined" disabled>
@@ -636,7 +641,7 @@ const Home: React.FC = (props) => {
         return (
           <StyledButton
             variant="outlined"
-            onClick={handleClaimSwapRewards}
+            onClick={() => handleClaimSwapRewards(isFromReferral)}
             color="inherit"
             disabled={!(parseFloat(owedAmount) > 0)} // in case the result can be NaN
             data-amp-analytics-on="click"
@@ -831,7 +836,7 @@ const Home: React.FC = (props) => {
                   <Box color="#D4FF00">{owedRewardFromSwap}&nbsp;</Box>
                   <Box>/ {totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
-                <Box color="#D4FF00">{claimSwapRewardsButton(owedRewardFromSwap)}</Box>
+                <Box color="#D4FF00">{claimSwapRewardsButton(owedRewardFromSwap, false)}</Box>
               </Box>
               <Box className={classes.rewardBox} border="1px solid #905BFF">
                 <Box color="#905BFF">REGERRAL BONUS</Box>
@@ -840,7 +845,7 @@ const Home: React.FC = (props) => {
                   <Box color="#905BFF">{owedRewardFromReferral}&nbsp;</Box>
                   <Box>/ {totalRewardFromReferral} DELFI</Box>{" "}
                 </Box>
-                <Box color="#905BFF">{claimSwapRewardsButton(owedRewardFromReferral)}</Box>
+                <Box color="#905BFF">{claimSwapRewardsButton(owedRewardFromReferral, true)}</Box>
               </Box>
             </Box>
           </Box>
