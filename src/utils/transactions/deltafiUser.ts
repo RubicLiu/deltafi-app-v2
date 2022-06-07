@@ -75,7 +75,7 @@ export async function createClaimSwapRewardsTransaction(
   // both requests have the same input parameters
   const claimRequest = isFromReferral
     ? program.transaction.claimReferralRewards
-    : program.transaction.claimTradeFarmingRewards;
+    : program.transaction.claimTradeRewards;
 
   const transactionClaimRewards = claimRequest({
     accounts: {

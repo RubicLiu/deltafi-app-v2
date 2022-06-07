@@ -327,10 +327,10 @@ const Home: React.FC = (props) => {
       exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
     if (deltafiUser?.user) {
       return {
-        owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedSwapRewards),
+        owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedTradeRewards),
         owedRewardFromReferral: parseRewardBN(deltafiUser.user.owedReferralRewards),
         totalRewardFromSwap: parseRewardBN(
-          deltafiUser.user.owedSwapRewards.add(deltafiUser.user.claimedSwapRewards),
+          deltafiUser.user.owedTradeRewards.add(deltafiUser.user.claimedTradeRewards),
         ),
         totalRewardFromReferral: parseRewardBN(
           deltafiUser.user.owedReferralRewards.add(deltafiUser.user.claimedReferralRewards),
