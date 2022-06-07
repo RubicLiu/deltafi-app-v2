@@ -45,27 +45,6 @@ import styled from "styled-components";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 import { scheduleWithInterval } from "utils";
 
-// /*
-//  * mockup test data for reward page
-//  */
-// const referralIntroCard = [
-//   {
-//     caption: "Get a referral link",
-//     detail: "Connect a wallet and generate a referral link to share.",
-//     image: "/images/get_referral_link.png",
-//   },
-//   {
-//     caption: "Share with friends",
-//     detail: "Invite your friends to register via your referral link.",
-//     image: "/images/share_friends.png",
-//   },
-//   {
-//     caption: "Earn crypto",
-//     detail: "Get referral rewards from your friends’ earnings & swaps.",
-//     image: "/images/earn_crypto.png",
-//   },
-// ];
-
 const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
   root: {
     width: "100%",
@@ -427,19 +406,6 @@ const Home: React.FC = (props) => {
   }, [dispatch, walletPubkey, signTransaction, program]);
 
   const connection = program.provider.connection;
-  // const handleRefresh = useCallback(async () => {
-  //   dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: true }));
-
-  //   try {
-  //     await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
-  //   } catch (e) {
-  //     console.error(e);
-  //     // TODO(leqiang): Add error display her
-  //   } finally {
-  //     dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: false }));
-  //   }
-  // }, [connection, walletPubkey, dispatch]);
-
   const handleClaimSwapRewardsGenerator = useCallback(
     (isFromReferral: boolean) => async () => {
       if (!walletPubkey || !program) {
@@ -527,27 +493,6 @@ const Home: React.FC = (props) => {
       dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
     }
   }, [dispatch, farmPoolKeyToFarmUser, program, signTransaction, userDeltafiToken, walletPubkey]);
-  // const refreshButton = useMemo(() => {
-  //   if (rewardView.isRefreshing) {
-  //     return (
-  //       <Button variant="contained" disabled={true}>
-  //         <CircularProgress color="inherit" />
-  //       </Button>
-  //     );
-  //   }
-  //   return (
-  //     <Button
-  //       variant="contained"
-  //       onClick={handleRefresh}
-  //       disabled={!deltafiUser?.user}
-  //       data-amp-analytics-on="click"
-  //       data-amp-analytics-name="click"
-  //       data-amp-analytics-attrs="page: Reward, target: Refresh"
-  //     >
-  //       Refresh
-  //     </Button>
-  //   );
-  // }, [rewardView, deltafiUser, handleRefresh]);
 
   const claimFarmRewardsButton = useMemo(() => {
     return (
