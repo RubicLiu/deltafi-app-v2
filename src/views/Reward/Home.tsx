@@ -218,7 +218,7 @@ const Home: React.FC = (props) => {
 
   useEffect(() => {
     // Refresh the pyth data every 5 seconds.
-    return scheduleWithInterval(() => dispatch(rewardViewActions.updateRefreshTs()), 1 * 5000);
+    return scheduleWithInterval(() => dispatch(rewardViewActions.updateRefreshTs()), 5 * 1000);
   }, [dispatch]);
 
   // farmPoolToReward records user's rewards in each pool
