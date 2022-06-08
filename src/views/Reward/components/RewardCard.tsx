@@ -111,8 +111,10 @@ const Card: React.FC<CardProps> = (props) => {
         color="inherit"
         disabled={
           !deltafiUser?.user?.owedReferralRewards ||
-          !deltafiUser?.user?.owedSwapRewards ||
-          deltafiUser?.user.owedReferralRewards.add(deltafiUser?.user.owedSwapRewards).eq(new BN(0))
+          !deltafiUser?.user?.owedTradeRewards ||
+          deltafiUser?.user.owedReferralRewards
+            .add(deltafiUser?.user.owedTradeRewards)
+            .eq(new BN(0))
         }
         data-amp-analytics-on="click"
         data-amp-analytics-name="click"

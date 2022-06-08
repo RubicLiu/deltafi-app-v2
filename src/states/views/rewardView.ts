@@ -13,7 +13,8 @@ const initialState = {
   referralLink: "",
   isRefreshing: false,
   isClaimingFarmRewards: false,
-  isClaimingSwapRewards: false,
+  isClaimingTradeRewards: false,
+  isClaimingReferralRewards: false,
   openSnackbar: false,
   claimResult: null,
   farmPoolToRewards: {},
@@ -40,8 +41,15 @@ const rewardViewSlice = createSlice({
       state.isClaimingFarmRewards = action.payload.isClaimingFarmRewards;
     },
 
-    setIsClaimingSwapRewards(state, action: PayloadAction<{ isClaimingSwapRewards: boolean }>) {
-      state.isClaimingSwapRewards = action.payload.isClaimingSwapRewards;
+    setisClaimingTradeRewards(state, action: PayloadAction<{ isClaimingTradeRewards: boolean }>) {
+      state.isClaimingTradeRewards = action.payload.isClaimingTradeRewards;
+    },
+
+    setIsClaimingReferralRewards(
+      state,
+      action: PayloadAction<{ isClaimingReferralRewards: boolean }>,
+    ) {
+      state.isClaimingReferralRewards = action.payload.isClaimingReferralRewards;
     },
 
     setClaimResult(state, action: PayloadAction<{ claimResult: { status: boolean } }>) {
