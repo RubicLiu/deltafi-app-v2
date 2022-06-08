@@ -418,8 +418,8 @@ const Home: React.FC = (props) => {
               isClaimingReferralRewards: isClaiming,
             })
         : (isClaiming: boolean) =>
-            rewardViewActions.setIsClaimingFarmTradingRewards({
-              isClaimingFarmTradingRewards: isClaiming,
+            rewardViewActions.setisClaimingTradeRewards({
+              isClaimingTradeRewards: isClaiming,
             });
 
       dispatch(setIsClaimingState(true));
@@ -588,7 +588,7 @@ const Home: React.FC = (props) => {
       function generator(owedAmount: string, isFromReferral: boolean) {
         const isClaiming = isFromReferral
           ? rewardView.isClaimingReferralRewards
-          : rewardView.isClaimingFarmTradingRewards;
+          : rewardView.isClaimingTradeRewards;
 
         if (isClaiming) {
           return (
