@@ -97,7 +97,6 @@ export async function createSwapTransaction(
     createDestinationAccountTransaction = result?.transaction;
     createAccountsCost += createTokenAccountCost;
   }
-
   const hasReferrer = !!referrer && referrer.toBase58() !== ZERO_ADDRESS;
   const marketConfig = new PublicKey(deployConfigV2.marketConfig);
   const [deltafiUserPubkey, deltafiUserBump] = await PublicKey.findProgramAddress(

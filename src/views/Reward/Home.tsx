@@ -45,27 +45,6 @@ import styled from "styled-components";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 import { scheduleWithInterval } from "utils";
 
-// /*
-//  * mockup test data for reward page
-//  */
-// const referralIntroCard = [
-//   {
-//     caption: "Get a referral link",
-//     detail: "Connect a wallet and generate a referral link to share.",
-//     image: "/images/get_referral_link.png",
-//   },
-//   {
-//     caption: "Share with friends",
-//     detail: "Invite your friends to register via your referral link.",
-//     image: "/images/share_friends.png",
-//   },
-//   {
-//     caption: "Earn crypto",
-//     detail: "Get referral rewards from your friends’ earnings & swaps.",
-//     image: "/images/earn_crypto.png",
-//   },
-// ];
-
 const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
   root: {
     width: "100%",
@@ -239,7 +218,7 @@ const Home: React.FC = (props) => {
 
   useEffect(() => {
     // Refresh the pyth data every 5 seconds.
-    return scheduleWithInterval(() => dispatch(rewardViewActions.updateRefreshTs()), 1 * 5000);
+    return scheduleWithInterval(() => dispatch(rewardViewActions.updateRefreshTs()), 5 * 1000);
   }, [dispatch]);
 
   // farmPoolToReward records user's rewards in each pool
@@ -348,10 +327,10 @@ const Home: React.FC = (props) => {
       exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
     if (deltafiUser?.user) {
       return {
-        owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedSwapRewards),
+        owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedTradeRewards),
         owedRewardFromReferral: parseRewardBN(deltafiUser.user.owedReferralRewards),
         totalRewardFromSwap: parseRewardBN(
-          deltafiUser.user.owedSwapRewards.add(deltafiUser.user.claimedSwapRewards),
+          deltafiUser.user.owedTradeRewards.add(deltafiUser.user.claimedTradeRewards),
         ),
         totalRewardFromReferral: parseRewardBN(
           deltafiUser.user.owedReferralRewards.add(deltafiUser.user.claimedReferralRewards),
@@ -427,49 +406,51 @@ const Home: React.FC = (props) => {
   }, [dispatch, walletPubkey, signTransaction, program]);
 
   const connection = program.provider.connection;
-  // const handleRefresh = useCallback(async () => {
-  //   dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: true }));
+  const handleClaimSwapRewardsGenerator = useCallback(
+    (isFromReferral: boolean) => async () => {
+      if (!walletPubkey || !program) {
+        return null;
+      }
 
-  //   try {
-  //     await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
-  //   } catch (e) {
-  //     console.error(e);
-  //     // TODO(leqiang): Add error display her
-  //   } finally {
-  //     dispatch(rewardViewActions.setIsRefreshing({ isRefreshing: false }));
-  //   }
-  // }, [connection, walletPubkey, dispatch]);
+      const setIsClaimingState = isFromReferral
+        ? (isClaiming: boolean) =>
+            rewardViewActions.setIsClaimingReferralRewards({
+              isClaimingReferralRewards: isClaiming,
+            })
+        : (isClaiming: boolean) =>
+            rewardViewActions.setisClaimingTradeRewards({
+              isClaimingTradeRewards: isClaiming,
+            });
 
-  const handleClaimSwapRewards = useCallback(async () => {
-    if (!walletPubkey || !program) {
-      return null;
-    }
+      dispatch(setIsClaimingState(true));
+      try {
+        const partialSignedTransaction = await createClaimSwapRewardsTransaction(
+          program,
+          connection,
+          walletPubkey,
+          userDeltafiToken?.publicKey,
+          deltafiUser.user,
+          isFromReferral,
+        );
 
-    dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: true }));
-    try {
-      const partialSignedTransaction = await createClaimSwapRewardsTransaction(
-        program,
-        connection,
-        walletPubkey,
-        userDeltafiToken?.publicKey,
-        deltafiUser.user,
-      );
+        const signedTransaction = await signTransaction(partialSignedTransaction);
+        const signature = await sendSignedTransaction({ signedTransaction, connection });
+        await connection.confirmTransaction(signature, "confirmed");
+        await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
+        dispatch(rewardViewActions.setClaimResult({ claimResult: { status: true } }));
+      } catch (e) {
+        console.error(e);
+        dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
+        // TODO(leqiang): Add error display here
+      } finally {
+        dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
+        dispatch(setIsClaimingState(false));
+      }
+    },
+    [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction],
+  );
 
-      const signedTransaction = await signTransaction(partialSignedTransaction);
-      const signature = await sendSignedTransaction({ signedTransaction, connection });
-      await connection.confirmTransaction(signature, "confirmed");
-      await fetchDeltafiUserManually(connection, walletPubkey, dispatch);
-      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: true } }));
-    } catch (e) {
-      console.error(e);
-      dispatch(rewardViewActions.setClaimResult({ claimResult: { status: false } }));
-      // TODO(leqiang): Add error display here
-    } finally {
-      dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: true }));
-      dispatch(rewardViewActions.setIsClaimingSwapRewards({ isClaimingSwapRewards: false }));
-    }
-  }, [connection, program, walletPubkey, userDeltafiToken, deltafiUser, dispatch, signTransaction]);
-
+  // claim from multiple farms at the same time
   const handleClaimFarmRewards = useCallback(async () => {
     if (!walletPubkey || !program) {
       return null;
@@ -512,27 +493,6 @@ const Home: React.FC = (props) => {
       dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
     }
   }, [dispatch, farmPoolKeyToFarmUser, program, signTransaction, userDeltafiToken, walletPubkey]);
-  // const refreshButton = useMemo(() => {
-  //   if (rewardView.isRefreshing) {
-  //     return (
-  //       <Button variant="contained" disabled={true}>
-  //         <CircularProgress color="inherit" />
-  //       </Button>
-  //     );
-  //   }
-  //   return (
-  //     <Button
-  //       variant="contained"
-  //       onClick={handleRefresh}
-  //       disabled={!deltafiUser?.user}
-  //       data-amp-analytics-on="click"
-  //       data-amp-analytics-name="click"
-  //       data-amp-analytics-attrs="page: Reward, target: Refresh"
-  //     >
-  //       Refresh
-  //     </Button>
-  //   );
-  // }, [rewardView, deltafiUser, handleRefresh]);
 
   const claimFarmRewardsButton = useMemo(() => {
     return (
@@ -623,10 +583,14 @@ const Home: React.FC = (props) => {
     );
   }, [handleSnackBarClose]);
 
-  const claimSwapRewardsButton = useMemo(
+  const claimSwapRewardsButtonGenerator = useMemo(
     () =>
-      function generator(owedAmount: string) {
-        if (rewardView.isClaimingSwapRewards && parseFloat(owedAmount) > 0) {
+      function generator(owedAmount: string, isFromReferral: boolean) {
+        const isClaiming = isFromReferral
+          ? rewardView.isClaimingReferralRewards
+          : rewardView.isClaimingTradeRewards;
+
+        if (isClaiming) {
           return (
             <StyledButton color="inherit" variant="outlined" disabled>
               <CircularProgress size={16} color="inherit" />
@@ -636,7 +600,7 @@ const Home: React.FC = (props) => {
         return (
           <StyledButton
             variant="outlined"
-            onClick={handleClaimSwapRewards}
+            onClick={handleClaimSwapRewardsGenerator(isFromReferral)}
             color="inherit"
             disabled={!(parseFloat(owedAmount) > 0)} // in case the result can be NaN
             data-amp-analytics-on="click"
@@ -655,7 +619,7 @@ const Home: React.FC = (props) => {
           </StyledButton>
         );
       },
-    [rewardView, handleClaimSwapRewards],
+    [rewardView, handleClaimSwapRewardsGenerator],
   );
 
   return (
@@ -831,7 +795,9 @@ const Home: React.FC = (props) => {
                   <Box color="#D4FF00">{owedRewardFromSwap}&nbsp;</Box>
                   <Box>/ {totalRewardFromSwap} DELFI</Box>{" "}
                 </Box>
-                <Box color="#D4FF00">{claimSwapRewardsButton(owedRewardFromSwap)}</Box>
+                <Box color="#D4FF00">
+                  {claimSwapRewardsButtonGenerator(owedRewardFromSwap, false)}
+                </Box>
               </Box>
               <Box className={classes.rewardBox} border="1px solid #905BFF">
                 <Box color="#905BFF">REGERRAL BONUS</Box>
@@ -840,7 +806,9 @@ const Home: React.FC = (props) => {
                   <Box color="#905BFF">{owedRewardFromReferral}&nbsp;</Box>
                   <Box>/ {totalRewardFromReferral} DELFI</Box>{" "}
                 </Box>
-                <Box color="#905BFF">{claimSwapRewardsButton(owedRewardFromReferral)}</Box>
+                <Box color="#905BFF">
+                  {claimSwapRewardsButtonGenerator(owedRewardFromReferral, true)}
+                </Box>
               </Box>
             </Box>
           </Box>

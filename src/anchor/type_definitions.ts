@@ -81,8 +81,8 @@ export interface DeltafiUser {
   configKey: PublicKey;
   owner: PublicKey;
   referrer: PublicKey;
-  owedSwapRewards: anchor.BN;
-  claimedSwapRewards: anchor.BN;
+  owedTradeRewards: anchor.BN;
+  claimedTradeRewards: anchor.BN;
   owedReferralRewards: anchor.BN;
   claimedReferralRewards: anchor.BN;
   reserved: Array<any>;

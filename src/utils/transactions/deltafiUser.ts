@@ -38,12 +38,14 @@ export async function createDeltafiUserTransaction(
   });
 }
 
+// claim the reward either from referral or from trade farming
 export async function createClaimSwapRewardsTransaction(
   program: any,
   connection: Connection,
   walletPubkey: PublicKey,
   userDeltafiToken: PublicKey,
   deltafiUser: DeltafiUser,
+  isFromReferral: boolean,
 ) {
   const marketConfig = new PublicKey(deployConfigV2.marketConfig);
   const [deltafiUserPubkey] = await PublicKey.findProgramAddress(
@@ -69,7 +71,13 @@ export async function createClaimSwapRewardsTransaction(
     throw Error("Deltafi user context does not exist");
   }
 
-  const transactionClaimRewards = program.transaction.claimSwapRewards({
+  // select which claim reward request to use
+  // both requests have the same input parameters
+  const claimRequest = isFromReferral
+    ? program.transaction.claimReferralRewards
+    : program.transaction.claimTradeRewards;
+
+  const transactionClaimRewards = claimRequest({
     accounts: {
       marketConfig,
       deltafiUser: deltafiUserPubkey,
