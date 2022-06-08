@@ -3,7 +3,12 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import { PriceData, ProductData, parsePriceData } from "@pythnetwork/client";
 import BigNumber from "bignumber.js";
 
-import { deployConfigV2, PoolConfig } from "constants/deployConfigV2";
+import {
+  deployConfigV2,
+  getTokenConfigBySymbol,
+  PoolConfig,
+  TokenConfig,
+} from "constants/deployConfigV2";
 import { validate } from "utils/utils";
 
 type PythData = {
@@ -26,13 +31,24 @@ export const fetchPythDataThunk = createAsyncThunk(
   "v2/fetchPythData",
   async (connection: Connection) => {
     const symbolToPythData: SymbolToPythData = {};
-    const pythDataList = await getPythDataList(connection);
-    for (const pythData of pythDataList) {
-      symbolToPythData[pythData.symbol] = pythData;
+    try {
+      const pythTokenInfoList = [];
+      for (const tokenInfo of deployConfigV2.tokenInfoList) {
+        if (!tokenInfo.pyth.productName.startsWith("Mock")) {
+          pythTokenInfoList.push(tokenInfo);
+        }
+      }
+      const pythDataList = await getPythDataList(connection, pythTokenInfoList);
+      for (const pythData of pythDataList) {
+        symbolToPythData[pythData.symbol] = pythData;
+      }
+      return {
+        symbolToPythData,
+      };
+    } catch (e) {
+      console.error(e);
+      throw e;
     }
-    return {
-      symbolToPythData,
-    };
   },
 );
 
@@ -42,8 +58,7 @@ export const pythAccountReducer = createReducer(initialState, (builder) => {
   });
 });
 
-async function getPythDataList(connection: Connection) {
-  const tokenInfoList = deployConfigV2.tokenInfoList;
+async function getPythDataList(connection: Connection, tokenInfoList: TokenConfig[]) {
   const pythPriceKeys = tokenInfoList.map(({ pyth }) => new PublicKey(pyth.price));
 
   const priceInfos = await connection.getMultipleAccountsInfo(pythPriceKeys, "confirmed");
@@ -68,6 +83,14 @@ export function getPythPriceBySymbol(
   let result = { priceData: null, priceAccountKey: null, price: null, confidenceInterval: null };
   if (!tokenSymbol) {
     return result;
+  }
+
+  const tokenInfo = getTokenConfigBySymbol(tokenSymbol);
+  if (tokenInfo && tokenInfo.pyth.productName.startsWith("Mock")) {
+    return {
+      price: tokenInfo.pyth.mockPrice,
+      confidenceInterval: 0,
+    };
   }
 
   if (!symbolToPythData[tokenSymbol]) {
