@@ -3,6 +3,8 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import { PriceData, ProductData, parsePriceData } from "@pythnetwork/client";
 import BigNumber from "bignumber.js";
 
+const MOCK_PYTH_PRODUCT_NAME_PREFIX = "Mock";
+
 import {
   deployConfigV2,
   getTokenConfigBySymbol,
@@ -34,7 +36,7 @@ export const fetchPythDataThunk = createAsyncThunk(
     try {
       const pythTokenInfoList = [];
       for (const tokenInfo of deployConfigV2.tokenInfoList) {
-        if (!tokenInfo.pyth.productName.startsWith("Mock")) {
+        if (!tokenInfo.pyth.productName.startsWith(MOCK_PYTH_PRODUCT_NAME_PREFIX)) {
           pythTokenInfoList.push(tokenInfo);
         }
       }
@@ -86,7 +88,7 @@ export function getPythPriceBySymbol(
   }
 
   const tokenInfo = getTokenConfigBySymbol(tokenSymbol);
-  if (tokenInfo && tokenInfo.pyth.productName.startsWith("Mock")) {
+  if (tokenInfo && tokenInfo.pyth.productName.startsWith(MOCK_PYTH_PRODUCT_NAME_PREFIX)) {
     return {
       price: tokenInfo.pyth.mockPrice,
       confidenceInterval: 0,
