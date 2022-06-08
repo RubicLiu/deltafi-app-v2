@@ -64,17 +64,21 @@ export interface SwapConfig {
   tradeRewardCap: anchor.BN;
   tradeRewardMaxReserve: anchor.BN;
   slope: anchor.BN;
+  disableStablePriceDiffCheck: boolean;
+  reservedU8: Array<any>;
   reservedU64: Array<any>;
 }
 
 export type SwapDirection =
-  | { sellBase?: any; sellQuote?: never }
-  | { sellBase?: never; sellQuote?: any };
+| { sellBase? : any, sellQuote?: never }
+| { sellBase?: never, sellQuote? : any }
+
 
 export type SwapType =
-  | { normalSwap?: any; stableSwap?: never; serumSwap?: never }
-  | { normalSwap?: never; stableSwap?: any; serumSwap?: never }
-  | { normalSwap?: never; stableSwap?: never; serumSwap?: any };
+| { normalSwap? : any, stableSwap?: never, serumSwap?: never }
+| { normalSwap?: never, stableSwap? : any, serumSwap?: never }
+| { normalSwap?: never, stableSwap?: never, serumSwap? : any }
+
 
 export interface DeltafiUser {
   bump: number;

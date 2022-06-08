@@ -2476,11 +2476,24 @@
             "type": "u128"
           },
           {
+            "name": "disableStablePriceDiffCheck",
+            "type": "bool"
+          },
+          {
+            "name": "reservedU8",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
                 "u64",
-                16
+                15
               ]
             }
           }

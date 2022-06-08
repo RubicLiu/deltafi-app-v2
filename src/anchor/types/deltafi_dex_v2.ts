@@ -2476,11 +2476,24 @@ export type DeltafiDexV2 = {
             "type": "u128"
           },
           {
+            "name": "disableStablePriceDiffCheck",
+            "type": "bool"
+          },
+          {
+            "name": "reservedU8",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
                 "u64",
-                16
+                15
               ]
             }
           }
@@ -5351,11 +5364,24 @@ export const IDL: DeltafiDexV2 = {
             "type": "u128"
           },
           {
+            "name": "disableStablePriceDiffCheck",
+            "type": "bool"
+          },
+          {
+            "name": "reservedU8",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
+          },
+          {
             "name": "reservedU64",
             "type": {
               "array": [
                 "u64",
-                16
+                15
               ]
             }
           }
