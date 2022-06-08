@@ -135,6 +135,20 @@
             "farmInfo": "FNUPc2bZb9hVjhmcLq9C7iUhFq8WWE2HtdaRgf96B9tX"
           }
         ]
+      },
+      {
+        "name": "UXD-USDC",
+        "base": "UXD",
+        "quote": "USDC",
+        "mintBase": "7kbnvuGBxxj8AG9qp8Scn56muWGaRaFqxg1FsRp3PaFT",
+        "mintQuote": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "swapInfo": "5FytqcoUbBAbo3tSArdU3evMnCCgbUmhvrDWFJDLy12Y",
+        "farmInfoList": [
+          {
+            "name": "default",
+            "farmInfo": "G7cNunkiWP3HyUFySQh8gk9xnLSZMtuF5vRW83o3vUAo"
+          }
+        ]
       }
     ],
     "tokenInfoList": [
@@ -184,6 +198,19 @@
           "price": "DZYZkJcFJThN9nZy4nK3hrHra1LaWeiyoZ9SMdLFEFpY",
           "product": "6Vi1i2rJj23CGxLQYHHVjoMwJm4pNWVGDESdDto7QqTk",
           "productName": "Crypto.GMT/USD"
+        }
+      },
+      {
+        "name": "UXD Stablecoin",
+        "mint": "7kbnvuGBxxj8AG9qp8Scn56muWGaRaFqxg1FsRp3PaFT",
+        "symbol": "UXD",
+        "decimals": 6,
+        "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7kbnvuGBxxj8AG9qp8Scn56muWGaRaFqxg1FsRp3PaFT/uxd-icon-black.png",
+        "pyth": {
+          "mockPrice": 1,
+          "price": "11111111111111111111111111111111",
+          "product": "11111111111111111111111111111111",
+          "productName": "Mock.UXD/USD"
         }
       }
     ]

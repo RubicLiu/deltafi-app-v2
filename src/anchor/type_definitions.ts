@@ -64,6 +64,8 @@ export interface SwapConfig {
   tradeRewardCap: anchor.BN;
   tradeRewardMaxReserve: anchor.BN;
   slope: anchor.BN;
+  disableStablePriceDiffCheck: boolean;
+  reservedU8: Array<any>;
   reservedU64: Array<any>;
 }
 
