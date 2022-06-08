@@ -3,8 +3,6 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import { PriceData, ProductData, parsePriceData } from "@pythnetwork/client";
 import BigNumber from "bignumber.js";
 
-const MOCK_PYTH_PRODUCT_NAME_PREFIX = "Mock";
-
 import {
   deployConfigV2,
   getTokenConfigBySymbol,
@@ -12,6 +10,8 @@ import {
   TokenConfig,
 } from "constants/deployConfigV2";
 import { validate } from "utils/utils";
+
+const MOCK_PYTH_PRODUCT_NAME_PREFIX = "Mock";
 
 type PythData = {
   symbol: string;
