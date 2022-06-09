@@ -4,6 +4,11 @@ An open source DeltaFi App.
 
 ## Available Scripts
 
+Start the backend server.
+```
+./backend/start_docker.sh
+```
+
 Install the dependencies.
 ```
 yarn install
