@@ -39,7 +39,6 @@
     "@types/react-router-dom": "^5.1.8",
     "@types/styled-system": "^5.1.12",
     "async-mutex": "^0.3.2",
-    "aws-amplify": "^4.3.0",
     "axios": "^0.25.0",
     "bigint-buffer": "^1.1.5",
     "bignumber.js": "^9.0.1",
@@ -80,11 +79,12 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "PORT=3001 ESLINT_NO_DEV_ERRORS=true REACT_APP_DEPLOYMENT_MODE=mainnet-test react-scripts start",
-    "start-dev": "PORT=3001 DISABLE_ESLINT_PLUGIN=true REACT_APP_DEPLOYMENT_MODE=testnet react-scripts start",
+    "start": "PORT=3001 ESLINT_NO_DEV_ERRORS=true REACT_APP_DEPLOYMENT_MODE=mainnet-prod react-scripts start",
+    "start-dev": "PORT=3001 DISABLE_ESLINT_PLUGIN=true REACT_APP_DEPLOYMENT_MODE=mainnet-test react-scripts start",
+    "start-test": "PORT=3001 DISABLE_ESLINT_PLUGIN=true REACT_APP_DEPLOYMENT_MODE=testnet react-scripts start",
     "build": "REACT_APP_DEPLOYMENT_MODE=mainnet-prod DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",
     "build-dev": "REACT_APP_DEPLOYMENT_MODE=mainnet-test DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false react-scripts build",
-    "build-dev-2": "REACT_APP_DEPLOYMENT_MODE=testnet DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "build-test": "REACT_APP_DEPLOYMENT_MODE=testnet DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",

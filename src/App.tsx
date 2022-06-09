@@ -1,6 +1,5 @@
 import React, { lazy, useEffect } from "react";
 import { Route, Switch, BrowserRouter, Redirect } from "react-router-dom";
-// import Amplify, { Analytics } from 'aws-amplify'
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import SuspenseWithChunkError from "./components/SuspenseWithChunkError";
@@ -9,7 +8,6 @@ import Header from "components/Header";
 import Footer from "components/Footer";
 import { FilterCountry } from "utils/checkJurisdiction";
 
-// import awsconfig from './aws-exports'
 import { useDispatch, useSelector } from "react-redux";
 
 import { PublicKey } from "@solana/web3.js";
@@ -27,18 +25,6 @@ import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { DELFI_USDT, fetchCandleSticksThunk, fetchTickerThunk } from "states/gateIoState";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 import { fetchFarmsThunk } from "states/accounts/farmAccount";
-
-// Amplify.configure(awsconfig)
-// Analytics.autoTrack('event', {
-//   enable: true,
-//   events: ['click'],
-//   selectorPrefix: 'data-amp-analytics-',
-//   provider: 'AWSPinpoint',
-//   attributes: {
-//     page: 'page',
-//   },
-// })
-// Analytics.record({ name: 'App' })
 
 const Swap = lazy(() => import("./views/Swap"));
 const Pool = lazy(() => import("./views/Pool"));
