@@ -4,7 +4,7 @@ An open source DeltaFi App.
 
 ## Available Scripts
 
-Start the backend server.
+Start the nodejs backend server.
 ```
 ./backend/start_docker.sh
 ```
