@@ -16,7 +16,7 @@ import {
   selectFarmUserByFarmKey,
 } from "states/selectors";
 import { exponentiate, exponentiatedBy } from "utils/decimal";
-import { useHistory } from "react-router";
+import { useModal } from "providers/modal";
 
 const Img = styled.img`
   width: 32px;
@@ -50,11 +50,12 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
     [breakpoints.up("sm")]: {
       width: "296px",
     },
+    lineHeight: 1,
   },
   header: {
     background: "url('/images/coin-card-banner.png')",
     backgroundSize: "cover",
-    height: 90,
+    height: 80,
     position: "relative",
     "&.lime": {
       backgroundColor: "#D4FF00",
@@ -72,15 +73,15 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
       position: "absolute",
       left: "50%",
       top: "100%",
-      transform: "translate(-50%, -50%)",
+      transform: "translate(-50%, -70%)",
     },
   },
   content: {
-    marginBottom: spacing(3.5),
+    marginBottom: spacing(2.5),
     [breakpoints.up("sm")]: {
-      marginBottom: spacing(7),
+      marginBottom: spacing(5),
     },
-    marginTop: spacing(4.5),
+    marginTop: spacing(3.5),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -96,6 +97,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   label: {
     color: palette.text.primary,
     fontSize: 14,
+    marginTop: 6,
     [breakpoints.up("sm")]: {
       fontSize: 18,
       fontWeight: 500,
@@ -121,7 +123,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
     },
   },
   cardBtn: {
-    marginTop: "28px",
+    marginTop: "20px",
     height: "48px",
     width: "238px",
   },
@@ -135,7 +137,6 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
   const farmInfo = useSelector(selectFarmByFarmKey(farmInfoAddress));
   const farmUser = useSelector(selectFarmUserByFarmKey(farmInfoAddress));
-  const history = useHistory();
 
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
@@ -152,6 +153,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
     }
     return new BigNumber(0);
   }, [quotePrice, swapInfo, quoteTokenInfo]);
+  const { setMenu } = useModal();
 
   const tvl = baseTvl.plus(quoteTvl);
 
@@ -238,37 +240,22 @@ const PoolCard: React.FC<CardProps> = (props) => {
       <Box className={classes.content}>
         <Box display="flex" alignItems="center" mb={2.5}>
           <Box>
-            <Typography className={classes.tokenPair}>{`${poolConfig.name}`}</Typography>
+            <Box className={classes.tokenPair}>{`${poolConfig.name}`}</Box>
           </Box>
         </Box>
-        {/* {props.isUserPool && (
+        {props.isUserPool && (
           <>
-            <Box marginTop={1}>
-              <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-                My Staked
-              </Typography>
-              <Typography className={classes.label}>{convertDollar(tvl.toFixed(2))}</Typography>
-            </Box>
-            <Box marginTop={1}>
-              <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-                My Reward Rate
-              </Typography>
-              <Typography className={classes.label}>{baseApr} DLT / Day</Typography>
+            <Box marginTop={1.25}>
+              <Box className={`${classes.labelTitle} ${props.color || ""}`}>My Staked</Box>
+              <Box className={classes.label}>{convertDollar(userStakedTvl.toFixed(2))}</Box>
             </Box>
           </>
-        )} */}
-
-        <Box marginTop={1}>
-          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>TVL</Typography>
-          <Typography className={classes.label}>{convertDollar(tvl.toFixed(2))}</Typography>
+        )}
+        <Box marginTop={1.25}>
+          <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total staked</Box>
+          <Box className={classes.label}>{convertDollar(stakedTvl.toFixed(2))}</Box>
         </Box>
-        <Box marginTop={1}>
-          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-            Total Staking
-          </Typography>
-          <Typography className={classes.label}>{convertDollar(stakedTvl.toFixed(2))}</Typography>
-        </Box>
-        <Box marginTop={1}>
+        {/* <Box marginTop={1}>
           <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
             Your Staking
           </Typography>
@@ -279,18 +266,14 @@ const PoolCard: React.FC<CardProps> = (props) => {
         <Box marginTop={1}>
           <Typography className={`${classes.labelTitle} ${props.color || ""}`}>Base APR</Typography>
           <Typography className={classes.label}>{baseApr}%</Typography>
-        </Box>
-        <Box marginTop={1}>
-          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-            Quote APR
-          </Typography>
-          <Typography className={classes.label}>{quoteApr}%</Typography>
+        </Box> */}
+        <Box marginTop={1.25}>
+          <Box className={`${classes.labelTitle} ${props.color || ""}`}>APR</Box>
+          <Box className={classes.label}>{quoteApr}%</Box>
         </Box>
         <ConnectButton
           className={classes.cardBtn}
-          onClick={() => {
-            history.push(`/stake/${farmInfoAddress}`);
-          }}
+          onClick={() => setMenu(true, "stake", undefined, { farmInfo: farmInfoAddress })}
           variant={"outlined"}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"

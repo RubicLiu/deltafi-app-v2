@@ -65,11 +65,10 @@ const TabMenu: React.FC = (props) => {
       <ToggleButton value="pools" aria-label="Pools" className={classes.button}>
         Pools
       </ToggleButton>
-      {deployMode === "testnet" ? (
-        <ToggleButton value="farms" aria-label="Farms" className={classes.button}>
-          Farms
-        </ToggleButton>
-      ) : null}
+      <ToggleButton value="farms" aria-label="Farms" className={classes.button}>
+        Farms
+      </ToggleButton>
+      )
     </ToggleButtonGroup>
   );
 };

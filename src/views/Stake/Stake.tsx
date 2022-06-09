@@ -1,4 +1,4 @@
-import { ReactElement, useMemo, useCallback, useEffect } from "react";
+import { ReactElement, useMemo, useCallback, useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
   Snackbar,
@@ -482,7 +482,6 @@ const Stake = (): ReactElement => {
             target="_blank"
             rel="noreferrer noopener"
             underline="always"
-            className={classes.link}
             data-amp-analytics-on="click"
             data-amp-analytics-name="click"
             data-amp-analytics-attrs="page: Farms, target: DELFI"

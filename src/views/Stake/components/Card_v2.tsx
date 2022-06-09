@@ -1,9 +1,9 @@
 import React from "react";
 import CurrencyInput from "react-currency-input-field";
-import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
+import { Box, makeStyles, Paper, Theme } from "@material-ui/core";
 
-import { DropDown } from "components";
 import { CardProps } from "./types";
+import { Avatar } from "@mui/material";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   root: {
@@ -12,7 +12,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     padding: spacing(2),
     borderRadius: 16,
     [breakpoints.up("md")]: {
-      padding: `${spacing(3)}px ${spacing(2.5)}px`,
+      padding: `${spacing(2.5)}px ${spacing(3)}px`,
     },
   },
   main: {
@@ -75,23 +75,84 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     borderRadius: 28,
     backgroundColor: palette.background.tertiary,
   },
+  tabs: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing(2),
+    textTransform: "none",
+    "& .MuiButton-text": {
+      padding: 0,
+    },
+    "& .MuiButton-root": {
+      minWidth: 0,
+      borderRadius: 3,
+      marginRight: 20,
+    },
+    "& .MuiButton-label": {
+      fontSize: 20,
+      fontWeight: 500,
+      lineHeight: 1,
+      fontFamily: "Rubik",
+      textTransform: "none",
+    },
+  },
+  btn: {
+    color: `${palette.secondary.main} !important`,
+    fontWeight: "bold",
+  },
+  activeBtn: {
+    color: `${palette.primary.main} !important`,
+    fontWeight: "bold",
+  },
 }));
 
 const StakeCard: React.FC<CardProps> = (props) => {
-  const { poolConfig, card, tokens, disableDrop } = props;
+  const { poolConfig, card } = props;
   const classes = useStyles(props);
-
   const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {};
   const baseDecimals = poolConfig.baseTokenInfo.decimals;
-  const baseBalance = card.baseBalance.toFixed(baseDecimals);
-  const baseStaked = card.baseStaked.toFixed(baseDecimals);
   const quoteDecimals = poolConfig.quoteTokenInfo.decimals;
-  const quoteBalance = card.quoteBalance.toFixed(quoteDecimals);
-  const quoteStaked = card.quoteStaked.toFixed(quoteDecimals);
+  const totalBalance = card.baseBalance
+    .plus(card.quoteBalance)
+    .toFixed(Math.min(quoteDecimals, baseDecimals));
 
   return (
     <Paper className={classes.root}>
       <Box className={classes.main}>
+        <Box
+          bgcolor="#1c1c1c"
+          display="flex"
+          sx={{
+            padding: "8px 24px 8px 24px",
+            borderRadius: 28,
+            boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+            alignItems: "center",
+          }}
+        >
+          <Avatar
+            src={poolConfig.baseTokenInfo.logoURI}
+            sx={{
+              borderRadius: "100%",
+              border: "1px solid #BDFF00",
+              width: 30,
+              height: 30,
+            }}
+          ></Avatar>
+          <Avatar
+            src={poolConfig.quoteTokenInfo.logoURI}
+            sx={{
+              marginLeft: -0.5,
+              borderRadius: "100%",
+              width: 30,
+              height: 30,
+              border: "1px solid #BDFF00",
+            }}
+          ></Avatar>
+          <Box ml={1} fontSize={16}>
+            {poolConfig.name}
+          </Box>
+        </Box>
         <CurrencyInput
           name="currency"
           disabled={true}
@@ -105,35 +166,11 @@ const StakeCard: React.FC<CardProps> = (props) => {
           onChange={inputHandler}
         />
       </Box>
-      <Box className={classes.main}>
-        <DropDown
-          value={poolConfig.quoteTokenInfo}
-          options={tokens}
-          inputProps={{ placeholder: "token name, symbol" }}
-          disableDrop={disableDrop}
-        />
-        <CurrencyInput
-          name="currency"
-          disabled={true}
-          className={classes.currencyInput}
-          autoComplete="off"
-          placeholder="0"
-          minLength={0}
-          maxLength={20}
-          decimalsLimit={20}
-          value={card.quoteAmount}
-          onChange={inputHandler}
-        />
-      </Box>
-      <Box display="flex" justifyContent="space-between">
-        <Typography
-          className={classes.tokenBalance}
-        >{`Staked base share: ${baseStaked}/${baseBalance}`}</Typography>
-      </Box>
-      <Box>
-        <Typography
-          className={classes.tokenBalance}
-        >{`Staked quote share: ${quoteStaked}/${quoteBalance}`}</Typography>
+
+      <Box display="flex" fontSize={16} fontWeight={500}>
+        <Box>Balance:&nbsp;</Box>
+        <Box sx={{ color: "#D4FF00" }}>{totalBalance || 0}&nbsp;</Box>
+        <Box>{poolConfig.name}</Box>
       </Box>
     </Paper>
   );
