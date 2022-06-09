@@ -518,6 +518,7 @@ const Stake = (): ReactElement => {
               padding: 0,
               minWidth: 0,
               lineHeight: 1,
+              textTransform: "none",
             }}
           >
             Stake
@@ -532,6 +533,7 @@ const Stake = (): ReactElement => {
               fontFamily: "Rubik",
               padding: 0,
               lineHeight: 1,
+              textTransform: "none",
             }}
           >
             Unstake
@@ -552,7 +554,7 @@ const Stake = (): ReactElement => {
       <Box marginTop={3} width="100%">
         {stakeView.isProcessingStake ? (
           <ConnectButton size="large" fullWidth variant="contained" disabled={true}>
-            <CircularProgress color="inherit" />
+            <CircularProgress size={50} color="inherit" />
           </ConnectButton>
         ) : isConnectedWallet ? (
           <ConnectButton

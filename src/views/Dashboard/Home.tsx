@@ -173,7 +173,7 @@ const Home: React.FC = (props) => {
     hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
   );
 
-  poolConfigsWithDeposit = poolConfigs
+  poolConfigsWithDeposit = poolConfigs;
 
   return (
     <Page>
