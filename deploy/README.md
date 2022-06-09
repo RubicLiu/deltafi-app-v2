@@ -1,4 +1,7 @@
 ### Build docker image and deploy to k8s
+
+These deploy commands are used by deltafi team.
+
 ```
 # Login to docker registry
 aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 077918681028.dkr.ecr.us-west-2.amazonaws.com
