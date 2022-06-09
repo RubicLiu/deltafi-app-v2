@@ -39,7 +39,6 @@
     "@types/react-router-dom": "^5.1.8",
     "@types/styled-system": "^5.1.12",
     "async-mutex": "^0.3.2",
-    "aws-amplify": "^4.3.0",
     "axios": "^0.25.0",
     "bigint-buffer": "^1.1.5",
     "bignumber.js": "^9.0.1",
