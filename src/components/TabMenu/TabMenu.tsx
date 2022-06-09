@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
 import { makeStyles, Theme } from "@material-ui/core";
-import { deployMode } from "constants/deployConfigV2";
 
 const useStyles = makeStyles(({ palette, breakpoints }: Theme) => ({
   button: {

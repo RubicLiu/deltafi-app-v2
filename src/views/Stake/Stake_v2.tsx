@@ -1,4 +1,4 @@
-import { ReactElement, useMemo, useCallback, useEffect, useState } from "react";
+import { ReactElement, useMemo, useCallback, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
   Snackbar,
@@ -82,7 +82,7 @@ const Stake = (): ReactElement => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const network = deployConfigV2.network;
 
-  const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
+  // const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
 
   const dispatch = useDispatch();
   const stakeView = useSelector(stakeViewSelector);
@@ -105,22 +105,22 @@ const Stake = (): ReactElement => {
     return new BigNumber(0);
   }, [quotePrice, swapInfo, quoteTokenInfo]);
 
-  const stakedTvl = useMemo(() => {
-    if (swapInfo && farmPool) {
-      const userBaseTvl = getUserTokenTvl(
-        baseTvl,
-        farmPool.stakedBaseShare,
-        swapInfo.poolState.baseSupply,
-      );
-      const userQuoteTvl = getUserTokenTvl(
-        quoteTvl,
-        farmPool.stakedQuoteShare,
-        swapInfo.poolState.quoteSupply,
-      );
-      return userBaseTvl.plus(userQuoteTvl);
-    }
-    return 0;
-  }, [swapInfo, farmPool, baseTvl, quoteTvl]);
+  // const stakedTvl = useMemo(() => {
+  //   if (swapInfo && farmPool) {
+  //     const userBaseTvl = getUserTokenTvl(
+  //       baseTvl,
+  //       farmPool.stakedBaseShare,
+  //       swapInfo.poolState.baseSupply,
+  //     );
+  //     const userQuoteTvl = getUserTokenTvl(
+  //       quoteTvl,
+  //       farmPool.stakedQuoteShare,
+  //       swapInfo.poolState.quoteSupply,
+  //     );
+  //     return userBaseTvl.plus(userQuoteTvl);
+  //   }
+  //   return 0;
+  // }, [swapInfo, farmPool, baseTvl, quoteTvl]);
 
   const baseTotalStaked = useMemo(() => {
     return farmPool
@@ -128,11 +128,11 @@ const Stake = (): ReactElement => {
       : new BigNumber(0);
   }, [farmPool, poolConfig]);
 
-  const quoteTotalStaked = useMemo(() => {
-    return farmPool
-      ? anchorBnToBn(poolConfig.quoteTokenInfo, farmPool.stakedQuoteShare)
-      : new BigNumber(0);
-  }, [farmPool, poolConfig]);
+  // const quoteTotalStaked = useMemo(() => {
+  //   return farmPool
+  //     ? anchorBnToBn(poolConfig.quoteTokenInfo, farmPool.stakedQuoteShare)
+  //     : new BigNumber(0);
+  // }, [farmPool, poolConfig]);
 
   const baseApr = new BigNumber(farmPool?.farmConfig.baseAprNumerator.toString()).div(
     new BigNumber(farmPool?.farmConfig.baseAprDenominator.toString()),
@@ -292,28 +292,28 @@ const Stake = (): ReactElement => {
 
   const setStakeAmount = useCallback((value: string) => {}, []);
 
-  const unclaimedReward = (() => {
-    if (lpUser && farmUser) {
-      const baseReward = getUnclaimedReward(
-        baseApr,
-        new BigNumber(farmUser.basePosition.lastUpdateTs.toString()),
-        new BigNumber(farmUser.basePosition.nextClaimTs.toString()),
-        new BigNumber(farmUser.basePosition.rewardsOwed.toString()),
-        new BigNumber(farmUser.basePosition.depositedAmount.toString()),
-        DELTAFI_TOKEN_DECIMALS,
-      );
-      const quoteReward = getUnclaimedReward(
-        quoteApr,
-        new BigNumber(farmUser.quotePosition.lastUpdateTs.toString()),
-        new BigNumber(farmUser.quotePosition.nextClaimTs.toString()),
-        new BigNumber(farmUser.quotePosition.rewardsOwed.toString()),
-        new BigNumber(farmUser.quotePosition.depositedAmount.toString()),
-        DELTAFI_TOKEN_DECIMALS,
-      );
-      return baseReward.plus(quoteReward);
-    }
-    return new BigNumber(0);
-  })();
+  // const unclaimedReward = (() => {
+  //   if (lpUser && farmUser) {
+  //     const baseReward = getUnclaimedReward(
+  //       baseApr,
+  //       new BigNumber(farmUser.basePosition.lastUpdateTs.toString()),
+  //       new BigNumber(farmUser.basePosition.nextClaimTs.toString()),
+  //       new BigNumber(farmUser.basePosition.rewardsOwed.toString()),
+  //       new BigNumber(farmUser.basePosition.depositedAmount.toString()),
+  //       DELTAFI_TOKEN_DECIMALS,
+  //     );
+  //     const quoteReward = getUnclaimedReward(
+  //       quoteApr,
+  //       new BigNumber(farmUser.quotePosition.lastUpdateTs.toString()),
+  //       new BigNumber(farmUser.quotePosition.nextClaimTs.toString()),
+  //       new BigNumber(farmUser.quotePosition.rewardsOwed.toString()),
+  //       new BigNumber(farmUser.quotePosition.depositedAmount.toString()),
+  //       DELTAFI_TOKEN_DECIMALS,
+  //     );
+  //     return baseReward.plus(quoteReward);
+  //   }
+  //   return new BigNumber(0);
+  // })();
 
   const basePoolRateByDay = useMemo(() => {
     if (farmPool && baseTotalStaked && baseTokenInfo) {

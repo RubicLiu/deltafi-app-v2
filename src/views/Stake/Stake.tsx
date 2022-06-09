@@ -1,4 +1,4 @@
-import { ReactElement, useMemo, useCallback, useEffect, useState } from "react";
+import { ReactElement, useMemo, useCallback, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
   Snackbar,

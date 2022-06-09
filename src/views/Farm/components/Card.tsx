@@ -1,6 +1,6 @@
 import React, { useMemo, memo } from "react";
 // import { useHistory } from "react-router-dom";
-import { Box, makeStyles, Typography } from "@material-ui/core";
+import { Box, makeStyles } from "@material-ui/core";
 // import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
 import styled from "styled-components";
@@ -155,7 +155,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   }, [quotePrice, swapInfo, quoteTokenInfo]);
   const { setMenu } = useModal();
 
-  const tvl = baseTvl.plus(quoteTvl);
+  // const tvl = baseTvl.plus(quoteTvl);
 
   const stakedTvl = useMemo(() => {
     if (swapInfo && farmInfo) {
@@ -191,21 +191,21 @@ const PoolCard: React.FC<CardProps> = (props) => {
     return new BigNumber(0);
   }, [baseTvl, quoteTvl, farmUser, swapInfo]);
 
-  const baseApr = useMemo(() => {
-    if (farmInfo && basePrice && farmInfo.farmConfig.baseAprDenominator.toNumber() > 0) {
-      const rawApr = exponentiatedBy(
-        exponentiate(
-          new BigNumber(farmInfo.farmConfig.baseAprNumerator.toString()).div(
-            new BigNumber(farmInfo.farmConfig.baseAprDenominator.toString()),
-          ),
-          baseTokenInfo.decimals,
-        ),
-        deltafiTokenDecimals,
-      );
-      return rawApr.dividedBy(basePrice).multipliedBy(100).toFixed(2);
-    }
-    return 0;
-  }, [farmInfo, basePrice, baseTokenInfo]);
+  // const baseApr = useMemo(() => {
+  //   if (farmInfo && basePrice && farmInfo.farmConfig.baseAprDenominator.toNumber() > 0) {
+  //     const rawApr = exponentiatedBy(
+  //       exponentiate(
+  //         new BigNumber(farmInfo.farmConfig.baseAprNumerator.toString()).div(
+  //           new BigNumber(farmInfo.farmConfig.baseAprDenominator.toString()),
+  //         ),
+  //         baseTokenInfo.decimals,
+  //       ),
+  //       deltafiTokenDecimals,
+  //     );
+  //     return rawApr.dividedBy(basePrice).multipliedBy(100).toFixed(2);
+  //   }
+  //   return 0;
+  // }, [farmInfo, basePrice, baseTokenInfo]);
 
   const quoteApr = useMemo(() => {
     if (farmInfo && quotePrice && farmInfo.farmConfig.quoteAprDenominator.toNumber() > 0) {
