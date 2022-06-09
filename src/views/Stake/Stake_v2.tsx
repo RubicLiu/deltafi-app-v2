@@ -23,11 +23,9 @@ import {
   selectLpUserBySwapKey,
   selectFarmByFarmKey,
   stakeViewSelector,
-  selectTokenAccountInfoByMint,
+  // selectTokenAccountInfoByMint,
   programSelector,
   selectFarmUserByFarmKey,
-  selectMarketPriceByPool,
-  selectSwapBySwapKey,
 } from "states/selectors";
 import { deployConfigV2, getPoolConfigByFarmKey } from "constants/deployConfigV2";
 import { tokenConfigs } from "constants/deployConfigV2";
@@ -36,33 +34,30 @@ import { createUpdateStakeTransaction } from "utils/transactions/stake";
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { anchorBnToBn, stringToAnchorBn } from "utils/tokenUtils";
-import { getTokenTvl, getUserTokenTvl } from "utils/utils";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 import { Button, Divider, Link } from "@mui/material";
 import Slider from "./components/Slider";
 
-const SECONDS_OF_YEAR = 31556926;
+// const getUnclaimedReward = (
+//   apr: BigNumber,
+//   lastUpdateTs: BigNumber,
+//   nextClaimTs: BigNumber,
+//   rewardsOwed: BigNumber,
+//   depositBalance: BigNumber,
+//   deltafiTokenDecimals: number,
+// ) => {
+//   const currentTs: BigNumber = new BigNumber(Date.now()).div(new BigNumber(1000));
+//   if (currentTs <= nextClaimTs) {
+//     return new BigNumber(0);
+//   }
+//   const unTrackedReward: BigNumber = currentTs
+//     .minus(lastUpdateTs)
+//     .div(new BigNumber(SECONDS_OF_YEAR))
+//     .multipliedBy(depositBalance)
+//     .multipliedBy(apr);
 
-const getUnclaimedReward = (
-  apr: BigNumber,
-  lastUpdateTs: BigNumber,
-  nextClaimTs: BigNumber,
-  rewardsOwed: BigNumber,
-  depositBalance: BigNumber,
-  deltafiTokenDecimals: number,
-) => {
-  const currentTs: BigNumber = new BigNumber(Date.now()).div(new BigNumber(1000));
-  if (currentTs <= nextClaimTs) {
-    return new BigNumber(0);
-  }
-  const unTrackedReward: BigNumber = currentTs
-    .minus(lastUpdateTs)
-    .div(new BigNumber(SECONDS_OF_YEAR))
-    .multipliedBy(depositBalance)
-    .multipliedBy(apr);
-
-  return exponentiatedBy(unTrackedReward.plus(rewardsOwed), deltafiTokenDecimals);
-};
+//   return exponentiatedBy(unTrackedReward.plus(rewardsOwed), deltafiTokenDecimals);
+// };
 
 const Stake = (): ReactElement => {
   const classes = useStyles();
@@ -70,7 +65,6 @@ const Stake = (): ReactElement => {
   const farmPoolId = data.farmInfo;
   const farmPool = useSelector(selectFarmByFarmKey(farmPoolId));
   const poolConfig = getPoolConfigByFarmKey(farmPoolId);
-  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
 
   const baseTokenInfo = poolConfig.baseTokenInfo;
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
@@ -89,39 +83,6 @@ const Stake = (): ReactElement => {
   const vertical = "top";
   const horizontal = "right";
 
-  const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
-
-  const baseTvl = useMemo(() => {
-    if (basePrice && swapInfo) {
-      return getTokenTvl(baseTokenInfo, swapInfo.poolState.baseReserve, basePrice);
-    }
-    return new BigNumber(0);
-  }, [basePrice, swapInfo, baseTokenInfo]);
-
-  const quoteTvl = useMemo(() => {
-    if (quotePrice && swapInfo) {
-      return getTokenTvl(quoteTokenInfo, swapInfo.poolState.quoteReserve, quotePrice);
-    }
-    return new BigNumber(0);
-  }, [quotePrice, swapInfo, quoteTokenInfo]);
-
-  // const stakedTvl = useMemo(() => {
-  //   if (swapInfo && farmPool) {
-  //     const userBaseTvl = getUserTokenTvl(
-  //       baseTvl,
-  //       farmPool.stakedBaseShare,
-  //       swapInfo.poolState.baseSupply,
-  //     );
-  //     const userQuoteTvl = getUserTokenTvl(
-  //       quoteTvl,
-  //       farmPool.stakedQuoteShare,
-  //       swapInfo.poolState.quoteSupply,
-  //     );
-  //     return userBaseTvl.plus(userQuoteTvl);
-  //   }
-  //   return 0;
-  // }, [swapInfo, farmPool, baseTvl, quoteTvl]);
-
   const baseTotalStaked = useMemo(() => {
     return farmPool
       ? anchorBnToBn(poolConfig.baseTokenInfo, farmPool.stakedBaseShare)
@@ -136,10 +97,6 @@ const Stake = (): ReactElement => {
 
   const baseApr = new BigNumber(farmPool?.farmConfig.baseAprNumerator.toString()).div(
     new BigNumber(farmPool?.farmConfig.baseAprDenominator.toString()),
-  );
-
-  const quoteApr = new BigNumber(farmPool?.farmConfig.quoteAprNumerator.toString()).div(
-    new BigNumber(farmPool?.farmConfig.quoteAprDenominator.toString()),
   );
 
   const farmUser = useSelector(selectFarmUserByFarmKey(farmPoolId));
@@ -292,29 +249,6 @@ const Stake = (): ReactElement => {
 
   const setStakeAmount = useCallback((value: string) => {}, []);
 
-  // const unclaimedReward = (() => {
-  //   if (lpUser && farmUser) {
-  //     const baseReward = getUnclaimedReward(
-  //       baseApr,
-  //       new BigNumber(farmUser.basePosition.lastUpdateTs.toString()),
-  //       new BigNumber(farmUser.basePosition.nextClaimTs.toString()),
-  //       new BigNumber(farmUser.basePosition.rewardsOwed.toString()),
-  //       new BigNumber(farmUser.basePosition.depositedAmount.toString()),
-  //       DELTAFI_TOKEN_DECIMALS,
-  //     );
-  //     const quoteReward = getUnclaimedReward(
-  //       quoteApr,
-  //       new BigNumber(farmUser.quotePosition.lastUpdateTs.toString()),
-  //       new BigNumber(farmUser.quotePosition.nextClaimTs.toString()),
-  //       new BigNumber(farmUser.quotePosition.rewardsOwed.toString()),
-  //       new BigNumber(farmUser.quotePosition.depositedAmount.toString()),
-  //       DELTAFI_TOKEN_DECIMALS,
-  //     );
-  //     return baseReward.plus(quoteReward);
-  //   }
-  //   return new BigNumber(0);
-  // })();
-
   const basePoolRateByDay = useMemo(() => {
     if (farmPool && baseTotalStaked && baseTokenInfo) {
       return exponentiatedBy(
@@ -324,84 +258,6 @@ const Stake = (): ReactElement => {
     }
     return "--";
   }, [farmPool, baseTokenInfo, baseApr, baseTotalStaked]);
-
-  // const quotePoolRateByDay = useMemo(() => {
-  //   if (farmPool && quoteTotalStaked && quoteTokenInfo) {
-  //     return exponentiatedBy(
-  //       exponentiate(
-  //         quoteTotalStaked.multipliedBy(quoteApr).dividedBy(365),
-  //         quoteTokenInfo.decimals,
-  //       ),
-  //       DELTAFI_TOKEN_DECIMALS,
-  //     ).toFixed(6);
-  //   }
-  //   return "--";
-  // }, [farmPool, quoteTokenInfo, quoteApr, quoteTotalStaked]);
-
-  // const rewardRateByDay = useMemo(() => {
-  //   if (lpUser && baseApr && quoteApr) {
-  //     const baseRate = exponentiatedBy(
-  //       exponentiate(userBaseStaked.multipliedBy(baseApr).dividedBy(365), baseTokenInfo.decimals),
-  //       DELTAFI_TOKEN_DECIMALS,
-  //     );
-  //     const quoteRate = exponentiatedBy(
-  //       exponentiate(
-  //         userQuoteStaked.multipliedBy(quoteApr).dividedBy(365),
-  //         quoteTokenInfo.decimals,
-  //       ),
-  //       DELTAFI_TOKEN_DECIMALS,
-  //     );
-  //     return baseRate.plus(quoteRate).toFixed(6);
-  //   }
-  //   return "0";
-  // }, [userBaseStaked, userQuoteStaked, baseApr, quoteApr, lpUser, baseTokenInfo, quoteTokenInfo]);
-
-  // const handleClaim = useCallback(async () => {
-  //   if (!walletPubkey || !lpUser || !rewardsAccount || !program) {
-  //     return null;
-  //   }
-
-  //   const connection = program.provider.connection;
-  //   try {
-  //     dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: true }));
-  //     const transaction = await createClaimFarmRewardsTransaction(
-  //       program,
-  //       connection,
-  //       poolConfig,
-  //       walletPubkey,
-  //       rewardsAccount.publicKey,
-  //     );
-  //     const signedTransaction = await signTransaction(transaction);
-
-  //     const hash = await sendSignedTransaction({
-  //       signedTransaction,
-  //       connection,
-  //     });
-
-  //     await connection.confirmTransaction(hash, "confirmed");
-  //     await fecthTokenAccountInfoList(
-  //       [DELTAFI_TOKEN_MINT.toBase58()],
-  //       walletPubkey,
-  //       connection,
-  //       dispatch,
-  //     );
-  //     dispatch(
-  //       stakeViewActions.setTransactionResult({
-  //         transactionResult: {
-  //           status: true,
-  //           action: "claim",
-  //           hash,
-  //         },
-  //       }),
-  //     );
-  //   } catch (e) {
-  //     dispatch(stakeViewActions.setTransactionResult({ transactionResult: { status: false } }));
-  //   } finally {
-  //     dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
-  //     dispatch(stakeViewActions.setIsProcessingClaim({ isProcessingClaim: false }));
-  //     dispatch(fetchLiquidityProvidersThunk({ connection, walletAddress: walletPubkey }));
-  //   }
-  // }, [walletPubkey, signTransaction, dispatch, poolConfig, lpUser, rewardsAccount, program]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: false }));
