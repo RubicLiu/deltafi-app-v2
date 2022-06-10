@@ -15,12 +15,15 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import Page from "components/layout/Page";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import PoolCard from "views/Pool/components/Card_v2";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import Reward from "views/Reward";
 import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
 import { useSelector } from "react-redux";
-import { lpUserSelector, tokenAccountSelector } from "states/selectors";
+import { lpUserSelector, tokenAccountSelector, poolSelector, pythSelector } from "states/selectors";
 import { useWallet } from "@solana/wallet-adapter-react";
+import BigNumber from "bignumber.js";
+import { getPythMarketPrice } from "states/accounts/pythAccount";
+import { getTokenTvl } from "utils/utils";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
@@ -149,12 +152,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
 }));
-// TODO replace value with real data
-const headerData = [
-  { label: "Total Holdings", color: "#d4ff00", value: "$2,345" },
-  { label: "Total Rewards", color: "#03f2a0", value: "$235" },
-  { label: "24hr Performance", color: "#693eff", value: "$212(9%)" },
-];
 
 const Home: React.FC = (props) => {
   const classes = useStyles(props);
@@ -171,10 +168,46 @@ const Home: React.FC = (props) => {
   const poolConfigsWithDeposit = poolConfigs.filter((poolConfig) =>
     hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
   );
+
+  const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
+  const symbolToPythData = useSelector(pythSelector).symbolToPythData;
+
+  const tvl = useMemo(() => {
+    if (poolConfigs.length > 0) {
+      return (poolConfigs as any).reduce((sum, poolConfig) => {
+        const swapInfo = swapKeyToSwapInfo[poolConfig.swapInfo];
+        const { basePrice, quotePrice } = getPythMarketPrice(symbolToPythData, poolConfig);
+
+        let volumn = new BigNumber(0);
+        if (basePrice && quotePrice && swapInfo) {
+          const baseTvl = getTokenTvl(
+            poolConfig.baseTokenInfo,
+            swapInfo.poolState.baseReserve,
+            basePrice,
+          );
+          const quoteTvl = getTokenTvl(
+            poolConfig.quoteTokenInfo,
+            swapInfo.poolState.quoteReserve,
+            quotePrice,
+          );
+          volumn = baseTvl.plus(quoteTvl);
+        }
+        return sum.plus(volumn);
+      }, new BigNumber(0)) as BigNumber;
+    }
+    return new BigNumber(0);
+  }, [symbolToPythData, swapKeyToSwapInfo]);
+
+  const headerData = [
+    { label: "Total Holdings", color: "#d4ff00", value: `$${tvl.toFixed(2)}` },
+    // TODO: add total rewards and 24hr performance
+    // { label: "Total Rewards", color: "#03f2a0", value: "$235" },
+    // { label: "24hr Performance", color: "#693eff", value: "$212(9%)" },
+  ];
+
   return (
     <Page>
       <Box padding={0} className={classes.container}>
-        {/* TODO: header layout only, fillin data and show header(remove 'display="none !important"') */}
         <Box color="#fff" textAlign="center" className={classes.header}>
           <Box className={classes.valuesCt}>
             <Box className={classes.values}>
