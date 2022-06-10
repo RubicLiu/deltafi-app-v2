@@ -337,20 +337,25 @@ const Stake = (): ReactElement => {
           <CloseIcon />
         </IconButton>
       </Box>
-      <Box lineHeight={1} display="flex" justifyContent="space-between" mt={3} pb={3}>
+      <Box
+        lineHeight={1}
+        fontWeight={500}
+        display="flex"
+        justifyContent="space-between"
+        mt={3}
+        pb={3}
+      >
         <Box>
-          <Box fontSize={14} fontWeight={500} color="#D3D3D3">
+          <Box fontSize={14} color="#D3D3D3">
             Total Staked
           </Box>
-          <Box fontSize={16} mt={1} fontWeight={400}>{`${baseTotalStaked
-            .toFixed(2)
-            .toString()}`}</Box>
+          <Box fontSize={16} mt={1}>{`${baseTotalStaked.toFixed(2).toString()}`}</Box>
         </Box>
         <Box>
-          <Box textAlign="right" fontSize={14} fontWeight={500} color="#D3D3D3">
+          <Box textAlign="right" fontSize={14} color="#D3D3D3">
             Pool Rate
           </Box>
-          <Box fontSize={16} mt={1} fontWeight={400}>
+          <Box fontSize={16} mt={1}>
             {basePoolRateByDay} DELFI / day
           </Box>
         </Box>
@@ -358,7 +363,7 @@ const Stake = (): ReactElement => {
       <Divider
         sx={{
           backgroundColor: "#fff",
-          opacity: 0.6,
+          opacity: 0.4,
         }}
       />
 

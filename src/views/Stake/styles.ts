@@ -5,7 +5,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     margin: "0 auto",
     maxWidth: 360,
     [breakpoints.up("sm")]: {
-      maxWidth: 560,
+      maxWidth: 460,
     },
   },
   iconGroup: {

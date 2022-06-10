@@ -1,7 +1,5 @@
 import React, { useMemo, memo } from "react";
-// import { useHistory } from "react-router-dom";
 import { Box, makeStyles } from "@material-ui/core";
-// import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
 import styled from "styled-components";
 
@@ -244,14 +242,12 @@ const PoolCard: React.FC<CardProps> = (props) => {
           </Box>
         </Box>
         {props.isUserPool && (
-          <>
-            <Box marginTop={1.25}>
-              <Box className={`${classes.labelTitle} ${props.color || ""}`}>My Staked</Box>
-              <Box className={classes.label}>{convertDollar(userStakedTvl.toFixed(2))}</Box>
-            </Box>
-          </>
+          <Box marginBottom={1.25}>
+            <Box className={`${classes.labelTitle} ${props.color || ""}`}>My Staked</Box>
+            <Box className={classes.label}>{convertDollar(userStakedTvl.toFixed(2))}</Box>
+          </Box>
         )}
-        <Box marginTop={1.25}>
+        <Box>
           <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total staked</Box>
           <Box className={classes.label}>{convertDollar(stakedTvl.toFixed(2))}</Box>
         </Box>
