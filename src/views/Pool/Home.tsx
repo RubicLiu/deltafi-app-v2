@@ -1,16 +1,15 @@
 import { useMemo } from "react";
 import { Backdrop, Box, Grid, makeStyles, Modal } from "@material-ui/core";
-import BigNumber from "bignumber.js";
 
 import Page from "components/layout/Page";
 import Card from "./components/Card_v2";
-import { convertDollar, getTokenTvl } from "utils/utils";
+import { convertDollar } from "utils/utils";
 import { poolConfigs } from "constants/deployConfigV2";
 import { useSelector } from "react-redux";
 import { pythSelector, poolSelector } from "states/selectors";
-import { getPythMarketPrice } from "states/accounts/pythAccount";
 import { useParams } from "react-router";
 import Deposit from "views/Deposit/Deposit";
+import { calculateTotalHoldings } from "lib/calc/pools";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
@@ -83,31 +82,10 @@ const Home: React.FC = () => {
   const params = useParams<{ poolAddress?: string }>();
   const poolAddress = params?.poolAddress;
 
-  const tvl = useMemo(() => {
-    if (poolConfigs.length > 0) {
-      return (poolConfigs as any).reduce((sum, poolConfig) => {
-        const swapInfo = poolState.swapKeyToSwapInfo[poolConfig.swapInfo];
-        const { basePrice, quotePrice } = getPythMarketPrice(symbolToPythData, poolConfig);
-
-        let volumn = new BigNumber(0);
-        if (basePrice && quotePrice && swapInfo) {
-          const baseTvl = getTokenTvl(
-            poolConfig.baseTokenInfo,
-            swapInfo.poolState.baseReserve,
-            basePrice,
-          );
-          const quoteTvl = getTokenTvl(
-            poolConfig.quoteTokenInfo,
-            swapInfo.poolState.quoteReserve,
-            quotePrice,
-          );
-          volumn = baseTvl.plus(quoteTvl);
-        }
-        return sum.plus(volumn);
-      }, new BigNumber(0)) as BigNumber;
-    }
-    return new BigNumber(0);
-  }, [symbolToPythData, poolState]);
+  const tvl = useMemo(
+    () => calculateTotalHoldings(poolConfigs, poolState.swapKeyToSwapInfo, symbolToPythData),
+    [symbolToPythData, poolState],
+  );
 
   return (
     <Page>

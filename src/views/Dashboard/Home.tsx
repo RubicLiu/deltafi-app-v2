@@ -21,9 +21,7 @@ import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
 import { useSelector } from "react-redux";
 import { lpUserSelector, tokenAccountSelector, poolSelector, pythSelector } from "states/selectors";
 import { useWallet } from "@solana/wallet-adapter-react";
-import BigNumber from "bignumber.js";
-import { getPythMarketPrice } from "states/accounts/pythAccount";
-import { getTokenTvl } from "utils/utils";
+import { calculateTotalHoldings } from "lib/calc/pools";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
@@ -172,31 +170,10 @@ const Home: React.FC = (props) => {
   const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
   const symbolToPythData = useSelector(pythSelector).symbolToPythData;
 
-  const tvl = useMemo(() => {
-    if (poolConfigs.length > 0) {
-      return (poolConfigs as any).reduce((sum, poolConfig) => {
-        const swapInfo = swapKeyToSwapInfo[poolConfig.swapInfo];
-        const { basePrice, quotePrice } = getPythMarketPrice(symbolToPythData, poolConfig);
-
-        let volumn = new BigNumber(0);
-        if (basePrice && quotePrice && swapInfo) {
-          const baseTvl = getTokenTvl(
-            poolConfig.baseTokenInfo,
-            swapInfo.poolState.baseReserve,
-            basePrice,
-          );
-          const quoteTvl = getTokenTvl(
-            poolConfig.quoteTokenInfo,
-            swapInfo.poolState.quoteReserve,
-            quotePrice,
-          );
-          volumn = baseTvl.plus(quoteTvl);
-        }
-        return sum.plus(volumn);
-      }, new BigNumber(0)) as BigNumber;
-    }
-    return new BigNumber(0);
-  }, [symbolToPythData, swapKeyToSwapInfo]);
+  const tvl = useMemo(
+    () => calculateTotalHoldings(poolConfigs, swapKeyToSwapInfo, symbolToPythData),
+    [symbolToPythData, swapKeyToSwapInfo],
+  );
 
   const headerData = [
     { label: "Total Holdings", color: "#d4ff00", value: `$${tvl.toFixed(2)}` },
