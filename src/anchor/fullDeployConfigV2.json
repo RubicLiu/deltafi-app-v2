@@ -33,6 +33,24 @@
         "mintQuote": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
         "swapInfo": "4vx4UNSGEzfL9NWDuFhnPxLfmqB8hjCHLBeuALzmzn19",
         "farmInfoList": []
+      },
+      {
+        "name": "UXD-USDC",
+        "base": "UXD",
+        "quote": "USDC",
+        "mintBase": "7kbnvuGBxxj8AG9qp8Scn56muWGaRaFqxg1FsRp3PaFT",
+        "mintQuote": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "swapInfo": "DkwiQyA2JfD8ARfvMbMqu2DD4XKRkewRZVDE94SZNxSS",
+        "farmInfoList": []
+      },
+      {
+        "name": "cUSDC-cUSDT",
+        "base": "cUSDC",
+        "quote": "cUSDT",
+        "mintBase": "993dVFL2uXWYeoXuEBFXR4BijeXdTv4s6BzsCjJZuwqk",
+        "mintQuote": "BTsbZDV7aCMRJ3VNy9ygV4Q2UeEo9GpR8D6VvmMZzNr8",
+        "swapInfo": "DzFzJyDTXG5YCWXN6DeVXbLGmpYbkX6PPHs1RNLX9fKk",
+        "farmInfoList": []
       }
     ],
     "tokenInfoList": [
