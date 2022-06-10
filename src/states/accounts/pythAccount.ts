@@ -19,7 +19,8 @@ type PythData = {
   productData: ProductData;
   priceData: PriceData;
 };
-type SymbolToPythData = Record<string, PythData>;
+
+export type SymbolToPythData = Record<string, PythData>;
 
 export interface PythState {
   symbolToPythData: SymbolToPythData;
