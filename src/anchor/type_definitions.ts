@@ -65,6 +65,7 @@ export interface SwapConfig {
   tradeRewardMaxReserve: anchor.BN;
   slope: anchor.BN;
   disableStablePriceDiffCheck: boolean;
+  disableQuoteTokenPriceCheck: boolean;
   reservedU8: Array<any>;
   reservedU64: Array<any>;
 }

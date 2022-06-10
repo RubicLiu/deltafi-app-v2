@@ -2480,11 +2480,15 @@ export type DeltafiDexV2 = {
             "type": "bool"
           },
           {
+            "name": "disableQuoteTokenPriceCheck",
+            "type": "bool"
+          },
+          {
             "name": "reservedU8",
             "type": {
               "array": [
                 "u8",
-                7
+                6
               ]
             }
           },
@@ -2882,6 +2886,16 @@ export type DeltafiDexV2 = {
       "code": 6069,
       "name": "DepeggedQuotePrice",
       "msg": "DepeggedQuotePrice"
+    },
+    {
+      "code": 6070,
+      "name": "InvalidWithdrawalAmount",
+      "msg": "Invalid withdrawal amount"
+    },
+    {
+      "code": 6071,
+      "name": "InvalidStakingAmount",
+      "msg": "Invalid staking amount"
     }
   ]
 };
@@ -5368,11 +5382,15 @@ export const IDL: DeltafiDexV2 = {
             "type": "bool"
           },
           {
+            "name": "disableQuoteTokenPriceCheck",
+            "type": "bool"
+          },
+          {
             "name": "reservedU8",
             "type": {
               "array": [
                 "u8",
-                7
+                6
               ]
             }
           },
@@ -5770,6 +5788,16 @@ export const IDL: DeltafiDexV2 = {
       "code": 6069,
       "name": "DepeggedQuotePrice",
       "msg": "DepeggedQuotePrice"
+    },
+    {
+      "code": 6070,
+      "name": "InvalidWithdrawalAmount",
+      "msg": "Invalid withdrawal amount"
+    },
+    {
+      "code": 6071,
+      "name": "InvalidStakingAmount",
+      "msg": "Invalid staking amount"
     }
   ]
 };
