@@ -104,7 +104,7 @@
         "decimals": 6,
         "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/993dVFL2uXWYeoXuEBFXR4BijeXdTv4s6BzsCjJZuwqk/logo.png",
         "pyth": {
-          "mockPrice": 1,
+          "mockPrice": 1.04,
           "price": "11111111111111111111111111111111",
           "product": "11111111111111111111111111111111",
           "productName": "Mock.cUSDC/USD"
@@ -117,7 +117,7 @@
         "decimals": 6,
         "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BTsbZDV7aCMRJ3VNy9ygV4Q2UeEo9GpR8D6VvmMZzNr8/logo.png",
         "pyth": {
-          "mockPrice": 1,
+          "mockPrice": 1.04,
           "price": "11111111111111111111111111111111",
           "product": "11111111111111111111111111111111",
           "productName": "Mock.cUSDT/USD"
@@ -273,7 +273,7 @@
         "decimals": 6,
         "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/993dVFL2uXWYeoXuEBFXR4BijeXdTv4s6BzsCjJZuwqk/logo.png",
         "pyth": {
-          "mockPrice": 1,
+          "mockPrice": 1.04,
           "price": "11111111111111111111111111111111",
           "product": "11111111111111111111111111111111",
           "productName": "Mock.cUSDC/USD"
@@ -286,7 +286,7 @@
         "decimals": 6,
         "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/BTsbZDV7aCMRJ3VNy9ygV4Q2UeEo9GpR8D6VvmMZzNr8/logo.png",
         "pyth": {
-          "mockPrice": 1,
+          "mockPrice": 1.04,
           "price": "11111111111111111111111111111111",
           "product": "11111111111111111111111111111111",
           "productName": "Mock.cUSDT/USD"
