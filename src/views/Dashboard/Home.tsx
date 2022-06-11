@@ -265,13 +265,13 @@ const Home: React.FC = (props) => {
 
   const headerData = [
     {
-      label: "Total Holdings",
+      label: "My Total Holdings",
       color: "#d4ff00",
       value: formatCurrencyAmount(totalHoldings),
       isLoading: isLoadingTotalHoldings,
     },
     {
-      label: "Total Rewards",
+      label: "My Total Rewards",
       color: "#03f2a0",
       value: formatCurrencyAmount(totalRewards),
       isLoading: isLoadingTotalRewards,
