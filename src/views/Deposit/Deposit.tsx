@@ -283,12 +283,26 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return new BigNumber(0);
   }, [lpUser, swapInfo]);
 
+  const { availableBaseShares, availableQuoteShares } = useMemo(() => {
+    if (!lpUser) {
+      return {
+        availableBaseShares: null,
+        availableQuoteShares: null,
+      };
+    }
+    return {
+      availableBaseShares: lpUser.baseShare.sub(lpUser.stakedBaseShare),
+      availableQuoteShares: lpUser.quoteShare.sub(lpUser.stakedQuoteShare),
+    };
+  }, [lpUser]);
+
   const { maxBaseWithdrawal, maxQuoteWithdrawal } = useMemo(() => {
     const baseTokenConfig = depositView?.base?.token;
     const quoteTokenConfig = depositView?.quote?.token;
 
     if (
-      !lpUser ||
+      !availableBaseShares ||
+      !availableQuoteShares ||
       !swapInfo?.poolState ||
       !baseTokenConfig ||
       !quoteTokenConfig ||
@@ -302,8 +316,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     }
 
     const res = calculateWithdrawalFromShares(
-      lpUser.baseShare,
-      lpUser.quoteShare,
+      availableBaseShares,
+      availableQuoteShares,
       baseTokenConfig,
       quoteTokenConfig,
       basePrice,
@@ -315,7 +329,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       maxBaseWithdrawal: res.baseWithdrawalAmount,
       maxQuoteWithdrawal: res.quoteWithdrawalAmount,
     };
-  }, [lpUser, swapInfo, depositView, basePrice, quotePrice]);
+  }, [availableBaseShares, availableQuoteShares, swapInfo, depositView, basePrice, quotePrice]);
 
   const baseShare = useMemo(() => {
     if (swapInfo && basePercent) {
@@ -419,12 +433,19 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     (value: number) => {
       const baseTokenConfig = depositView?.base?.token;
       const quoteTokenConfig = depositView?.quote?.token;
-      if (lpUser && swapInfo && baseTokenConfig && quoteTokenConfig && basePrice && quotePrice) {
+      if (
+        availableBaseShares &&
+        availableQuoteShares &&
+        swapInfo &&
+        baseTokenConfig &&
+        quoteTokenConfig &&
+        basePrice &&
+        quotePrice
+      ) {
         // TODO(ypeng): Consider price and pool ratio
 
-        const baseInputShare = lpUser.baseShare.mul(new BN(value)).div(new BN(100));
-        const quoteInputShare = lpUser.quoteShare.mul(new BN(value)).div(new BN(100));
-
+        const baseInputShare = availableBaseShares.mul(new BN(value)).div(new BN(100));
+        const quoteInputShare = availableQuoteShares.mul(new BN(value)).div(new BN(100));
         const { baseWithdrawalAmount, quoteWithdrawalAmount } = calculateWithdrawalFromShares(
           baseInputShare,
           quoteInputShare,
@@ -446,7 +467,15 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       }
       dispatch(depositViewActions.setWithdrawPercentage({ withdrawPercentage: value }));
     },
-    [dispatch, lpUser, basePrice, quotePrice, depositView, swapInfo],
+    [
+      dispatch,
+      availableBaseShares,
+      availableQuoteShares,
+      basePrice,
+      quotePrice,
+      depositView,
+      swapInfo,
+    ],
   );
 
   const unclaimedInterest = useMemo(() => {

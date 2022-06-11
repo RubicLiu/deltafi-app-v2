@@ -362,8 +362,8 @@ const Home: React.FC = (props) => {
       return;
     }
 
-    const referralLink =
-      process.env.REACT_APP_LOCAL_HOST + "?referrer=" + deltafiUser?.publicKey?.toBase58();
+    const host = window.location.protocol + "//" + window.location.host;
+    const referralLink = host + "?referrer=" + deltafiUser?.publicKey?.toBase58();
     dispatch(rewardViewActions.setReferralLink({ referralLink }));
   }, [isConnectedWallet, deltafiUser, dispatch]);
 

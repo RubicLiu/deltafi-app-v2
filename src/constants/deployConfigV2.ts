@@ -20,6 +20,8 @@ export type PoolConfig = {
 export type PythConfig = {
   price: string;
   product: string;
+  productName: string;
+  mockPrice: number | null;
 };
 
 export type TokenConfig = {
