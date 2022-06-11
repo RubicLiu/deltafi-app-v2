@@ -19,7 +19,6 @@ import { ChangeEvent, useMemo, useState } from "react";
 import Reward from "views/Reward";
 import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
 import { useSelector } from "react-redux";
-<<<<<<< HEAD
 import {
   lpUserSelector,
   tokenAccountSelector,
@@ -36,11 +35,6 @@ import { formatCurrencyAmount } from "utils/utils";
 import { exponentiatedBy } from "utils/decimal";
 import { DELTAFI_TOKEN_DECIMALS } from "constants/deployConfigV2";
 import { CircularProgress } from "@material-ui/core";
-=======
-import { lpUserSelector, tokenAccountSelector, poolSelector, pythSelector } from "states/selectors";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { calculateTotalHoldings } from "lib/calc/pools";
->>>>>>> f351138cc266277a5574a20451ee3de523d50b5c
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
