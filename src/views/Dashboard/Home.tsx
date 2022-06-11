@@ -229,14 +229,13 @@ const Home: React.FC = (props) => {
       return { totalHoldings, isLoadingTotalHoldings: false };
     }
     return { totalHoldings: new BigNumber(0), isLoadingTotalHoldings: false };
-  }, [symbolToPythData, swapKeyToSwapInfo, isConnectedWallet]);
+  }, [symbolToPythData, swapKeyToSwapInfo, swapKeyToLpUser, isConnectedWallet]);
 
   const { totalRewards, isLoadingTotalRewards } = useMemo(() => {
     // TODO(leqiang): Add farm rewards
     if (!isConnectedWallet) {
       return { totalRewards: null, isLoadingTotalRewards: false };
     }
-    console.log(deltafiUser);
     if (!deltafiUser.fetched || !deltafiPrice) {
       // when wallet is connected, but deltafiUser is not fetched yet
       return { totalRewards: null, isLoadingTotalRewards: true };
@@ -258,7 +257,6 @@ const Home: React.FC = (props) => {
 
     const totalRewards = totalDelfiAmount.multipliedBy(deltafiPrice.last);
 
-    console.log("res", totalRewards.toString());
     return {
       totalRewards,
       isLoadingTotalRewards: false,
