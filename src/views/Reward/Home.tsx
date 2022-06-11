@@ -800,7 +800,7 @@ const Home: React.FC = (props) => {
                 </Box>
               </Box>
               <Box className={classes.rewardBox} border="1px solid #905BFF">
-                <Box color="#905BFF">REGERRAL BONUS</Box>
+                <Box color="#905BFF">REFERRAL BONUS</Box>
                 <Box>Unclaimed / Total</Box>
                 <Box lineHeight="24px" display="flex" fontSize={20}>
                   <Box color="#905BFF">{owedRewardFromReferral}&nbsp;</Box>
