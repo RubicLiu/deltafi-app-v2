@@ -48,13 +48,7 @@ function hasDeposit(
     return false;
   }
   const lpUser = swapKeyToLpUser[poolConfig.swapInfo];
-  return (
-    lpUser &&
-    (lpUser.baseShare > 0 ||
-      lpUser.quoteShare > 0 ||
-      lpUser.basePosition.depositedAmount > 0 ||
-      lpUser.quotePosition.depositedAmount > 0)
-  );
+  return lpUser && (lpUser.baseShare > 0 || lpUser.quoteShare > 0);
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
