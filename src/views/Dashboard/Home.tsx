@@ -15,6 +15,7 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import Page from "components/layout/Page";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import PoolCard from "views/Pool/components/Card_v2";
+import FarmCard from "views/Farm/components/Card";
 import { ChangeEvent, useMemo, useState } from "react";
 import Reward from "views/Reward";
 import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
@@ -170,10 +171,11 @@ const Home: React.FC = (props) => {
   const mintToTokenAccountInfo = useSelector(tokenAccountSelector).mintToTokenAccountInfo;
   const swapKeyToLpUser = useSelector(lpUserSelector).swapKeyToLp;
 
-  const poolConfigsWithDeposit = poolConfigs.filter((poolConfig) =>
+  let poolConfigsWithDeposit = poolConfigs.filter((poolConfig) =>
     hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
   );
 
+  poolConfigsWithDeposit = poolConfigs;
   const deltafiPrice = useSelector(selectGateIoSticker("DELFI_USDT"));
 
   const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
@@ -319,6 +321,8 @@ const Home: React.FC = (props) => {
                 aria-label="dashboard tabs"
               >
                 <Tab label="My Pools" value="pool" />
+
+                <Tab label="My Farms" value="farm" />
                 <Tab label="Invite & Earn" value="reward" />
               </TabList>
             </Box>
@@ -350,6 +354,34 @@ const Home: React.FC = (props) => {
                   </Grid>
                 )}
               </>
+            </TabPanel>
+            <TabPanel value="farm" className={classes.tabPanel}>
+              {isConnectedWallet && (
+                <Grid container className={classes.poolCardContainer} justifyContent="center">
+                  {poolConfigsWithDeposit.length > 0 &&
+                    poolConfigsWithDeposit.map((poolConfig: PoolConfig, idx) =>
+                      poolConfig?.farmInfoList.map((farm) => (
+                        <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+                          <FarmCard
+                            color={
+                              idx % 4 === 0
+                                ? "greenYellow"
+                                : idx % 4 === 1
+                                ? "lime"
+                                : idx % 4 === 2
+                                ? "indigo"
+                                : "dodgerBlue"
+                            }
+                            key={farm.farmInfo}
+                            poolConfig={poolConfig}
+                            farmInfoAddress={farm.farmInfo}
+                            isUserPool
+                          />
+                        </Grid>
+                      )),
+                    )}
+                </Grid>
+              )}
             </TabPanel>
             <TabPanel value="reward" className={classes.tabPanel}>
               <Reward />

@@ -72,7 +72,7 @@ const CustomSlider = withStyles((theme: Theme) => ({
     height: 20,
     width: 20,
     backgroundColor: "#D4FF00",
-    border: "none",
+    border: "1px solid #333",
     marginTop: -6,
     marginLeft: -10,
     "&:focus, &:hover": {

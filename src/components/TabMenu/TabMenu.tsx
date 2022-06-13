@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useHistory, useLocation } from "react-router";
 import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
 import { makeStyles, Theme } from "@material-ui/core";
-import { deployMode } from "constants/deployConfigV2";
 
 const useStyles = makeStyles(({ palette, breakpoints }: Theme) => ({
   button: {
@@ -65,11 +64,10 @@ const TabMenu: React.FC = (props) => {
       <ToggleButton value="pools" aria-label="Pools" className={classes.button}>
         Pools
       </ToggleButton>
-      {deployMode === "testnet" ? (
-        <ToggleButton value="farms" aria-label="Farms" className={classes.button}>
-          Farms
-        </ToggleButton>
-      ) : null}
+      <ToggleButton value="farms" aria-label="Farms" className={classes.button}>
+        Farms
+      </ToggleButton>
+      )
     </ToggleButtonGroup>
   );
 };

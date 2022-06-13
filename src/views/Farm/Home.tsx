@@ -1,10 +1,12 @@
-import React, { ReactElement } from "react";
+import React, { ChangeEvent, ReactElement, useState } from "react";
 import { Box, Grid, Link, makeStyles, Theme } from "@material-ui/core";
 
 import Page from "components/layout/Page";
 import Card from "./components/Card";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import ShareIcon from "components/Svg/icons/ShareIcon";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { Divider, Tab } from "@mui/material";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -131,10 +133,34 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     backgroundSize: "cover",
     height: 200,
   },
+  tabContext: {
+    "& .MuiTabs-indicator": {
+      height: 2,
+      background: "linear-gradient(111.31deg, #D4FF00 15.34%, #BDFF00 95.74%)",
+    },
+    "& .Mui-selected": {
+      color: "#d4ff00",
+    },
+    "& .MuiTab-textColorInherit": {
+      opacity: 1,
+    },
+    "& .MuiTab-wrapper": {
+      textTransform: "none",
+    },
+    [breakpoints.up("md")]: {
+      padding: "0 24px",
+    },
+  },
+  tabPanel: {
+    "&.MuiTabPanel-root": {
+      padding: 0,
+    },
+  },
 }));
 
 const Home: React.FC = (props): ReactElement => {
   const classes = useStyles(props);
+  const [tab, setTab] = useState("active");
 
   return (
     <Page>
@@ -158,30 +184,107 @@ const Home: React.FC = (props): ReactElement => {
             </Box>
           </Box>
         </Box>
-        {poolConfigs.length && (
-          <Grid container className={classes.poolCardContainer} justifyContent="center">
-            {poolConfigs.map((poolConfig: PoolConfig, idx) =>
-              poolConfig?.farmInfoList.map((farm) => (
-                <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
-                  <Card
-                    color={
-                      idx % 4 === 0
-                        ? "greenYellow"
-                        : idx % 4 === 1
-                        ? "lime"
-                        : idx % 4 === 2
-                        ? "indigo"
-                        : "dodgerBlue"
-                    }
-                    key={farm.farmInfo}
-                    poolConfig={poolConfig}
-                    farmInfoAddress={farm.farmInfo}
-                  />
+        <Box className={classes.tabContext}>
+          <TabContext value={tab}>
+            <Box sx={{ borderBottom: 1, color: "#fff" }}>
+              <TabList
+                onChange={(event: ChangeEvent<{}>, value: any) => {
+                  setTab(value);
+                }}
+                centered
+                aria-label="dashboard tabs"
+              >
+                <Tab
+                  sx={{
+                    color: "#fff",
+                    "&.Mui-selected": { color: "#BDFF00" },
+                    padding: 0,
+                    fontSize: 15,
+                    fontWeight: 500,
+                    fontFamily: "Poppins",
+                    textTransform: "none",
+                  }}
+                  label="Active Farms"
+                  value="active"
+                />
+                <Tab
+                  sx={{
+                    color: "#fff",
+                    "&.Mui-selected": { color: "#BDFF00" },
+                    padding: 0,
+                    fontSize: 15,
+                    fontWeight: 500,
+                    fontFamily: "Poppins",
+                    textTransform: "none",
+                    marginLeft: 6,
+                  }}
+                  label="Inactive Farms"
+                  value="inactive"
+                />
+              </TabList>
+            </Box>
+            <Divider
+              sx={{
+                border: "none",
+                background: "linear-gradient(111.31deg, #D4FF00 15.34%, #BDFF00 95.74%)",
+                height: "1px",
+                opacity: 0.4,
+              }}
+            />
+            <TabPanel value="active" className={classes.tabPanel}>
+              {poolConfigs.length && (
+                <Grid container className={classes.poolCardContainer} justifyContent="center">
+                  {poolConfigs.map((poolConfig: PoolConfig, idx) =>
+                    poolConfig?.farmInfoList.map((farm) => (
+                      <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+                        <Card
+                          color={
+                            idx % 4 === 0
+                              ? "greenYellow"
+                              : idx % 4 === 1
+                              ? "lime"
+                              : idx % 4 === 2
+                              ? "indigo"
+                              : "dodgerBlue"
+                          }
+                          key={farm.farmInfo}
+                          poolConfig={poolConfig}
+                          farmInfoAddress={farm.farmInfo}
+                        />
+                      </Grid>
+                    )),
+                  )}
                 </Grid>
-              )),
-            )}
-          </Grid>
-        )}
+              )}
+            </TabPanel>
+            <TabPanel value="inactive" className={classes.tabPanel}>
+              {poolConfigs.length && (
+                <Grid container className={classes.poolCardContainer} justifyContent="center">
+                  {poolConfigs.map((poolConfig: PoolConfig, idx) =>
+                    poolConfig?.farmInfoList.map((farm) => (
+                      <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+                        <Card
+                          color={
+                            idx % 4 === 0
+                              ? "greenYellow"
+                              : idx % 4 === 1
+                              ? "lime"
+                              : idx % 4 === 2
+                              ? "indigo"
+                              : "dodgerBlue"
+                          }
+                          key={farm.farmInfo}
+                          poolConfig={poolConfig}
+                          farmInfoAddress={farm.farmInfo}
+                        />
+                      </Grid>
+                    )),
+                  )}
+                </Grid>
+              )}
+            </TabPanel>
+          </TabContext>
+        </Box>
       </Box>
     </Page>
   );

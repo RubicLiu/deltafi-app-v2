@@ -482,7 +482,6 @@ const Stake = (): ReactElement => {
             target="_blank"
             rel="noreferrer noopener"
             underline="always"
-            className={classes.link}
             data-amp-analytics-on="click"
             data-amp-analytics-name="click"
             data-amp-analytics-attrs="page: Farms, target: DELFI"

@@ -5,7 +5,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     margin: "0 auto",
     maxWidth: 360,
     [breakpoints.up("sm")]: {
-      maxWidth: 560,
+      maxWidth: 460,
     },
   },
   iconGroup: {
@@ -109,10 +109,11 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: spacing(4),
+    marginTop: spacing(3),
   },
   marketCondition: {
     fontWeight: "bold",
-    marginBottom: 32,
+    marginBottom: 24,
   },
   divider: {
     background: palette.primary.main,
@@ -132,7 +133,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     color: `${palette.primary.main} !important`,
     fontWeight: "bold",
   },
-  link: {},
   linkIcon: {
     marginLeft: spacing(1),
   },

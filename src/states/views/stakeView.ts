@@ -61,13 +61,8 @@ const stakeViewSlice = createSlice({
       state.stake.quoteAmount = "0";
     },
 
-    setIsStake(
-      state,
-      action: PayloadAction<{ isStake: boolean; baseBalance: BigNumber; quoteBalance: BigNumber }>,
-    ) {
+    setIsStake(state, action: PayloadAction<{ isStake: boolean }>) {
       state.stake.isStake = action.payload.isStake;
-      state.stake.baseBalance = action.payload.baseBalance;
-      state.stake.quoteBalance = action.payload.quoteBalance;
     },
 
     setTransactionResult(state, action: PayloadAction<{ transactionResult: TransactionResult }>) {

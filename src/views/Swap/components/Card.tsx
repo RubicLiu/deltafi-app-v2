@@ -146,14 +146,12 @@ const SwapCard: React.FC<CardProps> = (props) => {
           onChange={inputHandler}
         />
       </Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" columnGap={3}>
-        <Box display="flex">
-          <Typography className={classes.tokenBalance}>Balance:&nbsp;</Typography>
-          <Typography className={classes.tokenBalance} style={{ color: "#D4FF00" }}>
-            {tokenBalance?.toString() || 0}&nbsp;
-          </Typography>
-          <Typography className={classes.tokenBalance}>{card?.token?.symbol}</Typography>
-        </Box>
+      <Box display="flex">
+        <Typography className={classes.tokenBalance}>Balance:&nbsp;</Typography>
+        <Typography className={classes.tokenBalance} style={{ color: "#D4FF00" }}>
+          {tokenBalance?.toString() || 0}&nbsp;
+        </Typography>
+        <Typography className={classes.tokenBalance}>{card?.token?.symbol}</Typography>
       </Box>
     </Paper>
   );
