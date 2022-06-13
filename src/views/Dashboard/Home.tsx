@@ -16,7 +16,7 @@ import Page from "components/layout/Page";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import PoolCard from "views/Pool/components/Card_v2";
 import FarmCard from "views/Farm/components/Card";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import Reward from "views/Reward";
 import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
 import { useSelector } from "react-redux";
