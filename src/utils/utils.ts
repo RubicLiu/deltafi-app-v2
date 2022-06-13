@@ -53,3 +53,11 @@ export function validate(expression: boolean, errMsg: string) {
     throw Error(errMsg);
   }
 }
+
+export function formatCurrencyAmount(value: number | string | BigNumber) {
+  const valueBn = new BigNumber(value);
+  if (valueBn.isNaN()) {
+    return "--";
+  }
+  return valueBn.toNumber().toLocaleString("en-US", { style: "currency", currency: "USD" });
+}

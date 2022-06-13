@@ -4,7 +4,7 @@ import { deployConfigV2 } from "constants/deployConfigV2";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { SwapInfo } from "anchor/type_definitions";
 
-type SwapPoolKeyToSwap = Record<string, SwapInfo>;
+export type SwapPoolKeyToSwap = Record<string, SwapInfo>;
 
 export interface SwapState {
   swapKeyToSwapInfo: SwapPoolKeyToSwap;

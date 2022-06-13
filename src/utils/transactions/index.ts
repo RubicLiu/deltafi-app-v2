@@ -63,7 +63,7 @@ export async function partialSignTransaction({
   signers?: Array<Keypair>;
   connection: Connection;
 }) {
-  transaction.recentBlockhash = (await connection.getRecentBlockhash("max")).blockhash;
+  transaction.recentBlockhash = (await connection.getLatestBlockhash("max")).blockhash;
   transaction.feePayer = feePayer;
   if (signers.length > 0) {
     transaction.partialSign(...signers);

@@ -20,8 +20,22 @@ import { ChangeEvent, useState } from "react";
 import Reward from "views/Reward";
 import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
 import { useSelector } from "react-redux";
-import { lpUserSelector, tokenAccountSelector } from "states/selectors";
+import {
+  lpUserSelector,
+  tokenAccountSelector,
+  poolSelector,
+  pythSelector,
+  deltafiUserSelector,
+  selectGateIoSticker,
+} from "states/selectors";
 import { useWallet } from "@solana/wallet-adapter-react";
+import BigNumber from "bignumber.js";
+import { getPythMarketPrice } from "states/accounts/pythAccount";
+import { calculateWithdrawalFromShares } from "lib/calc";
+import { formatCurrencyAmount } from "utils/utils";
+import { exponentiatedBy } from "utils/decimal";
+import { DELTAFI_TOKEN_DECIMALS } from "constants/deployConfigV2";
+import { CircularProgress } from "@material-ui/core";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
@@ -35,13 +49,7 @@ function hasDeposit(
     return false;
   }
   const lpUser = swapKeyToLpUser[poolConfig.swapInfo];
-  return (
-    lpUser &&
-    (lpUser.baseShare > 0 ||
-      lpUser.quoteShare > 0 ||
-      lpUser.basePosition.depositedAmount > 0 ||
-      lpUser.quotePosition.depositedAmount > 0)
-  );
+  return lpUser && (lpUser.baseShare > 0 || lpUser.quoteShare > 0);
 }
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
@@ -150,12 +158,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     },
   },
 }));
-// TODO replace value with real data
-const headerData = [
-  { label: "Total Holdings", color: "#d4ff00", value: "$2,345" },
-  { label: "Total Rewards", color: "#03f2a0", value: "$235" },
-  { label: "24hr Performance", color: "#693eff", value: "$212(9%)" },
-];
 
 const Home: React.FC = (props) => {
   const classes = useStyles(props);
@@ -174,11 +176,109 @@ const Home: React.FC = (props) => {
   );
 
   poolConfigsWithDeposit = poolConfigs;
+  const deltafiPrice = useSelector(selectGateIoSticker("DELFI_USDT"));
+
+  const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
+  const symbolToPythData = useSelector(pythSelector).symbolToPythData;
+  const deltafiUser = useSelector(deltafiUserSelector);
+
+  const { totalHoldings, isLoadingTotalHoldings } = useMemo(() => {
+    if (!isConnectedWallet) {
+      return { totalHoldings: null, isLoadingTotalHoldings: false };
+    }
+
+    if (Object.keys(swapKeyToSwapInfo).length === 0 || Object.keys(swapKeyToLpUser).length === 0) {
+      // when wallet is connected, but lp or swapinfo are not fetched yet
+      return { totalHoldings: null, isLoadingTotalHoldings: true };
+    }
+
+    if (poolConfigs.length > 0) {
+      const totalHoldings = (poolConfigs as PoolConfig[]).reduce((res, poolConfig) => {
+        const swapInfo = swapKeyToSwapInfo[poolConfig.swapInfo];
+        const lpUser = swapKeyToLpUser[poolConfig.swapInfo];
+        if (!lpUser || !swapInfo) {
+          return res;
+        }
+
+        const { basePrice, quotePrice } = getPythMarketPrice(symbolToPythData, poolConfig);
+        const { baseWithdrawalAmount: baseAmount, quoteWithdrawalAmount: quoteAmount } =
+          calculateWithdrawalFromShares(
+            lpUser.baseShare,
+            lpUser.quoteShare,
+            poolConfig.baseTokenInfo,
+            poolConfig.quoteTokenInfo,
+            basePrice,
+            quotePrice,
+            swapInfo?.poolState,
+          );
+
+        let volumn = new BigNumber(0);
+        if (basePrice && quotePrice && swapInfo) {
+          const baseValue = new BigNumber(baseAmount).multipliedBy(basePrice);
+          const quoteValue = new BigNumber(quoteAmount).multipliedBy(quotePrice);
+
+          volumn = baseValue.plus(quoteValue);
+        }
+        return res.plus(volumn);
+      }, new BigNumber(0)) as BigNumber;
+
+      return { totalHoldings, isLoadingTotalHoldings: false };
+    }
+    return { totalHoldings: new BigNumber(0), isLoadingTotalHoldings: false };
+  }, [symbolToPythData, swapKeyToSwapInfo, swapKeyToLpUser, isConnectedWallet]);
+
+  const { totalRewards, isLoadingTotalRewards } = useMemo(() => {
+    // TODO(leqiang): Add farm rewards
+    if (!isConnectedWallet) {
+      return { totalRewards: null, isLoadingTotalRewards: false };
+    }
+    if (!deltafiUser.fetched || !deltafiPrice) {
+      // when wallet is connected, but deltafiUser is not fetched yet
+      return { totalRewards: null, isLoadingTotalRewards: true };
+    }
+    if (!deltafiUser.user) {
+      return { totalRewards: new BigNumber(0), isLoadingTotalRewards: false };
+    }
+
+    const totalDelfiAmount = exponentiatedBy(
+      new BigNumber(
+        deltafiUser.user.claimedReferralRewards
+          .add(deltafiUser.user.claimedTradeRewards)
+          .add(deltafiUser.user.owedReferralRewards)
+          .add(deltafiUser.user.owedTradeRewards)
+          .toString(),
+      ),
+      DELTAFI_TOKEN_DECIMALS,
+    );
+
+    const totalRewards = totalDelfiAmount.multipliedBy(deltafiPrice.last);
+
+    return {
+      totalRewards,
+      isLoadingTotalRewards: false,
+    };
+  }, [deltafiUser, isConnectedWallet, deltafiPrice]);
+
+  const headerData = [
+    {
+      label: "My Total Holdings",
+      color: "#d4ff00",
+      value: formatCurrencyAmount(totalHoldings),
+      isLoading: isLoadingTotalHoldings,
+    },
+    {
+      label: "My Total Rewards",
+      color: "#03f2a0",
+      value: formatCurrencyAmount(totalRewards),
+      isLoading: isLoadingTotalRewards,
+    },
+    // TODO: add 24hr performance
+    // { label: "24hr Performance", color: "#693eff", value: "$212(9%)" },
+  ];
 
   return (
     <Page>
       <Box padding={0} className={classes.container}>
-        {/* TODO: header layout only, fillin data and show header(remove 'display="none !important"') */}
         <Box color="#fff" textAlign="center" className={classes.header}>
           <Box className={classes.valuesCt}>
             <Box className={classes.values}>
@@ -195,7 +295,7 @@ const Home: React.FC = (props) => {
                       fontWeight={600}
                       color={data.color}
                     >
-                      {data.value}
+                      {data.isLoading ? <CircularProgress size={25} color="inherit" /> : data.value}
                     </Box>
                   </Box>
                   {idx === headerData.length - 1 || (
