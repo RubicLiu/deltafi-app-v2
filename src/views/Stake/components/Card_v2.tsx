@@ -110,12 +110,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
 const StakeCard: React.FC<CardProps> = (props) => {
   const { poolConfig, card } = props;
   const classes = useStyles(props);
-  const inputHandler = (_: React.ChangeEvent<HTMLInputElement>) => {};
-  const baseDecimals = poolConfig.baseTokenInfo.decimals;
-  const quoteDecimals = poolConfig.quoteTokenInfo.decimals;
-  const totalBalance = card.baseBalance
-    .plus(card.quoteBalance)
-    .toFixed(Math.min(quoteDecimals, baseDecimals));
 
   return (
     <Paper className={classes.root}>
@@ -139,18 +133,8 @@ const StakeCard: React.FC<CardProps> = (props) => {
               height: 30,
             }}
           ></Avatar>
-          <Avatar
-            src={poolConfig.quoteTokenInfo.logoURI}
-            sx={{
-              marginLeft: -0.5,
-              borderRadius: "100%",
-              width: 30,
-              height: 30,
-              border: "1px solid #BDFF00",
-            }}
-          ></Avatar>
           <Box ml={1} fontSize={16}>
-            {poolConfig.name}
+            {poolConfig.baseTokenInfo.symbol}
           </Box>
         </Box>
         <CurrencyInput
@@ -162,15 +146,59 @@ const StakeCard: React.FC<CardProps> = (props) => {
           minLength={0}
           maxLength={20}
           decimalsLimit={20}
-          value={card.baseAmount}
-          onChange={inputHandler}
+          value={card.baseSelectedAmount}
         />
       </Box>
 
-      <Box display="flex" fontSize={16} fontWeight={500}>
-        <Box>Balance:&nbsp;</Box>
-        <Box sx={{ color: "#D4FF00" }}>{totalBalance || 0}&nbsp;</Box>
-        <Box>{poolConfig.name}</Box>
+      <Box display="flex" fontSize={12} fontWeight={500} margin={1}>
+        <Box>Staked / Deposited:&nbsp;</Box>
+        <Box sx={{ color: "#D4FF00" }}>
+          {`${card.baseStakedAmount || 0} / ${card.baseTotalAmount || 0}`}&nbsp;
+        </Box>
+      </Box>
+
+      <Box className={classes.main}>
+        <Box
+          bgcolor="#1c1c1c"
+          display="flex"
+          sx={{
+            padding: "8px 24px 8px 24px",
+            borderRadius: 28,
+            boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+            alignItems: "center",
+          }}
+        >
+          <Avatar
+            src={poolConfig.quoteTokenInfo.logoURI}
+            sx={{
+              borderRadius: "100%",
+              border: "1px solid #BDFF00",
+              width: 30,
+              height: 30,
+            }}
+          ></Avatar>
+          <Box ml={1} fontSize={16}>
+            {poolConfig.quoteTokenInfo.symbol}
+          </Box>
+        </Box>
+        <CurrencyInput
+          name="currency"
+          disabled={true}
+          className={classes.currencyInput}
+          autoComplete="off"
+          placeholder="0"
+          minLength={0}
+          maxLength={20}
+          decimalsLimit={20}
+          value={card.quoteSelectedAmount}
+        />
+      </Box>
+
+      <Box display="flex" fontSize={12} fontWeight={500} margin={1}>
+        <Box>Staked / Deposited:&nbsp;</Box>
+        <Box sx={{ color: "#D4FF00" }}>
+          {`${card.quoteStakedAmount || 0} / ${card.quoteTotalAmount || 0}`}&nbsp;
+        </Box>
       </Box>
     </Paper>
   );

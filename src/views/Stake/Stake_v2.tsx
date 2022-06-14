@@ -1,4 +1,4 @@
-import { ReactElement, useMemo, useCallback, useEffect } from "react";
+import { ReactElement, useMemo, useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
   Snackbar,
@@ -16,14 +16,15 @@ import { ConnectButton } from "components";
 
 import useStyles from "./styles";
 import { useModal } from "providers/modal";
-import { exponentiate, exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK, DELTAFI_TOKEN_DECIMALS } from "constants/index";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectLpUserBySwapKey,
   selectFarmByFarmKey,
   stakeViewSelector,
+  selectSwapBySwapKey,
   // selectTokenAccountInfoByMint,
+  selectMarketPriceByPool,
   programSelector,
   selectFarmUserByFarmKey,
 } from "states/selectors";
@@ -33,31 +34,11 @@ import { stakeViewActions } from "states/views/stakeView";
 import { createUpdateStakeTransaction } from "utils/transactions/stake";
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
-import { anchorBnToBn, stringToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToBn, bnToAnchorBn, stringToAnchorBn } from "utils/tokenUtils";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 import { Button, Divider, Link } from "@mui/material";
 import Slider from "./components/Slider";
-
-// const getUnclaimedReward = (
-//   apr: BigNumber,
-//   lastUpdateTs: BigNumber,
-//   nextClaimTs: BigNumber,
-//   rewardsOwed: BigNumber,
-//   depositBalance: BigNumber,
-//   deltafiTokenDecimals: number,
-// ) => {
-//   const currentTs: BigNumber = new BigNumber(Date.now()).div(new BigNumber(1000));
-//   if (currentTs <= nextClaimTs) {
-//     return new BigNumber(0);
-//   }
-//   const unTrackedReward: BigNumber = currentTs
-//     .minus(lastUpdateTs)
-//     .div(new BigNumber(SECONDS_OF_YEAR))
-//     .multipliedBy(depositBalance)
-//     .multipliedBy(apr);
-
-//   return exponentiatedBy(unTrackedReward.plus(rewardsOwed), deltafiTokenDecimals);
-// };
+import { calculateWithdrawalFromShares } from "lib/calc";
 
 const Stake = (): ReactElement => {
   const classes = useStyles();
@@ -70,7 +51,10 @@ const Stake = (): ReactElement => {
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
 
   const lpUser = useSelector(selectLpUserBySwapKey(poolConfig.swapInfo));
+  const farmUser = useSelector(selectFarmUserByFarmKey(farmPoolId));
+  const swapInfo = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
   const program = useSelector(programSelector);
+  const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
@@ -83,47 +67,100 @@ const Stake = (): ReactElement => {
   const vertical = "top";
   const horizontal = "right";
 
-  const baseTotalStaked = useMemo(() => {
-    return farmPool
-      ? anchorBnToBn(poolConfig.baseTokenInfo, farmPool.stakedBaseShare)
-      : new BigNumber(0);
-  }, [farmPool, poolConfig]);
-
-  // const quoteTotalStaked = useMemo(() => {
-  //   return farmPool
-  //     ? anchorBnToBn(poolConfig.quoteTokenInfo, farmPool.stakedQuoteShare)
-  //     : new BigNumber(0);
-  // }, [farmPool, poolConfig]);
-
-  const baseApr = new BigNumber(farmPool?.farmConfig.baseAprNumerator.toString()).div(
-    new BigNumber(farmPool?.farmConfig.baseAprDenominator.toString()),
-  );
-
-  const farmUser = useSelector(selectFarmUserByFarmKey(farmPoolId));
-
-  const [userBaseStaked, userQuoteStaked] = useMemo(() => {
-    if (farmUser) {
-      const baseTokenInfo = poolConfig.baseTokenInfo;
-      const quoteTokenInfo = poolConfig.quoteTokenInfo;
-      return [
-        anchorBnToBn(baseTokenInfo, farmUser.basePosition.depositedAmount),
-        anchorBnToBn(quoteTokenInfo, farmUser.quotePosition.depositedAmount),
-      ];
+  const { baseStaked, quoteStaked, baseTotalAvailable, quoteTotalAvailable } = useMemo(() => {
+    if (!lpUser) {
+      return {
+        baseStaked: new BigNumber(0),
+        quoteStaked: new BigNumber(0),
+        baseTotalAvailable: new BigNumber(0),
+        quoteTotalAvailable: new BigNumber(0),
+      };
     }
-    return [new BigNumber(0), new BigNumber(0)];
-  }, [farmUser, poolConfig]);
 
-  const [userTotalBase, userTotalQuote] = useMemo(() => {
-    if (lpUser) {
-      const baseTokenInfo = poolConfig.baseTokenInfo;
-      const quoteTokenInfo = poolConfig.quoteTokenInfo;
-      return [
-        anchorBnToBn(baseTokenInfo, lpUser.baseShare.add(lpUser.stakedBaseShare)),
-        anchorBnToBn(quoteTokenInfo, lpUser.quoteShare.add(lpUser.stakedQuoteShare)),
-      ];
+    let baseTotalAvailable = anchorBnToBn(
+      baseTokenInfo,
+      lpUser?.baseShare.sub(lpUser?.stakedBaseShare),
+    );
+    let quoteTotalAvailable = anchorBnToBn(
+      quoteTokenInfo,
+      lpUser?.quoteShare.sub(lpUser?.stakedQuoteShare),
+    );
+
+    if (farmUser?.basePosition && farmUser?.quotePosition) {
+      const baseStaked = anchorBnToBn(baseTokenInfo, farmUser?.basePosition?.depositedAmount);
+      const quoteStaked = anchorBnToBn(quoteTokenInfo, farmUser?.quotePosition?.depositedAmount);
+      baseTotalAvailable = baseTotalAvailable.plus(baseStaked);
+      quoteTotalAvailable = quoteTotalAvailable.plus(quoteStaked);
+      return {
+        baseStaked,
+        quoteStaked,
+        baseTotalAvailable,
+        quoteTotalAvailable,
+      };
     }
-    return [new BigNumber(0), new BigNumber(0)];
-  }, [lpUser, poolConfig]);
+
+    return {
+      baseStaked: new BigNumber(0),
+      quoteStaked: new BigNumber(0),
+      baseTotalAvailable,
+      quoteTotalAvailable,
+    };
+  }, [lpUser, farmUser, baseTokenInfo, quoteTokenInfo]);
+
+  const stakeCard = useMemo(() => {
+    const { baseWithdrawalAmount: baseStakedAmount, quoteWithdrawalAmount: quoteStakedAmount } =
+      calculateWithdrawalFromShares(
+        bnToAnchorBn(baseTokenInfo, baseStaked),
+        bnToAnchorBn(quoteTokenInfo, quoteStaked),
+        baseTokenInfo,
+        quoteTokenInfo,
+        basePrice,
+        quotePrice,
+        swapInfo.poolState,
+      );
+
+    const { baseWithdrawalAmount: baseTotalAmount, quoteWithdrawalAmount: quoteTotalAmount } =
+      calculateWithdrawalFromShares(
+        bnToAnchorBn(baseTokenInfo, baseTotalAvailable),
+        bnToAnchorBn(quoteTokenInfo, quoteTotalAvailable),
+        baseTokenInfo,
+        quoteTokenInfo,
+        basePrice,
+        quotePrice,
+        swapInfo.poolState,
+      );
+
+    const { baseWithdrawalAmount: baseSelectedAmount, quoteWithdrawalAmount: quoteSelectedAmount } =
+      calculateWithdrawalFromShares(
+        bnToAnchorBn(baseTokenInfo, stakeView.stake.baseSelected),
+        bnToAnchorBn(quoteTokenInfo, stakeView.stake.quoteSelected),
+        baseTokenInfo,
+        quoteTokenInfo,
+        basePrice,
+        quotePrice,
+        swapInfo.poolState,
+      );
+
+    return {
+      baseStakedAmount,
+      quoteStakedAmount,
+      baseTotalAmount,
+      quoteTotalAmount,
+      baseSelectedAmount,
+      quoteSelectedAmount,
+    };
+  }, [
+    stakeView.stake,
+    swapInfo.poolState,
+    baseTokenInfo,
+    quoteTokenInfo,
+    baseStaked,
+    quoteStaked,
+    baseTotalAvailable,
+    quoteTotalAvailable,
+    basePrice,
+    quotePrice,
+  ]);
 
   const staking = stakeView.stake;
 
@@ -135,8 +172,14 @@ const Stake = (): ReactElement => {
     const connection = program.provider.connection;
     try {
       dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
-      const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, staking.baseAmount);
-      const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, staking.quoteAmount);
+      const baseAmount = stringToAnchorBn(
+        poolConfig.baseTokenInfo,
+        staking.baseSelected.toString(),
+      );
+      const quoteAmount = stringToAnchorBn(
+        poolConfig.quoteTokenInfo,
+        staking.quoteSelected.toString(),
+      );
       const transaction = await createUpdateStakeTransaction(
         program,
         connection,
@@ -159,9 +202,8 @@ const Stake = (): ReactElement => {
         stakeViewActions.setTransactionResult({
           transactionResult: {
             status: true,
-            action: "stake",
             hash,
-            stake: staking,
+            stake: stakeCard,
           },
         }),
       );
@@ -178,8 +220,8 @@ const Stake = (): ReactElement => {
       dispatch(
         stakeViewActions.setPercentage({
           percentage: 0,
-          baseAmount: "0",
-          quoteAmount: "0",
+          baseSelected: new BigNumber(0),
+          quoteSelected: new BigNumber(0),
         }),
       );
       dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
@@ -190,6 +232,7 @@ const Stake = (): ReactElement => {
   }, [
     walletPubkey,
     staking,
+    stakeCard,
     signTransaction,
     dispatch,
     poolConfig,
@@ -212,52 +255,62 @@ const Stake = (): ReactElement => {
   //   return [new BigNumber(0), new BigNumber(0), new BigNumber(0), new BigNumber(0)];
   // }, [lpUser, poolConfig]);
 
-  useEffect(() => {
-    if (poolConfig) {
-      dispatch(
-        stakeViewActions.setBalance({
-          baseBalance: userTotalBase,
-          quoteBalance: userTotalQuote,
-          baseStaked: userBaseStaked,
-          quoteStaked: userQuoteStaked,
-        }),
-      );
-    }
-  }, [dispatch, poolConfig, userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote]);
+  // useEffect(() => {
+  //   if (poolConfig) {
+  //     dispatch(
+  //       stakeViewActions.setBalance({
+  //         baseShare: userTotalBase,
+  //         quoteShare: userTotalQuote,
+  //         baseStaked: userBaseStaked,
+  //         quoteStaked: userQuoteStaked,
+  //       }),
+  //     );
+  //   }
+  // }, [dispatch, poolConfig, userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote]);
 
-  const percentage = staking.percentage;
   const setStakePercentage = useCallback(
     (percentage: number) => {
-      const baseAmount = staking.baseBalance
-        .multipliedBy(new BigNumber(percentage))
-        .dividedBy(new BigNumber(100))
-        .toFixed(poolConfig.baseTokenInfo.decimals);
-      const quoteAmount = staking.quoteBalance
-        .multipliedBy(new BigNumber(percentage))
-        .dividedBy(new BigNumber(100))
-        .toFixed(poolConfig.quoteTokenInfo.decimals);
+      const baseSelected = new BigNumber(
+        baseTotalAvailable
+          .multipliedBy(new BigNumber(percentage))
+          .dividedBy(new BigNumber(100))
+          .toFixed(poolConfig.baseTokenInfo.decimals),
+      );
+      const quoteSelected = new BigNumber(
+        quoteTotalAvailable
+          .multipliedBy(new BigNumber(percentage))
+          .dividedBy(new BigNumber(100))
+          .toFixed(poolConfig.quoteTokenInfo.decimals),
+      );
       dispatch(
         stakeViewActions.setPercentage({
           percentage,
-          baseAmount,
-          quoteAmount,
+          baseSelected,
+          quoteSelected,
         }),
       );
     },
-    [dispatch, staking, poolConfig],
+    [dispatch, poolConfig, baseTotalAvailable, quoteTotalAvailable],
   );
 
   const setStakeAmount = useCallback((value: string) => {}, []);
 
-  const basePoolRateByDay = useMemo(() => {
-    if (farmPool && baseTotalStaked && baseTokenInfo) {
-      return exponentiatedBy(
-        exponentiate(baseTotalStaked.multipliedBy(baseApr).dividedBy(365), baseTokenInfo.decimals),
-        DELTAFI_TOKEN_DECIMALS,
-      ).toFixed(6);
+  const dailyReward = useMemo(() => {
+    if (farmPool && baseStaked && quoteStaked) {
+      const baseApr = new BigNumber(farmPool?.farmConfig.baseAprNumerator.toString()).div(
+        new BigNumber(farmPool?.farmConfig.baseAprDenominator.toString()),
+      );
+      const quoteApr = new BigNumber(farmPool?.farmConfig.quoteAprNumerator.toString()).div(
+        new BigNumber(farmPool?.farmConfig.quoteAprDenominator.toString()),
+      );
+
+      const baseDailyReward = baseStaked.multipliedBy(baseApr).dividedBy(365);
+      const quoteDailyReward = quoteStaked.multipliedBy(quoteApr).dividedBy(365);
+
+      return baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
     }
     return "--";
-  }, [farmPool, baseTokenInfo, baseApr, baseTotalStaked]);
+  }, [farmPool, baseStaked, quoteStaked]);
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: false }));
@@ -349,14 +402,14 @@ const Stake = (): ReactElement => {
           <Box fontSize={14} color="#D3D3D3">
             Total Staked
           </Box>
-          <Box fontSize={16} mt={1}>{`${baseTotalStaked.toFixed(2).toString()}`}</Box>
+          <Box fontSize={16} mt={1}>{`${baseStaked.toFixed(2).toString()}`}</Box>
         </Box>
         <Box>
           <Box textAlign="right" fontSize={14} color="#D3D3D3">
             Pool Rate
           </Box>
           <Box fontSize={16} mt={1}>
-            {basePoolRateByDay} DELFI / day
+            {dailyReward} DELFI / day
           </Box>
         </Box>
       </Box>
@@ -370,8 +423,7 @@ const Stake = (): ReactElement => {
       <Box className={classes.tabs} position="relative">
         <Box>
           <Button
-            className={staking.isStake ? classes.activeBtn : classes.btn}
-            onClick={() => dispatch(stakeViewActions.setIsStake({ isStake: true }))}
+            className={classes.activeBtn}
             sx={{
               fontWeight: 500,
               fontSize: 16,
@@ -384,32 +436,17 @@ const Stake = (): ReactElement => {
           >
             Stake
           </Button>
-          <Button
-            className={staking.isStake ? classes.btn : classes.activeBtn}
-            onClick={() => dispatch(stakeViewActions.setIsStake({ isStake: false }))}
-            sx={{
-              marginLeft: 2,
-              fontWeight: 500,
-              fontSize: 16,
-              fontFamily: "Rubik",
-              padding: 0,
-              lineHeight: 1,
-              textTransform: "none",
-            }}
-          >
-            Unstake
-          </Button>
         </Box>
       </Box>
-      {staking.isStake || <Slider value={percentage} onChange={setStakePercentage} />}
+      <Slider value={staking.percentage} onChange={setStakePercentage} />
       <Box mt={3} display="flex" flexDirection="column" alignItems="flex-end">
         <StakeCard
           poolConfig={poolConfig}
-          card={staking}
+          card={stakeCard}
           handleChangeCard={setStakeAmount}
           tokens={tokenConfigs}
           disableDrop
-          percentage={percentage < 0.02 ? 0 : percentage}
+          percentage={staking.percentage < 0.02 ? 0 : staking.percentage}
         />
       </Box>
       <Box marginTop={3} width="100%">

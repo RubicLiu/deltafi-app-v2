@@ -4,7 +4,6 @@ import { StakeCard } from "views/Stake/components/types";
 
 interface TransactionResult {
   status: boolean | null;
-  action?: "stake" | "unstake" | "claim";
   hash?: string;
   stake?: StakeCard;
 }
@@ -15,13 +14,8 @@ const initialState = {
   transactionResult: null,
   openSnackbar: false,
   stake: {
-    isStake: true,
-    baseBalance: new BigNumber("0"),
-    quoteBalance: new BigNumber("0"),
-    baseStaked: new BigNumber("0"),
-    quoteStaked: new BigNumber("0"),
-    baseAmount: "0",
-    quoteAmount: "0",
+    baseSelected: new BigNumber("0"),
+    quoteSelected: new BigNumber("0"),
     percentage: 0,
   },
 };
@@ -34,35 +28,13 @@ const stakeViewSlice = createSlice({
       state,
       action: PayloadAction<{
         percentage: number;
-        baseAmount: string;
-        quoteAmount: string;
+        baseSelected: BigNumber;
+        quoteSelected: BigNumber;
       }>,
     ) {
       state.stake.percentage = action.payload.percentage;
-      state.stake.baseAmount = action.payload.baseAmount;
-      state.stake.quoteAmount = action.payload.quoteAmount;
-    },
-
-    setBalance(
-      state,
-      action: PayloadAction<{
-        baseBalance: BigNumber;
-        quoteBalance: BigNumber;
-        baseStaked: BigNumber;
-        quoteStaked: BigNumber;
-      }>,
-    ) {
-      state.stake.baseBalance = action.payload.baseBalance;
-      state.stake.quoteBalance = action.payload.quoteBalance;
-      state.stake.baseStaked = action.payload.baseStaked;
-      state.stake.quoteStaked = action.payload.quoteStaked;
-      state.stake.percentage = 0;
-      state.stake.baseAmount = "0";
-      state.stake.quoteAmount = "0";
-    },
-
-    setIsStake(state, action: PayloadAction<{ isStake: boolean }>) {
-      state.stake.isStake = action.payload.isStake;
+      state.stake.baseSelected = action.payload.baseSelected;
+      state.stake.quoteSelected = action.payload.quoteSelected;
     },
 
     setTransactionResult(state, action: PayloadAction<{ transactionResult: TransactionResult }>) {

@@ -106,7 +106,7 @@ const PercentageSlider: React.FC<SliderProps> = (props) => {
 
   return (
     <Box className={classes.root}>
-      <Typography className={classes.title}>Percentage of total stake</Typography>
+      <Typography className={classes.title}>Adjust percentage of total staking</Typography>
       <Box className={classes.content}>
         <Box className={classes.percent}>
           <Typography>{value}%</Typography>
