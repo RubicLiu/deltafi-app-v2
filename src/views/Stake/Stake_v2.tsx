@@ -71,7 +71,7 @@ const Stake = (): ReactElement => {
   // baseTotalAvailable and quoteTotalAvailable are available share from the user's deposit
   // that can be staked into current farm.
   // baseTotalAvailable = lpUserbaseShare + farmUser.stakedBase - lpUser.stakedBase
-  // same for quoteTotalAvailable
+  // same for quoteTotalAvailable calculation
   const { baseStaked, quoteStaked, baseTotalAvailable, quoteTotalAvailable } = useMemo(() => {
     if (!lpUser) {
       return {
