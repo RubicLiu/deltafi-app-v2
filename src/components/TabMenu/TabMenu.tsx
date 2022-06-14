@@ -67,7 +67,6 @@ const TabMenu: React.FC = (props) => {
       <ToggleButton value="farms" aria-label="Farms" className={classes.button}>
         Farms
       </ToggleButton>
-      )
     </ToggleButtonGroup>
   );
 };

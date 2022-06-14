@@ -233,7 +233,6 @@ const Stake = (): ReactElement => {
   }, [
     walletPubkey,
     staking,
-    stakeCard,
     signTransaction,
     dispatch,
     poolConfig,
@@ -241,6 +240,7 @@ const Stake = (): ReactElement => {
     program,
     farmPoolId,
     farmUser,
+    stakeView.stake,
   ]);
   // const [userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote] = useMemo(() => {
   //   if (lpUser) {
@@ -385,7 +385,7 @@ const Stake = (): ReactElement => {
         </Box>
       </Box>
     );
-  }, [stakeView, classes, network, baseTokenInfo, quoteTokenInfo]);
+  }, [stakeView, classes, network]);
 
   if (!farmPool) return null;
 
