@@ -61,8 +61,6 @@ const Stake = (): ReactElement => {
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
   const network = deployConfigV2.network;
 
-  // const rewardsAccount = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
-
   const dispatch = useDispatch();
   const stakeView = useSelector(stakeViewSelector);
   const vertical = "top";
@@ -246,32 +244,6 @@ const Stake = (): ReactElement => {
     farmUser,
     stakeView.stake,
   ]);
-  // const [userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote] = useMemo(() => {
-  //   if (lpUser) {
-  //     const baseTokenInfo = poolConfig.baseTokenInfo;
-  //     const quoteTokenInfo = poolConfig.quoteTokenInfo;
-  //     return [
-  //       anchorBnToBn(baseTokenInfo, lpUser.basePosition.depositedAmount),
-  //       anchorBnToBn(quoteTokenInfo, lpUser.quotePosition.depositedAmount),
-  //       anchorBnToBn(baseTokenInfo, lpUser.baseShare.add(lpUser.basePosition.depositedAmount)),
-  //       anchorBnToBn(quoteTokenInfo, lpUser.quoteShare.add(lpUser.quotePosition.depositedAmount)),
-  //     ];
-  //   }
-  //   return [new BigNumber(0), new BigNumber(0), new BigNumber(0), new BigNumber(0)];
-  // }, [lpUser, poolConfig]);
-
-  // useEffect(() => {
-  //   if (poolConfig) {
-  //     dispatch(
-  //       stakeViewActions.setBalance({
-  //         baseShare: userTotalBase,
-  //         quoteShare: userTotalQuote,
-  //         baseStaked: userBaseStaked,
-  //         quoteStaked: userQuoteStaked,
-  //       }),
-  //     );
-  //   }
-  // }, [dispatch, poolConfig, userBaseStaked, userQuoteStaked, userTotalBase, userTotalQuote]);
 
   const setStakePercentage = useCallback(
     (percentage: number) => {
