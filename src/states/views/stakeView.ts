@@ -1,11 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import BigNumber from "bignumber.js";
-import { StakeCard } from "views/Stake/components/types";
 
 interface TransactionResult {
   status: boolean | null;
   hash?: string;
-  stake?: StakeCard;
+  percentage?: number;
 }
 
 const initialState = {

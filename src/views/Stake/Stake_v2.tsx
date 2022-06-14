@@ -39,6 +39,7 @@ import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 import { Button, Divider, Link } from "@mui/material";
 import Slider from "./components/Slider";
 import { calculateWithdrawalFromShares } from "lib/calc";
+import { formatCurrencyAmount } from "utils/utils";
 
 const Stake = (): ReactElement => {
   const classes = useStyles();
@@ -203,7 +204,7 @@ const Stake = (): ReactElement => {
           transactionResult: {
             status: true,
             hash,
-            stake: stakeCard,
+            percentage: stakeView.stake.percentage,
           },
         }),
       );
@@ -312,6 +313,14 @@ const Stake = (): ReactElement => {
     return "--";
   }, [farmPool, baseStaked, quoteStaked]);
 
+  const totalStakedValue = useMemo(() => {
+    const baseValue: BigNumber = new BigNumber(stakeCard.baseStakedAmount).multipliedBy(basePrice);
+    const quoteValue: BigNumber = new BigNumber(stakeCard.quoteStakedAmount).multipliedBy(
+      quotePrice,
+    );
+    return baseValue.plus(quoteValue);
+  }, [basePrice, quotePrice, stakeCard]);
+
   const handleSnackBarClose = useCallback(() => {
     dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: false }));
   }, [dispatch]);
@@ -345,7 +354,7 @@ const Stake = (): ReactElement => {
       );
     }
 
-    const { hash, stake } = stakeView.transactionResult;
+    const { hash, percentage } = stakeView.transactionResult;
 
     return (
       <Box display="flex" alignItems="center">
@@ -355,12 +364,10 @@ const Stake = (): ReactElement => {
           className={classes.snackBarIcon}
         />
         <Box>
-          {stake && (
+          {percentage && (
             <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
               {`Update the staking to
-              ${Number(stake?.baseAmount).toFixed(baseTokenInfo.decimals)} ${baseTokenInfo.symbol}
-              share and ${Number(stake?.quoteAmount).toFixed(quoteTokenInfo.decimals)}
-              ${quoteTokenInfo.symbol} share`}
+              ${percentage}% of total shares`}
             </Box>
           )}
           <Box display="flex" alignItems="center">
@@ -402,7 +409,9 @@ const Stake = (): ReactElement => {
           <Box fontSize={14} color="#D3D3D3">
             Total Staked
           </Box>
-          <Box fontSize={16} mt={1}>{`${baseStaked.toFixed(2).toString()}`}</Box>
+          <Box fontSize={16} mt={1}>
+            {formatCurrencyAmount(totalStakedValue)}
+          </Box>
         </Box>
         <Box>
           <Box textAlign="right" fontSize={14} color="#D3D3D3">
@@ -464,7 +473,7 @@ const Stake = (): ReactElement => {
             data-amp-analytics-name="click"
             data-amp-analytics-attrs="page: Deposit, target: Deposit"
           >
-            Stake
+            Update Staking
           </ConnectButton>
         ) : (
           <ConnectButton size="large" fullWidth onClick={() => setMenu(true, "connect")}>

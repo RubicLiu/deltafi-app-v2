@@ -7,6 +7,8 @@ import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import ShareIcon from "components/Svg/icons/ShareIcon";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Divider, Tab } from "@mui/material";
+import { useSelector } from "react-redux";
+import { farmSelector } from "states";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -162,6 +164,8 @@ const Home: React.FC = (props): ReactElement => {
   const classes = useStyles(props);
   const [tab, setTab] = useState("active");
 
+  const farmKeyToFarmInfo = useSelector(farmSelector);
+
   return (
     <Page>
       <Box className={classes.container}>
@@ -235,24 +239,26 @@ const Home: React.FC = (props): ReactElement => {
               {poolConfigs.length && (
                 <Grid container className={classes.poolCardContainer} justifyContent="center">
                   {poolConfigs.map((poolConfig: PoolConfig, idx) =>
-                    poolConfig?.farmInfoList.map((farm) => (
-                      <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
-                        <Card
-                          color={
-                            idx % 4 === 0
-                              ? "greenYellow"
-                              : idx % 4 === 1
-                              ? "lime"
-                              : idx % 4 === 2
-                              ? "indigo"
-                              : "dodgerBlue"
-                          }
-                          key={farm.farmInfo}
-                          poolConfig={poolConfig}
-                          farmInfoAddress={farm.farmInfo}
-                        />
-                      </Grid>
-                    )),
+                    poolConfig?.farmInfoList
+                      .filter((farm) => !farmKeyToFarmInfo[farm.farmInfo]?.farmConfig?.isPaused)
+                      .map((farm) => (
+                        <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+                          <Card
+                            color={
+                              idx % 4 === 0
+                                ? "greenYellow"
+                                : idx % 4 === 1
+                                ? "lime"
+                                : idx % 4 === 2
+                                ? "indigo"
+                                : "dodgerBlue"
+                            }
+                            key={farm.farmInfo}
+                            poolConfig={poolConfig}
+                            farmInfoAddress={farm.farmInfo}
+                          />
+                        </Grid>
+                      )),
                   )}
                 </Grid>
               )}
@@ -261,24 +267,26 @@ const Home: React.FC = (props): ReactElement => {
               {poolConfigs.length && (
                 <Grid container className={classes.poolCardContainer} justifyContent="center">
                   {poolConfigs.map((poolConfig: PoolConfig, idx) =>
-                    poolConfig?.farmInfoList.map((farm) => (
-                      <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
-                        <Card
-                          color={
-                            idx % 4 === 0
-                              ? "greenYellow"
-                              : idx % 4 === 1
-                              ? "lime"
-                              : idx % 4 === 2
-                              ? "indigo"
-                              : "dodgerBlue"
-                          }
-                          key={farm.farmInfo}
-                          poolConfig={poolConfig}
-                          farmInfoAddress={farm.farmInfo}
-                        />
-                      </Grid>
-                    )),
+                    poolConfig?.farmInfoList
+                      .filter((farm) => farmKeyToFarmInfo[farm.farmInfo]?.farmConfig?.isPaused)
+                      .map((farm) => (
+                        <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+                          <Card
+                            color={
+                              idx % 4 === 0
+                                ? "greenYellow"
+                                : idx % 4 === 1
+                                ? "lime"
+                                : idx % 4 === 2
+                                ? "indigo"
+                                : "dodgerBlue"
+                            }
+                            key={farm.farmInfo}
+                            poolConfig={poolConfig}
+                            farmInfoAddress={farm.farmInfo}
+                          />
+                        </Grid>
+                      )),
                   )}
                 </Grid>
               )}
