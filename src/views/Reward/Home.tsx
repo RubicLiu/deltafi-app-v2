@@ -39,11 +39,12 @@ import {
 import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
-import { deployConfigV2, deployMode, PoolConfig, poolConfigs } from "constants/deployConfigV2";
+import { deployConfigV2, deployMode, getPoolConfigByFarmKey, PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import styled from "styled-components";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 import { scheduleWithInterval } from "utils";
+import { anchorBnToBn } from "utils/tokenUtils";
 
 const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
   root: {
@@ -207,13 +208,25 @@ const Home: React.FC = (props) => {
     apr: BigNumber,
     depositAmount: BigNumber,
   ) => {
+    console.log("ts diff", currentTs - lastUpdateTs)
+    console.log("currentTs", currentTs)
+    console.log("nextClaimTs", nextClaimTs)
+    console.log("apr", apr.toString())
+    console.log("depositAmount", depositAmount.toString())
     if (lastUpdateTs >= currentTs || currentTs <= nextClaimTs) {
       return new BigNumber(0);
     }
-    return depositAmount
-      .multipliedBy(apr)
-      .multipliedBy(currentTs - lastUpdateTs)
-      .dividedBy(SECONDS_PER_YEAR);
+
+    const rawResult = depositAmount
+    .multipliedBy(apr)
+    .multipliedBy(currentTs - lastUpdateTs)
+    .dividedBy(SECONDS_PER_YEAR);
+
+    if (rawResult.isLessThan(exponentiatedBy("1", DELTAFI_TOKEN_DECIMALS))) {
+      return new BigNumber(0);
+    }
+    
+    return new BigNumber(rawResult.toFixed(DELTAFI_TOKEN_DECIMALS));
   };
 
   useEffect(() => {
@@ -243,6 +256,7 @@ const Home: React.FC = (props) => {
 
     let hasFarmUser = false;
     for (const farmPoolKey in farmPoolKeyToFarmUser) {
+      const poolConfig = getPoolConfigByFarmKey(farmPoolKey);
       const farmUser = farmPoolKeyToFarmUser[farmPoolKey];
       const farmInfo = farmKeyToFarmInfo[farmPoolKey];
       if (!farmUser || !farmInfo) {
@@ -267,8 +281,9 @@ const Home: React.FC = (props) => {
         farmUser.basePosition.lastUpdateTs.toNumber(),
         farmUser.basePosition.nextClaimTs.toNumber(),
         baseApr,
-        exponentiatedBy(farmUser.basePosition.depositedAmount.toString(), DELTAFI_TOKEN_DECIMALS),
+        anchorBnToBn(poolConfig.baseTokenInfo, farmUser.basePosition.depositedAmount),
       );
+
       const claimedBaseRewards = exponentiatedBy(
         farmUser.basePosition.cumulativeInterest.toString(),
         DELTAFI_TOKEN_DECIMALS,
@@ -283,8 +298,9 @@ const Home: React.FC = (props) => {
         farmUser.quotePosition.lastUpdateTs.toNumber(),
         farmUser.quotePosition.nextClaimTs.toNumber(),
         quoteApr,
-        exponentiatedBy(farmUser.quotePosition.depositedAmount.toString(), DELTAFI_TOKEN_DECIMALS),
+        anchorBnToBn(poolConfig.quoteTokenInfo, farmUser.quotePosition.depositedAmount),
       );
+      
       const claimedQuoteRewards = exponentiatedBy(
         farmUser.quotePosition.cumulativeInterest.toString(),
         DELTAFI_TOKEN_DECIMALS,
@@ -461,11 +477,17 @@ const Home: React.FC = (props) => {
       const farmPoolInfoList = poolConfigs
         .map((poolConfig: PoolConfig) =>
           poolConfig.farmInfoList
-            .filter((farm) => !!farmPoolKeyToFarmUser[farm.farmInfo])
+            .filter(
+              (farm) =>
+                !!farmPoolKeyToFarmUser[farm.farmInfo] &&
+                farmPoolToRewards[farm.farmInfo].totalFarmRewards !== "--" &&
+                farmPoolToRewards[farm.farmInfo].unclaimedFarmRewards !== "0",
+            )
             .map((farm) => ({ poolConfig, farmInfo: farm.farmInfo })),
         )
         .flat();
 
+      console.log(farmPoolInfoList);
       const transaction = await createClaimFarmRewardsTransaction(
         program,
         connection,
