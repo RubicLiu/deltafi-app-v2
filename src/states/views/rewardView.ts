@@ -20,7 +20,6 @@ const initialState = {
   claimResult: null,
   farmPoolToRewards: {},
   rewardRefreshTs: Math.floor(Date.now() / 1000),
-  totalDelfiRewards: new BigNumber(0),
 };
 
 const rewardViewSlice = createSlice({
