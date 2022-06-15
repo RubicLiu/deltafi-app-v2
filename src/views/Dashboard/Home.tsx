@@ -16,7 +16,7 @@ import Page from "components/layout/Page";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import PoolCard from "views/Pool/components/Card_v2";
 import FarmCard from "views/Farm/components/Card";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useMemo } from "react";
 import Reward from "views/Reward";
 import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,7 +27,6 @@ import {
   pythSelector,
   deltafiUserSelector,
   selectGateIoSticker,
-  rewardViewSelector,
   dashboardViewSelector,
   farmUserSelector,
 } from "states/selectors";
@@ -36,8 +35,6 @@ import BigNumber from "bignumber.js";
 import { getPythMarketPrice } from "states/accounts/pythAccount";
 import { calculateWithdrawalFromShares } from "lib/calc";
 import { formatCurrencyAmount } from "utils/utils";
-import { exponentiatedBy } from "utils/decimal";
-import { DELTAFI_TOKEN_DECIMALS } from "constants/deployConfigV2";
 import { CircularProgress } from "@material-ui/core";
 import { dashboardViewActions } from "states/views/dashboardView";
 
