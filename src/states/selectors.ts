@@ -24,7 +24,7 @@ export const programSelector = (state: RootState) => state.app.program;
 
 export function selectPythPrice(symbol: string) {
   return (state: RootState) => {
-    return state.accounts.pythAccount.symbolToPythPriceData[symbol].price;
+    return getPythPrice(state.accounts.pythAccount.symbolToPythPriceData, symbol);
   };
 }
 
