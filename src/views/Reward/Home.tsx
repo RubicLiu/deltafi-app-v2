@@ -394,7 +394,7 @@ const Home: React.FC = (props) => {
             .map((farm) => ({ poolConfig, farmInfo: farm.farmInfo })),
         )
         .flat(),
-    [poolConfigs, farmPoolKeyToFarmUser, farmPoolToRewards],
+    [farmPoolKeyToFarmUser, farmPoolToRewards],
   );
 
   const handleSnackBarClose = useCallback(() => {
@@ -539,7 +539,15 @@ const Home: React.FC = (props) => {
       dispatch(rewardViewActions.setIsClaimingFarmRewards({ isClaimingFarmRewards: false }));
       dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
     }
-  }, [dispatch, farmPoolKeyToFarmUser, program, signTransaction, userDeltafiToken, walletPubkey]);
+  }, [
+    dispatch,
+    program,
+    signTransaction,
+    userDeltafiToken,
+    walletPubkey,
+    farmPoolInfoList,
+    farmPoolToRewards,
+  ]);
 
   const claimFarmRewardsButton = useMemo(() => {
     return (
@@ -577,7 +585,7 @@ const Home: React.FC = (props) => {
     setMenu,
     userUnclaimedFarmRewards,
     userTotalFarmRewards,
-    farmPoolToRewards,
+    farmPoolInfoList,
     handleClaimFarmRewards,
   ]);
 
