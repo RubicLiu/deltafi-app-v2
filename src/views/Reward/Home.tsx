@@ -39,7 +39,13 @@ import {
 import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
-import { deployConfigV2, deployMode, getPoolConfigByFarmKey, PoolConfig, poolConfigs } from "constants/deployConfigV2";
+import {
+  deployConfigV2,
+  deployMode,
+  getPoolConfigByFarmKey,
+  PoolConfig,
+  poolConfigs,
+} from "constants/deployConfigV2";
 import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import styled from "styled-components";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
@@ -208,24 +214,24 @@ const Home: React.FC = (props) => {
     apr: BigNumber,
     depositAmount: BigNumber,
   ) => {
-    console.log("ts diff", currentTs - lastUpdateTs)
-    console.log("currentTs", currentTs)
-    console.log("nextClaimTs", nextClaimTs)
-    console.log("apr", apr.toString())
-    console.log("depositAmount", depositAmount.toString())
+    console.log("ts diff", currentTs - lastUpdateTs);
+    console.log("currentTs", currentTs);
+    console.log("nextClaimTs", nextClaimTs);
+    console.log("apr", apr.toString());
+    console.log("depositAmount", depositAmount.toString());
     if (lastUpdateTs >= currentTs || currentTs <= nextClaimTs) {
       return new BigNumber(0);
     }
 
     const rawResult = depositAmount
-    .multipliedBy(apr)
-    .multipliedBy(currentTs - lastUpdateTs)
-    .dividedBy(SECONDS_PER_YEAR);
+      .multipliedBy(apr)
+      .multipliedBy(currentTs - lastUpdateTs)
+      .dividedBy(SECONDS_PER_YEAR);
 
     if (rawResult.isLessThan(exponentiatedBy("1", DELTAFI_TOKEN_DECIMALS))) {
       return new BigNumber(0);
     }
-    
+
     return new BigNumber(rawResult.toFixed(DELTAFI_TOKEN_DECIMALS));
   };
 
@@ -300,7 +306,7 @@ const Home: React.FC = (props) => {
         quoteApr,
         anchorBnToBn(poolConfig.quoteTokenInfo, farmUser.quotePosition.depositedAmount),
       );
-      
+
       const claimedQuoteRewards = exponentiatedBy(
         farmUser.quotePosition.cumulativeInterest.toString(),
         DELTAFI_TOKEN_DECIMALS,
@@ -361,6 +367,23 @@ const Home: React.FC = (props) => {
       totalRewardFromReferral: "--",
     };
   }, [deltafiUser]);
+
+  const farmPoolInfoList = useMemo(
+    () =>
+      poolConfigs
+        .map((poolConfig: PoolConfig) =>
+          poolConfig.farmInfoList
+            .filter(
+              (farm) =>
+                !!farmPoolKeyToFarmUser[farm.farmInfo] &&
+                farmPoolToRewards[farm.farmInfo].totalFarmRewards !== "--" &&
+                farmPoolToRewards[farm.farmInfo].unclaimedFarmRewards !== "--",
+            )
+            .map((farm) => ({ poolConfig, farmInfo: farm.farmInfo })),
+        )
+        .flat(),
+    [poolConfigs, farmPoolKeyToFarmUser, farmPoolToRewards],
+  );
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: false }));
@@ -474,24 +497,14 @@ const Home: React.FC = (props) => {
     const connection = program.provider.connection;
     dispatch(rewardViewActions.setIsClaimingFarmRewards({ isClaimingFarmRewards: true }));
     try {
-      const farmPoolInfoList = poolConfigs
-        .map((poolConfig: PoolConfig) =>
-          poolConfig.farmInfoList
-            .filter(
-              (farm) =>
-                !!farmPoolKeyToFarmUser[farm.farmInfo] &&
-                farmPoolToRewards[farm.farmInfo].totalFarmRewards !== "--" &&
-                farmPoolToRewards[farm.farmInfo].unclaimedFarmRewards !== "0",
-            )
-            .map((farm) => ({ poolConfig, farmInfo: farm.farmInfo })),
-        )
-        .flat();
+      const selectedFarmPooInfoList = farmPoolInfoList.filter(
+        ({ farmInfo }) => parseFloat(farmPoolToRewards[farmInfo].unclaimedFarmRewards) > 0,
+      );
 
-      console.log(farmPoolInfoList);
       const transaction = await createClaimFarmRewardsTransaction(
         program,
         connection,
-        farmPoolInfoList,
+        selectedFarmPooInfoList,
         walletPubkey,
         userDeltafiToken?.publicKey,
       );
@@ -527,11 +540,7 @@ const Home: React.FC = (props) => {
         }
         onClick={() =>
           setMenu(true, "liquidity-reward", null, {
-            farmPoolRewardsInfo: {
-              userUnclaimedFarmRewards,
-              userTotalFarmRewards,
-              farmPoolToRewards,
-            },
+            farmPoolInfoList,
             handleClaimFarmRewards,
           })
         }
