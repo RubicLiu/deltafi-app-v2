@@ -254,13 +254,6 @@ const Stake = (): ReactElement => {
         }),
       );
     } finally {
-      // dispatch(
-      //   stakeViewActions.setPercentage({
-      //     percentage: 0,
-      //     baseSelected: new BigNumber(0),
-      //     quoteSelected: new BigNumber(0),
-      //   }),
-      // );
       dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
       dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
