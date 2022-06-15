@@ -40,7 +40,20 @@ export function selectMarketPriceTuple(poolConfig: PoolConfig) {
 
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {
-    return getPythMarketPrice(state.accounts.pythAccount.symbolToPythData, poolConfig);
+    const symbolToPythPriceData = state.accounts.pythAccount.symbolToPythPriceData;
+    const marketPriceTuple = getPythMarketPriceTuple(
+      symbolToPythPriceData,
+      poolConfig.base,
+      poolConfig.quote,
+    );
+
+    return {
+      marketPrice: marketPriceTuple.marketPrice,
+      basePrice: symbolToPythPriceData[poolConfig.base].price,
+      quotePrice: symbolToPythPriceData[poolConfig.quote].price,
+      marketPriceLow: marketPriceTuple.lowPrice,
+      marketPriceHigh: marketPriceTuple.highPrice,
+    };
   };
 }
 
