@@ -391,8 +391,12 @@ const Home: React.FC = (props) => {
             .filter(
               (farm) =>
                 !!farmPoolKeyToFarmUser[farm.farmInfo] &&
-                farmPoolToRewards[farm.farmInfo].totalFarmRewards !== "--" &&
-                farmPoolToRewards[farm.farmInfo].unclaimedFarmRewards !== "--",
+                ((farmPoolKeyToFarmUser[farm.farmInfo].basePosition.depositedAmount.gt(new BN(0)) &&
+                  farmPoolKeyToFarmUser[farm.farmInfo].quotePosition.depositedAmount.gt(
+                    new BN(0),
+                  )) ||
+                  parseFloat(farmPoolToRewards[farm.farmInfo].unclaimedFarmRewards) > 0) &&
+                farmPoolToRewards[farm.farmInfo].totalFarmRewards !== "--",
             )
             .map((farm) => ({ poolConfig, farmInfo: farm.farmInfo })),
         )
