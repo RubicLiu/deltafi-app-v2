@@ -278,7 +278,7 @@ const Home: React.FC = (props) => {
         farmUser.basePosition.rewardsOwed.toString(),
         DELTAFI_TOKEN_DECIMALS,
       );
-      const unTrackedBaseRewards = getUntrackedReward(
+      const untrackedBaseRewards = getUntrackedReward(
         rewardView.rewardRefreshTs,
         farmUser.basePosition.lastUpdateTs.toNumber(),
         farmUser.basePosition.nextClaimTs.toNumber(),
@@ -295,7 +295,7 @@ const Home: React.FC = (props) => {
         farmUser.quotePosition.rewardsOwed.toString(),
         DELTAFI_TOKEN_DECIMALS,
       );
-      const unTrackedQuoteRewards = getUntrackedReward(
+      const untrackedQuoteRewards = getUntrackedReward(
         rewardView.rewardRefreshTs,
         farmUser.quotePosition.lastUpdateTs.toNumber(),
         farmUser.quotePosition.nextClaimTs.toNumber(),
@@ -308,10 +308,13 @@ const Home: React.FC = (props) => {
         DELTAFI_TOKEN_DECIMALS,
       );
 
+      const untrackedRewards =
+        untrackedBaseRewards.isEqualTo(0) || untrackedQuoteRewards.isEqualTo(0)
+          ? new BigNumber(0)
+          : untrackedBaseRewards.plus(untrackedQuoteRewards);
       const unclaimedFarmRewards = owedBaseRewards
         .plus(owedQuoteRewards)
-        .plus(unTrackedBaseRewards)
-        .plus(unTrackedQuoteRewards)
+        .plus(untrackedRewards)
         .toFixed(DELTAFI_TOKEN_DECIMALS);
       const totalFarmRewards = claimedBaseRewards
         .plus(claimedQuoteRewards)
