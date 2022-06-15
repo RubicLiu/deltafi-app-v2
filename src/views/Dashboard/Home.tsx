@@ -240,7 +240,12 @@ const Home: React.FC = (props) => {
     if (!isConnectedWallet) {
       return { totalRewards: null, isLoadingTotalRewards: false };
     }
-    if (!deltafiUser.fetched || !isFarmUserFetched || !deltafiPrice) {
+    if (
+      !deltafiUser.fetched ||
+      !isFarmUserFetched ||
+      !deltafiPrice ||
+      !dashboardView.totalDelfiRewards
+    ) {
       // when wallet is connected, but deltafiUser is not fetched yet
       return { totalRewards: null, isLoadingTotalRewards: true };
     }
