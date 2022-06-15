@@ -180,8 +180,11 @@ const Home: React.FC = (props): ReactElement => {
             Last DELFI Price
           </Box>
           <Box display="flex" alignItems="end" mt={1}>
-            <Link href="https://www.gate.io/trade/DELFI_USDT" underline="always">
-              Read more about DLT
+            <Link
+              onClick={() => window.open("https://www.gate.io/trade/DELFI_USDT")}
+              underline="always"
+            >
+              Read more about DELFI
             </Link>
             <Box ml={0.5} height={16} width={16}>
               <ShareIcon />

@@ -1,4 +1,4 @@
-import { ReactElement, useMemo, useCallback } from "react";
+import { ReactElement, useMemo, useCallback, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
   Snackbar,
@@ -36,7 +36,7 @@ import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { anchorBnToBn, bnToAnchorBn, stringToAnchorBn } from "utils/tokenUtils";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
-import { Button, Divider, Link } from "@mui/material";
+import { Link } from "@mui/material";
 import Slider from "./components/Slider";
 import { calculateWithdrawalFromShares } from "lib/calc";
 import { formatCurrencyAmount } from "utils/utils";
@@ -165,7 +165,41 @@ const Stake = (): ReactElement => {
     quotePrice,
   ]);
 
-  const staking = stakeView.stake;
+  useEffect(() => {
+    if (baseTotalAvailable.isEqualTo(0) || quoteTotalAvailable.isEqualTo(0)) {
+      dispatch(
+        stakeViewActions.setPercentage({
+          percentage: 0,
+          baseSelected: new BigNumber(0),
+          quoteSelected: new BigNumber(0),
+        }),
+      );
+    } else {
+      const baseRatio = baseStaked.dividedBy(baseTotalAvailable);
+      const quoteRatio = quoteStaked.dividedBy(quoteTotalAvailable);
+      if (baseRatio.isGreaterThan(quoteRatio)) {
+        dispatch(
+          stakeViewActions.setPercentage({
+            percentage: parseFloat(baseRatio.multipliedBy(100).toFixed(2)),
+            baseSelected: baseStaked,
+            quoteSelected: new BigNumber(
+              quoteTotalAvailable.multipliedBy(baseRatio).toFixed(DELTAFI_TOKEN_DECIMALS),
+            ),
+          }),
+        );
+      } else {
+        dispatch(
+          stakeViewActions.setPercentage({
+            percentage: parseFloat(quoteRatio.multipliedBy(100).toFixed(2)),
+            baseSelected: new BigNumber(
+              baseTotalAvailable.multipliedBy(quoteRatio).toFixed(DELTAFI_TOKEN_DECIMALS),
+            ),
+            quoteSelected: quoteStaked,
+          }),
+        );
+      }
+    }
+  }, [baseTotalAvailable, quoteTotalAvailable, baseStaked, quoteStaked, dispatch]);
 
   const handleStake = useCallback(async () => {
     if (!walletPubkey || !lpUser || !program) {
@@ -177,11 +211,11 @@ const Stake = (): ReactElement => {
       dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: true }));
       const baseAmount = stringToAnchorBn(
         poolConfig.baseTokenInfo,
-        staking.baseSelected.toString(),
+        stakeView.stake.baseSelected.toString(),
       );
       const quoteAmount = stringToAnchorBn(
         poolConfig.quoteTokenInfo,
-        staking.quoteSelected.toString(),
+        stakeView.stake.quoteSelected.toString(),
       );
       const transaction = await createUpdateStakeTransaction(
         program,
@@ -220,13 +254,13 @@ const Stake = (): ReactElement => {
         }),
       );
     } finally {
-      dispatch(
-        stakeViewActions.setPercentage({
-          percentage: 0,
-          baseSelected: new BigNumber(0),
-          quoteSelected: new BigNumber(0),
-        }),
-      );
+      // dispatch(
+      //   stakeViewActions.setPercentage({
+      //     percentage: 0,
+      //     baseSelected: new BigNumber(0),
+      //     quoteSelected: new BigNumber(0),
+      //   }),
+      // );
       dispatch(stakeViewActions.setOpenSnackbar({ openSnackbar: true }));
       dispatch(stakeViewActions.setIsProcessingStake({ isProcessingStake: false }));
       dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
@@ -234,7 +268,6 @@ const Stake = (): ReactElement => {
     }
   }, [
     walletPubkey,
-    staking,
     signTransaction,
     dispatch,
     poolConfig,
@@ -398,32 +431,7 @@ const Stake = (): ReactElement => {
           </Box>
         </Box>
       </Box>
-      <Divider
-        sx={{
-          backgroundColor: "#fff",
-          opacity: 0.4,
-        }}
-      />
-
-      <Box className={classes.tabs} position="relative">
-        <Box>
-          <Button
-            className={classes.activeBtn}
-            sx={{
-              fontWeight: 500,
-              fontSize: 16,
-              fontFamily: "Rubik",
-              padding: 0,
-              minWidth: 0,
-              lineHeight: 1,
-              textTransform: "none",
-            }}
-          >
-            Stake
-          </Button>
-        </Box>
-      </Box>
-      <Slider value={staking.percentage} onChange={setStakePercentage} />
+      <Slider value={stakeView.stake.percentage} onChange={setStakePercentage} />
       <Box mt={3} display="flex" flexDirection="column" alignItems="flex-end">
         <StakeCard
           poolConfig={poolConfig}
@@ -431,7 +439,7 @@ const Stake = (): ReactElement => {
           handleChangeCard={setStakeAmount}
           tokens={tokenConfigs}
           disableDrop
-          percentage={staking.percentage < 0.02 ? 0 : staking.percentage}
+          percentage={stakeView.stake.percentage < 0.02 ? 0 : stakeView.stake.percentage}
         />
       </Box>
       <Box marginTop={3} width="100%">
@@ -456,20 +464,6 @@ const Stake = (): ReactElement => {
             Connect Wallet
           </ConnectButton>
         )}
-      </Box>
-      <Box display="flex" justifyContent="center" mt={3}>
-        <Link
-          href="#"
-          target="_blank"
-          rel="noreferrer noopener"
-          underline="always"
-          data-amp-analytics-on="click"
-          data-amp-analytics-name="click"
-          data-amp-analytics-attrs="page: Farms, target: DELFI"
-          sx={{ fontSize: 12, color: "#f6f6f6" }}
-        >
-          About DeltaFi LT Tokens
-        </Link>
       </Box>
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
