@@ -1,7 +1,7 @@
 import { RootState } from "./store";
 
 import { getPythMarketPrice, getPythPrice } from "./accounts/pythAccount";
-import { getPoolConfigBySymbols, PoolConfig, poolConfigs } from "constants/deployConfigV2";
+import { getPoolConfigBySymbols, PoolConfig } from "constants/deployConfigV2";
 import { getPythMarketPriceTuple } from "anchor/pyth_utils";
 
 export const appSelector = (state: RootState) => state.app;
@@ -41,7 +41,7 @@ export function selectMarketPriceTuple(poolConfig: PoolConfig) {
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {
     return getPythMarketPrice(state.accounts.pythAccount.symbolToPythPriceData, poolConfig);
-  }
+  };
 }
 
 export function selectPoolBySymbols(baseSymbol: string, quoteSymbol: string) {
