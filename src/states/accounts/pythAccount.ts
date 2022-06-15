@@ -10,6 +10,7 @@ import {
   TokenConfig,
 } from "constants/deployConfigV2";
 import { validate } from "utils/utils";
+import { getSymbolToPythPriceData, SymbolToPythPriceData } from "anchor/pyth_utils";
 
 const MOCK_PYTH_PRODUCT_NAME_PREFIX = "Mock";
 
@@ -24,10 +25,12 @@ export type SymbolToPythData = Record<string, PythData>;
 
 export interface PythState {
   symbolToPythData: SymbolToPythData;
+  symbolToPythPriceData: SymbolToPythPriceData;
 }
 
 const initialState: PythState = {
   symbolToPythData: {},
+  symbolToPythPriceData: {},
 };
 
 export const fetchPythDataThunk = createAsyncThunk(
@@ -45,8 +48,10 @@ export const fetchPythDataThunk = createAsyncThunk(
       for (const pythData of pythDataList) {
         symbolToPythData[pythData.symbol] = pythData;
       }
+      const symbolToPythPriceData = await getSymbolToPythPriceData(connection, deployConfigV2.tokenInfoList);
       return {
         symbolToPythData,
+        symbolToPythPriceData,
       };
     } catch (e) {
       console.error(e);
@@ -58,6 +63,7 @@ export const fetchPythDataThunk = createAsyncThunk(
 export const pythAccountReducer = createReducer(initialState, (builder) => {
   builder.addCase(fetchPythDataThunk.fulfilled, (state, action) => {
     state.symbolToPythData = action.payload.symbolToPythData;
+    state.symbolToPythPriceData = action.payload.symbolToPythPriceData;
   });
 });
 
