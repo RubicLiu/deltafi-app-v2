@@ -1,7 +1,8 @@
 import { RootState } from "./store";
 
 import { getPythMarketPrice } from "./accounts/pythAccount";
-import { getPoolConfigBySymbols, PoolConfig } from "constants/deployConfigV2";
+import { getPoolConfigBySymbols, PoolConfig, poolConfigs } from "constants/deployConfigV2";
+import { getPythMarketPriceTuple } from "anchor/pyth_utils";
 
 export const appSelector = (state: RootState) => state.app;
 export const lpUserSelector = (state: RootState) => state.accounts.liquidityProviderAccount;
@@ -20,6 +21,22 @@ export const stakeViewSelector = (state: RootState) => state.views.stakeView;
 
 export const gateIoSelector = (state: RootState) => state.gateIo;
 export const programSelector = (state: RootState) => state.app.program;
+
+export function selectPythPrice(symbol: string) {
+  return (state: RootState) => {
+    return state.accounts.pythAccount.symbolToPythPriceData[symbol].price;
+  };
+}
+
+export function selectMarketPriceTuple(poolConfig: PoolConfig) {
+  return (state: RootState) => {
+    return getPythMarketPriceTuple(
+      state.accounts.pythAccount.symbolToPythPriceData,
+      poolConfig.base,
+      poolConfig.quote,
+    );
+  };
+}
 
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {

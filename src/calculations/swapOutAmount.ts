@@ -3,7 +3,7 @@ import { calculateOutAmountNormalSwap, calculateOutAmountStableSwap } from "./ca
 import { PoolState, SwapConfig, SwapInfo, SwapDirection } from "../anchor/type_definitions";
 import { WAD, bnToString, exponentiate, exponentiatedBy } from "./utils";
 import { TokenConfig } from "./types";
-import { getMarketPriceTuple, SymbolToPythPriceData } from "../anchor/pyth_utils";
+import { getPythMarketPriceTuple, SymbolToPythPriceData } from "../anchor/pyth_utils";
 
 export type SwapOutResult = {
   amountIn: string;
@@ -38,7 +38,7 @@ export async function getSwapOutResult(
       ? { baseToken: fromToken, quoteToken: toToken }
       : { baseToken: toToken, quoteToken: fromToken };
 
-  const marketPriceTuple = getMarketPriceTuple(
+  const marketPriceTuple = getPythMarketPriceTuple(
     symbolToPythPriceData,
     baseToken.symbol,
     quoteToken.symbol,

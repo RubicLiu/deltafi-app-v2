@@ -34,7 +34,7 @@ export async function getSymbolToPythPriceData(
   return symbolToPythPriceData;
 }
 
-export function getMarketPriceTuple(
+export function getPythMarketPriceTuple(
   symbolToPythPriceData: SymbolToPythPriceData,
   baseSymbol: string,
   quoteSymbol: string,

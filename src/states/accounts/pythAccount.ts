@@ -48,7 +48,10 @@ export const fetchPythDataThunk = createAsyncThunk(
       for (const pythData of pythDataList) {
         symbolToPythData[pythData.symbol] = pythData;
       }
-      const symbolToPythPriceData = await getSymbolToPythPriceData(connection, deployConfigV2.tokenInfoList);
+      const symbolToPythPriceData = await getSymbolToPythPriceData(
+        connection,
+        deployConfigV2.tokenInfoList,
+      );
       return {
         symbolToPythData,
         symbolToPythPriceData,
