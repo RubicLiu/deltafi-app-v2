@@ -151,3 +151,30 @@ export function getPythMarketPrice(symbolToPythData: SymbolToPythData, poolConfi
     marketPriceHigh,
   };
 }
+
+export function getPythPrice(
+  symbolToPythPriceData: SymbolToPythPriceData,
+  tokenSymbol: string | null | undefined,
+) {
+  let result = { price: null, confidenceInterval: null };
+  if (!tokenSymbol) {
+    return result;
+  }
+
+  if (!symbolToPythPriceData[tokenSymbol]) {
+    return result;
+  }
+
+  const priceData = symbolToPythPriceData[tokenSymbol];
+  result = {
+    price: priceData.price,
+    confidenceInterval: priceData.confidence,
+  };
+
+  // if the price and confidence interval are both not undefined, price should be greater than confidence interval
+  validate(
+    !(result.price && result.confidenceInterval) || result.price > result.confidenceInterval,
+    "confidence interval should not be larger than the price",
+  );
+  return result;
+}

@@ -1,6 +1,6 @@
 import { RootState } from "./store";
 
-import { getPythMarketPrice } from "./accounts/pythAccount";
+import { getPythMarketPrice, getPythPrice } from "./accounts/pythAccount";
 import { getPoolConfigBySymbols, PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { getPythMarketPriceTuple } from "anchor/pyth_utils";
 
@@ -47,12 +47,15 @@ export function selectMarketPriceByPool(poolConfig: PoolConfig) {
       poolConfig.quote,
     );
 
+    const basePrice = getPythPrice(symbolToPythPriceData, poolConfig.base);
+    const quotePrice = getPythPrice(symbolToPythPriceData, poolConfig.quote);
+
     return {
-      marketPrice: marketPriceTuple.marketPrice,
-      basePrice: symbolToPythPriceData[poolConfig.base].price,
-      quotePrice: symbolToPythPriceData[poolConfig.quote].price,
-      marketPriceLow: marketPriceTuple.lowPrice,
-      marketPriceHigh: marketPriceTuple.highPrice,
+      marketPrice: marketPriceTuple?.marketPrice,
+      basePrice: basePrice.price,
+      quotePrice: quotePrice.price,
+      marketPriceLow: marketPriceTuple?.lowPrice,
+      marketPriceHigh: marketPriceTuple?.highPrice,
     };
   };
 }
