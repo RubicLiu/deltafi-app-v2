@@ -78,7 +78,7 @@ const Home: React.FC = () => {
 
   const poolState = useSelector(poolSelector);
   const pythState = useSelector(pythSelector);
-  const symbolToPythData = pythState.symbolToPythData;
+  const symbolToPythData = pythState.symbolToPythPriceData;
   const params = useParams<{ poolAddress?: string }>();
   const poolAddress = params?.poolAddress;
 

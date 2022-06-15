@@ -10,7 +10,7 @@ import {
   TokenConfig,
 } from "constants/deployConfigV2";
 import { validate } from "utils/utils";
-import { getSymbolToPythPriceData, SymbolToPythPriceData } from "anchor/pyth_utils";
+import { getPythMarketPriceTuple, getSymbolToPythPriceData, SymbolToPythPriceData } from "anchor/pyth_utils";
 
 const MOCK_PYTH_PRODUCT_NAME_PREFIX = "Mock";
 
@@ -88,68 +88,23 @@ async function getPythDataList(connection: Connection, tokenInfoList: TokenConfi
   return pythDataList;
 }
 
-export function getPythPriceBySymbol(
-  symbolToPythData: SymbolToPythData,
-  tokenSymbol: string | null | undefined,
-) {
-  let result = { priceData: null, priceAccountKey: null, price: null, confidenceInterval: null };
-  if (!tokenSymbol) {
-    return result;
-  }
+export function getPythMarketPrice(symbolToPythPriceData: SymbolToPythPriceData, poolConfig: PoolConfig) {
+    const marketPriceTuple = getPythMarketPriceTuple(
+      symbolToPythPriceData,
+      poolConfig?.base,
+      poolConfig?.quote,
+    );
 
-  const tokenInfo = getTokenConfigBySymbol(tokenSymbol);
-  if (tokenInfo && tokenInfo.pyth.productName.startsWith(MOCK_PYTH_PRODUCT_NAME_PREFIX)) {
+    const basePrice = getPythPrice(symbolToPythPriceData, poolConfig.base);
+    const quotePrice = getPythPrice(symbolToPythPriceData, poolConfig.quote);
+
     return {
-      price: tokenInfo.pyth.mockPrice,
-      confidenceInterval: 0,
+      marketPrice: marketPriceTuple?.marketPrice,
+      basePrice: basePrice.price,
+      quotePrice: quotePrice.price,
+      marketPriceLow: marketPriceTuple?.lowPrice,
+      marketPriceHigh: marketPriceTuple?.highPrice,
     };
-  }
-
-  if (!symbolToPythData[tokenSymbol]) {
-    return result;
-  }
-
-  const priceData = symbolToPythData[tokenSymbol].priceData;
-  result.priceData = priceData;
-  result.priceAccountKey = symbolToPythData[tokenSymbol].priceKey;
-  result.price = priceData.price ? priceData.price : priceData.previousPrice;
-  result.confidenceInterval = priceData.price ? priceData.confidence : priceData.previousConfidence;
-
-  // if the price and confidence interval are both not undefined, price should be greater than confidence interval
-  validate(
-    !(result.price && result.confidenceInterval) || result.price > result.confidenceInterval,
-    "confidence interval should not be larger than the price",
-  );
-  return result;
-}
-
-export function getPythMarketPrice(symbolToPythData: SymbolToPythData, poolConfig: PoolConfig) {
-  const { price: basePrice, confidenceInterval: baseConfidenceInterval } = getPythPriceBySymbol(
-    symbolToPythData,
-    poolConfig?.base,
-  );
-  const { price: quotePrice, confidenceInterval: quoteConfidenceInterval } = getPythPriceBySymbol(
-    symbolToPythData,
-    poolConfig?.quote,
-  );
-  const marketPrice =
-    basePrice && quotePrice ? new BigNumber(basePrice / quotePrice) : new BigNumber(NaN);
-  const marketPriceLow =
-    basePrice && quotePrice && baseConfidenceInterval && quoteConfidenceInterval
-      ? new BigNumber((basePrice - baseConfidenceInterval) / (quotePrice + quoteConfidenceInterval))
-      : new BigNumber(NaN);
-  const marketPriceHigh =
-    basePrice && quotePrice && baseConfidenceInterval && quoteConfidenceInterval
-      ? new BigNumber((basePrice + baseConfidenceInterval) / (quotePrice - quoteConfidenceInterval))
-      : new BigNumber(NaN);
-
-  return {
-    marketPrice,
-    basePrice,
-    quotePrice,
-    marketPriceLow,
-    marketPriceHigh,
-  };
 }
 
 export function getPythPrice(

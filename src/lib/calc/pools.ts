@@ -1,3 +1,4 @@
+import { SymbolToPythPriceData } from "anchor/pyth_utils";
 import BigNumber from "bignumber.js";
 import { PoolConfig } from "constants/deployConfigV2";
 import { getPythMarketPrice, SymbolToPythData } from "states/accounts/pythAccount";
@@ -7,7 +8,7 @@ import { getTokenTvl } from "utils/utils";
 export function calculateTotalHoldings(
   poolConfigs: PoolConfig[],
   swapKeyToSwapInfo: SwapPoolKeyToSwap,
-  symbolToPythData: SymbolToPythData,
+  symbolToPythData: SymbolToPythPriceData,
 ) {
   if (poolConfigs.length > 0) {
     return (poolConfigs as any).reduce((sum, poolConfig) => {

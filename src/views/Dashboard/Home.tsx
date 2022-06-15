@@ -179,7 +179,7 @@ const Home: React.FC = (props) => {
   const deltafiPrice = useSelector(selectGateIoSticker("DELFI_USDT"));
 
   const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
-  const symbolToPythData = useSelector(pythSelector).symbolToPythData;
+  const symbolToPythData = useSelector(pythSelector).symbolToPythPriceData;
   const deltafiUser = useSelector(deltafiUserSelector);
 
   const { totalHoldings, isLoadingTotalHoldings } = useMemo(() => {
