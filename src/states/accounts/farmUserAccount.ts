@@ -7,10 +7,12 @@ import { FarmUser } from "anchor/type_definitions";
 type FarmPoolKeyToFarmUser = Record<string, FarmUser>;
 export interface FarmUserState {
   farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser;
+  fetched: boolean;
 }
 
 const initialState: FarmUserState = {
   farmPoolKeyToFarmUser: {},
+  fetched: false,
 };
 
 type FetchFarmUsersThunkArg = {
@@ -65,5 +67,6 @@ export const fetchFarmUsersThunk = createAsyncThunk(
 export const farmUserAccountReducer = createReducer(initialState, (builder) => {
   builder.addCase(fetchFarmUsersThunk.fulfilled, (state, action) => {
     state.farmPoolKeyToFarmUser = action.payload.farmPoolKeyToFarmUser;
+    state.fetched = true;
   });
 });

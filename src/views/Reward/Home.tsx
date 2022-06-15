@@ -51,6 +51,7 @@ import styled from "styled-components";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 import { scheduleWithInterval } from "utils";
 import { anchorBnToBn } from "utils/tokenUtils";
+import { dashboardViewActions } from "states/views/dashboardView";
 
 const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
   root: {
@@ -200,7 +201,7 @@ const Home: React.FC = (props) => {
   const rewardView = useSelector(rewardViewSelector);
   const deltafiUser = useSelector(deltafiUserSelector);
 
-  const farmPoolKeyToFarmUser = useSelector(farmUserSelector);
+  const farmPoolKeyToFarmUser = useSelector(farmUserSelector).farmPoolKeyToFarmUser;
   const farmKeyToFarmInfo = useSelector(farmSelector);
 
   const userDeltafiToken = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
@@ -214,11 +215,6 @@ const Home: React.FC = (props) => {
     apr: BigNumber,
     depositAmount: BigNumber,
   ) => {
-    console.log("ts diff", currentTs - lastUpdateTs);
-    console.log("currentTs", currentTs);
-    console.log("nextClaimTs", nextClaimTs);
-    console.log("apr", apr.toString());
-    console.log("depositAmount", depositAmount.toString());
     if (lastUpdateTs >= currentTs || currentTs <= nextClaimTs) {
       return new BigNumber(0);
     }
@@ -367,6 +363,22 @@ const Home: React.FC = (props) => {
       totalRewardFromReferral: "--",
     };
   }, [deltafiUser]);
+
+  useEffect(() => {
+    const totalRewardFromReferralBn =
+      totalRewardFromReferral === "--" ? new BigNumber(0) : new BigNumber(totalRewardFromReferral);
+    const totalRewardFromSwapBn =
+      totalRewardFromSwap === "--" ? new BigNumber(0) : new BigNumber(totalRewardFromSwap);
+    const userTotalFarmRewardsBn =
+      userTotalFarmRewards === "--" ? new BigNumber(0) : new BigNumber(userTotalFarmRewards);
+    dispatch(
+      dashboardViewActions.setTotalDelfiRewards({
+        totalDelfiRewards: totalRewardFromReferralBn
+          .plus(totalRewardFromSwapBn)
+          .plus(userTotalFarmRewardsBn),
+      }),
+    );
+  }, [totalRewardFromSwap, totalRewardFromReferral, userTotalFarmRewards, dispatch]);
 
   const farmPoolInfoList = useMemo(
     () =>

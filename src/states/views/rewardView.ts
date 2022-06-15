@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import BigNumber from "bignumber.js";
 
 type FarmPoolToRewards = Record<
   string,
@@ -19,6 +20,7 @@ const initialState = {
   claimResult: null,
   farmPoolToRewards: {},
   rewardRefreshTs: Math.floor(Date.now() / 1000),
+  totalDelfiRewards: new BigNumber(0),
 };
 
 const rewardViewSlice = createSlice({

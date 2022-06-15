@@ -138,7 +138,7 @@ const Card: React.FC<CardProps> = (props) => {
     <Box
       fontSize={{ md: 14, xs: 12 }}
       padding={{ md: 2.5, xs: 1 }}
-      minWidth={{ md: 480 }}
+      minWidth={{ md: 560 }}
       mt={1.25}
       lineHeight={1}
       sx={{
@@ -179,11 +179,10 @@ const Card: React.FC<CardProps> = (props) => {
             <Box color="#D3D3D3" fontWeight={500} whiteSpace="nowrap">
               Unclaimed / Total
             </Box>
-            {/* TODO replace the placeholder with real data */}
             <Box
               mt={1}
               display="flex"
-              fontSize={{ xs: 14, md: 18 }}
+              fontSize={{ xs: 12, md: 16 }}
               fontWeight={500}
               sx={{
                 whiteSpace: "nowrap",

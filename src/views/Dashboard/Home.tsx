@@ -16,10 +16,10 @@ import Page from "components/layout/Page";
 import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import PoolCard from "views/Pool/components/Card_v2";
 import FarmCard from "views/Farm/components/Card";
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import Reward from "views/Reward";
 import { MintToTokenAccountInfo } from "states/accounts/tokenAccount";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   lpUserSelector,
   tokenAccountSelector,
@@ -27,6 +27,9 @@ import {
   pythSelector,
   deltafiUserSelector,
   selectGateIoSticker,
+  rewardViewSelector,
+  dashboardViewSelector,
+  farmUserSelector,
 } from "states/selectors";
 import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
@@ -36,6 +39,7 @@ import { formatCurrencyAmount } from "utils/utils";
 import { exponentiatedBy } from "utils/decimal";
 import { DELTAFI_TOKEN_DECIMALS } from "constants/deployConfigV2";
 import { CircularProgress } from "@material-ui/core";
+import { dashboardViewActions } from "states/views/dashboardView";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
@@ -163,10 +167,15 @@ const Home: React.FC = (props) => {
   const classes = useStyles(props);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down("md"));
-  const [tab, setTab] = useState("reward");
-  const handleChange = (newValue: string) => {
-    setTab(newValue);
-  };
+  const dispatch = useDispatch();
+
+  const handleChange = useCallback(
+    (newValue: string) => {
+      dispatch(dashboardViewActions.setSelectedTab({ selectedTab: newValue }));
+    },
+    [dispatch],
+  );
+
   const { connected: isConnectedWallet } = useWallet();
   const mintToTokenAccountInfo = useSelector(tokenAccountSelector).mintToTokenAccountInfo;
   const swapKeyToLpUser = useSelector(lpUserSelector).swapKeyToLp;
@@ -180,7 +189,9 @@ const Home: React.FC = (props) => {
 
   const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
   const symbolToPythData = useSelector(pythSelector).symbolToPythData;
+  const isFarmUserFetched = useSelector(farmUserSelector).fetched;
   const deltafiUser = useSelector(deltafiUserSelector);
+  const dashboardView = useSelector(dashboardViewSelector);
 
   const { totalHoldings, isLoadingTotalHoldings } = useMemo(() => {
     if (!isConnectedWallet) {
@@ -232,32 +243,24 @@ const Home: React.FC = (props) => {
     if (!isConnectedWallet) {
       return { totalRewards: null, isLoadingTotalRewards: false };
     }
-    if (!deltafiUser.fetched || !deltafiPrice) {
+    if (!deltafiUser.fetched || !isFarmUserFetched || !deltafiPrice) {
       // when wallet is connected, but deltafiUser is not fetched yet
       return { totalRewards: null, isLoadingTotalRewards: true };
     }
-    if (!deltafiUser.user) {
-      return { totalRewards: new BigNumber(0), isLoadingTotalRewards: false };
-    }
 
-    const totalDelfiAmount = exponentiatedBy(
-      new BigNumber(
-        deltafiUser.user.claimedReferralRewards
-          .add(deltafiUser.user.claimedTradeRewards)
-          .add(deltafiUser.user.owedReferralRewards)
-          .add(deltafiUser.user.owedTradeRewards)
-          .toString(),
-      ),
-      DELTAFI_TOKEN_DECIMALS,
-    );
-
-    const totalRewards = totalDelfiAmount.multipliedBy(deltafiPrice.last);
+    const totalRewards = dashboardView.totalDelfiRewards.multipliedBy(deltafiPrice.last);
 
     return {
       totalRewards,
       isLoadingTotalRewards: false,
     };
-  }, [deltafiUser, isConnectedWallet, deltafiPrice]);
+  }, [
+    deltafiUser,
+    isConnectedWallet,
+    deltafiPrice,
+    dashboardView.totalDelfiRewards,
+    isFarmUserFetched,
+  ]);
 
   const headerData = [
     {
@@ -311,7 +314,7 @@ const Home: React.FC = (props) => {
           </Box>
         </Box>
         <Box className={classes.tabContext}>
-          <TabContext value={tab}>
+          <TabContext value={dashboardView.selectedTab}>
             <Box sx={{ borderBottom: 1, color: "#fff" }}>
               <TabList
                 onChange={(event: ChangeEvent<{}>, value: any) => {
