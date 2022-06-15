@@ -388,16 +388,21 @@ const Home: React.FC = (props) => {
       poolConfigs
         .map((poolConfig: PoolConfig) =>
           poolConfig.farmInfoList
-            .filter(
-              (farm) =>
-                !!farmPoolKeyToFarmUser[farm.farmInfo] &&
-                ((farmPoolKeyToFarmUser[farm.farmInfo].basePosition.depositedAmount.gt(new BN(0)) &&
-                  farmPoolKeyToFarmUser[farm.farmInfo].quotePosition.depositedAmount.gt(
-                    new BN(0),
-                  )) ||
-                  parseFloat(farmPoolToRewards[farm.farmInfo].unclaimedFarmRewards) > 0) &&
-                farmPoolToRewards[farm.farmInfo].totalFarmRewards !== "--",
-            )
+            .filter(({ farmInfo }) => {
+              const farmUser = farmPoolKeyToFarmUser[farmInfo];
+              if (!farmUser) {
+                return false;
+              }
+
+              const hasStakedShares =
+                farmUser.basePosition.depositedAmount.gt(new BN(0)) ||
+                farmUser.quotePosition.depositedAmount.gt(new BN(0));
+
+              const hasUnclaimedRewards =
+                parseFloat(farmPoolToRewards[farmInfo].unclaimedFarmRewards) > 0;
+
+              return hasStakedShares || hasUnclaimedRewards;
+            })
             .map((farm) => ({ poolConfig, farmInfo: farm.farmInfo })),
         )
         .flat(),

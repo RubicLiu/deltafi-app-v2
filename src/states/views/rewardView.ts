@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import BigNumber from "bignumber.js";
 
 type FarmPoolToRewards = Record<
   string,
