@@ -2989,8 +2989,5 @@
       "name": "InvalidStakingAmount",
       "msg": "Invalid staking amount"
     }
-  ],
-  "metadata": {
-    "address": "HcWvS1XyweYMrCvY8TEeDxXgbWJagizUZXxCSLC2E89N"
-  }
+  ]
 }
