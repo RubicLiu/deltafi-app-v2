@@ -78,13 +78,13 @@ const Home: React.FC = () => {
 
   const poolState = useSelector(poolSelector);
   const pythState = useSelector(pythSelector);
-  const symbolToPythData = pythState.symbolToPythData;
+  const symbolToPythPriceData = pythState.symbolToPythPriceData;
   const params = useParams<{ poolAddress?: string }>();
   const poolAddress = params?.poolAddress;
 
   const tvl = useMemo(
-    () => calculateTotalHoldings(poolConfigs, poolState.swapKeyToSwapInfo, symbolToPythData),
-    [symbolToPythData, poolState],
+    () => calculateTotalHoldings(poolConfigs, poolState.swapKeyToSwapInfo, symbolToPythPriceData),
+    [symbolToPythPriceData, poolState],
   );
 
   return (

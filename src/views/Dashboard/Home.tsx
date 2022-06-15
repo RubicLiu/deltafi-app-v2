@@ -179,7 +179,7 @@ const Home: React.FC = (props) => {
   const deltafiPrice = useSelector(selectGateIoSticker("DELFI_USDT"));
 
   const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
-  const symbolToPythData = useSelector(pythSelector).symbolToPythData;
+  const symbolToPythPriceData = useSelector(pythSelector).symbolToPythPriceData;
   const deltafiUser = useSelector(deltafiUserSelector);
 
   const { totalHoldings, isLoadingTotalHoldings } = useMemo(() => {
@@ -200,7 +200,7 @@ const Home: React.FC = (props) => {
           return res;
         }
 
-        const { basePrice, quotePrice } = getPythMarketPrice(symbolToPythData, poolConfig);
+        const { basePrice, quotePrice } = getPythMarketPrice(symbolToPythPriceData, poolConfig);
         const { baseWithdrawalAmount: baseAmount, quoteWithdrawalAmount: quoteAmount } =
           calculateWithdrawalFromShares(
             lpUser.baseShare,
@@ -225,7 +225,7 @@ const Home: React.FC = (props) => {
       return { totalHoldings, isLoadingTotalHoldings: false };
     }
     return { totalHoldings: new BigNumber(0), isLoadingTotalHoldings: false };
-  }, [symbolToPythData, swapKeyToSwapInfo, swapKeyToLpUser, isConnectedWallet]);
+  }, [symbolToPythPriceData, swapKeyToSwapInfo, swapKeyToLpUser, isConnectedWallet]);
 
   const { totalRewards, isLoadingTotalRewards } = useMemo(() => {
     // TODO(leqiang): Add farm rewards
