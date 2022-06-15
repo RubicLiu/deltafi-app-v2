@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { PoolConfig, TokenConfig } from "constants/deployConfigV2";
 
 export interface SettingsProps {
@@ -11,13 +10,12 @@ export interface SettingsProps {
 }
 
 export interface StakeCard {
-  isStake: boolean;
-  baseBalance: BigNumber;
-  quoteBalance: BigNumber;
-  baseStaked: BigNumber;
-  quoteStaked: BigNumber;
-  baseAmount: string;
-  quoteAmount: string;
+  baseTotalAmount: string;
+  quoteTotalAmount: string;
+  baseStakedAmount: string;
+  quoteStakedAmount: string;
+  baseSelectedAmount: string;
+  quoteSelectedAmount: string;
 }
 
 export interface CardProps {
