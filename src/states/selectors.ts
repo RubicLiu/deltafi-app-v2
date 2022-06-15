@@ -22,22 +22,6 @@ export const stakeViewSelector = (state: RootState) => state.views.stakeView;
 export const gateIoSelector = (state: RootState) => state.gateIo;
 export const programSelector = (state: RootState) => state.app.program;
 
-export function selectPythPrice(symbol: string) {
-  return (state: RootState) => {
-    return getPythPrice(state.accounts.pythAccount.symbolToPythPriceData, symbol);
-  };
-}
-
-export function selectMarketPriceTuple(poolConfig: PoolConfig) {
-  return (state: RootState) => {
-    return getPythMarketPriceTuple(
-      state.accounts.pythAccount.symbolToPythPriceData,
-      poolConfig.base,
-      poolConfig.quote,
-    );
-  };
-}
-
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {
     return getPythMarketPrice(state.accounts.pythAccount.symbolToPythPriceData, poolConfig);

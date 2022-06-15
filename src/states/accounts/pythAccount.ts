@@ -51,8 +51,8 @@ export function getPythMarketPrice(
     poolConfig?.quote,
   );
 
-  const basePrice = getPythPrice(symbolToPythPriceData, poolConfig.base);
-  const quotePrice = getPythPrice(symbolToPythPriceData, poolConfig.quote);
+  const basePrice = getPythPrice(symbolToPythPriceData, poolConfig?.base);
+  const quotePrice = getPythPrice(symbolToPythPriceData, poolConfig?.quote);
 
   return {
     marketPrice: marketPriceTuple?.marketPrice,
