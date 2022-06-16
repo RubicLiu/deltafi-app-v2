@@ -9,7 +9,7 @@ export const MARKET_CONFIG_ADDRESS = new PublicKey(deployConfigV2.marketConfig);
 export const DELTAFI_TOKEN_MINT = new PublicKey(deployConfigV2.deltafiMint);
 export const DAYS_PER_YEAR = 365;
 export const SECONDS_PER_YEAR = 31556926;
-
+export const TOKEN_PRICE_DECIMALS = 6;
 export const WAD_LENGTH = 18;
 
 export const WAD = new BigNumber(`1e+${WAD_LENGTH}`);
