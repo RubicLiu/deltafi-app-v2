@@ -64,6 +64,7 @@ import { DeltafiUser, SwapInfo } from "anchor/type_definitions";
 import Autocomplete from "@material-ui/lab/Autocomplete/Autocomplete";
 import CompareArrows from "components/Svg/icons/CompareArrows";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
+import { formatCurrencyAmount } from "utils/utils";
 
 //const priceMock = [
 //  {
@@ -890,9 +891,7 @@ const Home: React.FC = (props) => {
               <Grid item xs={6} sm={3}>
                 <Box className={classes.currencyCt}>
                   <Box>Price</Box>
-                  <Box sx={{ color: "#fff" }}>
-                    {Number(basePrice).toFixed(poolConfig?.baseTokenInfo?.decimals)}
-                  </Box>
+                  <Box sx={{ color: "#fff" }}>{formatCurrencyAmount(basePrice)}</Box>
                 </Box>
               </Grid>
               <Grid item xs={6} sm={2}></Grid>
@@ -913,9 +912,7 @@ const Home: React.FC = (props) => {
               <Grid item xs={6} sm={3}>
                 <Box className={classes.currencyCt}>
                   <Box>Price</Box>
-                  <Box sx={{ color: "#fff" }}>
-                    {Number(quotePrice).toFixed(poolConfig?.quoteTokenInfo?.decimals)}
-                  </Box>
+                  <Box sx={{ color: "#fff" }}>{formatCurrencyAmount(quotePrice)}</Box>
                 </Box>
               </Grid>
               <Grid item xs={6} sm={2}></Grid>
