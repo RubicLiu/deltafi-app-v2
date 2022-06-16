@@ -41,8 +41,7 @@ export function getPythMarketPriceTuple(
 ): MarketPriceTuple {
   const basePythPriceData = symbolToPythPriceData[baseSymbol];
   const quotePythPriceData = symbolToPythPriceData[quoteSymbol];
-
-  if (!basePythPriceData || quotePythPriceData) {
+  if (!basePythPriceData || !quotePythPriceData) {
     return {
       marketPrice: new BigNumber(NaN),
       lowPrice: new BigNumber(NaN),

@@ -330,7 +330,6 @@ const Home: React.FC = (props) => {
   const { setMenu } = useModal();
 
   const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
-
   const exchangeRateLabel = useMemo(() => {
     if (basePrice && quotePrice && swapInfo) {
       if (tokenFrom.token.symbol === poolConfig?.base) {
