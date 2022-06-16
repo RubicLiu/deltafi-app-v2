@@ -8,13 +8,15 @@ import { convertDollarSign as convertDollar, getTokenTvl, getUserTokenTvl } from
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
 import {
+  selectGateIoSticker,
   selectMarketPriceByPool,
   selectFarmByFarmKey,
   selectSwapBySwapKey,
   selectFarmUserByFarmKey,
 } from "states/selectors";
-import { exponentiate, exponentiatedBy } from "utils/decimal";
+
 import { useModal } from "providers/modal";
+import { anchorBnToBn } from "utils/tokenUtils";
 
 const Img = styled.img`
   width: 32px;
@@ -33,8 +35,6 @@ const Img = styled.img`
     }
   }
 `;
-
-const deltafiTokenDecimals = 6;
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
@@ -135,6 +135,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const swapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
   const farmInfo = useSelector(selectFarmByFarmKey(farmInfoAddress));
   const farmUser = useSelector(selectFarmUserByFarmKey(farmInfoAddress));
+  const deltafiPrice = useSelector(selectGateIoSticker("DELFI_USDT"));
 
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
@@ -189,48 +190,55 @@ const PoolCard: React.FC<CardProps> = (props) => {
     return new BigNumber(0);
   }, [baseTvl, quoteTvl, farmUser, swapInfo]);
 
-  // const baseApr = useMemo(() => {
-  //   if (farmInfo && basePrice && farmInfo.farmConfig.baseAprDenominator.toNumber() > 0) {
-  //     const rawApr = exponentiatedBy(
-  //       exponentiate(
-  //         new BigNumber(farmInfo.farmConfig.baseAprNumerator.toString()).div(
-  //           new BigNumber(farmInfo.farmConfig.baseAprDenominator.toString()),
-  //         ),
-  //         baseTokenInfo.decimals,
-  //       ),
-  //       deltafiTokenDecimals,
-  //     );
-  //     return rawApr.dividedBy(basePrice).multipliedBy(100).toFixed(2);
-  //   }
-  //   return 0;
-  // }, [farmInfo, basePrice, baseTokenInfo]);
+  const apr = useMemo(() => {
+    if (
+      farmInfo &&
+      quotePrice &&
+      basePrice &&
+      farmInfo?.farmConfig?.quoteAprDenominator.toNumber() > 0 &&
+      farmInfo?.farmConfig?.baseAprDenominator.toNumber() > 0 &&
+      deltafiPrice?.last
+    ) {
+      // reward from base per year if we have all the base share supply
+      const baseRewardRateAllShare = anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseSupply)
+        .multipliedBy(farmInfo.farmConfig.baseAprNumerator.toString())
+        .dividedBy(farmInfo.farmConfig.baseAprDenominator.toString())
+        .multipliedBy(deltafiPrice.last);
 
-  const quoteApr = useMemo(() => {
-    if (farmInfo && quotePrice && farmInfo.farmConfig.quoteAprDenominator.toNumber() > 0) {
-      const rawApr = exponentiatedBy(
-        exponentiate(
-          new BigNumber(farmInfo.farmConfig.quoteAprNumerator.toString()).div(
-            new BigNumber(farmInfo.farmConfig.quoteAprDenominator.toString()),
-          ),
-          quoteTokenInfo.decimals,
-        ),
-        deltafiTokenDecimals,
-      );
-      return rawApr.dividedBy(quotePrice).multipliedBy(100).toFixed(2);
+      // reward from quote per year if we have all the quote share supply
+      const quoteRewardRateAllShare = anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteSupply)
+        .multipliedBy(farmInfo.farmConfig.quoteAprDenominator.toString())
+        .dividedBy(farmInfo.farmConfig.quoteAprDenominator.toString())
+        .multipliedBy(deltafiPrice.last);
+
+      const rewardRate = baseRewardRateAllShare
+        .plus(quoteRewardRateAllShare)
+        .dividedBy(baseTvl.plus(quoteTvl));
+
+      return rewardRate.multipliedBy(100).toFixed(2);
     }
-    return 0;
-  }, [farmInfo, quotePrice, quoteTokenInfo]);
 
-  const [firstTokenInfo, secondTokenInfo] = [baseTokenInfo, quoteTokenInfo];
+    return "--";
+  }, [
+    farmInfo,
+    basePrice,
+    quotePrice,
+    baseTokenInfo,
+    quoteTokenInfo,
+    swapInfo.poolState,
+    deltafiPrice,
+    baseTvl,
+    quoteTvl,
+  ]);
 
   return (
     <Box className={classes.container}>
       <Box className={`${classes.header} ${props.color || ""}`}>
         <div>
-          <Img src={firstTokenInfo.logoURI} alt={`${firstTokenInfo.name} coin`} />
+          <Img src={baseTokenInfo.logoURI} alt={`${baseTokenInfo.name} coin`} />
           <Img
-            src={secondTokenInfo.logoURI}
-            alt={`${secondTokenInfo.name} coin`}
+            src={quoteTokenInfo.logoURI}
+            alt={`${quoteTokenInfo.name} coin`}
             className="coin-earning"
           />
         </div>
@@ -251,21 +259,9 @@ const PoolCard: React.FC<CardProps> = (props) => {
           <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total staked</Box>
           <Box className={classes.label}>{convertDollar(stakedTvl.toFixed(2))}</Box>
         </Box>
-        {/* <Box marginTop={1}>
-          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>
-            Your Staking
-          </Typography>
-          <Typography className={classes.label}>
-            {convertDollar(userStakedTvl.toFixed(2))}
-          </Typography>
-        </Box>
-        <Box marginTop={1}>
-          <Typography className={`${classes.labelTitle} ${props.color || ""}`}>Base APR</Typography>
-          <Typography className={classes.label}>{baseApr}%</Typography>
-        </Box> */}
         <Box marginTop={1.25}>
           <Box className={`${classes.labelTitle} ${props.color || ""}`}>APR</Box>
-          <Box className={classes.label}>{quoteApr}%</Box>
+          <Box className={classes.label}>{apr}%</Box>
         </Box>
         <ConnectButton
           className={classes.cardBtn}
