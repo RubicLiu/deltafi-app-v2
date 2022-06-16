@@ -217,6 +217,7 @@ const Stake = (): ReactElement => {
         poolConfig.quoteTokenInfo,
         stakeView.stake.quoteSelected.toString(),
       );
+
       const transaction = await createUpdateStakeTransaction(
         program,
         connection,

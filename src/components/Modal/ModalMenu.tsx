@@ -64,7 +64,7 @@ export default function ModalMenu() {
       case "liquidity-reward":
         return (
           <LiquidityReward
-            farmPoolRewardsInfo={data?.farmPoolRewardsInfo}
+            farmPoolInfoList={data?.farmPoolInfoList}
             handleClaimFarmRewards={
               data?.handleClaimFarmRewards || (() => console.error("no handler"))
             }

@@ -39,11 +39,19 @@ import {
 import BN from "bn.js";
 import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
-import { deployConfigV2, deployMode, PoolConfig, poolConfigs } from "constants/deployConfigV2";
+import {
+  deployConfigV2,
+  deployMode,
+  getPoolConfigByFarmKey,
+  PoolConfig,
+  poolConfigs,
+} from "constants/deployConfigV2";
 import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import styled from "styled-components";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 import { scheduleWithInterval } from "utils";
+import { anchorBnToBn } from "utils/tokenUtils";
+import { dashboardViewActions } from "states/views/dashboardView";
 
 const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
   root: {
@@ -193,7 +201,7 @@ const Home: React.FC = (props) => {
   const rewardView = useSelector(rewardViewSelector);
   const deltafiUser = useSelector(deltafiUserSelector);
 
-  const farmPoolKeyToFarmUser = useSelector(farmUserSelector);
+  const farmPoolKeyToFarmUser = useSelector(farmUserSelector).farmPoolKeyToFarmUser;
   const farmKeyToFarmInfo = useSelector(farmSelector);
 
   const userDeltafiToken = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
@@ -210,10 +218,17 @@ const Home: React.FC = (props) => {
     if (lastUpdateTs >= currentTs || currentTs <= nextClaimTs) {
       return new BigNumber(0);
     }
-    return depositAmount
+
+    const rawResult = depositAmount
       .multipliedBy(apr)
       .multipliedBy(currentTs - lastUpdateTs)
       .dividedBy(SECONDS_PER_YEAR);
+
+    if (rawResult.isLessThan(exponentiatedBy("1", DELTAFI_TOKEN_DECIMALS))) {
+      return new BigNumber(0);
+    }
+
+    return new BigNumber(rawResult.toFixed(DELTAFI_TOKEN_DECIMALS));
   };
 
   useEffect(() => {
@@ -243,6 +258,7 @@ const Home: React.FC = (props) => {
 
     let hasFarmUser = false;
     for (const farmPoolKey in farmPoolKeyToFarmUser) {
+      const poolConfig = getPoolConfigByFarmKey(farmPoolKey);
       const farmUser = farmPoolKeyToFarmUser[farmPoolKey];
       const farmInfo = farmKeyToFarmInfo[farmPoolKey];
       if (!farmUser || !farmInfo) {
@@ -262,13 +278,14 @@ const Home: React.FC = (props) => {
         farmUser.basePosition.rewardsOwed.toString(),
         DELTAFI_TOKEN_DECIMALS,
       );
-      const unTrackedBaseRewards = getUntrackedReward(
+      const untrackedBaseRewards = getUntrackedReward(
         rewardView.rewardRefreshTs,
         farmUser.basePosition.lastUpdateTs.toNumber(),
         farmUser.basePosition.nextClaimTs.toNumber(),
         baseApr,
-        exponentiatedBy(farmUser.basePosition.depositedAmount.toString(), DELTAFI_TOKEN_DECIMALS),
+        anchorBnToBn(poolConfig.baseTokenInfo, farmUser.basePosition.depositedAmount),
       );
+
       const claimedBaseRewards = exponentiatedBy(
         farmUser.basePosition.cumulativeInterest.toString(),
         DELTAFI_TOKEN_DECIMALS,
@@ -278,22 +295,26 @@ const Home: React.FC = (props) => {
         farmUser.quotePosition.rewardsOwed.toString(),
         DELTAFI_TOKEN_DECIMALS,
       );
-      const unTrackedQuoteRewards = getUntrackedReward(
+      const untrackedQuoteRewards = getUntrackedReward(
         rewardView.rewardRefreshTs,
         farmUser.quotePosition.lastUpdateTs.toNumber(),
         farmUser.quotePosition.nextClaimTs.toNumber(),
         quoteApr,
-        exponentiatedBy(farmUser.quotePosition.depositedAmount.toString(), DELTAFI_TOKEN_DECIMALS),
+        anchorBnToBn(poolConfig.quoteTokenInfo, farmUser.quotePosition.depositedAmount),
       );
+
       const claimedQuoteRewards = exponentiatedBy(
         farmUser.quotePosition.cumulativeInterest.toString(),
         DELTAFI_TOKEN_DECIMALS,
       );
 
+      const untrackedRewards =
+        untrackedBaseRewards.isEqualTo(0) || untrackedQuoteRewards.isEqualTo(0)
+          ? new BigNumber(0)
+          : untrackedBaseRewards.plus(untrackedQuoteRewards);
       const unclaimedFarmRewards = owedBaseRewards
         .plus(owedQuoteRewards)
-        .plus(unTrackedBaseRewards)
-        .plus(unTrackedQuoteRewards)
+        .plus(untrackedRewards)
         .toFixed(DELTAFI_TOKEN_DECIMALS);
       const totalFarmRewards = claimedBaseRewards
         .plus(claimedQuoteRewards)
@@ -345,6 +366,48 @@ const Home: React.FC = (props) => {
       totalRewardFromReferral: "--",
     };
   }, [deltafiUser]);
+
+  useEffect(() => {
+    const totalRewardFromReferralBn =
+      totalRewardFromReferral === "--" ? new BigNumber(0) : new BigNumber(totalRewardFromReferral);
+    const totalRewardFromSwapBn =
+      totalRewardFromSwap === "--" ? new BigNumber(0) : new BigNumber(totalRewardFromSwap);
+    const userTotalFarmRewardsBn =
+      userTotalFarmRewards === "--" ? new BigNumber(0) : new BigNumber(userTotalFarmRewards);
+    dispatch(
+      dashboardViewActions.setTotalDelfiRewards({
+        totalDelfiRewards: totalRewardFromReferralBn
+          .plus(totalRewardFromSwapBn)
+          .plus(userTotalFarmRewardsBn),
+      }),
+    );
+  }, [totalRewardFromSwap, totalRewardFromReferral, userTotalFarmRewards, dispatch]);
+
+  const farmPoolInfoList = useMemo(
+    () =>
+      poolConfigs
+        .map((poolConfig: PoolConfig) =>
+          poolConfig.farmInfoList
+            .filter(({ farmInfo }) => {
+              const farmUser = farmPoolKeyToFarmUser[farmInfo];
+              if (!farmUser) {
+                return false;
+              }
+
+              const hasStakedShares =
+                farmUser.basePosition.depositedAmount.gt(new BN(0)) ||
+                farmUser.quotePosition.depositedAmount.gt(new BN(0));
+
+              const hasUnclaimedRewards =
+                parseFloat(farmPoolToRewards[farmInfo].unclaimedFarmRewards) > 0;
+
+              return hasStakedShares || hasUnclaimedRewards;
+            })
+            .map((farm) => ({ poolConfig, farmInfo: farm.farmInfo })),
+        )
+        .flat(),
+    [farmPoolKeyToFarmUser, farmPoolToRewards],
+  );
 
   const handleSnackBarClose = useCallback(() => {
     dispatch(rewardViewActions.setOpenSnackbar({ openSnackbar: false }));
@@ -458,18 +521,14 @@ const Home: React.FC = (props) => {
     const connection = program.provider.connection;
     dispatch(rewardViewActions.setIsClaimingFarmRewards({ isClaimingFarmRewards: true }));
     try {
-      const farmPoolInfoList = poolConfigs
-        .map((poolConfig: PoolConfig) =>
-          poolConfig.farmInfoList
-            .filter((farm) => !!farmPoolKeyToFarmUser[farm.farmInfo])
-            .map((farm) => ({ poolConfig, farmInfo: farm.farmInfo })),
-        )
-        .flat();
+      const selectedFarmPooInfoList = farmPoolInfoList.filter(
+        ({ farmInfo }) => parseFloat(farmPoolToRewards[farmInfo].unclaimedFarmRewards) > 0,
+      );
 
       const transaction = await createClaimFarmRewardsTransaction(
         program,
         connection,
-        farmPoolInfoList,
+        selectedFarmPooInfoList,
         walletPubkey,
         userDeltafiToken?.publicKey,
       );
@@ -492,7 +551,15 @@ const Home: React.FC = (props) => {
       dispatch(rewardViewActions.setIsClaimingFarmRewards({ isClaimingFarmRewards: false }));
       dispatch(fetchFarmUsersThunk({ connection, walletAddress: walletPubkey }));
     }
-  }, [dispatch, farmPoolKeyToFarmUser, program, signTransaction, userDeltafiToken, walletPubkey]);
+  }, [
+    dispatch,
+    program,
+    signTransaction,
+    userDeltafiToken,
+    walletPubkey,
+    farmPoolInfoList,
+    farmPoolToRewards,
+  ]);
 
   const claimFarmRewardsButton = useMemo(() => {
     return (
@@ -505,11 +572,7 @@ const Home: React.FC = (props) => {
         }
         onClick={() =>
           setMenu(true, "liquidity-reward", null, {
-            farmPoolRewardsInfo: {
-              userUnclaimedFarmRewards,
-              userTotalFarmRewards,
-              farmPoolToRewards,
-            },
+            farmPoolInfoList,
             handleClaimFarmRewards,
           })
         }
@@ -534,7 +597,7 @@ const Home: React.FC = (props) => {
     setMenu,
     userUnclaimedFarmRewards,
     userTotalFarmRewards,
-    farmPoolToRewards,
+    farmPoolInfoList,
     handleClaimFarmRewards,
   ]);
 
