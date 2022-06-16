@@ -27,7 +27,7 @@ import SettingsPanel from "components/SettingsPanel/SettingsPanel";
 import SwapCard from "./components/Card";
 import { useModal } from "providers/modal";
 import { exponentiatedBy } from "utils/decimal";
-import { SOLSCAN_LINK } from "constants/index";
+import { SOLSCAN_LINK, TOKEN_PRICE_DECIMALS } from "constants/index";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
 import { getSwapInResult, getSwapOutResult } from "utils/swap";
@@ -64,52 +64,6 @@ import { DeltafiUser, SwapInfo } from "anchor/type_definitions";
 import Autocomplete from "@material-ui/lab/Autocomplete/Autocomplete";
 import CompareArrows from "components/Svg/icons/CompareArrows";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
-import { formatCurrencyAmount } from "utils/utils";
-
-//const priceMock = [
-//  {
-//    name: "Page A",
-//    uv: 4000,
-//    pv: 2400,
-//    amt: 2400,
-//  },
-//  {
-//    name: "Page B",
-//    uv: 3000,
-//    pv: 1398,
-//    amt: 2210,
-//  },
-//  {
-//    name: "Page C",
-//    uv: 2000,
-//    pv: 9800,
-//    amt: 2290,
-//  },
-//  {
-//    name: "Page D",
-//    uv: 2780,
-//    pv: 3908,
-//    amt: 2000,
-//  },
-//  {
-//    name: "Page E",
-//    uv: 1890,
-//    pv: 4800,
-//    amt: 2181,
-//  },
-//  {
-//    name: "Page F",
-//    uv: 2390,
-//    pv: 3800,
-//    amt: 2500,
-//  },
-//  {
-//    name: "Page G",
-//    uv: 3490,
-//    pv: 4300,
-//    amt: 2100,
-//  },
-//];
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -890,7 +844,9 @@ const Home: React.FC = (props) => {
               <Grid item xs={6} sm={3}>
                 <Box className={classes.currencyCt}>
                   <Box>Price</Box>
-                  <Box sx={{ color: "#fff" }}>{formatCurrencyAmount(basePrice)}</Box>
+                  <Box sx={{ color: "#fff" }}>{`$${
+                    basePrice ? basePrice.toFixed(TOKEN_PRICE_DECIMALS) : "--"
+                  }`}</Box>
                 </Box>
               </Grid>
               <Grid item xs={6} sm={2}></Grid>
@@ -911,7 +867,9 @@ const Home: React.FC = (props) => {
               <Grid item xs={6} sm={3}>
                 <Box className={classes.currencyCt}>
                   <Box>Price</Box>
-                  <Box sx={{ color: "#fff" }}>{formatCurrencyAmount(quotePrice)}</Box>
+                  <Box sx={{ color: "#fff" }}>{`$${
+                    quotePrice ? quotePrice.toFixed(TOKEN_PRICE_DECIMALS) : "--"
+                  }`}</Box>
                 </Box>
               </Grid>
               <Grid item xs={6} sm={2}></Grid>
