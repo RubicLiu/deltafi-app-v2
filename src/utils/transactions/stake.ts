@@ -39,13 +39,14 @@ export async function createUpdateStakeTransaction(
 
   if (!farmUser) {
     transaction.add(
-      program.transaction.createFarmUser(bump, {
+      program.transaction.createFarmUserV2(bump, {
         accounts: {
           marketConfig: new PublicKey(deployConfigV2.marketConfig),
           swapInfo: new PublicKey(poolConfig.swapInfo),
           farmInfo: new PublicKey(farmInfo),
           farmUser: farmUserPubKey,
           owner: walletPubkey,
+          payer: walletPubkey,
           systemProgram: SystemProgram.programId,
           rent: SYSVAR_RENT_PUBKEY,
         },

@@ -24,7 +24,7 @@ export const programSelector = (state: RootState) => state.app.program;
 
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {
-    return getPythMarketPrice(state.accounts.pythAccount.symbolToPythData, poolConfig);
+    return getPythMarketPrice(state.accounts.pythAccount.symbolToPythPriceData, poolConfig);
   };
 }
 

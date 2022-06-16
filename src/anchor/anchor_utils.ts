@@ -215,12 +215,13 @@ export async function getOrCreateLiquidityProvider(program, marketConfig, swapIn
     return lpPublicKey;
   }
 
-  await program.rpc.createLiquidityProvider(lpBump, {
+  await program.rpc.createLiquidityProviderV2(lpBump, {
     accounts: {
       marketConfig,
       swapInfo,
       liquidityProvider: lpPublicKey,
       owner: ownerKeypair.publicKey,
+      payer: ownerKeypair.publicKey,
       systemProgram: web3.SystemProgram.programId,
       rent: web3.SYSVAR_RENT_PUBKEY,
     },
@@ -240,12 +241,13 @@ export async function getOrCreateFarmUser(program, marketConfig, farmInfo, owner
     return farmUserPubKey;
   }
 
-  await program.rpc.createFarmUser(farmUserBump, {
+  await program.rpc.createFarmUserV2(farmUserBump, {
     accounts: {
       marketConfig,
       farmInfo,
       farmUser: farmUserPubKey,
       owner: ownerKeypair.publicKey,
+      payer: ownerKeypair.publicKey,
       systemProgram: web3.SystemProgram.programId,
       rent: web3.SYSVAR_RENT_PUBKEY,
     },
