@@ -41,7 +41,6 @@ import BigNumber from "bignumber.js";
 import { exponentiatedBy } from "utils/decimal";
 import {
   deployConfigV2,
-  deployMode,
   getPoolConfigByFarmKey,
   PoolConfig,
   poolConfigs,
@@ -840,17 +839,15 @@ const Home: React.FC = (props) => {
           userTotalFarmRewards !== "--") ? (
           <Box>
             <Box mt={2} mb={3} display="flex" gap={1.25} justifyContent="center" flexWrap="wrap">
-              {deployMode === "mainnet-prod" || (
-                <Box className={classes.rewardBox} border="1px solid #03F2A0">
-                  <Box color="#03F2A0">LIQUIDITY MINING</Box>
-                  <Box>Unclaimed / Total</Box>
-                  <Box lineHeight="24px" display="flex" fontSize={20}>
-                    <Box color="#03F2A0">{userUnclaimedFarmRewards}&nbsp;</Box>
-                    <Box>/ {userTotalFarmRewards} DELFI</Box>{" "}
-                  </Box>
-                  <Box color="#03F2A0">{claimFarmRewardsButton}</Box>
+              <Box className={classes.rewardBox} border="1px solid #03F2A0">
+                <Box color="#03F2A0">LIQUIDITY MINING</Box>
+                <Box>Unclaimed / Total</Box>
+                <Box lineHeight="24px" display="flex" fontSize={20}>
+                  <Box color="#03F2A0">{userUnclaimedFarmRewards}&nbsp;</Box>
+                  <Box>/ {userTotalFarmRewards} DELFI</Box>{" "}
                 </Box>
-              )}
+                <Box color="#03F2A0">{claimFarmRewardsButton}</Box>
+              </Box>
               <Box className={classes.rewardBox} border="1px solid #D4FF00">
                 <Box color="#D4FF00">TRADE FARMING</Box>
                 <Box>Unclaimed / Total</Box>
