@@ -207,7 +207,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
       // reward from quote per year if we have all the quote share supply
       const quoteRewardRateAllShare = anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteSupply)
-        .multipliedBy(farmInfo.farmConfig.quoteAprDenominator.toString())
+        .multipliedBy(farmInfo.farmConfig.quoteAprNumerator.toString())
         .dividedBy(farmInfo.farmConfig.quoteAprDenominator.toString())
         .multipliedBy(deltafiPrice.last);
 
