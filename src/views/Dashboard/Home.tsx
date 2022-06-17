@@ -177,11 +177,14 @@ const Home: React.FC = (props) => {
   const mintToTokenAccountInfo = useSelector(tokenAccountSelector).mintToTokenAccountInfo;
   const swapKeyToLpUser = useSelector(lpUserSelector).swapKeyToLp;
 
-  let poolConfigsWithDeposit = poolConfigs.filter((poolConfig) =>
-    hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
+  let poolConfigsWithDeposit = useMemo(
+    () =>
+      poolConfigs.filter((poolConfig) =>
+        hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
+      ),
+    [poolConfigs, mintToTokenAccountInfo, swapKeyToLpUser],
   );
 
-  poolConfigsWithDeposit = poolConfigs;
   const deltafiPrice = useSelector(selectGateIoSticker("DELFI_USDT"));
 
   const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
