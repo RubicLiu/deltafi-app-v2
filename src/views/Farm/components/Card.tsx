@@ -257,7 +257,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
           </Box>
         )}
         <Box>
-          <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total staked</Box>
+          <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total Staked</Box>
           <Box className={classes.label}>{convertDollar(stakedTvl.toFixed(2))}</Box>
         </Box>
         <Box marginTop={1.25}>
