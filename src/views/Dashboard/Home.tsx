@@ -177,7 +177,7 @@ const Home: React.FC = (props) => {
   const mintToTokenAccountInfo = useSelector(tokenAccountSelector).mintToTokenAccountInfo;
   const swapKeyToLpUser = useSelector(lpUserSelector).swapKeyToLp;
 
-  let poolConfigsWithDeposit = useMemo(
+  const poolConfigsWithDeposit = useMemo(
     () =>
       poolConfigs.filter((poolConfig) =>
         hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
