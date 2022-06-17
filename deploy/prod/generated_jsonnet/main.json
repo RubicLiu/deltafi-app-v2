@@ -27,14 +27,14 @@
                         "env": [
                            {
                               "name": "DOCKER_IMAGE_TAG",
-                              "value": "prod-3e9f4b0-20220617-105709"
+                              "value": "prod-b9f1aaf-20220617-111841"
                            },
                            {
                               "name": "DEPLOYMENT_MODE",
                               "value": "mainnet-prod"
                            }
                         ],
-                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/frontend:prod-3e9f4b0-20220617-105709",
+                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/frontend:prod-b9f1aaf-20220617-111841",
                         "name": "main",
                         "ports": [
                            {
@@ -104,14 +104,14 @@
                         "env": [
                            {
                               "name": "DOCKER_IMAGE_TAG",
-                              "value": "prod-3e9f4b0-20220617-105709"
+                              "value": "prod-b9f1aaf-20220617-111841"
                            },
                            {
                               "name": "DEPLOYMENT_MODE",
                               "value": "mainnet-prod"
                            }
                         ],
-                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/backend:prod-3e9f4b0-20220617-105709",
+                        "image": "077918681028.dkr.ecr.us-west-2.amazonaws.com/deltafi-app-v2/backend:prod-b9f1aaf-20220617-111841",
                         "name": "main",
                         "ports": [
                            {
