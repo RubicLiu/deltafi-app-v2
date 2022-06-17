@@ -8,7 +8,7 @@ import ShareIcon from "components/Svg/icons/ShareIcon";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Divider, Tab } from "@mui/material";
 import { useSelector } from "react-redux";
-import { farmSelector } from "states";
+import { farmSelector, selectGateIoSticker } from "states";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -164,17 +164,15 @@ const Home: React.FC = (props): ReactElement => {
   const classes = useStyles(props);
   const [tab, setTab] = useState("active");
 
+  const deltafiPrice = useSelector(selectGateIoSticker("DELFI_USDT"));
   const farmKeyToFarmInfo = useSelector(farmSelector);
 
   return (
     <Page>
       <Box className={classes.container}>
         <Box color="#fff" textAlign="center" className={classes.header}>
-          <Box marginTop={1} fontSize={16}>
-            DeltaFi Liquidity Mining
-          </Box>
           <Box fontSize={58} color="#D4FF00" fontWeight={600}>
-            Coming Soon
+            {`$${deltafiPrice?.last || "--"}`}
           </Box>
           <Box marginTop={1.5} fontSize={18}>
             Last DELFI Price
