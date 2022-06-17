@@ -239,7 +239,6 @@ const Home: React.FC = (props) => {
   }, [symbolToPythPriceData, swapKeyToSwapInfo, swapKeyToLpUser, isConnectedWallet]);
 
   const { totalRewards, isLoadingTotalRewards } = useMemo(() => {
-    // TODO(leqiang): Add farm rewards
     if (!isConnectedWallet) {
       return { totalRewards: null, isLoadingTotalRewards: false };
     }
