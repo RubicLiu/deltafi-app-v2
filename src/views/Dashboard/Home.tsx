@@ -182,7 +182,7 @@ const Home: React.FC = (props) => {
       poolConfigs.filter((poolConfig) =>
         hasDeposit(mintToTokenAccountInfo, swapKeyToLpUser, poolConfig),
       ),
-    [poolConfigs, mintToTokenAccountInfo, swapKeyToLpUser],
+    [mintToTokenAccountInfo, swapKeyToLpUser],
   );
 
   const deltafiPrice = useSelector(selectGateIoSticker("DELFI_USDT"));
