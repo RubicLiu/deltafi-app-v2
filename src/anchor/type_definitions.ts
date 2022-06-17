@@ -16,6 +16,8 @@ export interface PoolState {
   marketPriceLastUpdateSlot: anchor.BN;
   lowPrice: anchor.BN;
   highPrice: anchor.BN;
+  virtualBaseReserve: anchor.BN;
+  virtualQuoteReserve: anchor.BN;
   reservedU64: Array<any>;
 }
 
@@ -66,18 +68,23 @@ export interface SwapConfig {
   slope: anchor.BN;
   disableStablePriceDiffCheck: boolean;
   disableQuoteTokenPriceCheck: boolean;
+  rebateNumerator: number;
+  rebateDenominator: number;
+  maxVirtualReserveRatio: number;
   reservedU8: Array<any>;
   reservedU64: Array<any>;
 }
 
 export type SwapDirection =
-  | { sellBase?: any; sellQuote?: never }
-  | { sellBase?: never; sellQuote?: any };
+| { sellBase? : any, sellQuote?: never }
+| { sellBase?: never, sellQuote? : any }
+
 
 export type SwapType =
-  | { normalSwap?: any; stableSwap?: never; serumSwap?: never }
-  | { normalSwap?: never; stableSwap?: any; serumSwap?: never }
-  | { normalSwap?: never; stableSwap?: never; serumSwap?: any };
+| { normalSwap? : any, stableSwap?: never, serumSwap?: never }
+| { normalSwap?: never, stableSwap? : any, serumSwap?: never }
+| { normalSwap?: never, stableSwap?: never, serumSwap? : any }
+
 
 export interface DeltafiUser {
   bump: number;
