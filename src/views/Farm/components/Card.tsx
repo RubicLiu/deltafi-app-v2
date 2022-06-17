@@ -140,15 +140,15 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
   const baseTvl = useMemo(() => {
-    if (basePrice && swapInfo) {
-      return getTokenTvl(baseTokenInfo, swapInfo.poolState.baseReserve, basePrice);
+    if (basePrice && swapInfo?.poolState) {
+      return getTokenTvl(baseTokenInfo, swapInfo?.poolState.baseReserve, basePrice);
     }
     return new BigNumber(0);
   }, [basePrice, swapInfo, baseTokenInfo]);
 
   const quoteTvl = useMemo(() => {
     if (quotePrice && swapInfo) {
-      return getTokenTvl(quoteTokenInfo, swapInfo.poolState.quoteReserve, quotePrice);
+      return getTokenTvl(quoteTokenInfo, swapInfo?.poolState.quoteReserve, quotePrice);
     }
     return new BigNumber(0);
   }, [quotePrice, swapInfo, quoteTokenInfo]);
@@ -157,7 +157,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   // const tvl = baseTvl.plus(quoteTvl);
 
   const stakedTvl = useMemo(() => {
-    if (swapInfo && farmInfo) {
+    if (swapInfo?.poolState && farmInfo) {
       const userBaseTvl = getUserTokenTvl(
         baseTvl,
         farmInfo.stakedBaseShare,
@@ -174,7 +174,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
   }, [swapInfo, farmInfo, baseTvl, quoteTvl]);
 
   const userStakedTvl = useMemo(() => {
-    if (swapInfo && farmUser) {
+    if (swapInfo?.poolState && farmUser) {
       const userBaseTvl = getUserTokenTvl(
         baseTvl,
         farmUser.basePosition.depositedAmount,
@@ -192,6 +192,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
   const apr = useMemo(() => {
     if (
+      swapInfo?.poolState &&
       farmInfo &&
       quotePrice &&
       basePrice &&
@@ -207,7 +208,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
 
       // reward from quote per year if we have all the quote share supply
       const quoteRewardRateAllShare = anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteSupply)
-        .multipliedBy(farmInfo.farmConfig.quoteAprDenominator.toString())
+        .multipliedBy(farmInfo.farmConfig.quoteAprNumerator.toString())
         .dividedBy(farmInfo.farmConfig.quoteAprDenominator.toString())
         .multipliedBy(deltafiPrice.last);
 
@@ -225,7 +226,7 @@ const PoolCard: React.FC<CardProps> = (props) => {
     quotePrice,
     baseTokenInfo,
     quoteTokenInfo,
-    swapInfo.poolState,
+    swapInfo?.poolState,
     deltafiPrice,
     baseTvl,
     quoteTvl,
