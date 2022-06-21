@@ -225,6 +225,7 @@ const Home: React.FC = (props): ReactElement => {
     return result;
   }, [fullFarmPoolsData]);
 
+  // map a list of farm info data to a set of FarmCard react components
   const farmInfoDataListToFarmCards = useCallback(
     (farmInfoDataList: FarmInfoData[]) => (
       <Grid container className={classes.poolCardContainer} justifyContent="center">
@@ -253,7 +254,7 @@ const Home: React.FC = (props): ReactElement => {
         )}
       </Grid>
     ),
-    [],
+    [classes],
   );
 
   return (
