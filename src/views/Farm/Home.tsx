@@ -242,7 +242,6 @@ const Home: React.FC = (props): ReactElement => {
                     ? "indigo"
                     : "dodgerBlue"
                 }
-                key={farmInfoAddress}
                 poolConfig={poolConfig}
                 farmInfoAddress={farmInfoAddress}
                 totalStaked={totalStaked}
