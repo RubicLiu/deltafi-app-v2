@@ -39,7 +39,7 @@ export function getTokenTvl(tokenConfig: TokenConfig, amount: BN, price: BigNumb
   return anchorBnToBn(tokenConfig, amount).multipliedBy(price);
 }
 
-export function getStakedTokenTvl(tvl: BigNumber, share: BN, supply: BN) {
+export function getTokenShareTvl(tvl: BigNumber, share: BN, supply: BN) {
   if (share.isZero()) {
     return new BigNumber(0);
   }

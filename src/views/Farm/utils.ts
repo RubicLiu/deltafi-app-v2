@@ -5,7 +5,7 @@ import { FarmPoolKeyToFarm } from "states/accounts/farmAccount";
 import { FarmPoolKeyToFarmUser } from "states/accounts/farmUserAccount";
 import { SwapPoolKeyToSwap } from "states/accounts/swapAccount";
 import { anchorBnToBn } from "utils/tokenUtils";
-import { getStakedTokenTvl, getTokenTvl } from "utils/utils";
+import { getTokenShareTvl, getTokenTvl } from "utils/utils";
 
 export type FarmInfoData = {
   farmInfoAddress: string;
@@ -53,12 +53,12 @@ export function calculateFarmPoolsData(
         );
 
         // calculate total staked amount
-        const baseStakedTvl = getStakedTokenTvl(
+        const baseStakedTvl = getTokenShareTvl(
           baseTvl,
           farmInfo?.stakedBaseShare,
           swapInfo.poolState?.baseSupply,
         );
-        const quoteStakedTvl = getStakedTokenTvl(
+        const quoteStakedTvl = getTokenShareTvl(
           quoteTvl,
           farmInfo?.stakedQuoteShare,
           swapInfo.poolState?.quoteSupply,
@@ -73,12 +73,12 @@ export function calculateFarmPoolsData(
                 userQuoteStakedTvl: new BigNumber(0),
               }
             : {
-                userBaseStakedTvl: getStakedTokenTvl(
+                userBaseStakedTvl: getTokenShareTvl(
                   baseTvl,
                   farmUser.basePosition?.depositedAmount,
                   swapInfo.poolState?.baseSupply,
                 ),
-                userQuoteStakedTvl: getStakedTokenTvl(
+                userQuoteStakedTvl: getTokenShareTvl(
                   quoteTvl,
                   farmUser.quotePosition?.depositedAmount,
                   swapInfo.poolState?.quoteSupply,
