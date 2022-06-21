@@ -10,7 +10,7 @@ export const pythSelector = (state: RootState) => state.accounts.pythAccount;
 export const tokenAccountSelector = (state: RootState) => state.accounts.tokenAccount;
 export const deltafiUserSelector = (state: RootState) => state.accounts.deltafiUserAccount;
 export const farmUserSelector = (state: RootState) => state.accounts.farmUserAccount;
-export const farmSelector = (state: RootState) => state.accounts.farmAccount.farmKeyToFarmInfo;
+export const farmSelector = (state: RootState) => state.accounts.farmAccount;
 
 export const depositViewSelector = (state: RootState) => state.views.depositView;
 export const dashboardViewSelector = (state: RootState) => state.views.dashboardView;
@@ -21,6 +21,12 @@ export const stakeViewSelector = (state: RootState) => state.views.stakeView;
 
 export const gateIoSelector = (state: RootState) => state.gateIo;
 export const programSelector = (state: RootState) => state.app.program;
+
+export function dummySelector(val: number) {
+  return (state: RootState) => {
+    console.log("abc");
+  };
+}
 
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {

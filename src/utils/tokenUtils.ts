@@ -12,7 +12,7 @@ export function bnToAnchorBn(tokenConfig: TokenConfig, amount: BigNumber): BN {
 }
 
 export function anchorBnToBn(tokenConfig: TokenConfig, amount: BN): BigNumber {
-  return exponentiatedBy(new BigNumber(amount.toString()), tokenConfig.decimals);
+  return exponentiatedBy(new BigNumber(amount?.toString()), tokenConfig.decimals);
 }
 
 export function anchorBnToString(tokenConfig: TokenConfig, amount: BN): string {
