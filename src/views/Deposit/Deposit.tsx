@@ -36,11 +36,9 @@ import {
   programSelector,
 } from "states/selectors";
 import { depositViewActions } from "states/views/depositView";
-import { Transaction } from "@solana/web3.js";
 import { partialSignTransaction, sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
-import { createWithdrawTransaction } from "utils/transactions/deposit";
 import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/tokenUtils";
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { Paper } from "@material-ui/core";
@@ -637,8 +635,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   ]);
 
   const handleWithdraw = useCallback(async () => {
-    let transaction: Transaction;
-
     if (!swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount || !program) {
       return null;
     }
@@ -655,21 +651,29 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       const baseShare = new BN(base.share);
       const quoteShare = new BN(quote.share);
 
-      transaction = await createWithdrawTransaction(
-        program,
-        connection,
+      const { transaction, signers } = await transactionUtils.createWithdrawTransaction(
         poolConfig,
+        program,
         swapInfo,
         baseTokenAccount.publicKey,
         quoteTokenAccount.publicKey,
         walletPubkey,
         baseShare,
         quoteShare,
+        new BN(0),
+        new BN(0),
       );
 
-      transaction = await signTransaction(transaction);
+      const signedTransaction = await signTransaction(
+        await partialSignTransaction({
+          transaction,
+          feePayer: walletPubkey,
+          signers,
+          connection,
+        }),
+      );
       const hash = await sendSignedTransaction({
-        signedTransaction: transaction,
+        signedTransaction,
         connection,
       });
 
