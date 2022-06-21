@@ -22,12 +22,6 @@ export const stakeViewSelector = (state: RootState) => state.views.stakeView;
 export const gateIoSelector = (state: RootState) => state.gateIo;
 export const programSelector = (state: RootState) => state.app.program;
 
-export function dummySelector(val: number) {
-  return (state: RootState) => {
-    console.log("abc");
-  };
-}
-
 export function selectMarketPriceByPool(poolConfig: PoolConfig) {
   return (state: RootState) => {
     return getPythMarketPrice(state.accounts.pythAccount.symbolToPythPriceData, poolConfig);
