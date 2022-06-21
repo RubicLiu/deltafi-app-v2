@@ -201,7 +201,7 @@ const Home: React.FC = (props) => {
   const deltafiUser = useSelector(deltafiUserSelector);
 
   const farmPoolKeyToFarmUser = useSelector(farmUserSelector).farmPoolKeyToFarmUser;
-  const farmKeyToFarmInfo = useSelector(farmSelector);
+  const farmKeyToFarmInfo = useSelector(farmSelector).farmKeyToFarmInfo;
 
   const userDeltafiToken = useSelector(selectTokenAccountInfoByMint(deployConfigV2.deltafiMint));
   const referralLinkState = rewardView.referralLinkState;

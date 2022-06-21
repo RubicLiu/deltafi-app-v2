@@ -10,7 +10,7 @@ export const pythSelector = (state: RootState) => state.accounts.pythAccount;
 export const tokenAccountSelector = (state: RootState) => state.accounts.tokenAccount;
 export const deltafiUserSelector = (state: RootState) => state.accounts.deltafiUserAccount;
 export const farmUserSelector = (state: RootState) => state.accounts.farmUserAccount;
-export const farmSelector = (state: RootState) => state.accounts.farmAccount.farmKeyToFarmInfo;
+export const farmSelector = (state: RootState) => state.accounts.farmAccount;
 
 export const depositViewSelector = (state: RootState) => state.views.depositView;
 export const dashboardViewSelector = (state: RootState) => state.views.dashboardView;

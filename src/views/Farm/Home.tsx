@@ -1,14 +1,22 @@
-import React, { ChangeEvent, ReactElement, useState } from "react";
-import { Box, Grid, Link, makeStyles, Theme } from "@material-ui/core";
+import React, { ChangeEvent, ReactElement, useCallback, useMemo, useState } from "react";
+import { Box, Grid, makeStyles, Theme } from "@material-ui/core";
 
 import Page from "components/layout/Page";
-import Card from "./components/Card";
-import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
-import ShareIcon from "components/Svg/icons/ShareIcon";
+import FarmCard from "./components/Card";
+import { poolConfigs } from "constants/deployConfigV2";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Divider, Tab } from "@mui/material";
 import { useSelector } from "react-redux";
-import { farmSelector, selectGateIoSticker } from "states";
+import {
+  farmSelector,
+  farmUserSelector,
+  poolSelector,
+  pythSelector,
+  selectGateIoSticker,
+} from "states";
+import { calculateFarmPoolsStakeInfo, FarmInfoData } from "./utils";
+import BigNumber from "bignumber.js";
+import { PoolCardColor } from "utils/type";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -165,28 +173,97 @@ const Home: React.FC = (props): ReactElement => {
   const [tab, setTab] = useState("active");
 
   const deltafiPrice = useSelector(selectGateIoSticker("DELFI_USDT"));
-  const farmKeyToFarmInfo = useSelector(farmSelector);
+  const farmKeyToFarmInfo = useSelector(farmSelector).farmKeyToFarmInfo;
+
+  const symbolToPythPriceData = useSelector(pythSelector).symbolToPythPriceData;
+  const farmPoolKeyToFarmUser = useSelector(farmUserSelector).farmPoolKeyToFarmUser;
+  const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
+
+  // parse all farm pools' data using the util function
+  const fullFarmPoolsStakeInfo = useMemo(
+    () =>
+      calculateFarmPoolsStakeInfo(
+        poolConfigs,
+        swapKeyToSwapInfo,
+        farmKeyToFarmInfo,
+        farmPoolKeyToFarmUser,
+        symbolToPythPriceData,
+        deltafiPrice,
+      ),
+    [
+      symbolToPythPriceData,
+      farmPoolKeyToFarmUser,
+      swapKeyToSwapInfo,
+      farmKeyToFarmInfo,
+      deltafiPrice,
+    ],
+  );
+
+  // filter out active and inactive farms
+  const { activeFarms, inactiveFarms } = useMemo(() => {
+    const activeFarms: FarmInfoData[] = [];
+    const inactiveFarms: FarmInfoData[] = [];
+
+    fullFarmPoolsStakeInfo.forEach((farmInfoData) => {
+      const farmConfig = farmKeyToFarmInfo[farmInfoData.farmInfoAddress]?.farmConfig;
+      if (farmConfig && !farmConfig.isPaused) {
+        activeFarms.push(farmInfoData);
+      } else {
+        inactiveFarms.push(farmInfoData);
+      }
+    });
+    return { activeFarms, inactiveFarms };
+  }, [fullFarmPoolsStakeInfo, farmKeyToFarmInfo]);
+
+  const totalStaked = useMemo(() => {
+    let result = new BigNumber(0);
+    // sum up total staked value of each pool
+    // if any of the pool has a nan value which means the data is not available
+    // the final result will be nan
+    fullFarmPoolsStakeInfo.forEach((farmPoolsData) => {
+      result = result.plus(farmPoolsData.totalStaked);
+    });
+    return result;
+  }, [fullFarmPoolsStakeInfo]);
+
+  // colors for the farmcards
+  const farmCardColors: PoolCardColor[] = useMemo(
+    () => ["greenYellow", "lime", "indigo", "dodgerBlue"],
+    [],
+  );
+
+  // map a list of farm info data to a set of FarmCard react components
+  const farmInfoDataListToFarmCards = useCallback(
+    (farmInfoDataList: FarmInfoData[]) => (
+      <Grid container className={classes.poolCardContainer} justifyContent="center">
+        {farmInfoDataList.map(
+          ({ farmInfoAddress, totalStaked, userStaked, apr, poolConfig }, idx) => (
+            <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+              <FarmCard
+                color={farmCardColors[idx % 4]}
+                poolConfig={poolConfig}
+                farmInfoAddress={farmInfoAddress}
+                totalStaked={totalStaked}
+                userStaked={userStaked}
+                apr={apr}
+              />
+            </Grid>
+          ),
+        )}
+      </Grid>
+    ),
+    [classes, farmCardColors],
+  );
 
   return (
     <Page>
       <Box className={classes.container}>
         <Box color="#fff" textAlign="center" className={classes.header}>
           <Box fontSize={58} color="#D4FF00" fontWeight={600}>
-            {`$${deltafiPrice?.last || "--"}`}
+            {`$${totalStaked?.toFixed(2) || "--"}`}
           </Box>
           <Box marginTop={1.5} fontSize={18}>
-            Last DELFI Price
-          </Box>
-          <Box display="flex" alignItems="end" mt={1}>
-            <Link
-              onClick={() => window.open("https://www.gate.io/trade/DELFI_USDT")}
-              underline="always"
-            >
-              Read more about DELFI
-            </Link>
-            <Box ml={0.5} height={16} width={16}>
-              <ShareIcon />
-            </Box>
+            Total Staked
           </Box>
         </Box>
         <Box className={classes.tabContext}>
@@ -237,60 +314,10 @@ const Home: React.FC = (props): ReactElement => {
               }}
             />
             <TabPanel value="active" className={classes.tabPanel}>
-              {poolConfigs.length && (
-                <Grid container className={classes.poolCardContainer} justifyContent="center">
-                  {poolConfigs.map((poolConfig: PoolConfig, idx) =>
-                    poolConfig?.farmInfoList
-                      .filter((farm) => !farmKeyToFarmInfo[farm.farmInfo]?.farmConfig?.isPaused)
-                      .map((farm) => (
-                        <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
-                          <Card
-                            color={
-                              idx % 4 === 0
-                                ? "greenYellow"
-                                : idx % 4 === 1
-                                ? "lime"
-                                : idx % 4 === 2
-                                ? "indigo"
-                                : "dodgerBlue"
-                            }
-                            key={farm.farmInfo}
-                            poolConfig={poolConfig}
-                            farmInfoAddress={farm.farmInfo}
-                          />
-                        </Grid>
-                      )),
-                  )}
-                </Grid>
-              )}
+              {farmInfoDataListToFarmCards(activeFarms)}
             </TabPanel>
             <TabPanel value="inactive" className={classes.tabPanel}>
-              {poolConfigs.length && (
-                <Grid container className={classes.poolCardContainer} justifyContent="center">
-                  {poolConfigs.map((poolConfig: PoolConfig, idx) =>
-                    poolConfig?.farmInfoList
-                      .filter((farm) => farmKeyToFarmInfo[farm.farmInfo]?.farmConfig?.isPaused)
-                      .map((farm) => (
-                        <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
-                          <Card
-                            color={
-                              idx % 4 === 0
-                                ? "greenYellow"
-                                : idx % 4 === 1
-                                ? "lime"
-                                : idx % 4 === 2
-                                ? "indigo"
-                                : "dodgerBlue"
-                            }
-                            key={farm.farmInfo}
-                            poolConfig={poolConfig}
-                            farmInfoAddress={farm.farmInfo}
-                          />
-                        </Grid>
-                      )),
-                  )}
-                </Grid>
-              )}
+              {farmInfoDataListToFarmCards(inactiveFarms)}
             </TabPanel>
           </TabContext>
         </Box>

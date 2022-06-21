@@ -4,7 +4,7 @@ import { deployConfigV2 } from "constants/deployConfigV2";
 import { getDeltafiDexV2, makeProvider } from "anchor/anchor_utils";
 import { FarmInfo } from "anchor/type_definitions";
 
-type FarmPoolKeyToFarm = Record<string, FarmInfo>;
+export type FarmPoolKeyToFarm = Record<string, FarmInfo>;
 
 export interface FarmState {
   farmKeyToFarmInfo: FarmPoolKeyToFarm;

@@ -29,6 +29,7 @@ import {
   selectGateIoSticker,
   dashboardViewSelector,
   farmUserSelector,
+  farmSelector,
 } from "states/selectors";
 import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
@@ -37,6 +38,8 @@ import { calculateWithdrawalFromShares } from "lib/calc";
 import { formatCurrencyAmount } from "utils/utils";
 import { CircularProgress } from "@material-ui/core";
 import { dashboardViewActions } from "states/views/dashboardView";
+import { calculateFarmPoolsStakeInfo } from "views/Farm/utils";
+import { PoolCardColor } from "utils/type";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
@@ -192,6 +195,28 @@ const Home: React.FC = (props) => {
   const deltafiUser = useSelector(deltafiUserSelector);
   const dashboardView = useSelector(dashboardViewSelector);
   const isFarmUserFetched = useSelector(farmUserSelector).fetched;
+  const farmPoolKeyToFarmUser = useSelector(farmUserSelector).farmPoolKeyToFarmUser;
+  const farmKeyToFarmInfo = useSelector(farmSelector).farmKeyToFarmInfo;
+
+  const userFarmPoolsData = useMemo(
+    () =>
+      calculateFarmPoolsStakeInfo(
+        poolConfigsWithDeposit,
+        swapKeyToSwapInfo,
+        farmKeyToFarmInfo,
+        farmPoolKeyToFarmUser,
+        symbolToPythPriceData,
+        deltafiPrice,
+      ),
+    [
+      symbolToPythPriceData,
+      farmPoolKeyToFarmUser,
+      swapKeyToSwapInfo,
+      deltafiPrice,
+      farmKeyToFarmInfo,
+      poolConfigsWithDeposit,
+    ],
+  );
 
   const { totalHoldings, isLoadingTotalHoldings } = useMemo(() => {
     if (!isConnectedWallet) {
@@ -283,6 +308,12 @@ const Home: React.FC = (props) => {
     // { label: "24hr Performance", color: "#693eff", value: "$212(9%)" },
   ];
 
+  // colors for the farmcards
+  const cardColors: PoolCardColor[] = useMemo(
+    () => ["greenYellow", "lime", "indigo", "dodgerBlue"],
+    [],
+  );
+
   return (
     <Page>
       <Box padding={0} className={classes.container}>
@@ -344,15 +375,7 @@ const Home: React.FC = (props) => {
                         <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
                           <PoolCard
                             isUserPool={true}
-                            color={
-                              idx % 4 === 0
-                                ? "greenYellow"
-                                : idx % 4 === 1
-                                ? "lime"
-                                : idx % 4 === 2
-                                ? "indigo"
-                                : "dodgerBlue"
-                            }
+                            color={cardColors[idx % 4]}
                             key={poolConfig.swapInfo}
                             poolConfig={poolConfig}
                           />
@@ -365,28 +388,22 @@ const Home: React.FC = (props) => {
             <TabPanel value="farm" className={classes.tabPanel}>
               {isConnectedWallet && (
                 <Grid container className={classes.poolCardContainer} justifyContent="center">
-                  {poolConfigsWithDeposit.length > 0 &&
-                    poolConfigsWithDeposit.map((poolConfig: PoolConfig, idx) =>
-                      poolConfig?.farmInfoList.map((farm) => (
-                        <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
-                          <FarmCard
-                            color={
-                              idx % 4 === 0
-                                ? "greenYellow"
-                                : idx % 4 === 1
-                                ? "lime"
-                                : idx % 4 === 2
-                                ? "indigo"
-                                : "dodgerBlue"
-                            }
-                            key={farm.farmInfo}
-                            poolConfig={poolConfig}
-                            farmInfoAddress={farm.farmInfo}
-                            isUserPool
-                          />
-                        </Grid>
-                      )),
-                    )}
+                  {userFarmPoolsData.map(
+                    ({ farmInfoAddress, totalStaked, userStaked, apr, poolConfig }, idx) => (
+                      <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+                        <FarmCard
+                          color={cardColors[idx % 4]}
+                          key={farmInfoAddress}
+                          poolConfig={poolConfig}
+                          farmInfoAddress={farmInfoAddress}
+                          totalStaked={totalStaked}
+                          userStaked={userStaked}
+                          apr={apr}
+                          isUserPool
+                        />
+                      </Grid>
+                    ),
+                  )}
                 </Grid>
               )}
             </TabPanel>
