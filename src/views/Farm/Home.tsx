@@ -16,7 +16,7 @@ import {
 } from "states";
 import { calculateFarmPoolsStakeInfo, FarmInfoData } from "./utils";
 import BigNumber from "bignumber.js";
-import { FarmCardColor } from "./components/types";
+import { PoolCardColor } from "utils/type";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -227,7 +227,7 @@ const Home: React.FC = (props): ReactElement => {
   }, [fullFarmPoolsStakeInfo]);
 
   // colors for the farmcards
-  const farmCardColors: FarmCardColor[] = useMemo(
+  const farmCardColors: PoolCardColor[] = useMemo(
     () => ["greenYellow", "lime", "indigo", "dodgerBlue"],
     [],
   );
