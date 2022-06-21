@@ -39,6 +39,7 @@ import { formatCurrencyAmount } from "utils/utils";
 import { CircularProgress } from "@material-ui/core";
 import { dashboardViewActions } from "states/views/dashboardView";
 import { calculateFarmPoolsStakeInfo } from "views/Farm/utils";
+import { FarmCardColor } from "views/Farm/components/types";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
@@ -307,6 +308,12 @@ const Home: React.FC = (props) => {
     // { label: "24hr Performance", color: "#693eff", value: "$212(9%)" },
   ];
 
+  // colors for the farmcards
+  const farmCardColors: FarmCardColor[] = useMemo(
+    () => ["greenYellow", "lime", "indigo", "dodgerBlue"],
+    [],
+  );
+
   return (
     <Page>
       <Box padding={0} className={classes.container}>
@@ -368,15 +375,7 @@ const Home: React.FC = (props) => {
                         <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
                           <PoolCard
                             isUserPool={true}
-                            color={
-                              idx % 4 === 0
-                                ? "greenYellow"
-                                : idx % 4 === 1
-                                ? "lime"
-                                : idx % 4 === 2
-                                ? "indigo"
-                                : "dodgerBlue"
-                            }
+                            color={farmCardColors[idx % 4]}
                             key={poolConfig.swapInfo}
                             poolConfig={poolConfig}
                           />
