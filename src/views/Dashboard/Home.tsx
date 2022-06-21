@@ -38,7 +38,7 @@ import { calculateWithdrawalFromShares } from "lib/calc";
 import { formatCurrencyAmount } from "utils/utils";
 import { CircularProgress } from "@material-ui/core";
 import { dashboardViewActions } from "states/views/dashboardView";
-import { calculateFarmPoolsData } from "views/Farm/utils";
+import { calculateFarmPoolsStakeInfo } from "views/Farm/utils";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
@@ -199,7 +199,7 @@ const Home: React.FC = (props) => {
 
   const userFarmPoolsData = useMemo(
     () =>
-      calculateFarmPoolsData(
+      calculateFarmPoolsStakeInfo(
         poolConfigsWithDeposit,
         swapKeyToSwapInfo,
         farmKeyToFarmInfo,

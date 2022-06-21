@@ -15,7 +15,7 @@ export type FarmInfoData = {
   poolConfig: PoolConfig;
 };
 
-export function calculateFarmPoolsData(
+export function calculateFarmPoolsStakeInfo(
   poolConfigs: PoolConfig[],
   swapKeyToSwapInfo: SwapPoolKeyToSwap,
   farmKeyToFarmInfo: FarmPoolKeyToFarm,

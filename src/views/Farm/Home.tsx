@@ -14,7 +14,7 @@ import {
   pythSelector,
   selectGateIoSticker,
 } from "states";
-import { calculateFarmPoolsData, FarmInfoData } from "./utils";
+import { calculateFarmPoolsStakeInfo, FarmInfoData } from "./utils";
 import BigNumber from "bignumber.js";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
@@ -179,9 +179,9 @@ const Home: React.FC = (props): ReactElement => {
   const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
 
   // parse all farm pools' data using the util function
-  const fullFarmPoolsData = useMemo(
+  const fullFarmPoolsStakeInfo = useMemo(
     () =>
-      calculateFarmPoolsData(
+      calculateFarmPoolsStakeInfo(
         poolConfigs,
         swapKeyToSwapInfo,
         farmKeyToFarmInfo,
@@ -203,7 +203,7 @@ const Home: React.FC = (props): ReactElement => {
     const activeFarms: FarmInfoData[] = [];
     const inactiveFarms: FarmInfoData[] = [];
 
-    fullFarmPoolsData.forEach((farmInfoData) => {
+    fullFarmPoolsStakeInfo.forEach((farmInfoData) => {
       const farmConfig = farmKeyToFarmInfo[farmInfoData.farmInfoAddress]?.farmConfig;
       if (farmConfig && !farmConfig.isPaused) {
         activeFarms.push(farmInfoData);
@@ -212,18 +212,18 @@ const Home: React.FC = (props): ReactElement => {
       }
     });
     return { activeFarms, inactiveFarms };
-  }, [fullFarmPoolsData, farmKeyToFarmInfo]);
+  }, [fullFarmPoolsStakeInfo, farmKeyToFarmInfo]);
 
   const totalStaked = useMemo(() => {
     let result = new BigNumber(0);
     // sum up total staked value of each pool
     // if any of the pool has a nan value which means the data is not available
     // the final result will be nan
-    fullFarmPoolsData.forEach((farmPoolsData) => {
+    fullFarmPoolsStakeInfo.forEach((farmPoolsData) => {
       result = result.plus(farmPoolsData.totalStaked);
     });
     return result;
-  }, [fullFarmPoolsData]);
+  }, [fullFarmPoolsStakeInfo]);
 
   // map a list of farm info data to a set of FarmCard react components
   const farmInfoDataListToFarmCards = useCallback(
