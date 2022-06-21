@@ -1,6 +1,8 @@
 import BigNumber from "bignumber.js";
 import { PoolConfig } from "constants/deployConfigV2";
 
+export type FarmCardColor = "lime" | "greenYellow" | "indigo" | "dodgerBlue";
+
 export interface CardProps {
   isUserPool?: boolean;
   poolConfig: PoolConfig;
@@ -8,5 +10,5 @@ export interface CardProps {
   totalStaked: BigNumber;
   userStaked: BigNumber;
   apr: BigNumber;
-  color?: "lime" | "greenYellow" | "indigo" | "dodgerBlue";
+  color?: FarmCardColor;
 }

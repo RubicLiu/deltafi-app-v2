@@ -16,6 +16,7 @@ import {
 } from "states";
 import { calculateFarmPoolsStakeInfo, FarmInfoData } from "./utils";
 import BigNumber from "bignumber.js";
+import { FarmCardColor } from "./components/types";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -225,6 +226,12 @@ const Home: React.FC = (props): ReactElement => {
     return result;
   }, [fullFarmPoolsStakeInfo]);
 
+  // colors for the farmcards
+  const farmCardColors: FarmCardColor[] = useMemo(
+    () => ["greenYellow", "lime", "indigo", "dodgerBlue"],
+    [],
+  );
+
   // map a list of farm info data to a set of FarmCard react components
   const farmInfoDataListToFarmCards = useCallback(
     (farmInfoDataList: FarmInfoData[]) => (
@@ -233,15 +240,7 @@ const Home: React.FC = (props): ReactElement => {
           ({ farmInfoAddress, totalStaked, userStaked, apr, poolConfig }, idx) => (
             <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
               <FarmCard
-                color={
-                  idx % 4 === 0
-                    ? "greenYellow"
-                    : idx % 4 === 1
-                    ? "lime"
-                    : idx % 4 === 2
-                    ? "indigo"
-                    : "dodgerBlue"
-                }
+                color={farmCardColors[idx % 4]}
                 poolConfig={poolConfig}
                 farmInfoAddress={farmInfoAddress}
                 totalStaked={totalStaked}
@@ -253,7 +252,7 @@ const Home: React.FC = (props): ReactElement => {
         )}
       </Grid>
     ),
-    [classes],
+    [classes, farmCardColors],
   );
 
   return (
