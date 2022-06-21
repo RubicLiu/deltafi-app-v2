@@ -36,11 +36,9 @@ import {
   programSelector,
 } from "states/selectors";
 import { depositViewActions } from "states/views/depositView";
-import { Transaction } from "@solana/web3.js";
-import { sendSignedTransaction } from "utils/transactions";
+import { partialSignTransaction, sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
-import { createDepositTransaction, createWithdrawTransaction } from "utils/transactions/deposit";
 import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/tokenUtils";
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { Paper } from "@material-ui/core";
@@ -50,6 +48,7 @@ import DepositCard from "./components/DepositCard/Card";
 import { IDepositCard } from "./components/DepositCard/types";
 import { calculateWithdrawalFromShares } from "lib/calc";
 import BN from "bn.js";
+import * as transactionUtils from "anchor/transaction_utils";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -533,8 +532,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const { publicKey: walletPubkey, signTransaction } = useWallet();
 
   const handleDeposit = useCallback(async () => {
-    let transaction: Transaction;
-
     if (!swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount || !program) {
       return null;
     }
@@ -551,10 +548,9 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
       const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, base.amount);
       const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, quote.amount);
-      transaction = await createDepositTransaction(
-        program,
-        connection,
+      const { transaction, signers } = await transactionUtils.createDepositTransaction(
         poolConfig,
+        program,
         swapInfo,
         baseTokenAccount.publicKey,
         quoteTokenAccount.publicKey,
@@ -562,9 +558,19 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         lpUser,
         baseAmount,
         quoteAmount,
+        new BN(0),
+        new BN(0),
       );
 
-      const signedTransaction = await signTransaction(transaction);
+      const signedTransaction = await signTransaction(
+        await partialSignTransaction({
+          transaction,
+          feePayer: walletPubkey,
+          signers,
+          connection,
+        }),
+      );
+
       const hash = await sendSignedTransaction({
         signedTransaction,
         connection,
@@ -629,8 +635,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   ]);
 
   const handleWithdraw = useCallback(async () => {
-    let transaction: Transaction;
-
     if (!swapInfo || !walletPubkey || !baseTokenAccount || !quoteTokenAccount || !program) {
       return null;
     }
@@ -647,21 +651,29 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       const baseShare = new BN(base.share);
       const quoteShare = new BN(quote.share);
 
-      transaction = await createWithdrawTransaction(
-        program,
-        connection,
+      const { transaction, signers } = await transactionUtils.createWithdrawTransaction(
         poolConfig,
+        program,
         swapInfo,
         baseTokenAccount.publicKey,
         quoteTokenAccount.publicKey,
         walletPubkey,
         baseShare,
         quoteShare,
+        new BN(0),
+        new BN(0),
       );
 
-      transaction = await signTransaction(transaction);
+      const signedTransaction = await signTransaction(
+        await partialSignTransaction({
+          transaction,
+          feePayer: walletPubkey,
+          signers,
+          connection,
+        }),
+      );
       const hash = await sendSignedTransaction({
-        signedTransaction: transaction,
+        signedTransaction,
         connection,
       });
 
