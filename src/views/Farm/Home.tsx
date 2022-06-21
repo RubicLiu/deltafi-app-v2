@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactElement, useMemo, useState } from "react";
+import React, { ChangeEvent, ReactElement, useCallback, useMemo, useState } from "react";
 import { Box, Grid, makeStyles, Theme } from "@material-ui/core";
 
 import Page from "components/layout/Page";
@@ -225,6 +225,37 @@ const Home: React.FC = (props): ReactElement => {
     return result;
   }, [fullFarmPoolsData]);
 
+  const farmInfoDataListToFarmCards = useCallback(
+    (farmInfoDataList: FarmInfoData[]) => (
+      <Grid container className={classes.poolCardContainer} justifyContent="center">
+        {farmInfoDataList.map(
+          ({ farmInfoAddress, totalStaked, userStaked, apr, poolConfig }, idx) => (
+            <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
+              <FarmCard
+                color={
+                  idx % 4 === 0
+                    ? "greenYellow"
+                    : idx % 4 === 1
+                    ? "lime"
+                    : idx % 4 === 2
+                    ? "indigo"
+                    : "dodgerBlue"
+                }
+                key={farmInfoAddress}
+                poolConfig={poolConfig}
+                farmInfoAddress={farmInfoAddress}
+                totalStaked={totalStaked}
+                userStaked={userStaked}
+                apr={apr}
+              />
+            </Grid>
+          ),
+        )}
+      </Grid>
+    ),
+    [],
+  );
+
   return (
     <Page>
       <Box className={classes.container}>
@@ -284,58 +315,10 @@ const Home: React.FC = (props): ReactElement => {
               }}
             />
             <TabPanel value="active" className={classes.tabPanel}>
-              <Grid container className={classes.poolCardContainer} justifyContent="center">
-                {activeFarms.map(
-                  ({ farmInfoAddress, totalStaked, userStaked, apr, poolConfig }, idx) => (
-                    <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
-                      <FarmCard
-                        color={
-                          idx % 4 === 0
-                            ? "greenYellow"
-                            : idx % 4 === 1
-                            ? "lime"
-                            : idx % 4 === 2
-                            ? "indigo"
-                            : "dodgerBlue"
-                        }
-                        key={farmInfoAddress}
-                        poolConfig={poolConfig}
-                        farmInfoAddress={farmInfoAddress}
-                        totalStaked={totalStaked}
-                        userStaked={userStaked}
-                        apr={apr}
-                      />
-                    </Grid>
-                  ),
-                )}
-              </Grid>
+              {farmInfoDataListToFarmCards(activeFarms)}
             </TabPanel>
             <TabPanel value="inactive" className={classes.tabPanel}>
-              <Grid container className={classes.poolCardContainer} justifyContent="center">
-                {inactiveFarms.map(
-                  ({ farmInfoAddress, totalStaked, userStaked, apr, poolConfig }, idx) => (
-                    <Grid item key={idx} xl={2} lg={3} md={4} sm={6}>
-                      <FarmCard
-                        color={
-                          idx % 4 === 0
-                            ? "greenYellow"
-                            : idx % 4 === 1
-                            ? "lime"
-                            : idx % 4 === 2
-                            ? "indigo"
-                            : "dodgerBlue"
-                        }
-                        key={farmInfoAddress}
-                        poolConfig={poolConfig}
-                        farmInfoAddress={farmInfoAddress}
-                        totalStaked={totalStaked}
-                        userStaked={userStaked}
-                        apr={apr}
-                      />
-                    </Grid>
-                  ),
-                )}
-              </Grid>
+              {farmInfoDataListToFarmCards(inactiveFarms)}
             </TabPanel>
           </TabContext>
         </Box>

@@ -6,6 +6,8 @@ import { FarmPoolKeyToFarmUser } from "states/accounts/farmUserAccount";
 import { SwapPoolKeyToSwap } from "states/accounts/swapAccount";
 import { anchorBnToBn } from "utils/tokenUtils";
 import { getTokenShareTvl, getTokenTvl } from "utils/utils";
+import FarmCard from "./components/Card";
+import { Grid } from "@material-ui/core";
 
 export type FarmInfoData = {
   farmInfoAddress: string;
