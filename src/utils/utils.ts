@@ -3,6 +3,7 @@ import { PublicKey } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
 import { TokenConfig } from "constants/deployConfigV2";
 import { anchorBnToBn } from "./tokenUtils";
+import { SwapInfo } from "anchor/type_definitions";
 
 export const convertDollar = (value) => {
   return "USD " + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -46,6 +47,25 @@ export function getTokenShareTvl(tvl: BigNumber, share: BN, supply: BN) {
   return tvl
     .multipliedBy(new BigNumber(share.toString()))
     .dividedBy(new BigNumber(supply.toString()));
+}
+
+export function getTotalVolume(
+  basePrice: BigNumber,
+  quotePrice: BigNumber,
+  swapInfo: SwapInfo,
+  baseTokenInfo: TokenConfig,
+  quoteTokenInfo: TokenConfig,
+) {
+  if (basePrice && quotePrice && swapInfo && baseTokenInfo && quoteTokenInfo) {
+    const baseVolume = getTokenTvl(baseTokenInfo, swapInfo.poolState.totalTradedBase, basePrice);
+    const quoteVolume = getTokenTvl(
+      quoteTokenInfo,
+      swapInfo.poolState.totalTradedQuote,
+      quotePrice,
+    );
+    return baseVolume.plus(quoteVolume);
+  }
+  return new BigNumber(0);
 }
 
 export function validate(expression: boolean, errMsg: string) {
