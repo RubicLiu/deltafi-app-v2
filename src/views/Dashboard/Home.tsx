@@ -287,7 +287,7 @@ const Home: React.FC = (props) => {
   // userUnclaimedFarmRewards is user's unclaimed rewards up till now
   // userTotalFarmRewards is the rewards amount that have been claimed by the user
   // these values are passed into reward component
-  const { farmPoolToRewards, userUnclaimedFarmRewards, userTotalFarmRewards } = useMemo(() => {
+  const { userUnclaimedFarmRewards, userTotalFarmRewards } = useMemo(() => {
     const farmPoolToRewards: Record<
       string,
       { unclaimedFarmRewards: string; totalFarmRewards: string }
@@ -374,9 +374,9 @@ const Home: React.FC = (props) => {
       farmPoolToRewards[farmPoolKey] = { unclaimedFarmRewards, totalFarmRewards };
     }
 
+    // update to rewardview
     dispatch(rewardViewActions.setFarmPoolRewardsInfo({ farmPoolToRewards }));
     return {
-      farmPoolToRewards,
       userUnclaimedFarmRewards: hasFarmUser
         ? userUnclaimedFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
         : "--",
@@ -583,7 +583,6 @@ const Home: React.FC = (props) => {
             </TabPanel>
             <TabPanel value="reward" className={classes.tabPanel}>
               <Reward
-                farmPoolToRewards={farmPoolToRewards}
                 userUnclaimedFarmRewards={userUnclaimedFarmRewards}
                 userTotalFarmRewards={userTotalFarmRewards}
                 totalRewardFromSwap={totalRewardFromSwap}

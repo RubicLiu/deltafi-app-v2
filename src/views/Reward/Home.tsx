@@ -173,13 +173,6 @@ const StyledButton = styled(Button)`
 `;
 
 type RewardComponentProps = {
-  farmPoolToRewards: Record<
-    string,
-    {
-      unclaimedFarmRewards: string;
-      totalFarmRewards: string;
-    }
-  >;
   userUnclaimedFarmRewards: string;
   userTotalFarmRewards: string;
   owedRewardFromSwap: string;
@@ -191,7 +184,6 @@ type RewardComponentProps = {
 const Home: React.FC<RewardComponentProps> = (props: RewardComponentProps) => {
   const classes = useStyles(props);
   const {
-    farmPoolToRewards,
     userUnclaimedFarmRewards,
     userTotalFarmRewards,
     owedRewardFromSwap,
@@ -206,6 +198,7 @@ const Home: React.FC<RewardComponentProps> = (props: RewardComponentProps) => {
   const program = useSelector(programSelector);
 
   const rewardView = useSelector(rewardViewSelector);
+  const farmPoolToRewards = rewardView.farmPoolToRewards;
   const deltafiUser = useSelector(deltafiUserSelector);
 
   const farmPoolKeyToFarmUser = useSelector(farmUserSelector).farmPoolKeyToFarmUser;
