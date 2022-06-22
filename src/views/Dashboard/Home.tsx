@@ -50,6 +50,7 @@ import { exponentiatedBy } from "calculations/utils";
 import { anchorBnToBn } from "utils/tokenUtils";
 import { SECONDS_PER_YEAR } from "constants/index";
 import { rewardViewActions } from "states/views/rewardView";
+import BN from "bn.js";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
@@ -251,6 +252,36 @@ const Home: React.FC = (props) => {
       poolConfigsWithDeposit,
     ],
   );
+
+  // extract swap and referral rewards from deltafi user account
+  const {
+    owedRewardFromSwap,
+    owedRewardFromReferral,
+    totalRewardFromSwap,
+    totalRewardFromReferral,
+  } = useMemo(() => {
+    const parseRewardBN = (rewardAmount: BN) =>
+      exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
+    if (deltafiUser?.user) {
+      return {
+        owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedTradeRewards),
+        owedRewardFromReferral: parseRewardBN(deltafiUser.user.owedReferralRewards),
+        totalRewardFromSwap: parseRewardBN(
+          deltafiUser.user.owedTradeRewards.add(deltafiUser.user.claimedTradeRewards),
+        ),
+        totalRewardFromReferral: parseRewardBN(
+          deltafiUser.user.owedReferralRewards.add(deltafiUser.user.claimedReferralRewards),
+        ),
+      };
+    }
+
+    return {
+      owedRewardFromSwap: "--",
+      owedRewardFromReferral: "--",
+      totalRewardFromSwap: "--",
+      totalRewardFromReferral: "--",
+    };
+  }, [deltafiUser]);
 
   // farmPoolToReward records user's rewards in each pool
   // userUnclaimedFarmRewards is user's unclaimed rewards up till now
@@ -549,6 +580,10 @@ const Home: React.FC = (props) => {
                 farmPoolToRewards={farmPoolToRewards}
                 userUnclaimedFarmRewards={userUnclaimedFarmRewards}
                 userTotalFarmRewards={userTotalFarmRewards}
+                totalRewardFromSwap={totalRewardFromSwap}
+                owedRewardFromSwap={owedRewardFromSwap}
+                totalRewardFromReferral={totalRewardFromReferral}
+                owedRewardFromReferral={owedRewardFromReferral}
               />
             </TabPanel>
           </TabContext>

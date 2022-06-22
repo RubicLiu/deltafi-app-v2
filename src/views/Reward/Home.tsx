@@ -29,19 +29,16 @@ import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
 
 import {
   BLOG_LINK,
-  DELTAFI_TOKEN_DECIMALS,
   DISCORD_LINK,
   TELEGRAM_LINK,
   TWITTER_LINK,
 } from "constants/index";
 import BN from "bn.js";
 import BigNumber from "bignumber.js";
-import { exponentiatedBy } from "utils/decimal";
 import { deployConfigV2, PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import styled from "styled-components";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
-import { anchorBnToBn } from "utils/tokenUtils";
 import { dashboardViewActions } from "states/views/dashboardView";
 import { scheduleWithInterval } from "utils";
 
@@ -192,11 +189,23 @@ type RewardComponentProps = {
   >;
   userUnclaimedFarmRewards: string;
   userTotalFarmRewards: string;
+  owedRewardFromSwap: string;
+  owedRewardFromReferral: string;
+  totalRewardFromSwap: string;
+  totalRewardFromReferral: string;
 };
 
 const Home: React.FC<RewardComponentProps> = (props: RewardComponentProps) => {
   const classes = useStyles(props);
-  const { farmPoolToRewards, userUnclaimedFarmRewards, userTotalFarmRewards } = props;
+  const {
+    farmPoolToRewards,
+    userUnclaimedFarmRewards,
+    userTotalFarmRewards,
+    owedRewardFromSwap,
+    owedRewardFromReferral,
+    totalRewardFromSwap,
+    totalRewardFromReferral,
+  } = props;
   const { setMenu } = useModal();
   const wallet = useWallet();
   const { connected: isConnectedWallet, publicKey: walletPubkey, signTransaction } = wallet;
@@ -216,35 +225,6 @@ const Home: React.FC<RewardComponentProps> = (props: RewardComponentProps) => {
     // Refresh the pyth data every 5 seconds.
     return scheduleWithInterval(() => dispatch(rewardViewActions.updateRefreshTs()), 5 * 1000);
   }, [dispatch]);
-
-  const {
-    owedRewardFromSwap,
-    owedRewardFromReferral,
-    totalRewardFromSwap,
-    totalRewardFromReferral,
-  } = useMemo(() => {
-    const parseRewardBN = (rewardAmount: BN) =>
-      exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
-    if (deltafiUser?.user) {
-      return {
-        owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedTradeRewards),
-        owedRewardFromReferral: parseRewardBN(deltafiUser.user.owedReferralRewards),
-        totalRewardFromSwap: parseRewardBN(
-          deltafiUser.user.owedTradeRewards.add(deltafiUser.user.claimedTradeRewards),
-        ),
-        totalRewardFromReferral: parseRewardBN(
-          deltafiUser.user.owedReferralRewards.add(deltafiUser.user.claimedReferralRewards),
-        ),
-      };
-    }
-
-    return {
-      owedRewardFromSwap: "--",
-      owedRewardFromReferral: "--",
-      totalRewardFromSwap: "--",
-      totalRewardFromReferral: "--",
-    };
-  }, [deltafiUser]);
 
   useEffect(() => {
     const totalRewardFromReferralBn =
