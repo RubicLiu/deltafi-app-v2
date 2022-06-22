@@ -327,8 +327,8 @@ const Home: React.FC = (props) => {
         const volumeA = getPoolTradingVolumeFromPoolConfig(poolConfigA);
         const volumeB = getPoolTradingVolumeFromPoolConfig(poolConfigB);
 
-        if (volumeA.isNaN() || volumeB.isNaN()) {
-          return 0;
+        if (volumeA.isNaN() || volumeB.isNaN() || volumeB.isEqualTo(volumeA)) {
+          return poolConfigA.name < poolConfigB.name ? 1 : -1;
         }
         return volumeB.minus(volumeA).toNumber();
       }),
