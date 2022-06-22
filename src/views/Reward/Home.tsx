@@ -27,19 +27,12 @@ import {
 } from "utils/transactions/deltafiUser";
 import { createClaimFarmRewardsTransaction } from "utils/transactions/stake";
 
-import {
-  BLOG_LINK,
-  DISCORD_LINK,
-  TELEGRAM_LINK,
-  TWITTER_LINK,
-} from "constants/index";
+import { BLOG_LINK, DISCORD_LINK, TELEGRAM_LINK, TWITTER_LINK } from "constants/index";
 import BN from "bn.js";
-import BigNumber from "bignumber.js";
 import { deployConfigV2, PoolConfig, poolConfigs } from "constants/deployConfigV2";
 import { Box, Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import styled from "styled-components";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
-import { dashboardViewActions } from "states/views/dashboardView";
 import { scheduleWithInterval } from "utils";
 
 const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
@@ -225,22 +218,6 @@ const Home: React.FC<RewardComponentProps> = (props: RewardComponentProps) => {
     // Refresh the pyth data every 5 seconds.
     return scheduleWithInterval(() => dispatch(rewardViewActions.updateRefreshTs()), 5 * 1000);
   }, [dispatch]);
-
-  useEffect(() => {
-    const totalRewardFromReferralBn =
-      totalRewardFromReferral === "--" ? new BigNumber(0) : new BigNumber(totalRewardFromReferral);
-    const totalRewardFromSwapBn =
-      totalRewardFromSwap === "--" ? new BigNumber(0) : new BigNumber(totalRewardFromSwap);
-    const userTotalFarmRewardsBn =
-      userTotalFarmRewards === "--" ? new BigNumber(0) : new BigNumber(userTotalFarmRewards);
-    dispatch(
-      dashboardViewActions.setTotalDelfiRewards({
-        totalDelfiRewards: totalRewardFromReferralBn
-          .plus(totalRewardFromSwapBn)
-          .plus(userTotalFarmRewardsBn),
-      }),
-    );
-  }, [totalRewardFromSwap, totalRewardFromReferral, userTotalFarmRewards, dispatch]);
 
   const farmPoolInfoList = useMemo(
     () =>

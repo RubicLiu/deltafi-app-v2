@@ -439,13 +439,17 @@ const Home: React.FC = (props) => {
       !deltafiUser.fetched ||
       !isFarmUserFetched ||
       !deltafiPrice ||
-      !dashboardView.totalDelfiRewards
+      userTotalFarmRewards === "--" ||
+      totalRewardFromSwap === "--" ||
+      totalRewardFromReferral === "--"
     ) {
       // when wallet is connected, but deltafiUser is not fetched yet
       return { totalRewards: null, isLoadingTotalRewards: true };
     }
 
-    const totalRewards = dashboardView.totalDelfiRewards.multipliedBy(deltafiPrice.last);
+    const totalRewards = new BigNumber(userTotalFarmRewards)
+      .plus(totalRewardFromSwap)
+      .plus(totalRewardFromReferral);
 
     return {
       totalRewards,
@@ -455,8 +459,10 @@ const Home: React.FC = (props) => {
     deltafiUser,
     isConnectedWallet,
     deltafiPrice,
-    dashboardView.totalDelfiRewards,
     isFarmUserFetched,
+    userTotalFarmRewards,
+    totalRewardFromSwap,
+    totalRewardFromReferral,
   ]);
 
   const headerData = [
