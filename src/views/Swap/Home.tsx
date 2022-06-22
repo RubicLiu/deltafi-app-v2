@@ -42,6 +42,8 @@ import {
   deltafiUserSelector,
   appSelector,
   programSelector,
+  poolSelector,
+  pythSelector,
 } from "states/selectors";
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
@@ -59,11 +61,12 @@ import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { createSwapTransaction } from "utils/transactions/swap";
 import { BN } from "@project-serum/anchor";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
-import { anchorBnToString, stringToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToBn, anchorBnToString, stringToAnchorBn } from "utils/tokenUtils";
 import { DeltafiUser, SwapInfo } from "anchor/type_definitions";
 import Autocomplete from "@material-ui/lab/Autocomplete/Autocomplete";
 import CompareArrows from "components/Svg/icons/CompareArrows";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
+import BigNumber from "bignumber.js";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -269,6 +272,9 @@ const Home: React.FC = (props) => {
     tokenTo.token.symbol,
   );
   const swapInfo: SwapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
+  const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
+  const symbolToPythPriceData = useSelector(pythSelector).symbolToPythPriceData;
+
   const deltafiUser: DeltafiUser = useSelector(deltafiUserSelector).user;
 
   const sourceAccount = useSelector(selectTokenAccountInfoByMint(tokenFrom.token.mint));
@@ -297,6 +303,37 @@ const Home: React.FC = (props) => {
 
   const network = deployConfigV2.network;
   const possibleTokenToConfigs = useMemo(() => getPossibleTokenToConfigs(tokenFrom), [tokenFrom]);
+
+  const getPoolTradingVolumeFromPoolConfig = useCallback(
+    (poolConfig: PoolConfig) => {
+      const basePrice = new BigNumber(symbolToPythPriceData[poolConfig.base]?.price);
+      const quotePrice = new BigNumber(symbolToPythPriceData[poolConfig.quote]?.price);
+      const baseVolume = anchorBnToBn(
+        poolConfig.baseTokenInfo,
+        swapKeyToSwapInfo[poolConfig.swapInfo]?.poolState?.totalTradedBase,
+      ).multipliedBy(basePrice);
+      const quoteVolume = anchorBnToBn(
+        poolConfig.quoteTokenInfo,
+        swapKeyToSwapInfo[poolConfig.swapInfo]?.poolState?.totalTradedQuote,
+      ).multipliedBy(quotePrice);
+      return baseVolume.plus(quoteVolume);
+    },
+    [symbolToPythPriceData, swapKeyToSwapInfo],
+  );
+
+  const poolConfigsSortedByVolume = useMemo(
+    () =>
+      poolConfigs.sort((poolConfigA: PoolConfig, poolConfigB: PoolConfig) => {
+        const volumeA = getPoolTradingVolumeFromPoolConfig(poolConfigA);
+        const volumeB = getPoolTradingVolumeFromPoolConfig(poolConfigB);
+
+        if (volumeA.isNaN() || volumeB.isNaN() || volumeB.isEqualTo(volumeA)) {
+          return poolConfigA.name < poolConfigB.name ? 1 : -1;
+        }
+        return volumeB.minus(volumeA).toNumber();
+      }),
+    [getPoolTradingVolumeFromPoolConfig],
+  );
 
   const handleSwapDirectionChange = () => {
     const temp = Object.assign({}, tokenFrom);
@@ -760,16 +797,10 @@ const Home: React.FC = (props) => {
               </Box>
             );
           }}
-          options={[
-            ...poolConfigs.map((poolConfig) => ({
-              tokenFrom: poolConfig.base,
-              tokenTo: poolConfig.quote,
-            })),
-            ...poolConfigs.map((poolConfig) => ({
-              tokenFrom: poolConfig.quote,
-              tokenTo: poolConfig.base,
-            })),
-          ]}
+          options={poolConfigsSortedByVolume.map((poolConfig) => ({
+            tokenFrom: poolConfig.base,
+            tokenTo: poolConfig.quote,
+          }))}
           classes={{ paper: classes.optionsPaper }}
           className={classes.searchCt}
         ></Autocomplete>

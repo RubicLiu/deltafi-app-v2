@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import styled from "styled-components";
 
 import { ConnectButton } from "components";
-import { convertDollarSign as convertDollar, getTokenTvl } from "utils/utils";
+import { convertDollarSign as convertDollar, getTokenTvl, getTotalVolume } from "utils/utils";
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
 import { useModal } from "providers/modal";
@@ -137,18 +137,10 @@ const PoolCard: React.FC<CardProps> = (props) => {
   const swapInfo: SwapInfo = useSelector(selectSwapBySwapKey(poolConfig.swapInfo));
   const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
 
-  const totalTradeVolume = useMemo(() => {
-    if (basePrice && quotePrice && swapInfo && baseTokenInfo && quoteTokenInfo) {
-      const baseVolume = getTokenTvl(baseTokenInfo, swapInfo.poolState.totalTradedBase, basePrice);
-      const quoteVolume = getTokenTvl(
-        quoteTokenInfo,
-        swapInfo.poolState.totalTradedQuote,
-        quotePrice,
-      );
-      return baseVolume.plus(quoteVolume);
-    }
-    return new BigNumber(0);
-  }, [basePrice, quotePrice, swapInfo, baseTokenInfo, quoteTokenInfo]);
+  const totalTradeVolume = useMemo(
+    () => getTotalVolume(basePrice, quotePrice, swapInfo, baseTokenInfo, quoteTokenInfo),
+    [basePrice, quotePrice, swapInfo, baseTokenInfo, quoteTokenInfo],
+  );
 
   const baseTvl = useMemo(() => {
     if (basePrice && swapInfo) {
