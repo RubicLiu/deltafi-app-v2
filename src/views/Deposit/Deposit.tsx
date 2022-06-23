@@ -626,61 +626,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     program,
   ]);
 
-  //  const handleClaimInterest = useCallback(async () => {
-  //    if (!walletPubkey || !program || !lpUser) {
-  //      return null;
-  //    }
-  //    const connection = program.provider.connection;
-  //
-  //    try {
-  //      dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
-  //
-  //      const transaction = await createClaimFarmRewardsTransaction(
-  //        program,
-  //        connection,
-  //        poolConfig,
-  //        walletPubkey,
-  //        rewardsAccount?.publicKey,
-  //      );
-  //      const signedTransaction = await signTransaction(transaction);
-  //
-  //      const hash = await sendSignedTransaction({
-  //        signedTransaction,
-  //        connection,
-  //      });
-  //
-  //      await connection.confirmTransaction(hash, "confirmed");
-  //
-  //      dispatch(
-  //        depositViewActions.setTransactionResult({
-  //          transactionResult: {
-  //            status: true,
-  //            action: "claim",
-  //            hash,
-  //          },
-  //        }),
-  //      );
-  //    } catch (e) {
-  //      console.error("error", e);
-  //      dispatch(
-  //        depositViewActions.setTransactionResult({
-  //          transactionResult: {
-  //            status: false,
-  //          },
-  //        }),
-  //      );
-  //    } finally {
-  //      dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: true }));
-  //      dispatch(depositViewActions.setIsProcessing({ isProcessing: false }));
-  //      dispatch(
-  //        fetchLiquidityProvidersThunk({
-  //          connection,
-  //          walletAddress: walletPubkey,
-  //        }),
-  //      );
-  //    }
-  //  }, [lpUser, poolConfig, walletPubkey, program, rewardsAccount, signTransaction, dispatch]);
-
   const handleSnackBarClose = useCallback(() => {
     dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: false }));
   }, [dispatch]);
