@@ -5,7 +5,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { ConnectButton } from "components";
 
 import { useModal } from "providers/modal";
-import { getSwapOutResult } from "utils/swap";
+import { calculateSwapOutResult } from "calculations/swapOutAmount";
 import { fixedNumber } from "utils/utils";
 import { useSelector } from "react-redux";
 import { selectMarketPriceByPool, selectSwapBySwapKey } from "states/selectors";
@@ -80,7 +80,7 @@ const ConfirmSwapPanel = (props: IConfirmSwapPanelProps): ReactElement => {
   const swapOut = useMemo(() => {
     if (swapInfo && data) {
       const { tokenFrom, tokenTo, slippage } = data;
-      return getSwapOutResult(
+      return calculateSwapOutResult(
         swapInfo,
         tokenFrom.token,
         tokenTo.token,
