@@ -13,7 +13,12 @@ import {
 
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import Page from "components/layout/Page";
-import { PoolConfig, poolConfigs } from "constants/deployConfigV2";
+import {
+  DELTAFI_TOKEN_DECIMALS,
+  getPoolConfigByFarmKey,
+  PoolConfig,
+  poolConfigs,
+} from "constants/deployConfigV2";
 import PoolCard from "views/Pool/components/Card_v2";
 import FarmCard from "views/Farm/components/Card";
 import { ChangeEvent, useCallback, useMemo } from "react";
@@ -30,6 +35,7 @@ import {
   dashboardViewSelector,
   farmUserSelector,
   farmSelector,
+  rewardViewSelector,
 } from "states/selectors";
 import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
@@ -40,6 +46,11 @@ import { CircularProgress } from "@material-ui/core";
 import { dashboardViewActions } from "states/views/dashboardView";
 import { calculateFarmPoolsStakeInfo } from "views/Farm/utils";
 import { PoolCardColor } from "utils/type";
+import { exponentiatedBy } from "calculations/utils";
+import { anchorBnToBn } from "utils/tokenUtils";
+import { SECONDS_PER_YEAR } from "constants/index";
+import { rewardViewActions } from "states/views/rewardView";
+import BN from "bn.js";
 
 function hasDeposit(
   mintToTokenAccountInfo: MintToTokenAccountInfo,
@@ -194,9 +205,33 @@ const Home: React.FC = (props) => {
   const symbolToPythPriceData = useSelector(pythSelector).symbolToPythPriceData;
   const deltafiUser = useSelector(deltafiUserSelector);
   const dashboardView = useSelector(dashboardViewSelector);
+  const rewardView = useSelector(rewardViewSelector);
   const isFarmUserFetched = useSelector(farmUserSelector).fetched;
   const farmPoolKeyToFarmUser = useSelector(farmUserSelector).farmPoolKeyToFarmUser;
   const farmKeyToFarmInfo = useSelector(farmSelector).farmKeyToFarmInfo;
+
+  const getUntrackedReward = (
+    currentTs: number,
+    lastUpdateTs: number,
+    nextClaimTs: number,
+    apr: BigNumber,
+    depositAmount: BigNumber,
+  ) => {
+    if (lastUpdateTs >= currentTs || currentTs <= nextClaimTs) {
+      return new BigNumber(0);
+    }
+
+    const rawResult = depositAmount
+      .multipliedBy(apr)
+      .multipliedBy(currentTs - lastUpdateTs)
+      .dividedBy(SECONDS_PER_YEAR);
+
+    if (rawResult.isLessThan(exponentiatedBy("1", DELTAFI_TOKEN_DECIMALS))) {
+      return new BigNumber(0);
+    }
+
+    return new BigNumber(rawResult.toFixed(DELTAFI_TOKEN_DECIMALS));
+  };
 
   const userFarmPoolsData = useMemo(
     () =>
@@ -217,6 +252,139 @@ const Home: React.FC = (props) => {
       poolConfigsWithDeposit,
     ],
   );
+
+  // extract swap and referral rewards from deltafi user account
+  const {
+    owedRewardFromSwap,
+    owedRewardFromReferral,
+    totalRewardFromSwap,
+    totalRewardFromReferral,
+  } = useMemo(() => {
+    const parseRewardBN = (rewardAmount: BN) =>
+      exponentiatedBy(new BigNumber(rewardAmount.toString()), DELTAFI_TOKEN_DECIMALS).toString();
+    if (deltafiUser?.user) {
+      return {
+        owedRewardFromSwap: parseRewardBN(deltafiUser.user.owedTradeRewards),
+        owedRewardFromReferral: parseRewardBN(deltafiUser.user.owedReferralRewards),
+        totalRewardFromSwap: parseRewardBN(
+          deltafiUser.user.owedTradeRewards.add(deltafiUser.user.claimedTradeRewards),
+        ),
+        totalRewardFromReferral: parseRewardBN(
+          deltafiUser.user.owedReferralRewards.add(deltafiUser.user.claimedReferralRewards),
+        ),
+      };
+    }
+
+    return {
+      owedRewardFromSwap: "--",
+      owedRewardFromReferral: "--",
+      totalRewardFromSwap: "--",
+      totalRewardFromReferral: "--",
+    };
+  }, [deltafiUser]);
+
+  // farmPoolToReward records user's rewards in each pool
+  // userUnclaimedFarmRewards is user's unclaimed rewards up till now
+  // userTotalFarmRewards is the rewards amount that have been claimed by the user
+  // these values are passed into reward component
+  const { userUnclaimedFarmRewards, userTotalFarmRewards } = useMemo(() => {
+    const farmPoolToRewards: Record<
+      string,
+      { unclaimedFarmRewards: string; totalFarmRewards: string }
+    > = {};
+
+    let userUnclaimedFarmRewards = new BigNumber(0);
+    let userTotalFarmRewards = new BigNumber(0);
+
+    if (!farmKeyToFarmInfo || !farmPoolKeyToFarmUser) {
+      return {
+        farmPoolToRewards,
+        userUnclaimedFarmRewards: "--",
+        userTotalFarmRewards: "--",
+      };
+    }
+
+    let hasFarmUser = false;
+    for (const farmPoolKey in farmPoolKeyToFarmUser) {
+      const poolConfig = getPoolConfigByFarmKey(farmPoolKey);
+      const farmUser = farmPoolKeyToFarmUser[farmPoolKey];
+      const farmInfo = farmKeyToFarmInfo[farmPoolKey];
+      if (!farmUser || !farmInfo) {
+        farmPoolToRewards[farmPoolKey] = { unclaimedFarmRewards: "--", totalFarmRewards: "--" };
+        continue;
+      }
+      hasFarmUser = true;
+
+      const baseApr = new BigNumber(farmInfo.farmConfig.baseAprNumerator.toString()).dividedBy(
+        farmInfo.farmConfig.baseAprDenominator.toString(),
+      );
+      const quoteApr = new BigNumber(farmInfo.farmConfig.quoteAprNumerator.toString()).dividedBy(
+        farmInfo.farmConfig.quoteAprDenominator.toString(),
+      );
+
+      const owedBaseRewards = exponentiatedBy(
+        farmUser.basePosition.rewardsOwed.toString(),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+      const untrackedBaseRewards = getUntrackedReward(
+        rewardView.rewardRefreshTs,
+        farmUser.basePosition.lastUpdateTs.toNumber(),
+        farmUser.basePosition.nextClaimTs.toNumber(),
+        baseApr,
+        anchorBnToBn(poolConfig.baseTokenInfo, farmUser.basePosition.depositedAmount),
+      );
+
+      const claimedBaseRewards = exponentiatedBy(
+        farmUser.basePosition.cumulativeInterest.toString(),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+
+      const owedQuoteRewards = exponentiatedBy(
+        farmUser.quotePosition.rewardsOwed.toString(),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+      const untrackedQuoteRewards = getUntrackedReward(
+        rewardView.rewardRefreshTs,
+        farmUser.quotePosition.lastUpdateTs.toNumber(),
+        farmUser.quotePosition.nextClaimTs.toNumber(),
+        quoteApr,
+        anchorBnToBn(poolConfig.quoteTokenInfo, farmUser.quotePosition.depositedAmount),
+      );
+
+      const claimedQuoteRewards = exponentiatedBy(
+        farmUser.quotePosition.cumulativeInterest.toString(),
+        DELTAFI_TOKEN_DECIMALS,
+      );
+
+      const untrackedRewards =
+        untrackedBaseRewards.isEqualTo(0) || untrackedQuoteRewards.isEqualTo(0)
+          ? new BigNumber(0)
+          : untrackedBaseRewards.plus(untrackedQuoteRewards);
+      const unclaimedFarmRewards = owedBaseRewards
+        .plus(owedQuoteRewards)
+        .plus(untrackedRewards)
+        .toFixed(DELTAFI_TOKEN_DECIMALS);
+      const totalFarmRewards = claimedBaseRewards
+        .plus(claimedQuoteRewards)
+        .toFixed(DELTAFI_TOKEN_DECIMALS);
+
+      userUnclaimedFarmRewards = userUnclaimedFarmRewards.plus(unclaimedFarmRewards);
+      userTotalFarmRewards = userTotalFarmRewards.plus(totalFarmRewards);
+
+      farmPoolToRewards[farmPoolKey] = { unclaimedFarmRewards, totalFarmRewards };
+    }
+
+    // update to rewardview
+    dispatch(rewardViewActions.setFarmPoolRewardsInfo({ farmPoolToRewards }));
+    return {
+      userUnclaimedFarmRewards: hasFarmUser
+        ? userUnclaimedFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
+        : "--",
+      userTotalFarmRewards: hasFarmUser
+        ? userTotalFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
+        : "--",
+    };
+  }, [farmPoolKeyToFarmUser, farmKeyToFarmInfo, rewardView.rewardRefreshTs, dispatch]);
 
   const { totalHoldings, isLoadingTotalHoldings } = useMemo(() => {
     if (!isConnectedWallet) {
@@ -271,13 +439,17 @@ const Home: React.FC = (props) => {
       !deltafiUser.fetched ||
       !isFarmUserFetched ||
       !deltafiPrice ||
-      !dashboardView.totalDelfiRewards
+      userTotalFarmRewards === "--" ||
+      totalRewardFromSwap === "--" ||
+      totalRewardFromReferral === "--"
     ) {
       // when wallet is connected, but deltafiUser is not fetched yet
       return { totalRewards: null, isLoadingTotalRewards: true };
     }
 
-    const totalRewards = dashboardView.totalDelfiRewards.multipliedBy(deltafiPrice.last);
+    const totalRewards = new BigNumber(userTotalFarmRewards)
+      .plus(totalRewardFromSwap)
+      .plus(totalRewardFromReferral);
 
     return {
       totalRewards,
@@ -287,8 +459,10 @@ const Home: React.FC = (props) => {
     deltafiUser,
     isConnectedWallet,
     deltafiPrice,
-    dashboardView.totalDelfiRewards,
     isFarmUserFetched,
+    userTotalFarmRewards,
+    totalRewardFromSwap,
+    totalRewardFromReferral,
   ]);
 
   const headerData = [
@@ -408,7 +582,14 @@ const Home: React.FC = (props) => {
               )}
             </TabPanel>
             <TabPanel value="reward" className={classes.tabPanel}>
-              <Reward />
+              <Reward
+                userUnclaimedFarmRewards={userUnclaimedFarmRewards}
+                userTotalFarmRewards={userTotalFarmRewards}
+                totalRewardFromSwap={totalRewardFromSwap}
+                owedRewardFromSwap={owedRewardFromSwap}
+                totalRewardFromReferral={totalRewardFromReferral}
+                owedRewardFromReferral={owedRewardFromReferral}
+              />
             </TabPanel>
           </TabContext>
         </Box>

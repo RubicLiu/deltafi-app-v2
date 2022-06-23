@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import BigNumber from "bignumber.js";
 
 const initialState = {
-  totalDelfiRewards: null,
   selectedTab: "reward",
 };
 
@@ -12,10 +10,6 @@ const dashboardViewSlice = createSlice({
   reducers: {
     setSelectedTab(state, action: PayloadAction<{ selectedTab: string }>) {
       state.selectedTab = action.payload.selectedTab;
-    },
-
-    setTotalDelfiRewards(state, action: PayloadAction<{ totalDelfiRewards: BigNumber }>) {
-      state.totalDelfiRewards = action.payload.totalDelfiRewards;
     },
   },
 });
