@@ -91,7 +91,7 @@ export function calculateOutAmountNormalSwap(
   );
 
   const outputBAmount =
-    approximationResult === 0
+    approximationResult === null
       ? calculationResult
       : Math.max(approximationResult, calculationResult);
 
@@ -99,6 +99,10 @@ export function calculateOutAmountNormalSwap(
     outputBAmount <= impliedOutAmount,
     "final result for swap out amount should not be larger than the implied out amount",
   );
+
+  if (inputAAmount.isEqualTo(0)) {
+    return { outAmount: new BigNumber(outputBAmount), priceImpact: new BigNumber(0) };
+  }
 
   let impliedPrice: BigNumber = marketPrice
     .multipliedBy(currentReserveB)

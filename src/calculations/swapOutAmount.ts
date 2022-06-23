@@ -55,6 +55,24 @@ export async function getSwapOutResult(
   );
 }
 
+export const emptyResult: SwapResult = {
+  amountIn: "",
+  amountOut: "",
+  amountOutWithSlippage: "",
+  fee: "",
+  priceImpact: "",
+  insufficientLiquidity: false,
+};
+
+export const zeroResult: SwapResult = {
+  amountIn: "0",
+  amountOut: "0",
+  amountOutWithSlippage: "0",
+  fee: "0",
+  priceImpact: "0",
+  insufficientLiquidity: false,
+};
+
 /**
  * Main interface function of this module, calculate the output information
  * of a swap with the swap input information
@@ -81,15 +99,12 @@ export function calculateSwapOutResult(
 ): SwapResult {
   const amountInBN: BigNumber = new BigNumber(amountIn);
   if (amountInBN.isNaN()) {
-    return {
-      amountIn,
-      amountOut: "",
-      amountOutWithSlippage: "",
-      fee: "",
-      priceImpact: "",
-      insufficientLiquidity: false,
-    };
+    return emptyResult;
   }
+  if (amountInBN.isEqualTo(0)) {
+    return zeroResult;
+  }
+
   if (parseFloat(amountIn) < 0) {
     throw Error(`invalid amount input: ${amountIn}`);
   }
@@ -169,15 +184,12 @@ export function calculateSwapInResult(
 ): SwapResult {
   const amountOutBN: BigNumber = new BigNumber(amountOut);
   if (amountOutBN.isNaN()) {
-    return {
-      amountIn: "",
-      amountOut: "",
-      amountOutWithSlippage: "",
-      fee: "",
-      priceImpact: "",
-      insufficientLiquidity: false,
-    };
+    return emptyResult;
   }
+  if (amountOutBN.isEqualTo(0)) {
+    return zeroResult;
+  }
+
   if (amountOutBN.toNumber() < 0) {
     throw Error(`invalid amount input: ${amountOut}`);
   }
