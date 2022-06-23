@@ -22,11 +22,7 @@ import { exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK } from "constants/index";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getPoolConfigBySwapKey,
-  deployConfigV2,
-  DELTAFI_TOKEN_DECIMALS,
-} from "constants/deployConfigV2";
+import { getPoolConfigBySwapKey, deployConfigV2 } from "constants/deployConfigV2";
 import {
   selectLpUserBySwapKey,
   selectMarketPriceByPool,
@@ -41,7 +37,6 @@ import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAc
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
 import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/tokenUtils";
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
-import { Paper } from "@material-ui/core";
 import { scheduleWithInterval } from "utils";
 import WithdrawSelectCard from "./components/WithdrawSelectCard/Card";
 import DepositCard from "./components/DepositCard/Card";
@@ -348,14 +343,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return new BigNumber(0);
   }, [swapInfo, quotePercent, quoteTokenInfo]);
 
-  // const swapFee = useMemo(() => {
-  //   if (swapInfo) {
-  //     return new BigNumber(swapInfo.swapConfig.tradeFeeNumerator.toString())
-  //       .dividedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
-  //       .multipliedBy(100);
-  //   }
-  //   return new BigNumber(0);
-  // }, [swapInfo]);
+  const swapFee = useMemo(() => {
+    if (swapInfo) {
+      return new BigNumber(swapInfo.swapConfig.tradeFeeNumerator.toString())
+        .dividedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
+        .multipliedBy(100);
+    }
+    return new BigNumber(0);
+  }, [swapInfo]);
 
   const withdrawFee = useMemo(() => {
     if (swapInfo) {
@@ -365,59 +360,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     }
     return new BigNumber(0);
   }, [swapInfo]);
-
-  const cumulativeInterest: string = useMemo(() => {
-    //    if (lpUser) {
-    //      return exponentiatedBy(
-    //        lpUser.basePosition.cumulativeInterest
-    //          .add(lpUser.quotePosition.cumulativeInterest)
-    //          .toString(),
-    //        DELTAFI_TOKEN_DECIMALS,
-    //      ).toFixed(DELTAFI_TOKEN_DECIMALS);
-    //    }
-    return "--";
-  }, []);
-
-  //const delfiTicker = useSelector(selectGateIoSticker(DELFI_USDT));
-  //const { dailyRewardRate } = useMemo(() => {
-  //  let dailyReward = "--";
-  //  let dailyRewardRate = "--";
-  //
-  //    if (swapInfo?.swapConfig && delfiTicker) {
-  //      const baseRewardPerToken: BigNumber = new BigNumber(
-  //        swapInfo.swapConfig.baseAprNumerator.toString(),
-  //      ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
-  //      const quoteRewardPerToken: BigNumber = new BigNumber(
-  //        swapInfo.swapConfig.quoteAprNumerator.toString(),
-  //      ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
-  //
-  //      const baseDailyRewardRate: BigNumber = baseRewardPerToken
-  //        .dividedBy(basePrice)
-  //        .dividedBy(DAYS_PER_YEAR);
-  //      const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
-  //        .dividedBy(quotePrice)
-  //        .dividedBy(DAYS_PER_YEAR);
-  //
-  //      dailyRewardRate = baseDailyRewardRate
-  //        .plus(quoteDailyRewardRate)
-  //        .times(new BigNumber(delfiTicker.last))
-  //        .toFixed(DELTAFI_TOKEN_DECIMALS);
-  //
-  //      if (swapInfo?.poolState) {
-  //        const baseDailyReward: BigNumber = baseRewardPerToken
-  //          .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
-  //          .dividedBy(DAYS_PER_YEAR);
-  //        const quoteDailyReward: BigNumber = quoteRewardPerToken
-  //          .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
-  //          .dividedBy(DAYS_PER_YEAR);
-  //        dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
-  //      }
-  //    }
-  //  return {
-  //    dailyReward,
-  //    dailyRewardRate,
-  //  };
-  //}, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, delfiTicker]);
 
   // update reward every 5 seconds
   useEffect(
@@ -476,58 +418,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       swapInfo,
     ],
   );
-
-  const unclaimedInterest = useMemo(() => {
-    if (lpUser && swapInfo?.swapConfig) {
-      const totalOwedInterest = new BigNumber(0);
-      //const totalOwedInterest = exponentiatedBy(
-      //  lpUser.basePosition.rewardsOwed.add(lpUser.quotePosition.rewardsOwed).toString(),
-      //  DELTAFI_TOKEN_DECIMALS,
-      //);
-
-      //const secondsFromBaseLastUpdate =
-      //  lpUser.basePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
-      //    ? new BN(0)
-      //    : new BN(depositView.currentUnixTimestamp).sub(lpUser.basePosition.lastUpdateTs);
-      //const secondsFromQuoteLastUpdate =
-      //  lpUser.quotePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
-      //    ? new BN(0)
-      //    : new BN(depositView.currentUnixTimestamp).sub(lpUser.quotePosition.lastUpdateTs);
-
-      const extraOwedBaseInterest = new BigNumber(0);
-      const extraOwnedQuoteInterest = new BigNumber(0);
-      //      const extraOwedBaseInterest = exponentiatedBy(
-      //        new BigNumber(
-      //          lpUser.basePosition.depositedAmount
-      //            .mul(swapInfo.swapConfig.baseAprNumerator)
-      //            .mul(secondsFromBaseLastUpdate)
-      //            .toString(),
-      //        )
-      //          .dividedBy(swapInfo.swapConfig.baseAprDenominator.toString())
-      //          .dividedBy(SECONDS_PER_YEAR),
-      //        DELTAFI_TOKEN_DECIMALS,
-      //      );
-      //
-      //      const extraOwnedQuoteInterest = exponentiatedBy(
-      //        new BigNumber(
-      //          lpUser.quotePosition.depositedAmount
-      //            .mul(swapInfo.swapConfig.quoteAprNumerator)
-      //            .mul(secondsFromQuoteLastUpdate)
-      //            .toString(),
-      //        )
-      //          .dividedBy(swapInfo.swapConfig.quoteAprDenominator.toString())
-      //          .dividedBy(new BigNumber(SECONDS_PER_YEAR)),
-      //        DELTAFI_TOKEN_DECIMALS,
-      //      );
-
-      return totalOwedInterest
-        .plus(extraOwedBaseInterest)
-        .plus(extraOwnedQuoteInterest)
-        .toFixed(DELTAFI_TOKEN_DECIMALS);
-    }
-
-    return "--";
-  }, [lpUser, swapInfo?.swapConfig]);
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
 
@@ -736,61 +626,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     program,
   ]);
 
-  //  const handleClaimInterest = useCallback(async () => {
-  //    if (!walletPubkey || !program || !lpUser) {
-  //      return null;
-  //    }
-  //    const connection = program.provider.connection;
-  //
-  //    try {
-  //      dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
-  //
-  //      const transaction = await createClaimFarmRewardsTransaction(
-  //        program,
-  //        connection,
-  //        poolConfig,
-  //        walletPubkey,
-  //        rewardsAccount?.publicKey,
-  //      );
-  //      const signedTransaction = await signTransaction(transaction);
-  //
-  //      const hash = await sendSignedTransaction({
-  //        signedTransaction,
-  //        connection,
-  //      });
-  //
-  //      await connection.confirmTransaction(hash, "confirmed");
-  //
-  //      dispatch(
-  //        depositViewActions.setTransactionResult({
-  //          transactionResult: {
-  //            status: true,
-  //            action: "claim",
-  //            hash,
-  //          },
-  //        }),
-  //      );
-  //    } catch (e) {
-  //      console.error("error", e);
-  //      dispatch(
-  //        depositViewActions.setTransactionResult({
-  //          transactionResult: {
-  //            status: false,
-  //          },
-  //        }),
-  //      );
-  //    } finally {
-  //      dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: true }));
-  //      dispatch(depositViewActions.setIsProcessing({ isProcessing: false }));
-  //      dispatch(
-  //        fetchLiquidityProvidersThunk({
-  //          connection,
-  //          walletAddress: walletPubkey,
-  //        }),
-  //      );
-  //    }
-  //  }, [lpUser, poolConfig, walletPubkey, program, rewardsAccount, signTransaction, dispatch]);
-
   const handleSnackBarClose = useCallback(() => {
     dispatch(depositViewActions.setOpenSnackbar({ openSnackbar: false }));
   }, [dispatch]);
@@ -908,19 +743,13 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           className={classes.snackBarIcon}
         />
         <Box>
-          {depositView.method === "claim" ? (
-            <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
-              {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(
-                unclaimedInterest,
-              ).toFixed(DELTAFI_TOKEN_DECIMALS)} DELFI`}
-            </Box>
-          ) : (
+          {
             <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
               {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(base.amount).toFixed(
                 6,
               )} ${base.token.symbol} and ${Number(quote.amount).toFixed(6)} ${quote.token.symbol}`}
             </Box>
-          )}
+          }
           <Box display="flex" alignItems="center">
             <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
               View Transaction:
@@ -936,7 +765,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         </Box>
       </Box>
     );
-  }, [unclaimedInterest, depositView, classes, network]);
+  }, [depositView, classes, network]);
 
   const snackAction = useMemo(() => {
     return (
@@ -1164,13 +993,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
                     />
                   </Box>
                 );
-              case "claim":
-                return (
-                  <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
-                    <Paper>Cumulative interest: {cumulativeInterest} DELFI</Paper>
-                    <Paper>Unclaimed interest: {unclaimedInterest} DELFI</Paper>
-                  </Box>
-                );
               default:
                 throw Error("Invalid deposit card method: " + method);
             }
@@ -1180,11 +1002,10 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           {actionButton}
         </Box>
         <Box display="flex" justifyContent="center" className={classes.statsBottom}>
-          {/* <Box>{swapFee.toString()}% Swap Fee</Box> */}
+          <Box>{swapFee.toString()}% Swap Fee</Box>
           <Box>{withdrawFee.toString()}% Withdraw Fee</Box>
         </Box>
       </Box>
-      {/* <PoolInformation pool={poolConfig} /> */}
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={depositView.openSnackbar}
