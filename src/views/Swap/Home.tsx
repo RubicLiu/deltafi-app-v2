@@ -30,7 +30,7 @@ import { exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK, TOKEN_PRICE_DECIMALS } from "constants/index";
 import { SWAP_DIRECTION } from "lib/instructions";
 import { sendSignedTransaction } from "utils/transactions";
-import { getSwapInResult, getSwapOutResult } from "utils/swap";
+import { calculateSwapInResult, calculateSwapOutResult } from "calculations/swapOutAmount";
 import { SwapCard as ISwapCard } from "./components/types";
 import { PublicKey } from "@solana/web3.js";
 import { useSelector, useDispatch } from "react-redux";
@@ -66,6 +66,7 @@ import { DeltafiUser, SwapInfo } from "anchor/type_definitions";
 import Autocomplete from "@material-ui/lab/Autocomplete/Autocomplete";
 import CompareArrows from "components/Svg/icons/CompareArrows";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
+import { getPriceImpactDisplay } from "calculations/utils";
 import BigNumber from "bignumber.js";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
@@ -376,7 +377,7 @@ const Home: React.FC = (props) => {
       insufficientLiquidity,
       amountOut: quoteAmount,
       amountOutWithSlippage: quoteAmountWithSlippage,
-    } = getSwapOutResult(
+    } = calculateSwapOutResult(
       swapInfo,
       newTokenFrom,
       newTokenTo,
@@ -386,7 +387,11 @@ const Home: React.FC = (props) => {
     );
 
     dispatch(swapViewActions.setInsufficientLiquidity({ insufficientLiquidity }));
-    dispatch(swapViewActions.setPriceImpact({ priceImpact }));
+    dispatch(
+      swapViewActions.setPriceImpact({
+        priceImpact: getPriceImpactDisplay(new BigNumber(priceImpact)),
+      }),
+    );
 
     const amountOut = quoteAmount === "NaN" ? "" : quoteAmount;
     const amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
@@ -422,7 +427,7 @@ const Home: React.FC = (props) => {
       insufficientLiquidity,
       amountIn: baseAmount,
       amountOutWithSlippage: quoteAmountWithSlippage,
-    } = getSwapInResult(
+    } = calculateSwapInResult(
       swapInfo,
       newTokenFrom,
       newTokenTo,
@@ -432,7 +437,11 @@ const Home: React.FC = (props) => {
     );
 
     dispatch(swapViewActions.setInsufficientLiquidity({ insufficientLiquidity }));
-    dispatch(swapViewActions.setPriceImpact({ priceImpact }));
+    dispatch(
+      swapViewActions.setPriceImpact({
+        priceImpact: getPriceImpactDisplay(new BigNumber(priceImpact)),
+      }),
+    );
 
     const amountIn = baseAmount === "NaN" ? "" : baseAmount;
     const amountOutWithSlippage = quoteAmountWithSlippage === "NaN" ? "" : quoteAmountWithSlippage;
