@@ -22,11 +22,7 @@ import { exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK } from "constants/index";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getPoolConfigBySwapKey,
-  deployConfigV2,
-  DELTAFI_TOKEN_DECIMALS,
-} from "constants/deployConfigV2";
+import { getPoolConfigBySwapKey, deployConfigV2 } from "constants/deployConfigV2";
 import {
   selectLpUserBySwapKey,
   selectMarketPriceByPool,
@@ -41,7 +37,6 @@ import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAc
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
 import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/tokenUtils";
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
-import { Paper } from "@material-ui/core";
 import { scheduleWithInterval } from "utils";
 import WithdrawSelectCard from "./components/WithdrawSelectCard/Card";
 import DepositCard from "./components/DepositCard/Card";
