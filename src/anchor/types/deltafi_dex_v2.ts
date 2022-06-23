@@ -190,36 +190,6 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "updateSwapVirtualReserve",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "swapInfo",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "virtualBaseReserve",
-          "type": "u64"
-        },
-        {
-          "name": "virtualQuoteReserve",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "updateFarmConfig",
       "accounts": [
         {
@@ -2568,19 +2538,11 @@ export type DeltafiDexV2 = {
             "type": "u128"
           },
           {
-            "name": "virtualBaseReserve",
-            "type": "u64"
-          },
-          {
-            "name": "virtualQuoteReserve",
-            "type": "u64"
-          },
-          {
             "name": "reservedU64",
             "type": {
               "array": [
                 "u64",
-                14
+                16
               ]
             }
           }
@@ -2782,7 +2744,7 @@ export type DeltafiDexV2 = {
             "type": "u32"
           },
           {
-            "name": "maxVirtualReserveRatio",
+            "name": "virtualReservePercentage",
             "type": "u16"
           },
           {
@@ -3399,36 +3361,6 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "updateSwapVirtualReserve",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "swapInfo",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": true
-        }
-      ],
-      "args": [
-        {
-          "name": "virtualBaseReserve",
-          "type": "u64"
-        },
-        {
-          "name": "virtualQuoteReserve",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "updateFarmConfig",
       "accounts": [
         {
@@ -5777,19 +5709,11 @@ export const IDL: DeltafiDexV2 = {
             "type": "u128"
           },
           {
-            "name": "virtualBaseReserve",
-            "type": "u64"
-          },
-          {
-            "name": "virtualQuoteReserve",
-            "type": "u64"
-          },
-          {
             "name": "reservedU64",
             "type": {
               "array": [
                 "u64",
-                14
+                16
               ]
             }
           }
@@ -5991,7 +5915,7 @@ export const IDL: DeltafiDexV2 = {
             "type": "u32"
           },
           {
-            "name": "maxVirtualReserveRatio",
+            "name": "virtualReservePercentage",
             "type": "u16"
           },
           {
