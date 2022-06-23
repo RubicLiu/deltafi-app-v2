@@ -348,14 +348,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return new BigNumber(0);
   }, [swapInfo, quotePercent, quoteTokenInfo]);
 
-   const swapFee = useMemo(() => {
-     if (swapInfo) {
-       return new BigNumber(swapInfo.swapConfig.tradeFeeNumerator.toString())
-         .dividedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
-         .multipliedBy(100);
-     }
-     return new BigNumber(0);
-   }, [swapInfo]);
+  const swapFee = useMemo(() => {
+    if (swapInfo) {
+      return new BigNumber(swapInfo.swapConfig.tradeFeeNumerator.toString())
+        .dividedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
+        .multipliedBy(100);
+    }
+    return new BigNumber(0);
+  }, [swapInfo]);
 
   const withdrawFee = useMemo(() => {
     if (swapInfo) {
@@ -365,59 +365,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     }
     return new BigNumber(0);
   }, [swapInfo]);
-
-  const cumulativeInterest: string = useMemo(() => {
-    //    if (lpUser) {
-    //      return exponentiatedBy(
-    //        lpUser.basePosition.cumulativeInterest
-    //          .add(lpUser.quotePosition.cumulativeInterest)
-    //          .toString(),
-    //        DELTAFI_TOKEN_DECIMALS,
-    //      ).toFixed(DELTAFI_TOKEN_DECIMALS);
-    //    }
-    return "--";
-  }, []);
-
-  //const delfiTicker = useSelector(selectGateIoSticker(DELFI_USDT));
-  //const { dailyRewardRate } = useMemo(() => {
-  //  let dailyReward = "--";
-  //  let dailyRewardRate = "--";
-  //
-  //    if (swapInfo?.swapConfig && delfiTicker) {
-  //      const baseRewardPerToken: BigNumber = new BigNumber(
-  //        swapInfo.swapConfig.baseAprNumerator.toString(),
-  //      ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
-  //      const quoteRewardPerToken: BigNumber = new BigNumber(
-  //        swapInfo.swapConfig.quoteAprNumerator.toString(),
-  //      ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
-  //
-  //      const baseDailyRewardRate: BigNumber = baseRewardPerToken
-  //        .dividedBy(basePrice)
-  //        .dividedBy(DAYS_PER_YEAR);
-  //      const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
-  //        .dividedBy(quotePrice)
-  //        .dividedBy(DAYS_PER_YEAR);
-  //
-  //      dailyRewardRate = baseDailyRewardRate
-  //        .plus(quoteDailyRewardRate)
-  //        .times(new BigNumber(delfiTicker.last))
-  //        .toFixed(DELTAFI_TOKEN_DECIMALS);
-  //
-  //      if (swapInfo?.poolState) {
-  //        const baseDailyReward: BigNumber = baseRewardPerToken
-  //          .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
-  //          .dividedBy(DAYS_PER_YEAR);
-  //        const quoteDailyReward: BigNumber = quoteRewardPerToken
-  //          .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
-  //          .dividedBy(DAYS_PER_YEAR);
-  //        dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
-  //      }
-  //    }
-  //  return {
-  //    dailyReward,
-  //    dailyRewardRate,
-  //  };
-  //}, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, delfiTicker]);
 
   // update reward every 5 seconds
   useEffect(
@@ -476,58 +423,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       swapInfo,
     ],
   );
-
-  const unclaimedInterest = useMemo(() => {
-    if (lpUser && swapInfo?.swapConfig) {
-      const totalOwedInterest = new BigNumber(0);
-      //const totalOwedInterest = exponentiatedBy(
-      //  lpUser.basePosition.rewardsOwed.add(lpUser.quotePosition.rewardsOwed).toString(),
-      //  DELTAFI_TOKEN_DECIMALS,
-      //);
-
-      //const secondsFromBaseLastUpdate =
-      //  lpUser.basePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
-      //    ? new BN(0)
-      //    : new BN(depositView.currentUnixTimestamp).sub(lpUser.basePosition.lastUpdateTs);
-      //const secondsFromQuoteLastUpdate =
-      //  lpUser.quotePosition.nextClaimTs.toNumber() > depositView.currentUnixTimestamp
-      //    ? new BN(0)
-      //    : new BN(depositView.currentUnixTimestamp).sub(lpUser.quotePosition.lastUpdateTs);
-
-      const extraOwedBaseInterest = new BigNumber(0);
-      const extraOwnedQuoteInterest = new BigNumber(0);
-      //      const extraOwedBaseInterest = exponentiatedBy(
-      //        new BigNumber(
-      //          lpUser.basePosition.depositedAmount
-      //            .mul(swapInfo.swapConfig.baseAprNumerator)
-      //            .mul(secondsFromBaseLastUpdate)
-      //            .toString(),
-      //        )
-      //          .dividedBy(swapInfo.swapConfig.baseAprDenominator.toString())
-      //          .dividedBy(SECONDS_PER_YEAR),
-      //        DELTAFI_TOKEN_DECIMALS,
-      //      );
-      //
-      //      const extraOwnedQuoteInterest = exponentiatedBy(
-      //        new BigNumber(
-      //          lpUser.quotePosition.depositedAmount
-      //            .mul(swapInfo.swapConfig.quoteAprNumerator)
-      //            .mul(secondsFromQuoteLastUpdate)
-      //            .toString(),
-      //        )
-      //          .dividedBy(swapInfo.swapConfig.quoteAprDenominator.toString())
-      //          .dividedBy(new BigNumber(SECONDS_PER_YEAR)),
-      //        DELTAFI_TOKEN_DECIMALS,
-      //      );
-
-      return totalOwedInterest
-        .plus(extraOwedBaseInterest)
-        .plus(extraOwnedQuoteInterest)
-        .toFixed(DELTAFI_TOKEN_DECIMALS);
-    }
-
-    return "--";
-  }, [lpUser, swapInfo?.swapConfig]);
 
   const { publicKey: walletPubkey, signTransaction } = useWallet();
 
@@ -908,19 +803,13 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           className={classes.snackBarIcon}
         />
         <Box>
-          {depositView.method === "claim" ? (
-            <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
-              {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(
-                unclaimedInterest,
-              ).toFixed(DELTAFI_TOKEN_DECIMALS)} DELFI`}
-            </Box>
-          ) : (
+          {
             <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
               {`${action.charAt(0).toUpperCase() + action.slice(1)} ${Number(base.amount).toFixed(
                 6,
               )} ${base.token.symbol} and ${Number(quote.amount).toFixed(6)} ${quote.token.symbol}`}
             </Box>
-          )}
+          }
           <Box display="flex" alignItems="center">
             <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
               View Transaction:
@@ -936,7 +825,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         </Box>
       </Box>
     );
-  }, [unclaimedInterest, depositView, classes, network]);
+  }, [depositView, classes, network]);
 
   const snackAction = useMemo(() => {
     return (
@@ -1164,13 +1053,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
                     />
                   </Box>
                 );
-              case "claim":
-                return (
-                  <Box display="flex" flexDirection="column" alignItems="flex-end" gridGap={24}>
-                    <Paper>Cumulative interest: {cumulativeInterest} DELFI</Paper>
-                    <Paper>Unclaimed interest: {unclaimedInterest} DELFI</Paper>
-                  </Box>
-                );
               default:
                 throw Error("Invalid deposit card method: " + method);
             }
@@ -1184,7 +1066,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           <Box>{withdrawFee.toString()}% Withdraw Fee</Box>
         </Box>
       </Box>
-      {/* <PoolInformation pool={poolConfig} /> */}
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={depositView.openSnackbar}
