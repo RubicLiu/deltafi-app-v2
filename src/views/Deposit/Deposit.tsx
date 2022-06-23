@@ -348,14 +348,14 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return new BigNumber(0);
   }, [swapInfo, quotePercent, quoteTokenInfo]);
 
-  // const swapFee = useMemo(() => {
-  //   if (swapInfo) {
-  //     return new BigNumber(swapInfo.swapConfig.tradeFeeNumerator.toString())
-  //       .dividedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
-  //       .multipliedBy(100);
-  //   }
-  //   return new BigNumber(0);
-  // }, [swapInfo]);
+   const swapFee = useMemo(() => {
+     if (swapInfo) {
+       return new BigNumber(swapInfo.swapConfig.tradeFeeNumerator.toString())
+         .dividedBy(swapInfo.swapConfig.tradeFeeDenominator.toString())
+         .multipliedBy(100);
+     }
+     return new BigNumber(0);
+   }, [swapInfo]);
 
   const withdrawFee = useMemo(() => {
     if (swapInfo) {
@@ -1180,7 +1180,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           {actionButton}
         </Box>
         <Box display="flex" justifyContent="center" className={classes.statsBottom}>
-          {/* <Box>{swapFee.toString()}% Swap Fee</Box> */}
+          <Box>{swapFee.toString()}% Swap Fee</Box>
           <Box>{withdrawFee.toString()}% Withdraw Fee</Box>
         </Box>
       </Box>
