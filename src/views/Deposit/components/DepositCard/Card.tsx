@@ -31,7 +31,7 @@ const DepositCard: React.FC<DepositCardProps> = (props) => {
   const handleChangeToken = (_) => {};
 
   const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.replace(/[^\d.-]/g, "");
+    const value = event.target.value.replace(/[^\d.]/g, "");
     if (new BigNumber(value).isNaN() && value !== "") {
       return;
     } else if (value === "") {
