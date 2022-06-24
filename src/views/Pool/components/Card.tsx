@@ -1,10 +1,14 @@
 import React, { useMemo, memo } from "react";
-import { Box, makeStyles } from "@material-ui/core";
+import { Box, CircularProgress, makeStyles } from "@material-ui/core";
 import BigNumber from "bignumber.js";
 import styled from "styled-components";
 
 import { ConnectButton } from "components";
-import { convertDollarSign as convertDollar, getTotalVolume } from "utils/utils";
+import {
+  convertDollarSign as convertDollar,
+  getTotalVolume,
+  getValueByCondition,
+} from "utils/utils";
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
 import { useModal } from "providers/modal";
@@ -205,18 +209,30 @@ const PoolCard: React.FC<CardProps> = (props) => {
         {props.isUserPool && (
           <Box marginBottom={1.25}>
             <Box className={`${classes.labelTitle} ${props.color || ""}`}>My Deposit</Box>
-            <Box className={classes.label}>{convertDollar(userTvl.toFixed(2))}</Box>
+            <Box className={classes.label}>
+              {getValueByCondition(
+                userTvl && !userTvl.isNaN(),
+                convertDollar(userTvl.toFixed(2)),
+              ) || <CircularProgress size={15} color="inherit" />}
+            </Box>
           </Box>
         )}
         <Box>
           <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total Trading Volume</Box>
           <Box className={classes.label}>
-            {convertDollar(totalTradeVolume.toFixed(2).toString())}
+            {getValueByCondition(
+              totalTradeVolume && !totalTradeVolume.isNaN(),
+              convertDollar(totalTradeVolume.toFixed(2)),
+            ) || <CircularProgress size={15} color="inherit" />}
           </Box>
         </Box>
         <Box marginTop={1.25}>
           <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total Deposits</Box>
-          <Box className={classes.label}>{convertDollar(tvl.toFixed(2).toString())}</Box>
+          <Box className={classes.label}>
+            {getValueByCondition(tvl && !tvl.isNaN(), convertDollar(tvl.toFixed(2).toString())) || (
+              <CircularProgress size={15} color="inherit" />
+            )}
+          </Box>
         </Box>
         <ConnectButton
           className={classes.cardBtn}

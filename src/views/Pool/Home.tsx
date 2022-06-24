@@ -1,15 +1,15 @@
 import { useMemo } from "react";
-import { Backdrop, Box, Grid, makeStyles, Modal } from "@material-ui/core";
+import { Backdrop, Box, CircularProgress, Grid, makeStyles, Modal } from "@material-ui/core";
 
 import Page from "components/layout/Page";
-import Card from "./components/Card_v2";
-import { formatCurrencyAmount } from "utils/utils";
+import Card from "./components/Card";
+import { formatCurrencyAmount, getValueByCondition } from "utils/utils";
 import { poolConfigs } from "constants/deployConfigV2";
 import { useSelector } from "react-redux";
 import { pythSelector, poolSelector } from "states/selectors";
 import { useParams } from "react-router";
 import Deposit from "views/Deposit/Deposit";
-import { calculateTotalHoldings } from "lib/calc/pools";
+import { calculateTotalValueLocked } from "lib/calc/pools";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   container: {
@@ -83,7 +83,8 @@ const Home: React.FC = () => {
   const poolAddress = params?.poolAddress;
 
   const tvl = useMemo(
-    () => calculateTotalHoldings(poolConfigs, poolState.swapKeyToSwapInfo, symbolToPythPriceData),
+    () =>
+      calculateTotalValueLocked(poolConfigs, poolState.swapKeyToSwapInfo, symbolToPythPriceData),
     [symbolToPythPriceData, poolState],
   );
 
@@ -92,7 +93,9 @@ const Home: React.FC = () => {
       <Box padding={0} className={classes.container}>
         <Box color="#fff" textAlign="center" className={classes.header}>
           <Box fontSize={36} color="#D4FF00" fontWeight={600}>
-            {formatCurrencyAmount(tvl)}
+            {getValueByCondition(tvl && !tvl.isNaN(), formatCurrencyAmount(tvl)) || (
+              <CircularProgress size={30} color="inherit" />
+            )}
           </Box>
           <Box marginTop={1} fontSize={18}>
             Total Value Locked

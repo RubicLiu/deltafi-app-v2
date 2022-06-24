@@ -1,9 +1,9 @@
 import React, { memo } from "react";
-import { Box, makeStyles } from "@material-ui/core";
+import { Box, CircularProgress, makeStyles } from "@material-ui/core";
 import styled from "styled-components";
 
 import { ConnectButton } from "components";
-import { convertDollarSign as convertDollar } from "utils/utils";
+import { convertDollarSign as convertDollar, getValueByCondition } from "utils/utils";
 import { CardProps } from "./types";
 import { useModal } from "providers/modal";
 
@@ -118,7 +118,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
 
 const FarmCard: React.FC<CardProps> = (props) => {
   const classes = useStyles(props);
-  const { poolConfig, farmInfoAddress, totalStaked, userStaked, apr } = props;
+  const { poolConfig, farmInfoAddress, userStaked, totalStaked, apr } = props;
   const baseTokenInfo = poolConfig.baseTokenInfo;
   const quoteTokenInfo = poolConfig.quoteTokenInfo;
   const { setMenu } = useModal();
@@ -144,16 +144,30 @@ const FarmCard: React.FC<CardProps> = (props) => {
         {props.isUserPool && (
           <Box marginBottom={1.25}>
             <Box className={`${classes.labelTitle} ${props.color || ""}`}>My Staked</Box>
-            <Box className={classes.label}>{convertDollar(userStaked.toFixed(2))}</Box>
+            <Box className={classes.label}>
+              {getValueByCondition(
+                userStaked && !userStaked.isNaN(),
+                convertDollar(userStaked.toFixed(2)),
+              ) || <CircularProgress size={15} color="inherit" />}
+            </Box>
           </Box>
         )}
         <Box>
           <Box className={`${classes.labelTitle} ${props.color || ""}`}>Total Staked</Box>
-          <Box className={classes.label}>{convertDollar(totalStaked.toFixed(2))}</Box>
+          <Box className={classes.label}>
+            {getValueByCondition(
+              totalStaked && !totalStaked.isNaN(),
+              convertDollar(totalStaked.toFixed(2)),
+            ) || <CircularProgress size={15} color="inherit" />}
+          </Box>
         </Box>
         <Box marginTop={1.25}>
           <Box className={`${classes.labelTitle} ${props.color || ""}`}>APR</Box>
-          <Box className={classes.label}>{apr.isNaN() ? "--" : apr.toFixed(2)}%</Box>
+          <Box className={classes.label}>
+            {getValueByCondition(apr && !apr.isNaN(), `${apr.toFixed(2)}%`) || (
+              <CircularProgress size={15} color="inherit" />
+            )}
+          </Box>
         </Box>
         <ConnectButton
           className={classes.cardBtn}

@@ -19,7 +19,7 @@ import {
   PoolConfig,
   poolConfigs,
 } from "constants/deployConfigV2";
-import PoolCard from "views/Pool/components/Card_v2";
+import PoolCard from "views/Pool/components/Card";
 import FarmCard from "views/Farm/components/Card";
 import { ChangeEvent, useCallback, useMemo } from "react";
 import Reward from "views/Reward";

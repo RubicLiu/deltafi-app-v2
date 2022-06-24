@@ -1,5 +1,5 @@
 import React, { ChangeEvent, ReactElement, useCallback, useMemo, useState } from "react";
-import { Box, Grid, makeStyles, Theme } from "@material-ui/core";
+import { Box, CircularProgress, Grid, makeStyles, Theme } from "@material-ui/core";
 
 import Page from "components/layout/Page";
 import FarmCard from "./components/Card";
@@ -11,7 +11,7 @@ import { farmSelector, poolSelector, pythSelector, selectGateIoSticker } from "s
 import { calculateFarmPoolsStakeInfo, FarmInfoData } from "./utils";
 import BigNumber from "bignumber.js";
 import { PoolCardColor } from "utils/type";
-import { formatCurrencyAmount } from "utils/utils";
+import { formatCurrencyAmount, getValueByCondition } from "utils/utils";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -247,7 +247,10 @@ const Home: React.FC = (props): ReactElement => {
       <Box className={classes.container}>
         <Box color="#fff" textAlign="center" className={classes.header}>
           <Box fontSize={36} color="#D4FF00" fontWeight={600}>
-            {formatCurrencyAmount(totalStaked)}
+            {getValueByCondition(
+              totalStaked && !totalStaked.isNaN(),
+              formatCurrencyAmount(totalStaked),
+            ) || <CircularProgress size={30} color="inherit" />}
           </Box>
           <Box marginTop={1.5} fontSize={18}>
             Total Staked
