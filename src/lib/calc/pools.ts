@@ -5,12 +5,16 @@ import { getPythMarketPrice } from "states/accounts/pythAccount";
 import { SwapPoolKeyToSwap } from "states/accounts/swapAccount";
 import { getTokenTvl } from "utils/utils";
 
-export function calculateTotalHoldings(
+export function calculateTotalValueLocked(
   poolConfigs: PoolConfig[],
   swapKeyToSwapInfo: SwapPoolKeyToSwap,
   symbolToPythPriceData: SymbolToPythPriceData,
 ) {
   if (poolConfigs.length > 0) {
+    if (Object.keys(swapKeyToSwapInfo).length < poolConfigs.length) {
+      // if the swapinfo length is less than pool config length, it means the data is not loaded yet
+      return new BigNumber(null);
+    }
     return (poolConfigs as any).reduce((sum, poolConfig) => {
       const swapInfo = swapKeyToSwapInfo[poolConfig.swapInfo];
       const { basePrice, quotePrice } = getPythMarketPrice(symbolToPythPriceData, poolConfig);

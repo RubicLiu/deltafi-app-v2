@@ -90,3 +90,7 @@ export function formatCurrencyAmount(value: number | string | BigNumber) {
   }
   return valueBn.toNumber().toLocaleString("en-US", { style: "currency", currency: "USD" });
 }
+
+export function getValueByCondition(condition: boolean, value: any): any {
+  return condition ? value : null;
+}

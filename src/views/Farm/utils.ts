@@ -35,7 +35,7 @@ export function calculateFarmPoolsStakeInfo(
       const farmUser = farmPoolKeyToFarmUser ? farmPoolKeyToFarmUser[farmInfoAddress] : null;
       const basePrice = getPythPrice(symbolToPythPriceData, poolConfig.base);
       const quotePrice = getPythPrice(symbolToPythPriceData, poolConfig.quote);
-      
+
       if (
         !basePrice?.price ||
         !quotePrice?.price ||
