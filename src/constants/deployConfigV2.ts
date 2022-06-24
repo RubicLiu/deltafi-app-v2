@@ -57,6 +57,30 @@ export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String):
   );
 }
 
+// if the pool doesn't exist in our deployment
+// we will return a fake poolConfig with undefined address info but with symbols
+// base and quote token in this fake poolConfig are in alphabetical orde
+export function getPoolConfigBySymbolsAllowFake(
+  baseSymbol: String,
+  quoteSymbol: String,
+): PoolConfig {
+  const result = getPoolConfigBySymbols(baseSymbol, quoteSymbol);
+  if (result) {
+    return result;
+  }
+
+  if (quoteSymbol < baseSymbol) {
+    [baseSymbol, quoteSymbol] = [quoteSymbol, baseSymbol];
+  }
+
+  return {
+    base: baseSymbol,
+    quote: quoteSymbol,
+    baseTokenInfo: getTokenConfigBySymbol(baseSymbol),
+    quoteTokenInfo: getTokenConfigBySymbol(quoteSymbol),
+  } as PoolConfig;
+}
+
 export function getPoolConfigBySwapKey(poolKey: String): PoolConfig {
   return poolConfigs.find(({ swapInfo }) => swapInfo === poolKey);
 }

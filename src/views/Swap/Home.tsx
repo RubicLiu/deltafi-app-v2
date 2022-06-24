@@ -49,7 +49,7 @@ import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
   deployConfigV2,
   enableReferral,
-  getPoolConfigBySymbols,
+  getPoolConfigBySymbolsAllowFake,
   getTokenConfigBySymbol,
   PoolConfig,
   poolConfigs,
@@ -268,7 +268,7 @@ const Home: React.FC = (props) => {
   const tokenFrom = swapView.tokenFrom;
   const tokenTo = swapView.tokenTo;
 
-  const poolConfig: PoolConfig = getPoolConfigBySymbols(
+  const poolConfig: PoolConfig = getPoolConfigBySymbolsAllowFake(
     tokenFrom.token.symbol,
     tokenTo.token.symbol,
   );
@@ -292,7 +292,7 @@ const Home: React.FC = (props) => {
 
   const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
   const exchangeRateLabel = useMemo(() => {
-    if (basePrice && quotePrice && swapInfo) {
+    if (basePrice && quotePrice) {
       if (tokenFrom.token.symbol === poolConfig?.base) {
         return Number(basePrice / quotePrice).toFixed(poolConfig.quoteTokenInfo.decimals);
       } else if (tokenFrom.token.symbol === poolConfig?.quote) {
