@@ -100,58 +100,6 @@ const PoolStatsCollapsible = ({
             <Box textAlign={"left"}>Reserve Magnifier:</Box>
             <Box textAlign={"right"}>{`${stringCutDecimals(2, reserveManifier.toString())}x`}</Box>
           </Box>
-          <Box className={classes.dataRow}>
-            <Box textAlign={"left"}>Swap Account:</Box>
-            <Box textAlign={"right"}>{`${stringCutDecimals(2, reserveManifier.toString())}x`}</Box>
-          </Box>
-          <Box className={classes.dataRow}>
-            <Box textAlign={"left"}>{baseTokenInfo.symbol} Address:</Box>
-            <Box textAlign={"right"} className={classes.clickable}>
-              <Link
-                onClick={() =>
-                  window.open(`https://solscan.io/token/${swapInfo.mintBase.toBase58()}`)
-                }
-              >
-                {addressLink(swapInfo.mintBase.toBase58(), "")}
-              </Link>
-            </Box>
-          </Box>
-          <Box className={classes.dataRow}>
-            <Box textAlign={"left"}>{quoteTokenInfo.symbol} Address:</Box>
-            <Box textAlign={"right"} className={classes.clickable}>
-              <Link
-                onClick={() =>
-                  window.open(`https://solscan.io/token/${swapInfo.mintQuote.toBase58()}`)
-                }
-              >
-                {addressLink(swapInfo.mintQuote.toBase58(), "")}
-              </Link>
-            </Box>
-          </Box>
-          <Box className={classes.dataRow}>
-            <Box textAlign={"left"}>{baseTokenInfo.symbol} Reserve:</Box>
-            <Box textAlign={"right"} className={classes.clickable}>
-              <Link
-                onClick={() =>
-                  window.open(`https://solscan.io/account/${swapInfo.tokenBase.toBase58()}`)
-                }
-              >
-                {addressLink(swapInfo.tokenBase.toBase58(), "")}
-              </Link>
-            </Box>
-          </Box>
-          <Box className={classes.dataRow}>
-            <Box textAlign={"left"}>{quoteTokenInfo.symbol} Reserve:</Box>
-            <Box textAlign={"right"} className={classes.clickable}>
-              <Link
-                onClick={() =>
-                  window.open(`https://solscan.io/account/${swapInfo.tokenQuote.toBase58()}`)
-                }
-              >
-                {addressLink(swapInfo.tokenQuote.toBase58(), "")}
-              </Link>
-            </Box>
-          </Box>
         </Box>
       </Box>
     </Box>
