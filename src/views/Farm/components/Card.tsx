@@ -164,7 +164,7 @@ const FarmCard: React.FC<CardProps> = (props) => {
         <Box marginTop={1.25}>
           <Box className={`${classes.labelTitle} ${props.color || ""}`}>APR</Box>
           <Box className={classes.label}>
-            {getValueByCondition(apr && !apr.isNaN(), convertDollar(apr.toFixed(2))) || (
+            {getValueByCondition(apr && !apr.isNaN(), `${apr.toFixed(2)}%`) || (
               <CircularProgress size={15} color="inherit" />
             )}
           </Box>
