@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import styled from "styled-components";
 
 import { ConnectButton } from "components";
-import { convertDollarSign as convertDollar, getTokenTvl, getTotalVolume } from "utils/utils";
+import { convertDollarSign as convertDollar, getTotalVolume } from "utils/utils";
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
 import { useModal } from "providers/modal";
@@ -14,6 +14,7 @@ import {
   selectLpUserBySwapKey,
 } from "states/selectors";
 import { SwapInfo } from "anchor/type_definitions";
+import { calculatePoolTvl } from "../utils";
 
 const Img = styled.img`
   width: 32px;
@@ -142,21 +143,10 @@ const PoolCard: React.FC<CardProps> = (props) => {
     [basePrice, quotePrice, swapInfo, baseTokenInfo, quoteTokenInfo],
   );
 
-  const baseTvl = useMemo(() => {
-    if (basePrice && swapInfo) {
-      return getTokenTvl(baseTokenInfo, swapInfo.poolState.baseReserve, basePrice);
-    }
-    return new BigNumber(0);
-  }, [basePrice, swapInfo, baseTokenInfo]);
-
-  const quoteTvl = useMemo(() => {
-    if (quotePrice && swapInfo) {
-      return getTokenTvl(quoteTokenInfo, swapInfo.poolState.quoteReserve, quotePrice);
-    }
-    return new BigNumber(0);
-  }, [quotePrice, swapInfo, quoteTokenInfo]);
-
-  const tvl = baseTvl.plus(quoteTvl);
+  const { baseTvl, quoteTvl, tvl } = useMemo(
+    () => calculatePoolTvl(basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, swapInfo),
+    [basePrice, baseTokenInfo, quotePrice, quoteTokenInfo, swapInfo],
+  );
 
   const basePercent = useMemo(() => {
     if (lpUser && swapInfo) {
@@ -192,46 +182,6 @@ const PoolCard: React.FC<CardProps> = (props) => {
   }, [quoteTvl, quotePercent]);
 
   const userTvl = userBaseTvl.plus(userQuoteTvl);
-
-  //const delfiTicker = useSelector(selectGateIoSticker(DELFI_USDT));
-  //const { dailyReward, dailyRewardRate } = useMemo(() => {
-  //  let dailyReward = "--";
-  //  let dailyRewardRate = "--";
-  //      if (swapInfo?.swapConfig && delfiTicker) {
-  //        const baseRewardPerToken: BigNumber = new BigNumber(
-  //          swapInfo.swapConfig.baseAprNumerator.toString(),
-  //        ).dividedBy(new BigNumber(swapInfo.swapConfig.baseAprDenominator.toString()));
-  //        const quoteRewardPerToken: BigNumber = new BigNumber(
-  //          swapInfo.swapConfig.quoteAprNumerator.toString(),
-  //        ).dividedBy(new BigNumber(swapInfo.swapConfig.quoteAprDenominator.toString()));
-  //
-  //        const baseDailyRewardRate: BigNumber = baseRewardPerToken
-  //          .dividedBy(basePrice)
-  //          .dividedBy(DAYS_PER_YEAR);
-  //        const quoteDailyRewardRate: BigNumber = quoteRewardPerToken
-  //          .dividedBy(quotePrice)
-  //          .dividedBy(DAYS_PER_YEAR);
-  //
-  //        dailyRewardRate = baseDailyRewardRate
-  //          .plus(quoteDailyRewardRate)
-  //          .times(new BigNumber(delfiTicker.last))
-  //          .toFixed(DELTAFI_TOKEN_DECIMALS);
-  //
-  //        if (swapInfo?.poolState) {
-  //          const baseDailyReward: BigNumber = baseRewardPerToken
-  //            .multipliedBy(anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve))
-  //            .dividedBy(DAYS_PER_YEAR);
-  //          const quoteDailyReward: BigNumber = quoteRewardPerToken
-  //            .multipliedBy(anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve))
-  //            .dividedBy(DAYS_PER_YEAR);
-  //          dailyReward = baseDailyReward.plus(quoteDailyReward).toFixed(DELTAFI_TOKEN_DECIMALS);
-  //        }
-  //      }
-  //  return {
-  //    dailyReward,
-  //    dailyRewardRate,
-  //  };
-  //}, [swapInfo, basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, delfiTicker]);
 
   if (!swapInfo) return null;
   return (
