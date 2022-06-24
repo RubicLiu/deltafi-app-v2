@@ -448,47 +448,6 @@ export type DeltafiDexV2 = {
       ]
     },
     {
-      "name": "createLiquidityProvider",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "swapInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "liquidityProvider",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "bump",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "createLiquidityProviderV2",
       "accounts": [
         {
@@ -2033,47 +1992,6 @@ export type DeltafiDexV2 = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "createFarmUser",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmUser",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "bump",
-          "type": "u8"
-        }
-      ]
     },
     {
       "name": "createFarmUserV2",
@@ -3619,47 +3537,6 @@ export const IDL: DeltafiDexV2 = {
       ]
     },
     {
-      "name": "createLiquidityProvider",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "swapInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "liquidityProvider",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "bump",
-          "type": "u8"
-        }
-      ]
-    },
-    {
       "name": "createLiquidityProviderV2",
       "accounts": [
         {
@@ -5204,47 +5081,6 @@ export const IDL: DeltafiDexV2 = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "createFarmUser",
-      "accounts": [
-        {
-          "name": "marketConfig",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "farmUser",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "owner",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "bump",
-          "type": "u8"
-        }
-      ]
     },
     {
       "name": "createFarmUserV2",
