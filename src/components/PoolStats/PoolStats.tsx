@@ -53,6 +53,30 @@ const PoolStatsCollapsible = ({
     }
   }, [swapInfo]);
 
+  // if one of the values is less than 100
+  // we display full decimals
+  // else only display the integer part
+  const { baseReserveDisplay, quoteReserveDisplay } = useMemo(() => {
+    const decimalDisplayThresHold = 100;
+    if (
+      baseReserve.isLessThan(decimalDisplayThresHold) ||
+      quoteReserve.isLessThan(decimalDisplayThresHold)
+    ) {
+      return {
+        baseReserveDisplay: currencyValueDisplay(
+          stringCutDecimals(baseTokenInfo.decimals, baseReserve.toString()),
+        ),
+        quoteReserveDisplay: currencyValueDisplay(
+          stringCutDecimals(quoteTokenInfo.decimals, quoteReserve.toString()),
+        ),
+      };
+    }
+    return {
+      baseReserveDisplay: currencyValueDisplay(baseReserve.toFixed(0)),
+      quoteReserveDisplay: currencyValueDisplay(quoteReserve.toFixed(0)),
+    };
+  }, [baseReserve, quoteReserve]);
+
   return (
     <Box className="collapsible" hidden={hidden}>
       <Box className={classes.clickable} {...getToggleProps()}>
@@ -65,7 +89,7 @@ const PoolStatsCollapsible = ({
             <Box textAlign={"right"}>
               <Box display={"flex"} justifyContent={"space-between"}>
                 <Box>
-                  {currencyValueDisplay(baseReserve.toFixed(0))} {baseTokenInfo.symbol}
+                  {baseReserveDisplay} {baseTokenInfo.symbol}
                 </Box>
                 <Avatar
                   sx={{
@@ -77,7 +101,7 @@ const PoolStatsCollapsible = ({
               </Box>
               <Box display={"flex"}>
                 <Box>
-                  {currencyValueDisplay(quoteReserve.toFixed(0))} {quoteTokenInfo.symbol}{" "}
+                  {quoteReserveDisplay} {quoteTokenInfo.symbol}{" "}
                 </Box>
                 <Avatar
                   sx={{
