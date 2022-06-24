@@ -299,7 +299,7 @@ const Home: React.FC = (props) => {
         return Number(quotePrice / basePrice).toFixed(poolConfig.baseTokenInfo.decimals);
       }
     }
-    return "-";
+    return "--";
   }, [basePrice, quotePrice, tokenFrom.token.symbol, poolConfig, swapInfo]);
 
   const network = deployConfigV2.network;
