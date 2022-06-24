@@ -238,10 +238,10 @@ const Home: React.FC = (props) => {
       calculateFarmPoolsStakeInfo(
         poolConfigsWithDeposit,
         swapKeyToSwapInfo,
-        farmKeyToFarmInfo,
-        farmPoolKeyToFarmUser,
         symbolToPythPriceData,
         deltafiPrice,
+        farmKeyToFarmInfo,
+        farmPoolKeyToFarmUser,
       ),
     [
       symbolToPythPriceData,

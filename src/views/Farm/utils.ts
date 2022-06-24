@@ -18,10 +18,10 @@ export type FarmInfoData = {
 export function calculateFarmPoolsStakeInfo(
   poolConfigs: PoolConfig[],
   swapKeyToSwapInfo: SwapPoolKeyToSwap,
-  farmKeyToFarmInfo: FarmPoolKeyToFarm,
-  farmPoolKeyToFarmUser: FarmPoolKeyToFarmUser,
   symbolToPythPriceData: SymbolToPythPriceData,
   deltafiPrice: any,
+  farmKeyToFarmInfo: FarmPoolKeyToFarm,
+  farmPoolKeyToFarmUser?: FarmPoolKeyToFarmUser,
 ): FarmInfoData[] {
   const result = [];
 
@@ -29,7 +29,9 @@ export function calculateFarmPoolsStakeInfo(
     const swapInfo = swapKeyToSwapInfo[poolConfig.swapInfo];
     poolConfig?.farmInfoList?.forEach(({ farmInfo: farmInfoAddress }) => {
       const farmInfo = farmKeyToFarmInfo[farmInfoAddress];
-      const farmUser = farmPoolKeyToFarmUser[farmInfoAddress];
+      // null means there is no farmuser supplied explicitly
+      // undefined means it is not loaded for some reason
+      const farmUser = farmPoolKeyToFarmUser ? farmPoolKeyToFarmUser[farmInfoAddress] : null;
       const basePrice = symbolToPythPriceData[poolConfig.base];
       const quotePrice = symbolToPythPriceData[poolConfig.quote];
 
