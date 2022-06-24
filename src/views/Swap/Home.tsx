@@ -292,7 +292,7 @@ const Home: React.FC = (props) => {
 
   const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
   const exchangeRateLabel = useMemo(() => {
-    if (basePrice && quotePrice) {
+    if (basePrice && quotePrice && swapInfo) {
       if (tokenFrom.token.symbol === poolConfig?.base) {
         return Number(basePrice / quotePrice).toFixed(poolConfig.quoteTokenInfo.decimals);
       } else if (tokenFrom.token.symbol === poolConfig?.quote) {
@@ -300,7 +300,7 @@ const Home: React.FC = (props) => {
       }
     }
     return "-";
-  }, [basePrice, quotePrice, tokenFrom.token.symbol, poolConfig]);
+  }, [basePrice, quotePrice, tokenFrom.token.symbol, poolConfig, swapInfo]);
 
   const network = deployConfigV2.network;
   const possibleTokenToConfigs = useMemo(() => getPossibleTokenToConfigs(tokenFrom), [tokenFrom]);
