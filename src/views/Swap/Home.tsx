@@ -49,7 +49,8 @@ import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
   deployConfigV2,
   enableReferral,
-  getPoolConfigBySymbolsAllowFake,
+  getMockedPoolConfigBySymbol,
+  getPoolConfigBySymbols,
   getTokenConfigBySymbol,
   PoolConfig,
   poolConfigs,
@@ -268,10 +269,9 @@ const Home: React.FC = (props) => {
   const tokenFrom = swapView.tokenFrom;
   const tokenTo = swapView.tokenTo;
 
-  const poolConfig: PoolConfig = getPoolConfigBySymbolsAllowFake(
-    tokenFrom.token.symbol,
-    tokenTo.token.symbol,
-  );
+  const poolConfig: PoolConfig =
+    getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol) ||
+    getMockedPoolConfigBySymbol(tokenFrom.token.symbol, tokenTo.token.symbol);
   const swapInfo: SwapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
   const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
   const symbolToPythPriceData = useSelector(pythSelector).symbolToPythPriceData;
