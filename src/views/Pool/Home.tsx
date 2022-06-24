@@ -3,7 +3,7 @@ import { Backdrop, Box, Grid, makeStyles, Modal } from "@material-ui/core";
 
 import Page from "components/layout/Page";
 import Card from "./components/Card_v2";
-import { convertDollar, formatCurrencyAmount } from "utils/utils";
+import { formatCurrencyAmount } from "utils/utils";
 import { poolConfigs } from "constants/deployConfigV2";
 import { useSelector } from "react-redux";
 import { pythSelector, poolSelector } from "states/selectors";
