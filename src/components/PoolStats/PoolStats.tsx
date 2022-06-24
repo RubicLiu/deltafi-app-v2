@@ -1,6 +1,6 @@
 import { ReactElement, useMemo } from "react";
 import useCollapse from "react-collapsed";
-import { Box, Link, makeStyles } from "@material-ui/core";
+import { Box, makeStyles } from "@material-ui/core";
 import { TokenConfig } from "constants/deployConfigV2";
 import BigNumber from "bignumber.js";
 import { SwapInfo } from "anchor/type_definitions";
@@ -27,10 +27,6 @@ export type PoolStatsDataFeed = {
   tvl: BigNumber;
   swapInfo: SwapInfo;
   hidden: boolean;
-};
-
-const addressLink = (address: string, link: string) => {
-  return address.length < 8 ? address : `${address.slice(0, 4)}...${address.slice(-4)}`;
 };
 
 const PoolStatsCollapsible = ({
