@@ -22,7 +22,7 @@ import { exponentiatedBy } from "utils/decimal";
 import { SOLSCAN_LINK } from "constants/index";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getPoolConfigBySwapKey, deployConfigV2 } from "constants/deployConfigV2";
+import { getPoolConfigBySwapKey, deployConfigV2, deployMode } from "constants/deployConfigV2";
 import {
   selectLpUserBySwapKey,
   selectMarketPriceByPool,
@@ -44,6 +44,8 @@ import { IDepositCard } from "./components/DepositCard/types";
 import { calculateWithdrawalFromShares } from "lib/calc";
 import BN from "bn.js";
 import * as transactionUtils from "anchor/transaction_utils";
+import PoolStatsCollapsible from "components/PoolStats/PoolStats";
+import { calculatePoolTvl } from "views/Pool/utils";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -360,6 +362,11 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     }
     return new BigNumber(0);
   }, [swapInfo]);
+
+  const { tvl } = useMemo(
+    () => calculatePoolTvl(basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, swapInfo),
+    [basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, swapInfo],
+  );
 
   // update reward every 5 seconds
   useEffect(
@@ -1005,6 +1012,15 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
           <Box>{swapFee.toString()}% Swap Fee</Box>
           <Box>{withdrawFee.toString()}% Withdraw Fee</Box>
         </Box>
+        <PoolStatsCollapsible
+          baseTokenInfo={baseTokenInfo}
+          quoteTokenInfo={quoteTokenInfo}
+          baseReserve={anchorBnToBn(baseTokenInfo, swapInfo.poolState.baseReserve)}
+          quoteReserve={anchorBnToBn(quoteTokenInfo, swapInfo.poolState.quoteReserve)}
+          tvl={tvl}
+          swapInfo={swapInfo}
+          hidden={deployMode === "mainnet-prod"}
+        />
       </Box>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
