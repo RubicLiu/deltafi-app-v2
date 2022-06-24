@@ -5,8 +5,15 @@ import { TokenConfig } from "constants/deployConfigV2";
 import { anchorBnToBn } from "./tokenUtils";
 import { SwapInfo } from "anchor/type_definitions";
 
-export const currencyValueDisplay = (value) =>
-  value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+export const currencyValueDisplay = (value) => {
+  const valueParts = value.toString().split(".");
+  if (!valueParts[0]) {
+    return null;
+  }
+  valueParts[0] = valueParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  console.log(valueParts);
+  return valueParts.join(".");
+};
 
 export const convertDollar = (value) => {
   return "USD " + currencyValueDisplay(value);
