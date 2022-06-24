@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import styled from "styled-components";
 
 import { ConnectButton } from "components";
-import { convertDollarSign as convertDollar, getTokenTvl, getTotalVolume } from "utils/utils";
+import { convertDollarSign as convertDollar, getTotalVolume } from "utils/utils";
 import { CardProps } from "./types";
 import { useSelector } from "react-redux";
 import { useModal } from "providers/modal";

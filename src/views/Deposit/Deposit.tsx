@@ -45,7 +45,6 @@ import { calculateWithdrawalFromShares } from "lib/calc";
 import BN from "bn.js";
 import * as transactionUtils from "anchor/transaction_utils";
 import PoolStatsCollapsible from "components/PoolStats/PoolStats";
-import { getTokenTvl } from "utils/utils";
 import { calculatePoolTvl } from "views/Pool/utils";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
@@ -364,7 +363,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     return new BigNumber(0);
   }, [swapInfo]);
 
-  const { baseTvl, quoteTvl, tvl } = useMemo(
+  const { tvl } = useMemo(
     () => calculatePoolTvl(basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, swapInfo),
     [basePrice, quotePrice, baseTokenInfo, quoteTokenInfo, swapInfo],
   );

@@ -1,12 +1,13 @@
 import { ReactElement, useMemo } from "react";
 import useCollapse from "react-collapsed";
 import { Box, Link, makeStyles } from "@material-ui/core";
-import { PoolConfig, TokenConfig } from "constants/deployConfigV2";
+import { TokenConfig } from "constants/deployConfigV2";
 import BigNumber from "bignumber.js";
 import { SwapInfo } from "anchor/type_definitions";
 import { WAD } from "constants/index";
 import { stringCutDecimals } from "utils/tokenUtils";
 import { Avatar } from "@mui/material";
+import { convertDollarSign, currencyValueDisplay } from "utils/utils";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }) => ({
   clickable: {
@@ -65,9 +66,9 @@ const PoolStatsCollapsible = ({
           <Box className={classes.dataRow}>
             <Box textAlign={"left"}>Currency Reserves:</Box>
             <Box textAlign={"right"}>
-              <Box display={"flex"}>
+              <Box display={"flex"} justifyContent={"space-between"}>
                 <Box>
-                  {baseReserve.toFixed(0)} {baseTokenInfo.symbol}
+                  {currencyValueDisplay(baseReserve.toFixed(0))} {baseTokenInfo.symbol}
                 </Box>
                 <Avatar
                   sx={{
@@ -79,7 +80,7 @@ const PoolStatsCollapsible = ({
               </Box>
               <Box display={"flex"}>
                 <Box>
-                  {quoteReserve.toFixed(0)} {quoteTokenInfo.symbol}{" "}
+                  {currencyValueDisplay(quoteReserve.toFixed(0))} {quoteTokenInfo.symbol}{" "}
                 </Box>
                 <Avatar
                   sx={{
@@ -93,7 +94,7 @@ const PoolStatsCollapsible = ({
           </Box>
           <Box className={classes.dataRow}>
             <Box textAlign={"left"}>Total Reserve:</Box>
-            <Box textAlign={"right"}>{tvl.toFixed(0)}</Box>
+            <Box textAlign={"right"}>{convertDollarSign(tvl.toFixed(2))}</Box>
           </Box>
           <Box className={classes.dataRow}>
             <Box textAlign={"left"}>Reserve Magnifier:</Box>
