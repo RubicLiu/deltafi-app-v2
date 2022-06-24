@@ -36,6 +36,7 @@ const PoolStatsCollapsible = ({
   quoteReserve,
   tvl,
   swapInfo,
+  hidden,
 }: PoolStatsDataFeed): ReactElement => {
   const { getCollapseProps, getToggleProps, isExpanded } = useCollapse();
   const classes = useStyles();
@@ -53,7 +54,7 @@ const PoolStatsCollapsible = ({
   }, [swapInfo]);
 
   return (
-    <Box className="collapsible">
+    <Box className="collapsible" hidden={hidden}>
       <Box className={classes.clickable} {...getToggleProps()}>
         {isExpanded ? "Details" : "Details ..."}
       </Box>
