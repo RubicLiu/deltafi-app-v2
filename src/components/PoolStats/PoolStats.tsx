@@ -75,7 +75,7 @@ const PoolStatsCollapsible = ({
       baseReserveDisplay: currencyValueDisplay(baseReserve.toFixed(0)),
       quoteReserveDisplay: currencyValueDisplay(quoteReserve.toFixed(0)),
     };
-  }, [baseReserve, quoteReserve]);
+  }, [baseReserve, quoteReserve, baseTokenInfo, quoteTokenInfo]);
 
   return (
     <Box className="collapsible" hidden={hidden}>

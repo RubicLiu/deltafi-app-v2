@@ -11,7 +11,6 @@ export const currencyValueDisplay = (value) => {
     return null;
   }
   valueParts[0] = valueParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  console.log(valueParts);
   return valueParts.join(".");
 };
 
