@@ -255,6 +255,19 @@ function getPossibleTokenToConfigs(tokenFrom: ISwapCard) {
   return possibleTokenToConfigs;
 }
 
+// mock config for price display
+function getMockedPoolConfigBySymbol(baseSymbol: String, quoteSymbol: String): PoolConfig {
+  if (quoteSymbol < baseSymbol) {
+    [baseSymbol, quoteSymbol] = [quoteSymbol, baseSymbol];
+  }
+  return {
+    base: baseSymbol,
+    quote: quoteSymbol,
+    baseTokenInfo: getTokenConfigBySymbol(baseSymbol),
+    quoteTokenInfo: getTokenConfigBySymbol(quoteSymbol),
+  } as PoolConfig;
+}
+
 const Home: React.FC = (props) => {
   const dispatch = useDispatch();
 
@@ -268,10 +281,9 @@ const Home: React.FC = (props) => {
   const tokenFrom = swapView.tokenFrom;
   const tokenTo = swapView.tokenTo;
 
-  const poolConfig: PoolConfig = getPoolConfigBySymbols(
-    tokenFrom.token.symbol,
-    tokenTo.token.symbol,
-  );
+  const poolConfig: PoolConfig =
+    getPoolConfigBySymbols(tokenFrom.token.symbol, tokenTo.token.symbol) ||
+    getMockedPoolConfigBySymbol(tokenFrom.token.symbol, tokenTo.token.symbol);
   const swapInfo: SwapInfo = useSelector(selectSwapBySwapKey(poolConfig?.swapInfo));
   const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
   const symbolToPythPriceData = useSelector(pythSelector).symbolToPythPriceData;
@@ -299,8 +311,8 @@ const Home: React.FC = (props) => {
         return Number(quotePrice / basePrice).toFixed(poolConfig.baseTokenInfo.decimals);
       }
     }
-    return "-";
-  }, [basePrice, quotePrice, tokenFrom.token.symbol, swapInfo, poolConfig]);
+    return "--";
+  }, [basePrice, quotePrice, tokenFrom.token.symbol, poolConfig, swapInfo]);
 
   const network = deployConfigV2.network;
   const possibleTokenToConfigs = useMemo(() => getPossibleTokenToConfigs(tokenFrom), [tokenFrom]);
