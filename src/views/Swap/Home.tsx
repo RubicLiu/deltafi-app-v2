@@ -68,6 +68,7 @@ import CompareArrows from "components/Svg/icons/CompareArrows";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { getPriceImpactDisplay } from "calculations/utils";
 import BigNumber from "bignumber.js";
+import { getPythPrice } from "states/accounts/pythAccount";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -319,8 +320,8 @@ const Home: React.FC = (props) => {
 
   const getPoolTradingVolumeFromPoolConfig = useCallback(
     (poolConfig: PoolConfig) => {
-      const basePrice = new BigNumber(symbolToPythPriceData[poolConfig.base]?.price);
-      const quotePrice = new BigNumber(symbolToPythPriceData[poolConfig.quote]?.price);
+      const basePrice = new BigNumber(getPythPrice(symbolToPythPriceData, poolConfig.base).price);
+      const quotePrice = new BigNumber(getPythPrice(symbolToPythPriceData, poolConfig.quote).price);
       const baseVolume = anchorBnToBn(
         poolConfig.baseTokenInfo,
         swapKeyToSwapInfo[poolConfig.swapInfo]?.poolState?.totalTradedBase,

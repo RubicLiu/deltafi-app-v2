@@ -77,8 +77,17 @@ export function getPythPrice(
   }
 
   const priceData = symbolToPythPriceData[tokenSymbol];
+
+  let price = priceData.price;
+  if (!price) {
+    price = priceData.previousPrice;
+  }
+  if (!price) {
+    price = priceData.aggregate.price;
+  }
+
   result = {
-    price: priceData.price,
+    price,
     confidenceInterval: priceData.confidence,
   };
 

@@ -3,6 +3,7 @@ import BigNumber from "bignumber.js";
 import { PoolConfig } from "constants/deployConfigV2";
 import { FarmPoolKeyToFarm } from "states/accounts/farmAccount";
 import { FarmPoolKeyToFarmUser } from "states/accounts/farmUserAccount";
+import { getPythPrice } from "states/accounts/pythAccount";
 import { SwapPoolKeyToSwap } from "states/accounts/swapAccount";
 import { anchorBnToBn } from "utils/tokenUtils";
 import { getTokenShareTvl, getTokenTvl } from "utils/utils";
@@ -32,9 +33,9 @@ export function calculateFarmPoolsStakeInfo(
       // null means there is no farmuser supplied explicitly
       // undefined means it is not loaded for some reason
       const farmUser = farmPoolKeyToFarmUser ? farmPoolKeyToFarmUser[farmInfoAddress] : null;
-      const basePrice = symbolToPythPriceData[poolConfig.base];
-      const quotePrice = symbolToPythPriceData[poolConfig.quote];
-
+      const basePrice = getPythPrice(symbolToPythPriceData, poolConfig.base);
+      const quotePrice = getPythPrice(symbolToPythPriceData, poolConfig.quote);
+      
       if (
         !basePrice?.price ||
         !quotePrice?.price ||
