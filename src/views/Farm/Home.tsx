@@ -7,13 +7,7 @@ import { poolConfigs } from "constants/deployConfigV2";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Divider, Tab } from "@mui/material";
 import { useSelector } from "react-redux";
-import {
-  farmSelector,
-  farmUserSelector,
-  poolSelector,
-  pythSelector,
-  selectGateIoSticker,
-} from "states";
+import { farmSelector, poolSelector, pythSelector, selectGateIoSticker } from "states";
 import { calculateFarmPoolsStakeInfo, FarmInfoData } from "./utils";
 import BigNumber from "bignumber.js";
 import { PoolCardColor } from "utils/type";
@@ -177,7 +171,6 @@ const Home: React.FC = (props): ReactElement => {
   const farmKeyToFarmInfo = useSelector(farmSelector).farmKeyToFarmInfo;
 
   const symbolToPythPriceData = useSelector(pythSelector).symbolToPythPriceData;
-  const farmPoolKeyToFarmUser = useSelector(farmUserSelector).farmPoolKeyToFarmUser;
   const swapKeyToSwapInfo = useSelector(poolSelector).swapKeyToSwapInfo;
 
   // parse all farm pools' data using the util function
@@ -186,18 +179,11 @@ const Home: React.FC = (props): ReactElement => {
       calculateFarmPoolsStakeInfo(
         poolConfigs,
         swapKeyToSwapInfo,
-        farmKeyToFarmInfo,
-        farmPoolKeyToFarmUser,
         symbolToPythPriceData,
         deltafiPrice,
+        farmKeyToFarmInfo,
       ),
-    [
-      symbolToPythPriceData,
-      farmPoolKeyToFarmUser,
-      swapKeyToSwapInfo,
-      farmKeyToFarmInfo,
-      deltafiPrice,
-    ],
+    [symbolToPythPriceData, swapKeyToSwapInfo, farmKeyToFarmInfo, deltafiPrice],
   );
 
   // filter out active and inactive farms
