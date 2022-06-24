@@ -300,7 +300,7 @@ const Home: React.FC = (props) => {
       }
     }
     return "-";
-  }, [basePrice, quotePrice, tokenFrom.token.symbol, swapInfo, poolConfig]);
+  }, [basePrice, quotePrice, tokenFrom.token.symbol, poolConfig]);
 
   const network = deployConfigV2.network;
   const possibleTokenToConfigs = useMemo(() => getPossibleTokenToConfigs(tokenFrom), [tokenFrom]);
