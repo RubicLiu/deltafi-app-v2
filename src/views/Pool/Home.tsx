@@ -3,7 +3,7 @@ import { Backdrop, Box, Grid, makeStyles, Modal } from "@material-ui/core";
 
 import Page from "components/layout/Page";
 import Card from "./components/Card_v2";
-import { convertDollar } from "utils/utils";
+import { formatCurrencyAmount } from "utils/utils";
 import { poolConfigs } from "constants/deployConfigV2";
 import { useSelector } from "react-redux";
 import { pythSelector, poolSelector } from "states/selectors";
@@ -92,7 +92,7 @@ const Home: React.FC = () => {
       <Box padding={0} className={classes.container}>
         <Box color="#fff" textAlign="center" className={classes.header}>
           <Box fontSize={36} color="#D4FF00" fontWeight={600}>
-            {convertDollar(tvl.toFixed(2))}
+            {formatCurrencyAmount(tvl)}
           </Box>
           <Box marginTop={1} fontSize={18}>
             Total Value Locked
