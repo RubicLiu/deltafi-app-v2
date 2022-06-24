@@ -17,6 +17,7 @@ import {
 import { calculateFarmPoolsStakeInfo, FarmInfoData } from "./utils";
 import BigNumber from "bignumber.js";
 import { PoolCardColor } from "utils/type";
+import { formatCurrencyAmount } from "utils/utils";
 
 const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   container: {
@@ -141,7 +142,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     backgroundColor: palette.background.primary,
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
-    height: 200,
+    height: 120,
   },
   tabContext: {
     "& .MuiTabs-indicator": {
@@ -259,8 +260,8 @@ const Home: React.FC = (props): ReactElement => {
     <Page>
       <Box className={classes.container}>
         <Box color="#fff" textAlign="center" className={classes.header}>
-          <Box fontSize={58} color="#D4FF00" fontWeight={600}>
-            {`$${totalStaked?.toFixed(2) || "--"}`}
+          <Box fontSize={36} color="#D4FF00" fontWeight={600}>
+            {formatCurrencyAmount(totalStaked)}
           </Box>
           <Box marginTop={1.5} fontSize={18}>
             Total Staked
