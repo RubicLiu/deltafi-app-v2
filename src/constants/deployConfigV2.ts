@@ -57,19 +57,6 @@ export function getPoolConfigBySymbols(baseSymbol: String, quoteSymbol: String):
   );
 }
 
-// mock config for price display
-export function getMockedPoolConfigBySymbol(baseSymbol: String, quoteSymbol: String): PoolConfig {
-  if (quoteSymbol < baseSymbol) {
-    [baseSymbol, quoteSymbol] = [quoteSymbol, baseSymbol];
-  }
-  return {
-    base: baseSymbol,
-    quote: quoteSymbol,
-    baseTokenInfo: getTokenConfigBySymbol(baseSymbol),
-    quoteTokenInfo: getTokenConfigBySymbol(quoteSymbol),
-  } as PoolConfig;
-}
-
 export function getPoolConfigBySwapKey(poolKey: String): PoolConfig {
   return poolConfigs.find(({ swapInfo }) => swapInfo === poolKey);
 }

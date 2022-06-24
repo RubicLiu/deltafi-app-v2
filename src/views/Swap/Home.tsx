@@ -49,7 +49,6 @@ import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import {
   deployConfigV2,
   enableReferral,
-  getMockedPoolConfigBySymbol,
   getPoolConfigBySymbols,
   getTokenConfigBySymbol,
   PoolConfig,
@@ -254,6 +253,19 @@ function getPossibleTokenToConfigs(tokenFrom: ISwapCard) {
     }
   }
   return possibleTokenToConfigs;
+}
+
+// mock config for price display
+function getMockedPoolConfigBySymbol(baseSymbol: String, quoteSymbol: String): PoolConfig {
+  if (quoteSymbol < baseSymbol) {
+    [baseSymbol, quoteSymbol] = [quoteSymbol, baseSymbol];
+  }
+  return {
+    base: baseSymbol,
+    quote: quoteSymbol,
+    baseTokenInfo: getTokenConfigBySymbol(baseSymbol),
+    quoteTokenInfo: getTokenConfigBySymbol(quoteSymbol),
+  } as PoolConfig;
 }
 
 const Home: React.FC = (props) => {
