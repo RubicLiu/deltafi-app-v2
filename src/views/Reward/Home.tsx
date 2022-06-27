@@ -160,6 +160,10 @@ const useStyles = makeStyles(({ palette, breakpoints, spacing }: Theme) => ({
       fontWeight: 600,
     },
   },
+  referralLinkButton: {
+    minWidth: 150,
+    height: 50,
+  },
 }));
 
 const StyledButton = styled(Button)`
@@ -544,18 +548,23 @@ const Home: React.FC<RewardComponentProps> = (props: RewardComponentProps) => {
                   placeholder={"Please Create A DELFI Token Account Before Referring Others!"}
                   className={classes.inputLink}
                 />
-              ) : (
+              ) : referralLinkState === "Processing" ? (
                 <input
-                  placeholder={referralLink}
-                  disabled={referralLinkState === "Processing"}
+                  placeholder={"Setting up wallet with DELFI account"}
+                  disabled
                   className={classes.inputLink}
                 />
+              ) : (
+                <input value={referralLink} disabled className={classes.inputLink} />
               )}
               {(() => {
                 switch (referralLinkState) {
                   case "Unavailable": {
                     return (
-                      <ConnectButton onClick={handleCreateDeltafiUser}>
+                      <ConnectButton
+                        className={classes.referralLinkButton}
+                        onClick={handleCreateDeltafiUser}
+                      >
                         {"Wallet Set Up"}
                       </ConnectButton>
                     );
@@ -563,6 +572,7 @@ const Home: React.FC<RewardComponentProps> = (props: RewardComponentProps) => {
                   case "Ready": {
                     return (
                       <ConnectButton
+                        className={classes.referralLinkButton}
                         onClick={() => {
                           copy(referralLink);
                           dispatch(
@@ -586,12 +596,16 @@ const Home: React.FC<RewardComponentProps> = (props: RewardComponentProps) => {
                     );
                   }
                   case "Copied": {
-                    return <ConnectButton>{"Copied"}</ConnectButton>;
+                    return (
+                      <ConnectButton className={classes.referralLinkButton}>
+                        {"Copied"}
+                      </ConnectButton>
+                    );
                   }
                   case "Processing": {
                     return (
-                      <ConnectButton disabled={true}>
-                        <CircularProgress color="inherit" />
+                      <ConnectButton disabled={true} className={classes.referralLinkButton}>
+                        <CircularProgress color="inherit" size={25} />
                       </ConnectButton>
                     );
                   }

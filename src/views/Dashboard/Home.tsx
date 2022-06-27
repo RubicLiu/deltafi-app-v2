@@ -275,6 +275,18 @@ const Home: React.FC = (props) => {
       };
     }
 
+    // if deltafiUser's data is set is null explicitly
+    // it means there is no reward yet and the data should be set to 0
+    if (deltafiUser?.user === null) {
+      return {
+        owedRewardFromSwap: "0",
+        owedRewardFromReferral: "0",
+        totalRewardFromSwap: "0",
+        totalRewardFromReferral: "0",
+      };
+    }
+
+    // i
     return {
       owedRewardFromSwap: "--",
       owedRewardFromReferral: "--",
@@ -379,10 +391,10 @@ const Home: React.FC = (props) => {
     return {
       userUnclaimedFarmRewards: hasFarmUser
         ? userUnclaimedFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
-        : "--",
+        : "0",
       userTotalFarmRewards: hasFarmUser
         ? userTotalFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
-        : "--",
+        : "0",
     };
   }, [farmPoolKeyToFarmUser, farmKeyToFarmInfo, rewardView.rewardRefreshTs, dispatch]);
 
@@ -435,6 +447,7 @@ const Home: React.FC = (props) => {
     if (!isConnectedWallet) {
       return { totalRewards: null, isLoadingTotalRewards: false };
     }
+
     if (
       !deltafiUser.fetched ||
       !isFarmUserFetched ||
