@@ -796,7 +796,16 @@ const Home: React.FC = (props) => {
         Connect Wallet
       </ConnectButton>
     );
-  }, [isConnectedWallet, handleSwap, setMenu, sourceBalance, swapInfo, tokenFrom, swapView]);
+  }, [
+    isConnectedWallet,
+    handleSwap,
+    setMenu,
+    sourceBalance,
+    swapInfo,
+    tokenFrom,
+    swapView,
+    classes,
+  ]);
 
   const vertical = "top";
   const horizontal = "right";
