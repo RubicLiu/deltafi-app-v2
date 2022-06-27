@@ -372,13 +372,17 @@ const Home: React.FC = (props) => {
         untrackedBaseRewards.isEqualTo(0) || untrackedQuoteRewards.isEqualTo(0)
           ? new BigNumber(0)
           : untrackedBaseRewards.plus(untrackedQuoteRewards);
-      const unclaimedFarmRewards = owedBaseRewards
-        .plus(owedQuoteRewards)
-        .plus(untrackedRewards)
-        .toFixed(DELTAFI_TOKEN_DECIMALS);
-      const totalFarmRewards = claimedBaseRewards
-        .plus(claimedQuoteRewards)
-        .toFixed(DELTAFI_TOKEN_DECIMALS);
+      const unclaimedFarmRewards = stringCutDecimals(
+        DELTAFI_TOKEN_DECIMALS,
+        owedBaseRewards
+          .plus(owedQuoteRewards)
+          .plus(untrackedRewards)
+          .toFixed(DELTAFI_TOKEN_DECIMALS),
+      );
+      const totalFarmRewards = stringCutDecimals(
+        DELTAFI_TOKEN_DECIMALS,
+        claimedBaseRewards.plus(claimedQuoteRewards).toFixed(DELTAFI_TOKEN_DECIMALS),
+      );
 
       userUnclaimedFarmRewards = userUnclaimedFarmRewards.plus(unclaimedFarmRewards);
       userTotalFarmRewards = userTotalFarmRewards.plus(totalFarmRewards);
