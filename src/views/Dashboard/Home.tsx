@@ -47,7 +47,7 @@ import { dashboardViewActions } from "states/views/dashboardView";
 import { calculateFarmPoolsStakeInfo } from "views/Farm/utils";
 import { PoolCardColor } from "utils/type";
 import { exponentiatedBy } from "calculations/utils";
-import { anchorBnToBn } from "utils/tokenUtils";
+import { anchorBnToBn, stringCutDecimals } from "utils/tokenUtils";
 import { SECONDS_PER_YEAR } from "constants/index";
 import { rewardViewActions } from "states/views/rewardView";
 import BN from "bn.js";
@@ -390,10 +390,16 @@ const Home: React.FC = (props) => {
     dispatch(rewardViewActions.setFarmPoolRewardsInfo({ farmPoolToRewards }));
     return {
       userUnclaimedFarmRewards: hasFarmUser
-        ? userUnclaimedFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
+        ? stringCutDecimals(
+            DELTAFI_TOKEN_DECIMALS,
+            userUnclaimedFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS),
+          )
         : "0",
       userTotalFarmRewards: hasFarmUser
-        ? userTotalFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS)
+        ? stringCutDecimals(
+            DELTAFI_TOKEN_DECIMALS,
+            userTotalFarmRewards.toFixed(DELTAFI_TOKEN_DECIMALS),
+          )
         : "0",
     };
   }, [farmPoolKeyToFarmUser, farmKeyToFarmInfo, rewardView.rewardRefreshTs, dispatch]);
