@@ -71,8 +71,8 @@ describe("withdraw", function () {
         },
       ),
     ).toEqual({
-      baseWithdrawalAmount: "0.000100",
-      quoteWithdrawalAmount: "0.000190",
+      baseWithdrawalAmount: "0.0001",
+      quoteWithdrawalAmount: "0.00019",
     });
 
     expect(
@@ -93,8 +93,8 @@ describe("withdraw", function () {
         },
       ),
     ).toEqual({
-      baseWithdrawalAmount: "0.000190",
-      quoteWithdrawalAmount: "0.000100",
+      baseWithdrawalAmount: "0.00019",
+      quoteWithdrawalAmount: "0.0001",
     });
   });
 });
