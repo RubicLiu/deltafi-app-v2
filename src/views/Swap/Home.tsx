@@ -240,6 +240,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     marginLeft: 3,
     marginRight: 3,
   },
+  swapButton: {
+    height: 65,
+  },
 }));
 
 function getPossibleTokenToConfigs(tokenFrom: ISwapCard) {
@@ -381,6 +384,7 @@ const Home: React.FC = (props) => {
     if (newTokenTo.mint !== tokenTo.token.mint || newTokenFrom.mint !== tokenFrom.token.mint) {
       // change buy/sell token, clear the input/output to 0
       dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: "" }));
+      dispatch(swapViewActions.setInsufficientBalance({ insufficientBalance: false }));
       dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenTo, amount: "" }));
       return;
     }
@@ -413,6 +417,11 @@ const Home: React.FC = (props) => {
       swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: card.amount }),
     );
     dispatch(
+      swapViewActions.setInsufficientBalance({
+        insufficientBalance: sourceBalance && sourceBalance.isLessThan(card.amount),
+      }),
+    );
+    dispatch(
       swapViewActions.setTokenTo({
         token: newTokenTo,
         amount: amountOut,
@@ -431,6 +440,7 @@ const Home: React.FC = (props) => {
     if (newTokenTo.mint !== tokenTo.token.mint || newTokenFrom.mint !== tokenFrom.token.mint) {
       // change buy/sell token, clear the input/output to 0
       dispatch(swapViewActions.setTokenFrom({ ...tokenFrom, token: newTokenFrom, amount: "" }));
+      dispatch(swapViewActions.setInsufficientBalance({ insufficientBalance: false }));
       dispatch(swapViewActions.setTokenTo({ ...tokenTo, token: newTokenTo, amount: "" }));
       return;
     }
@@ -474,6 +484,11 @@ const Home: React.FC = (props) => {
         amount: amountIn,
       }),
     );
+    dispatch(
+      swapViewActions.setInsufficientBalance({
+        insufficientBalance: sourceBalance && sourceBalance.isLessThan(amountIn),
+      }),
+    );
   };
 
   const handleTradePairChange = (event, value) => {
@@ -500,7 +515,7 @@ const Home: React.FC = (props) => {
       return null;
     }
 
-    if (sourceBalance.isLessThan(tokenFrom.amount)) {
+    if (!sourceBalance || sourceBalance.isLessThan(tokenFrom.amount)) {
       return null;
     }
 
@@ -719,20 +734,35 @@ const Home: React.FC = (props) => {
   }, [handleSnackBarClose, classes]);
 
   const actionButton = useMemo(() => {
+    const unavailable = !swapInfo;
+    if (unavailable) {
+      return (
+        <ConnectButton
+          fullWidth
+          size="large"
+          className={classes.swapButton}
+          disabled={true}
+          data-amp-analytics-on="click"
+          data-amp-analytics-name="click"
+          data-amp-analytics-attrs="page: Swap, target: EnterAmount"
+        >
+          Unavailable
+        </ConnectButton>
+      );
+    }
+
     if (isConnectedWallet) {
-      const unavailable = !swapInfo;
       const sourceAccountNonExist = !sourceBalance;
       // TODO(leqiang): remove this variabe and use a swapView state instead
-      const isInsufficientBalance = sourceBalance?.isLessThan(tokenFrom.amount);
 
       return (
         <ConnectButton
           fullWidth
           size="large"
+          className={classes.swapButton}
           disabled={
-            unavailable ||
             sourceAccountNonExist ||
-            isInsufficientBalance ||
+            swapView.insufficientBalance ||
             swapView.insufficientLiquidity ||
             swapView.isProcessing
           }
@@ -741,16 +771,14 @@ const Home: React.FC = (props) => {
           data-amp-analytics-name="click"
           data-amp-analytics-attrs="page: Swap, target: EnterAmount"
         >
-          {unavailable ? (
-            "unavailable"
-          ) : sourceAccountNonExist ? (
+          {sourceAccountNonExist ? (
             "No " + tokenFrom.token.symbol + " Account in Wallet"
-          ) : isInsufficientBalance ? (
+          ) : swapView.insufficientBalance ? (
             "Insufficient Balance"
           ) : swapView.insufficientLiquidity ? (
             "Insufficient Liquidity"
           ) : swapView.isProcessing ? (
-            <CircularProgress color="inherit" />
+            <CircularProgress size={36} color="inherit" />
           ) : (
             "Swap"
           )}
@@ -759,11 +787,25 @@ const Home: React.FC = (props) => {
     }
 
     return (
-      <ConnectButton fullWidth size="large" onClick={() => setMenu(true, "connect")}>
+      <ConnectButton
+        fullWidth
+        size="large"
+        className={classes.swapButton}
+        onClick={() => setMenu(true, "connect")}
+      >
         Connect Wallet
       </ConnectButton>
     );
-  }, [isConnectedWallet, handleSwap, setMenu, sourceBalance, swapInfo, tokenFrom, swapView]);
+  }, [
+    isConnectedWallet,
+    handleSwap,
+    setMenu,
+    sourceBalance,
+    swapInfo,
+    tokenFrom,
+    swapView,
+    classes,
+  ]);
 
   const vertical = "top";
   const horizontal = "right";

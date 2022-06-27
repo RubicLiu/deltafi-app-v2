@@ -2,7 +2,7 @@ import { PoolState } from "anchor/type_definitions";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
 import { TokenConfig } from "constants/deployConfigV2";
-import { anchorBnToBn } from "utils/tokenUtils";
+import { anchorBnToBn, stringCutTokenDecimals } from "utils/tokenUtils";
 
 export function calculateWithdrawalFromShares(
   baseShare: BN,
@@ -59,8 +59,14 @@ export function calculateWithdrawalFromShares(
   }
 
   return {
-    baseWithdrawalAmount: baseWithdrawalAmount.toFixed(baseTokenConfig.decimals),
-    quoteWithdrawalAmount: quoteWithdrawalAmount.toFixed(quoteTokenConfig.decimals),
+    baseWithdrawalAmount: stringCutTokenDecimals(
+      baseTokenConfig,
+      baseWithdrawalAmount.toFixed(baseTokenConfig.decimals),
+    ),
+    quoteWithdrawalAmount: stringCutTokenDecimals(
+      quoteTokenConfig,
+      quoteWithdrawalAmount.toFixed(quoteTokenConfig.decimals),
+    ),
   };
 }
 

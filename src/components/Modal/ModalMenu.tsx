@@ -5,7 +5,7 @@ import ConnectPanel from "components/BurgerMenu/ConnectPanel";
 import WalletPanel from "components/BurgerMenu/WalletPanel";
 import ConfirmSwapPanel from "components/BurgerMenu/ConfirmSwapPanel";
 import ConnectPanelV2 from "components/BurgerMenu/ConnectPanel_v2";
-import StakeV2 from "views/Stake/Stake_v2";
+import StakeV2 from "views/Stake/Stake";
 import Deposit from "views/Deposit/Deposit";
 // import Stake from "views/Stake/Stake";
 import { useModal } from "providers/modal";

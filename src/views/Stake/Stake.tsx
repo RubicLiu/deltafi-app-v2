@@ -11,7 +11,7 @@ import {
 import { Close as CloseIcon } from "@material-ui/icons";
 import BigNumber from "bignumber.js";
 
-import StakeCard from "views/Stake/components/Card_v2";
+import StakeCard from "views/Stake/components/Card";
 import { ConnectButton } from "components";
 
 import useStyles from "./styles";
