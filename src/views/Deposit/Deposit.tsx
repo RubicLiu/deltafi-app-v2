@@ -323,10 +323,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
 
     return {
       maxBaseWithdrawal: stringCutTokenDecimals(baseTokenConfig, res.baseWithdrawalAmount),
-      maxQuoteWithdrawal: stringCutTokenDecimals(
-        quoteTokenConfig,
-        res.quoteWithdrawalAmount,
-      ),
+      maxQuoteWithdrawal: stringCutTokenDecimals(quoteTokenConfig, res.quoteWithdrawalAmount),
     };
   }, [availableBaseShares, availableQuoteShares, swapInfo, depositView, basePrice, quotePrice]);
 
