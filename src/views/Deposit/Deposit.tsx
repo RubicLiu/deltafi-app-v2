@@ -460,7 +460,6 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         anchorBnToBn(poolConfig.quoteTokenInfo, quoteAmount),
         new BigNumber(marketPrice),
         minCoeff,
-        swapInfo.swapType.stableSwap,
       );
 
       const { transaction, signers } = await transactionUtils.createDepositTransaction(

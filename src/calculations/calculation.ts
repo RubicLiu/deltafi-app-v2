@@ -281,13 +281,12 @@ export function calculateMinOutAmountDeposit(
   quoteAmount: BigNumber,
   marketPrice: BigNumber,
   minCoeff: BigNumber,
-  normalSwap: boolean,
 ): {
   minBaseShare: BigNumber;
   minQuoteShare: BigNumber;
 } {
   const poolState: PoolState = swapInfo.poolState;
-  const denominator: BigNumber = normalSwap ? marketPrice : new BigNumber(1);
+  const denominator: BigNumber = swapInfo.swapType.normalSwap ? marketPrice : new BigNumber(1);
 
   const { base, quote } = splitByRatio(baseAmount, quoteAmount, new BigNumber(1), denominator);
 
