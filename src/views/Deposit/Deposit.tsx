@@ -35,7 +35,12 @@ import { depositViewActions } from "states/views/depositView";
 import { partialSignTransaction, sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
 import { fetchSwapsThunk } from "states/accounts/swapAccount";
-import { anchorBnToBn, stringCutTokenDecimals, stringToAnchorBn } from "utils/tokenUtils";
+import {
+  anchorBnToBn,
+  bnToAnchorBn,
+  stringCutTokenDecimals,
+  stringToAnchorBn,
+} from "utils/tokenUtils";
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { scheduleWithInterval } from "utils";
 import WithdrawSelectCard from "./components/WithdrawSelectCard/Card";
@@ -44,6 +49,7 @@ import { IDepositCard } from "./components/DepositCard/types";
 import { calculateWithdrawalFromShares } from "lib/calc";
 import BN from "bn.js";
 import * as transactionUtils from "anchor/transaction_utils";
+import { calculateMinOutAmountDeposit } from "calculations/calculation";
 import PoolStatsCollapsible from "components/PoolStats/PoolStats";
 import { calculatePoolTvl } from "views/Pool/utils";
 
@@ -245,7 +251,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
   const quoteTokenAccount = useSelector(selectTokenAccountInfoByMint(quoteTokenInfo.mint));
 
   const lpUser: LiquidityProvider = useSelector(selectLpUserBySwapKey(poolAddress));
-  const { basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
+  const { marketPrice, basePrice, quotePrice } = useSelector(selectMarketPriceByPool(poolConfig));
   const depositView = useSelector(depositViewSelector);
   const dispatch = useDispatch();
   const network = deployConfigV2.network;
@@ -445,6 +451,18 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       dispatch(depositViewActions.setIsProcessing({ isProcessing: true }));
       const baseAmount = stringToAnchorBn(poolConfig.baseTokenInfo, base.amount);
       const quoteAmount = stringToAnchorBn(poolConfig.quoteTokenInfo, quote.amount);
+
+      let minCoeff = new BigNumber(0.99);
+
+      const { minBaseShare, minQuoteShare } = calculateMinOutAmountDeposit(
+        swapInfo,
+        anchorBnToBn(poolConfig.baseTokenInfo, baseAmount),
+        anchorBnToBn(poolConfig.quoteTokenInfo, quoteAmount),
+        new BigNumber(marketPrice),
+        minCoeff,
+        swapInfo.swapType.stableSwap,
+      );
+
       const { transaction, signers } = await transactionUtils.createDepositTransaction(
         poolConfig,
         program,
@@ -455,8 +473,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         lpUser,
         baseAmount,
         quoteAmount,
-        new BN(0),
-        new BN(0),
+        bnToAnchorBn(poolConfig.baseTokenInfo, minBaseShare),
+        bnToAnchorBn(poolConfig.quoteTokenInfo, minQuoteShare),
       );
 
       const signedTransaction = await signTransaction(
@@ -527,6 +545,7 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
     signTransaction,
     dispatch,
     lpUser,
+    marketPrice,
     depositView,
     program,
   ]);
