@@ -1,6 +1,8 @@
 import BigNumber from "bignumber.js";
 import { BigNumberWithConfig, validate } from "./utils";
 import { approximateOutAmount } from "./approximation";
+import { getNormalizedReserves } from "./swapOutAmount";
+import { SwapInfo, PoolState } from "../anchor/type_definitions";
 
 const FLOAT_ROUND_UP_ESPSILON: number = 0.00000000000000006;
 
@@ -269,4 +271,84 @@ export function calculateOutAmountStableSwap(
     outAmount: new BigNumber(outputBAmount.toFixed(0)),
     priceImpact,
   };
+}
+
+// Calculate expected output from Deposit multiplied by minCoeff
+// Checks if its normalSwap or stableSwap and adjusts initial splitByRatio accordingly
+export function calculateMinOutAmountDeposit(
+  swapInfo: SwapInfo,
+  baseAmount: BigNumber,
+  quoteAmount: BigNumber,
+  marketPrice: BigNumber,
+  minCoeff: BigNumber,
+): {
+  minBaseShare: BigNumber;
+  minQuoteShare: BigNumber;
+} {
+  const poolState: PoolState = swapInfo.poolState;
+  const denominator: BigNumber = swapInfo.swapType.normalSwap ? marketPrice : new BigNumber(1);
+
+  const { base, quote } = splitByRatio(baseAmount, quoteAmount, new BigNumber(1), denominator);
+
+  const { normalizedBaseReserve, normalizedQuoteReserve } = getNormalizedReserves(
+    new BigNumber(poolState.baseReserve.toString()),
+    new BigNumber(poolState.quoteReserve.toString()),
+    new BigNumber(poolState.targetBaseReserve.toString()),
+    new BigNumber(poolState.targetQuoteReserve.toString()),
+    marketPrice,
+  );
+
+  // share = supply * deposit_amount / normalized_reserve
+  let minBaseShare = new BigNumber(poolState.baseSupply.toString())
+    .multipliedBy(base)
+    .dividedBy(normalizedBaseReserve)
+    .integerValue();
+
+  // share = supply * deposit_amount / normalized_reserve
+  let minQuoteShare = new BigNumber(poolState.quoteSupply.toString())
+    .multipliedBy(quote)
+    .dividedBy(normalizedQuoteReserve)
+    .integerValue();
+
+  return {
+    minBaseShare: minBaseShare.multipliedBy(minCoeff),
+    minQuoteShare: minQuoteShare.multipliedBy(minCoeff),
+  };
+}
+
+// Split (base, quote) into (base_main, quote_main, base_residual, quote_residual)
+// - base_main/quote_main = numerator/denominator
+// - base_main + base_residual = base
+// - quote_main + quote_residual = quote
+// - base_residual = 0 or quote_residual = 0
+export function splitByRatio(
+  base: BigNumber,
+  quote: BigNumber,
+  numerator: BigNumber,
+  denominator: BigNumber,
+): {
+  base: BigNumber;
+  quote: BigNumber;
+  baseResidual: BigNumber;
+  quoteResidual: BigNumber;
+} {
+  if (base.multipliedBy(denominator).isGreaterThan(quote.multipliedBy(numerator))) {
+    const baseMain: BigNumber = quote.multipliedBy(numerator).dividedBy(denominator).integerValue();
+    const baseResidual: BigNumber = base.minus(baseMain);
+    return {
+      base: baseMain,
+      quote,
+      baseResidual,
+      quoteResidual: new BigNumber(0),
+    };
+  } else {
+    const quoteMain: BigNumber = base.multipliedBy(denominator).dividedBy(numerator).integerValue();
+    const quoteResidual: BigNumber = quote.minus(quoteMain);
+    return {
+      base,
+      quote: quoteMain,
+      baseResidual: new BigNumber(0),
+      quoteResidual,
+    };
+  }
 }
