@@ -566,6 +566,10 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
       const baseShare = new BN(base.share);
       const quoteShare = new BN(quote.share);
 
+      const minCoeff = new BigNumber(0.99);
+      const minBaseAmount = minCoeff.multipliedBy(new BigNumber(depositView.base.amount));
+      const minQuoteAmount = minCoeff.multipliedBy(new BigNumber(depositView.quote.amount));
+
       const { transaction, signers } = await transactionUtils.createWithdrawTransaction(
         poolConfig,
         program,
@@ -575,8 +579,8 @@ const Deposit: React.FC<{ poolAddress?: string }> = (props) => {
         walletPubkey,
         baseShare,
         quoteShare,
-        new BN(0),
-        new BN(0),
+        bnToAnchorBn(poolConfig.baseTokenInfo, minBaseAmount),
+        bnToAnchorBn(poolConfig.quoteTokenInfo, minQuoteAmount),
       );
 
       const signedTransaction = await signTransaction(
