@@ -8,7 +8,7 @@ import BigNumber from "bignumber.js";
 import { useSelector } from "react-redux";
 import { selectTokenAccountInfoByMint } from "states/selectors";
 import { getTokenConfigBySymbol } from "constants/deployConfigV2";
-import { anchorBnToBn } from "utils/tokenUtils";
+import { anchorBnToBn } from "calculations/tokenUtils";
 import { BN } from "@project-serum/anchor";
 import { Box } from "@mui/material";
 

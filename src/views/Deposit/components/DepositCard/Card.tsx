@@ -12,7 +12,7 @@ import { tokenConfigs } from "constants/deployConfigV2";
 import BigNumber from "bignumber.js";
 import { useSelector } from "react-redux";
 import { selectTokenAccountInfoByMint } from "states";
-import { anchorBnToBn } from "utils/tokenUtils";
+import { anchorBnToBn } from "calculations/tokenUtils";
 import BN from "bn.js";
 
 const DepositCard: React.FC<DepositCardProps> = (props) => {

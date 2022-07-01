@@ -51,7 +51,7 @@ import {
 import { getTokenBalanceDiffFromTransaction } from "utils/transactions/utils";
 import { swapViewActions } from "states/views/swapView";
 import { createSwapTransaction } from "utils/transactions/swap";
-import { anchorBnToString, stringToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToString, stringToAnchorBn } from "calculations/tokenUtils";
 import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import BN from "bn.js";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";

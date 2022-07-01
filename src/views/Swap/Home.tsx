@@ -61,7 +61,7 @@ import { fecthTokenAccountInfoList } from "states/accounts/tokenAccount";
 import { createSwapTransaction } from "utils/transactions/swap";
 import { BN } from "@project-serum/anchor";
 import { fetchDeltafiUserThunk } from "states/accounts/deltafiUserAccount";
-import { anchorBnToBn, anchorBnToString, stringToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToBn, anchorBnToString, stringToAnchorBn } from "calculations/tokenUtils";
 import { DeltafiUser, SwapInfo } from "anchor/type_definitions";
 import Autocomplete from "@material-ui/lab/Autocomplete/Autocomplete";
 import CompareArrows from "components/Svg/icons/CompareArrows";

@@ -34,11 +34,11 @@ import { stakeViewActions } from "states/views/stakeView";
 import { createUpdateStakeTransaction } from "utils/transactions/stake";
 import { sendSignedTransaction } from "utils/transactions";
 import { fetchLiquidityProvidersThunk } from "states/accounts/liqudityProviderAccount";
-import { anchorBnToBn, bnToAnchorBn, stringToAnchorBn } from "utils/tokenUtils";
+import { anchorBnToBn, bnToAnchorBn, stringToAnchorBn } from "calculations/tokenUtils";
 import { fetchFarmUsersThunk } from "states/accounts/farmUserAccount";
 import { Link } from "@mui/material";
 import Slider from "./components/Slider";
-import { calculateWithdrawalFromShares } from "lib/calc";
+import { calculateWithdrawalFromShares } from "calculations/calculation";
 import { formatCurrencyAmount } from "utils/utils";
 
 const Stake = (): ReactElement => {

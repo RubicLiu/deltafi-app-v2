@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { PublicKey } from "@solana/web3.js";
 import { BN } from "@project-serum/anchor";
 import { TokenConfig } from "constants/deployConfigV2";
-import { anchorBnToBn } from "./tokenUtils";
+import { anchorBnToBn } from "../calculations/tokenUtils";
 import { SwapInfo } from "anchor/type_definitions";
 
 export const currencyValueDisplay = (value) => {
