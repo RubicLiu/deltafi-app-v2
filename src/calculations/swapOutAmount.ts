@@ -1,7 +1,8 @@
 import BigNumber from "bignumber.js";
 import { calculateOutAmountNormalSwap, calculateOutAmountStableSwap } from "./calculation";
 import { PoolState, SwapConfig, SwapInfo, SwapDirection } from "../anchor/type_definitions";
-import { WAD, bnToString, exponentiate, exponentiatedBy, getOppsiteSwapDirection } from "./utils";
+import { WAD, exponentiate, exponentiatedBy, getOppsiteSwapDirection } from "./utils";
+import { bnToString } from "./tokenUtils";
 import { TokenConfig } from "./types";
 import { getPythMarketPriceTuple, SymbolToPythPriceData } from "../anchor/pyth_utils";
 

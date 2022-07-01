@@ -20,10 +20,6 @@ export function validate(expression: boolean, errMsg: string) {
   }
 }
 
-export function bnToString(tokenConfig: TokenConfig, amount: BigNumber): string {
-  return amount.toFixed(tokenConfig.decimals);
-}
-
 const ClonedBignumber = BigNumber.clone({
   FORMAT: {
     decimalSeparator: ".",
