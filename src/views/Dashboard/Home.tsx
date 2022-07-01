@@ -40,14 +40,14 @@ import {
 import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
 import { getPythMarketPrice } from "states/accounts/pythAccount";
-import { calculateWithdrawalFromShares } from "lib/calc";
+import { calculateWithdrawalFromShares } from "calculations/calculation";
 import { formatCurrencyAmount } from "utils/utils";
 import { CircularProgress } from "@material-ui/core";
 import { dashboardViewActions } from "states/views/dashboardView";
 import { calculateFarmPoolsStakeInfo } from "views/Farm/utils";
 import { PoolCardColor } from "utils/type";
 import { exponentiatedBy } from "calculations/utils";
-import { anchorBnToBn, stringCutDecimals } from "utils/tokenUtils";
+import { anchorBnToBn, stringCutDecimals } from "calculations/tokenUtils";
 import { SECONDS_PER_YEAR } from "constants/index";
 import { rewardViewActions } from "states/views/rewardView";
 import BN from "bn.js";

@@ -5,7 +5,7 @@ import { TokenConfig } from "constants/deployConfigV2";
 import BigNumber from "bignumber.js";
 import { SwapInfo } from "anchor/type_definitions";
 import { WAD } from "constants/index";
-import { stringCutDecimals } from "utils/tokenUtils";
+import { stringCutDecimals } from "calculations/tokenUtils";
 import { Avatar } from "@mui/material";
 import { convertDollarSign, currencyValueDisplay } from "utils/utils";
 

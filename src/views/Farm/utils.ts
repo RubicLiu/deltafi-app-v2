@@ -5,7 +5,7 @@ import { FarmPoolKeyToFarm } from "states/accounts/farmAccount";
 import { FarmPoolKeyToFarmUser } from "states/accounts/farmUserAccount";
 import { getPythPrice } from "states/accounts/pythAccount";
 import { SwapPoolKeyToSwap } from "states/accounts/swapAccount";
-import { anchorBnToBn } from "utils/tokenUtils";
+import { anchorBnToBn } from "calculations/tokenUtils";
 import { getTokenShareTvl, getTokenTvl } from "utils/utils";
 
 export type FarmInfoData = {

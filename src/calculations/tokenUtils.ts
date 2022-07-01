@@ -1,7 +1,7 @@
 import { BN } from "@project-serum/anchor";
 import BigNumber from "bignumber.js";
-import { TokenConfig } from "constants/deployConfigV2";
-import { exponentiate, exponentiatedBy } from "./decimal";
+import { TokenConfig } from "./types";
+import { exponentiate, exponentiatedBy } from "./utils";
 
 export function bnToString(tokenConfig: TokenConfig, amount: BigNumber): string {
   return amount.toFixed(tokenConfig.decimals);

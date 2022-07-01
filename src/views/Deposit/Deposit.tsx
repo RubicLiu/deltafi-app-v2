@@ -40,16 +40,18 @@ import {
   bnToAnchorBn,
   stringCutTokenDecimals,
   stringToAnchorBn,
-} from "utils/tokenUtils";
+} from "calculations/tokenUtils";
 import { LiquidityProvider, SwapInfo } from "anchor/type_definitions";
 import { scheduleWithInterval } from "utils";
 import WithdrawSelectCard from "./components/WithdrawSelectCard/Card";
 import DepositCard from "./components/DepositCard/Card";
 import { IDepositCard } from "./components/DepositCard/types";
-import { calculateWithdrawalFromShares } from "lib/calc";
 import BN from "bn.js";
 import * as transactionUtils from "anchor/transaction_utils";
-import { calculateMinOutAmountDeposit } from "calculations/calculation";
+import {
+  calculateMinOutAmountDeposit,
+  calculateWithdrawalFromShares,
+} from "calculations/calculation";
 import PoolStatsCollapsible from "components/PoolStats/PoolStats";
 import { calculatePoolTvl } from "views/Pool/utils";
 

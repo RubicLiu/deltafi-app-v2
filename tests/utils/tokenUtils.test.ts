@@ -1,4 +1,4 @@
-import { stringCutDecimals } from "../../src/utils/tokenUtils";
+import { stringCutDecimals } from "../../src/calculations/tokenUtils";
 
 describe("utils/tokenUtils", function () {
   it("stringCutDecimals", function () {

@@ -1,7 +1,7 @@
 import {
   calculateWithdrawalFromShares,
   calculateWithdrawFromSharesAndBalances,
-} from "../../../src/lib/calc/withdraw";
+} from "../../../src/calculations/calculation";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
 
