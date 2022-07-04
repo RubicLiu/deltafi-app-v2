@@ -5,6 +5,8 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { ConnectButton } from "components";
 import WalletPanel from "components/BurgerMenu/WalletPanel";
 import { Box } from "@mui/material";
+import { useLocation } from "react-router";
+import WalletPanel_v2 from "components/BurgerMenu/WalletPanel_v2";
 
 const Img = styled.img`
   width: 24px;
@@ -30,6 +32,7 @@ const WalletButton: React.FC<ButtonProps> = (props) => {
   const { wallet, publicKey } = useWallet();
   const classes = useStyles(props);
   const accountAddress = publicKey ? publicKey.toString() : "";
+  const location = useLocation();
 
   return (
     <>
@@ -48,7 +51,11 @@ const WalletButton: React.FC<ButtonProps> = (props) => {
         className={classes.snackBar}
         open={open}
       >
-        <WalletPanel />
+        {location.pathname.substring(1) === "bridge" ? (
+          <WalletPanel_v2></WalletPanel_v2>
+        ) : (
+          <WalletPanel />
+        )}
       </Snackbar>
     </>
   );

@@ -680,14 +680,10 @@ const Home: React.FC = (props) => {
             alt="snack-status-icon"
             className={classes.snackBarIcon}
           />
-          <Box>
-            <Typography variant="h6" color="primary">
-              Transaction failed(try again later)
-            </Typography>
+          <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+            <Box>Transaction failed(try again later)</Box>
             <Box>
-              <Typography variant="body1" color="primary">
-                failed to send transaction: Transaction simulation failed: Blockhash not found
-              </Typography>
+              failed to send transaction: Transaction simulation failed: Blockhash not found
             </Box>
           </Box>
         </Box>
@@ -703,15 +699,15 @@ const Home: React.FC = (props) => {
           className={classes.snackBarIcon}
         />
         <Box>
-          <Typography variant="body1" color="primary">
+          <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
             {`Swap ${Number(base.amount).toFixed(base.token.decimals)} ${
               base.token.symbol
             } to ${Number(quote.amount).toFixed(quote.token.decimals)} ${quote.token.symbol}`}
-          </Typography>
+          </Box>
           <Box display="flex" alignItems="center">
-            <Typography variant="subtitle2" color="primary">
+            <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
               View Transaction:
-            </Typography>
+            </Box>
             <Link
               className={classes.snackBarLink}
               target="_blank"

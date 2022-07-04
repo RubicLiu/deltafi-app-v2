@@ -7,4 +7,6 @@ export interface DropDownProps<T extends TokenConfig> {
   onChange: (value: T) => void;
   inputProps?: InputBaseProps;
   disableDrop?: boolean;
+  size?: "large";
+  variant?: "network";
 }

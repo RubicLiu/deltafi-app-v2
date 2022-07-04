@@ -16,8 +16,9 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     background: palette.background.secondary,
     padding: spacing(2),
     borderRadius: 16,
+    fontFamily: "Poppins",
     [breakpoints.up("md")]: {
-      padding: `${spacing(3)}px ${spacing(2.5)}px`,
+      padding: `${spacing(2.5)}px ${spacing(3)}px`,
     },
   },
   main: {
@@ -25,7 +26,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     justifyContent: "space-between",
     marginBottom: 8,
     [breakpoints.up("md")]: {
-      marginBottom: 16,
+      marginBottom: 14,
     },
   },
   ratePanel: {
@@ -56,6 +57,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontSize: 14,
     fontWeight: 400,
     width: "100%",
+    fontFamily: "Poppins",
     flex: 1,
     [breakpoints.up("md")]: {
       fontSize: 24,
@@ -66,7 +68,6 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
   },
   tokenBalance: {
     color: palette.text.dark,
-    fontFamily: "Inter",
     fontSize: 12,
     fontWeight: 500,
     [breakpoints.up("md")]: {
@@ -154,6 +155,7 @@ const SwapCard: React.FC<CardProps> = (props) => {
           alignItems="center"
           color="#d3d3d3"
           fontSize={16}
+          fontWeight={500}
         >
           Chain
         </Box>
@@ -161,8 +163,10 @@ const SwapCard: React.FC<CardProps> = (props) => {
           value={card.token}
           options={tokens}
           onChange={handleChangeToken}
-          inputProps={{ placeholder: "token name, symbol" }}
+          inputProps={{ placeholder: "Chain Name, Symbol" }}
           disableDrop={disableDrop}
+          size="large"
+          variant="network"
         />
       </Box>
       <Box className={classes.main}>
@@ -182,15 +186,13 @@ const SwapCard: React.FC<CardProps> = (props) => {
           value={card.token}
           options={tokens}
           onChange={handleChangeToken}
-          inputProps={{ placeholder: "token name, symbol" }}
+          inputProps={{ placeholder: "Token Name, Symbol" }}
           disableDrop={disableDrop}
+          size="large"
         />
       </Box>
       <Box display="flex" justifyContent="space-between">
-        <Typography className={classes.tokenBalance}>{`Balance: ${
-          tokenBalance?.toString() ?? "--"
-        }`}</Typography>
-        <Typography className={classes.tokenBalance}>--%</Typography>
+        <Box className={classes.tokenBalance}>{`Balance: ${tokenBalance?.toString() ?? "--"}`}</Box>
       </Box>
     </Paper>
   );

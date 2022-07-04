@@ -5,6 +5,7 @@ import { ConnectButton, TabMenu, WalletButton } from "components";
 import { useModal } from "providers/modal";
 import { HOMEPAGE_LINK } from "constants/index";
 import { Box, Link } from "@mui/material";
+import { useLocation } from "react-router";
 
 const useStyles = makeStyles(({ breakpoints, palette }: Theme) => ({
   header: {
@@ -47,10 +48,19 @@ const Header: React.FC = (props) => {
   const classes = useStyles(props);
   const { connected: isConnectedWallet } = useWallet();
   const { setMenu } = useModal();
+  const location = useLocation();
 
   useEffect(() => {
     if (isConnectedWallet) setMenu(false, "");
   }, [isConnectedWallet, setMenu]);
+
+  const handleConnect = () => {
+    if (location.pathname.substring(1) === "bridge") {
+      setMenu(true, "connectV2");
+    } else {
+      setMenu(true, "connect");
+    }
+  };
 
   return (
     <AppBar position="fixed" className={classes.header}>
@@ -79,7 +89,7 @@ const Header: React.FC = (props) => {
           {isConnectedWallet ? (
             <WalletButton />
           ) : (
-            <ConnectButton size="small" onClick={() => setMenu(true, "connect")}>
+            <ConnectButton size="small" onClick={handleConnect}>
               <Box fontSize={16}>Connect wallet</Box>
             </ConnectButton>
           )}

@@ -78,11 +78,9 @@ const ConnectItem = styled.div<ConnectProps>`
   text-align: center;
   cursor: ${({ isAccept }) => (isAccept ? "pointer" : "unset")};
 
-  ${({ theme }) => theme.muibreakpoints.down("lg")} {
+  ${({ theme }) => theme.muibreakpoints.up("md")} {
     height: 64px;
-  }
-  ${({ theme }) => theme.muibreakpoints.down("md")} {
-    height: 64px;
+    width: 232px;
   }
 `;
 const Img = styled.img`

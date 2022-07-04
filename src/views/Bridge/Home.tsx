@@ -61,7 +61,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     maxWidth: 550,
     margin: "0 auto",
     flex: 1,
-    marginTop: "56px",
+    marginTop: "40px",
   },
   root: {
     background: palette.background.primary,
@@ -98,7 +98,7 @@ const useStyles = makeStyles(({ breakpoints, palette, spacing }: Theme) => ({
     fontWeight: 400,
   },
   snackBarContent: {
-    maxWidth: 421,
+    maxWidth: 393,
     backgroundColor: palette.background.lightBlack,
     display: "flex",
     flexWrap: "unset",
@@ -501,19 +501,19 @@ const Home: React.FC = (props) => {
   ]);
 
   const handleSwap = useCallback(async () => {
-    if (tokenFrom.amount) {
-      setMenu(true, "confirm-swap", undefined, {
-        tokenFrom,
-        tokenTo,
-        slippage: parseFloat(maxSlippage),
-        callback: swapCallback,
-      });
-    }
+    // if (tokenFrom.amount) {
+    setMenu(true, "confirm-bridge-swap", undefined, {
+      tokenFrom,
+      tokenTo,
+      slippage: parseFloat(maxSlippage),
+      callback: swapCallback,
+    });
+    // }
   }, [tokenFrom, tokenTo, maxSlippage, swapCallback, setMenu]);
   const network = deployConfigV2.network;
 
   const snackMessasge = useMemo(() => {
-    if (!swapView?.transactionResult?.status) {
+    if (!swapView.transactionResult || !swapView.transactionResult.status) {
       return (
         <Box display="flex" alignItems="center">
           <img
@@ -521,14 +521,10 @@ const Home: React.FC = (props) => {
             alt="snack-status-icon"
             className={classes.snackBarIcon}
           />
-          <Box>
-            <Typography variant="h6" color="primary">
-              Transaction failed(try again later)
-            </Typography>
+          <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
+            <Box>Transaction failed(try again later)</Box>
             <Box>
-              <Typography variant="body1" color="primary">
-                failed to send transaction: Transaction simulation failed: Blockhash not found
-              </Typography>
+              failed to send transaction: Transaction simulation failed: Blockhash not found
             </Box>
           </Box>
         </Box>
@@ -536,7 +532,6 @@ const Home: React.FC = (props) => {
     }
 
     const { base, quote, signature } = swapView.transactionResult;
-
     return (
       <Box display="flex" alignItems="center">
         <img
@@ -545,17 +540,15 @@ const Home: React.FC = (props) => {
           className={classes.snackBarIcon}
         />
         <Box>
-          <Typography variant="body1" color="primary">
+          <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
             {`Swap ${Number(base.amount).toFixed(base.token.decimals)} ${
               base.token.symbol
-            } to ${Number(quote.amount).toFixed(quote.token.decimals)} ${quote.token.symbol} for ${
-              base.token.symbol
-            }-${quote.token.symbol} Pool`}
-          </Typography>
+            } to ${Number(quote.amount).toFixed(quote.token.decimals)} ${quote.token.symbol}`}
+          </Box>
           <Box display="flex" alignItems="center">
-            <Typography variant="subtitle2" color="primary">
+            <Box fontSize={14} fontWeight={400} lineHeight={1.5} color="#fff">
               View Transaction:
-            </Typography>
+            </Box>
             <Link
               className={classes.snackBarLink}
               target="_blank"
@@ -567,7 +560,7 @@ const Home: React.FC = (props) => {
         </Box>
       </Box>
     );
-  }, [swapView.transactionResult, classes, network]);
+  }, [swapView, classes, network]);
 
   const snackAction = useMemo(() => {
     return (
@@ -597,13 +590,13 @@ const Home: React.FC = (props) => {
           fullWidth
           size="large"
           variant="contained"
-          disabled={
-            unavailable ||
-            isZeroFromAmount ||
-            sourceAccountNonExist ||
-            isInsufficientBalance ||
-            isInsufficientLiquidity
-          }
+          // disabled={
+          //   unavailable ||
+          //   isZeroFromAmount ||
+          //   sourceAccountNonExist ||
+          //   isInsufficientBalance ||
+          //   isInsufficientLiquidity
+          // }
           onClick={handleSwap}
           data-amp-analytics-on="click"
           data-amp-analytics-name="click"

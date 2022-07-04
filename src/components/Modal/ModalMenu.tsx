@@ -5,6 +5,7 @@ import ConnectPanel from "components/BurgerMenu/ConnectPanel";
 import WalletPanel from "components/BurgerMenu/WalletPanel";
 import ConfirmSwapPanel from "components/BurgerMenu/ConfirmSwapPanel";
 import ConnectPanelV2 from "components/BurgerMenu/ConnectPanel_v2";
+import ConfirmBridgeSwap from "components/BurgerMenu/ConfirmBridgeSwapPanel";
 import StakeV2 from "views/Stake/Stake";
 import Deposit from "views/Deposit/Deposit";
 // import Stake from "views/Stake/Stake";
@@ -55,6 +56,8 @@ export default function ModalMenu() {
         return <WalletPanel />;
       case "confirm-swap":
         return <ConfirmSwapPanel />;
+      case "confirm-bridge-swap":
+        return <ConfirmBridgeSwap />;
       case "deposit":
         return <Deposit />;
       case "stake":
