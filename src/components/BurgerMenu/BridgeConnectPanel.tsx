@@ -111,14 +111,17 @@ const BridgeConnectPanel: React.FC = (props) => {
   const { setMenu } = useModal();
   const [isAccept, setAccept] = useState(false);
   const [selectedNetworkIdx, setSelectedNetworkIdx] = useState(0);
-  const [wallet1Connected, setWallet1] = useState(null);
-  const [wallet2Connected, setWallet2] = useState(null);
+  const [sourceWalletConnected, setSourceWallet] = useState(null);
+  const [destinationWalletConnected, setDestinationWallet] = useState(null);
   const classes = useStyles(props);
 
   const onConnectWallet = async (type: Wallet) => {
     // mock setwallet
-    if (selectedNetworkIdx === 0) setWallet1(type);
-    else setWallet2(type);
+    if (selectedNetworkIdx === 0) {
+      setSourceWallet(type);
+    } else {
+      setDestinationWallet(type);
+    }
     // if (!isAccept) {
     //   return;
     // }
@@ -177,7 +180,7 @@ const BridgeConnectPanel: React.FC = (props) => {
           <CloseIcon />
         </IconButton>
       </Box>
-      {!!wallet1Connected === !!wallet2Connected ? (
+      {!!sourceWalletConnected === !!destinationWalletConnected ? (
         <>
           <Box className={classes.content}>
             <Box className={classes.label}>Choose Network</Box>
@@ -202,7 +205,8 @@ const BridgeConnectPanel: React.FC = (props) => {
                   >
                     {item.name}
                   </Typography>
-                  {((index === 0 && wallet1Connected) || (index === 1 && wallet2Connected)) && (
+                  {((index === 0 && sourceWalletConnected) ||
+                    (index === 1 && destinationWalletConnected)) && (
                     <CheckIcon
                       sx={{ height: 16, marginRight: 0, marginLeft: "auto", color: "#D4FF00" }}
                     />
@@ -214,7 +218,7 @@ const BridgeConnectPanel: React.FC = (props) => {
           <Divider flexItem sx={{ backgroundColor: "#313131", marginTop: 3 }} />
           <Box className={classes.content}>
             <Box className={classes.label}>Choose Wallet</Box>
-            {wallet2Connected ? (
+            {destinationWalletConnected ? (
               <>
                 <Box
                   sx={{
@@ -231,7 +235,7 @@ const BridgeConnectPanel: React.FC = (props) => {
                   pr={5}
                   mt={2}
                 >
-                  <Box component="img" mr={2} src={wallet1Connected.icon} height={28}></Box>
+                  <Box component="img" mr={2} src={sourceWalletConnected.icon} height={28}></Box>
                   <Box color="#fff">8iaU1RZ9Dhy9U...dzK1NEVseHdh5</Box>
                   <Box ml="auto" mr={0}>
                     <CopyAddressIcon height={22} color="#D4FF00" />
@@ -309,7 +313,7 @@ const BridgeConnectPanel: React.FC = (props) => {
               variant="network"
             />
           </Box>
-          {wallet1Connected ? (
+          {sourceWalletConnected ? (
             <>
               <Box
                 sx={{
@@ -326,7 +330,7 @@ const BridgeConnectPanel: React.FC = (props) => {
                 pr={5}
                 mt={2}
               >
-                <Box component="img" mr={2} src={wallet1Connected.icon} height={28}></Box>
+                <Box component="img" mr={2} src={sourceWalletConnected.icon} height={28}></Box>
                 <Box color="#fff">8iaU1RZ9Dhy9U...dzK1NEVseHdh5</Box>
                 <Box ml="auto" mr={0}>
                   <CopyAddressIcon height={22} color="#D4FF00" />
@@ -354,7 +358,7 @@ const BridgeConnectPanel: React.FC = (props) => {
                   <ConnectItem
                     key={`w-item-${index}`}
                     isAccept={isAccept}
-                    onClick={() => setWallet1(item)}
+                    onClick={() => setSourceWallet(item)}
                     data-amp-analytics-name="click"
                     data-amp-analytics-attrs="page: Menu, target: ConnectLedger"
                   >
@@ -408,7 +412,7 @@ const BridgeConnectPanel: React.FC = (props) => {
               variant="network"
             />
           </Box>
-          {wallet2Connected ? (
+          {destinationWalletConnected ? (
             <>
               <Box
                 sx={{
@@ -425,7 +429,7 @@ const BridgeConnectPanel: React.FC = (props) => {
                 pr={5}
                 mt={2}
               >
-                <Box component="img" mr={2} src={wallet2Connected.icon} height={28}></Box>
+                <Box component="img" mr={2} src={destinationWalletConnected.icon} height={28}></Box>
                 <Box color="#fff">8iaU1RZ9Dhy9U...dzK1NEVseHdh5</Box>
                 <Box ml="auto" mr={0}>
                   <CopyAddressIcon height={22} color="#D4FF00" />
@@ -453,7 +457,7 @@ const BridgeConnectPanel: React.FC = (props) => {
                   <ConnectItem
                     key={`w-item-${index}`}
                     isAccept={isAccept}
-                    onClick={() => setWallet2(item)}
+                    onClick={() => setDestinationWallet(item)}
                     data-amp-analytics-name="click"
                     data-amp-analytics-attrs="page: Menu, target: ConnectLedger"
                   >
