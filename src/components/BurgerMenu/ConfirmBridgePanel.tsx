@@ -1,9 +1,7 @@
 import { ReactElement, ReactNode, useMemo } from "react";
 import { IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-
 import { ConnectButton } from "components";
-
 import { useModal } from "providers/modal";
 import { calculateSwapOutResult } from "calculations/swapOutAmount";
 import { fixedNumber } from "utils/utils";

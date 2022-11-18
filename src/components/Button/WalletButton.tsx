@@ -3,10 +3,10 @@ import { ButtonProps, makeStyles, Snackbar } from "@material-ui/core";
 import styled from "styled-components";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ConnectButton } from "components";
-import WalletPanel from "components/BurgerMenu/WalletPanel";
+import WalletPanel from "components/BurgerMenu/SwapWalletPanel";
 import { Box } from "@mui/material";
 import { useLocation } from "react-router";
-import WalletPanel_v2 from "components/BurgerMenu/WalletPanel_v2";
+import BridgeWalletPanel from "components/BurgerMenu/BridgeWalletPanel";
 
 const Img = styled.img`
   width: 24px;
@@ -52,7 +52,7 @@ const WalletButton: React.FC<ButtonProps> = (props) => {
         open={open}
       >
         {location.pathname.substring(1) === "bridge" ? (
-          <WalletPanel_v2></WalletPanel_v2>
+          <BridgeWalletPanel></BridgeWalletPanel>
         ) : (
           <WalletPanel />
         )}

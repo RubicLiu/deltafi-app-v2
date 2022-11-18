@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { CopyAddressIcon } from "components";
 import { useModal } from "providers/modal";
 import { CheckOutlined } from "@material-ui/icons";
-// import Reset from "components/Svg/icons/Reset";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { Avatar, Box, Fade } from "@mui/material";
 import CompareArrows from "components/Svg/icons/CompareArrows";
@@ -96,7 +95,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) 
 // TODO: generate real swap history
 const swapHistory = [{}];
 
-const WalletPanel: React.FC = (props) => {
+const BridgeWalletPanel: React.FC = (props) => {
   const { wallet, disconnect, publicKey } = useWallet();
   const { setMenu } = useModal();
   const [copyMessageOpen, setCopyMessageOpen] = useState(false);
@@ -261,4 +260,4 @@ const WalletPanel: React.FC = (props) => {
   );
 };
 
-export default WalletPanel;
+export default BridgeWalletPanel;

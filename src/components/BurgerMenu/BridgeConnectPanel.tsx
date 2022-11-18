@@ -2,10 +2,10 @@ import { useState } from "react";
 import styled from "styled-components";
 import CloseIcon from "@material-ui/icons/Close";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { Wallet, WalletName } from "@solana/wallet-adapter-wallets";
+import { Wallet } from "@solana/wallet-adapter-wallets";
 import { Checkbox, IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
 import { useModal } from "providers/modal";
-import { CheckBoxOutlineBlankOutlined, CheckBoxOutlined, CheckOutlined } from "@material-ui/icons";
+import { CheckBoxOutlineBlankOutlined, CheckBoxOutlined } from "@material-ui/icons";
 import CheckIcon from "@mui/icons-material/Check";
 import { Box, Divider } from "@mui/material";
 import DropDown from "components/ChainDropdown";
@@ -105,7 +105,7 @@ const Img = styled.img`
   }
 `;
 
-const ConnectPanel: React.FC = (props) => {
+const BridgeConnectPanel: React.FC = (props) => {
   const wallet = useWallet();
 
   const { setMenu } = useModal();
@@ -117,7 +117,7 @@ const ConnectPanel: React.FC = (props) => {
 
   const onConnectWallet = async (type: Wallet) => {
     // mock setwallet
-    if (selectedNetworkIdx == 0) setWallet1(type);
+    if (selectedNetworkIdx === 0) setWallet1(type);
     else setWallet2(type);
     // if (!isAccept) {
     //   return;
@@ -177,7 +177,7 @@ const ConnectPanel: React.FC = (props) => {
           <CloseIcon />
         </IconButton>
       </Box>
-      {!!wallet1Connected == !!wallet2Connected ? (
+      {!!wallet1Connected === !!wallet2Connected ? (
         <>
           <Box className={classes.content}>
             <Box className={classes.label}>Choose Network</Box>
@@ -187,7 +187,7 @@ const ConnectPanel: React.FC = (props) => {
                   key={`w-item-${index}`}
                   isAccept={isAccept}
                   onClick={() => setSelectedNetworkIdx(index)}
-                  className={index == selectedNetworkIdx ? "selected" : ""}
+                  className={index === selectedNetworkIdx ? "selected" : ""}
                   data-amp-analytics-name="click"
                   data-amp-analytics-attrs="page: Menu, target: ConnectLedger"
                 >
@@ -202,7 +202,7 @@ const ConnectPanel: React.FC = (props) => {
                   >
                     {item.name}
                   </Typography>
-                  {((index == 0 && wallet1Connected) || (index == 1 && wallet2Connected)) && (
+                  {((index === 0 && wallet1Connected) || (index === 1 && wallet2Connected)) && (
                     <CheckIcon
                       sx={{ height: 16, marginRight: 0, marginLeft: "auto", color: "#D4FF00" }}
                     />
@@ -501,4 +501,4 @@ const ConnectPanel: React.FC = (props) => {
   );
 };
 
-export default ConnectPanel;
+export default BridgeConnectPanel;

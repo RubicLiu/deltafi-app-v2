@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import CurrencyInput from "react-currency-input-field";
-import { Box, makeStyles, Paper, Theme, Typography } from "@material-ui/core";
-
+import { Box, makeStyles, Paper, Theme } from "@material-ui/core";
 import { DropDown } from "components";
 import { CardProps } from "./types";
 import { exponentiatedBy } from "utils/decimal";

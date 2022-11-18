@@ -1,14 +1,12 @@
 import { createRef, ReactElement } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-
-import ConnectPanel from "components/BurgerMenu/ConnectPanel";
-import WalletPanel from "components/BurgerMenu/WalletPanel";
+import SwapConnectPanel from "components/BurgerMenu/SwapConnectPanel";
+import WalletPanel from "components/BurgerMenu/SwapWalletPanel";
 import ConfirmSwapPanel from "components/BurgerMenu/ConfirmSwapPanel";
-import ConnectPanelV2 from "components/BurgerMenu/ConnectPanel_v2";
-import ConfirmBridgeSwap from "components/BurgerMenu/ConfirmBridgeSwapPanel";
+import BridgeConnectPanel from "components/BurgerMenu/BridgeConnectPanel";
+import ConfirmBridgeSwap from "components/BurgerMenu/ConfirmBridgePanel";
 import StakeV2 from "views/Stake/Stake";
 import Deposit from "views/Deposit/Deposit";
-// import Stake from "views/Stake/Stake";
 import { useModal } from "providers/modal";
 import { Modal, Fade, Backdrop } from "@mui/material";
 import styled from "styled-components";
@@ -35,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+
 const StyledBackdrop = styled(Backdrop)`
   &.MuiBackdrop-root {
     background-color: rgba(51, 51, 51, 0.9);
@@ -49,9 +48,9 @@ export default function ModalMenu() {
   const renderModalContent = (): ReactElement => {
     switch (menu) {
       case "connect":
-        return <ConnectPanel />;
+        return <SwapConnectPanel />;
       case "connectV2":
-        return <ConnectPanelV2 />;
+        return <BridgeConnectPanel />;
       case "wallet":
         return <WalletPanel />;
       case "confirm-swap":

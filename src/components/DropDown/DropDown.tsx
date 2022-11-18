@@ -262,14 +262,14 @@ const DropDown = <T extends TokenConfig>(props: DropDownProps<T> & { children?: 
                         display="flex"
                         flexDirection="column"
                         height={32}
-                        justifyContent={props.variant == "network" ? "center" : "space-between"}
+                        justifyContent={props.variant === "network" ? "center" : "space-between"}
                       >
                         {classes.symbol && <Box className={classes.symbol}>{option.symbol}</Box>}
-                        {props.variant == "network" || (
+                        {props.variant === "network" || (
                           <Box className={classes.optionLabel}>{option.name}</Box>
                         )}
                       </Box>
-                      {option.symbol && props.variant != "network" && (
+                      {option.symbol && props.variant !== "network" && (
                         <Box className={classes.optionLabel}>
                           {"0"} {option.symbol}
                         </Box>

@@ -4,7 +4,6 @@ import CloseIcon from "@material-ui/icons/Close";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Wallet, WalletName } from "@solana/wallet-adapter-wallets";
 import { Box, Checkbox, IconButton, makeStyles, Theme, Typography } from "@material-ui/core";
-
 import { useModal } from "providers/modal";
 import { CheckBoxOutlineBlankOutlined, CheckBoxOutlined } from "@material-ui/icons";
 
