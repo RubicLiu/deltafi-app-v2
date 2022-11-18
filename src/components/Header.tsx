@@ -56,6 +56,7 @@ const Header: React.FC = (props) => {
 
   const handleConnect = () => {
     if (location.pathname.substring(1) === "bridge") {
+      // TODO (deltafilzr): rename connectV2 to a better one
       setMenu(true, "connectV2");
     } else {
       setMenu(true, "connect");
